@@ -1,10 +1,20 @@
+# SkyClues visual identity (see skyclues/theme.py): white page, ink text, hairlines, one warm accent.
 [theme]
 base = "light"
-primaryColor = "#1f5fbf"
+primaryColor = "#14171c"
 backgroundColor = "#ffffff"
-secondaryBackgroundColor = "#f3f5f8"
-textColor = "#14181f"
-font = "sans serif"
+secondaryBackgroundColor = "#f6f7f8"
+textColor = "#14171c"
+linkColor = "#c4411c"
+borderColor = "#e3e6ea"
+dataframeBorderColor = "#e3e6ea"
+baseRadius = "0.4rem"
+showWidgetBorder = true
+baseFontSize = 15
+# Web fonts (Google Fonts) with system fallbacks: the app stays legible without network access to them.
+font = "'IBM Plex Sans':https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap, system-ui, 'Segoe UI', sans-serif"
+headingFont = "Newsreader:https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap, 'Iowan Old Style', 'Palatino Linotype', Georgia, serif"
+codeFont = "'IBM Plex Mono':https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap, ui-monospace, Consolas, monospace"
 
 [server]
 headless = true

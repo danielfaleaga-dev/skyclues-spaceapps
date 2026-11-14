@@ -139,14 +139,23 @@ def _pair(v):
     return f"{v[0]:+.2f}, {v[1]:+.2f}"
 
 
-def render(seq, report_json: str) -> None:
-    st.markdown(
-        '<div class="sc-note"><b>Buscar algo que se mueve.</b> Mide la posición de una fuente en cada exposición '
-        'SPHEREx original (IMAGE − ZODI, VARIANCE, FLAGS y el modelo ePSF oficial), registra cada imagen con '
-        'estrellas Gaia estacionarias del campo y compara temporadas con incertidumbres. Resultados posibles: '
-        '<i>Movimiento medido</i>, <i>Evidencia insuficiente</i>, <i>Observaciones incompatibles</i> o <i>Datos '
-        'insuficientes</i>. Una posición calculada con el catálogo nunca se cuenta como detección.</div>',
-        unsafe_allow_html=True)
+def render(seq, report_json: str, level: str = "scientific") -> None:
+    """``level`` only changes the wording of the introduction; the measurement is the same."""
+    if level == "simple":
+        st.markdown(
+            '<div class="sc-note"><b>¿Se mueve algo?</b> Elija una fuente y SkyClues medirá su posición en cada '
+            'observación real, usando estrellas fijas del campo como referencia. El resultado puede ser <i>Movimiento '
+            'medido</i>, <i>Evidencia insuficiente</i>, <i>Observaciones incompatibles</i> o <i>Datos insuficientes</i>, '
+            'siempre con sus motivos. Una posición calculada con un catálogo nunca cuenta como detección.</div>',
+            unsafe_allow_html=True)
+    else:
+        st.markdown(
+            '<div class="sc-note"><b>Buscar algo que se mueve.</b> Mide la posición de una fuente en cada exposición '
+            'SPHEREx original (IMAGE − ZODI, VARIANCE, FLAGS y el modelo ePSF oficial), registra cada imagen con '
+            'estrellas Gaia estacionarias del campo y compara temporadas con incertidumbres. Resultados posibles: '
+            '<i>Movimiento medido</i>, <i>Evidencia insuficiente</i>, <i>Observaciones incompatibles</i> o <i>Datos '
+            'insuficientes</i>. Una posición calculada con el catálogo nunca se cuenta como detección.</div>',
+            unsafe_allow_html=True)
     saved = saved_investigations()
     if saved:
         with st.expander("Investigaciones reales guardadas (results/motion_*.json)"):

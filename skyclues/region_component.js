@@ -1,0 +1,397 @@
+// SkyClues · region selector.
+//
+// One region (centre RA/Dec + field-of-view diameter), three ways to change it in the same place:
+// the object search, the coordinate fields and the Atlas (Aladin Lite). Everything on screen is
+// updated here, in the browser, at interaction speed; Python only hears about a change once the
+// interaction settles (debounced), so dragging the map never reruns the application per frame.
+//
+// Loop prevention: Python owns `data.rev`. It increases only when the region was changed outside
+// this component (name resolved, saved sequence opened, link restored). The map is recentred only
+// then; the echo of our own updates comes back with the same `rev` and is ignored.
+export default function (c) {
+  const root = c.parentElement;
+  const $ = (sel) => root.querySelector(sel);
+  let S = root.__skyRegion;
+  const first = !S;
+  if (first) S = root.__skyRegion = { rev: null, cur: null, lock: false, gaiaKey: null, active: -1, items: [] };
+  S.api = c;
+  S.data = c.data;
+  const D = () => S.data;
+
+  // ---------------------------------------------------------------- numbers and formats
+  const reduced = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const normRa = (ra) => { const r = ((ra % 360) + 360) % 360; return r >= 359.99999995 ? 0 : r; };
+  const r7 = (v) => Math.round(v * 1e7) / 1e7;
+  const fovDeg = (arcmin) => Math.round((arcmin / 60) * 1e4) / 1e4;
+  const fmtRa = (v) => normRa(v).toFixed(6);
+  const fmtDec = (v) => (v < 0 ? '−' : '+') + Math.abs(v).toFixed(6);
+  const fmtArcmin = (deg) => (Math.round(deg * 600) / 10).toFixed(1);
+  const pad = (n, w) => String(n).padStart(w, '0');
+  function sexaRa(ra) {
+    let t = Math.round(normRa(ra) / 15 * 36000);           // tenths of a second of time
+    if (t >= 24 * 36000) t = 0;
+    const h = Math.floor(t / 36000), m = Math.floor((t % 36000) / 600), s = (t % 600) / 10;
+    return `${pad(h, 2)}h ${pad(m, 2)}m ${s.toFixed(1).padStart(4, '0')}s`;
+  }
+  function sexaDec(dec) {
+    const t = Math.round(Math.abs(dec) * 3600);
+    const d = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+    return `${dec < 0 ? '−' : '+'}${pad(d, 2)}° ${pad(m, 2)}′ ${pad(s, 2)}″`;
+  }
+  const clean = (t) => String(t).trim().replace(/[−–]/g, '-').replace(',', '.');
+  const DECIMAL = /^[+-]?(\d+\.?\d*|\.\d+)$/;
+  function parseRa(text) {
+    const t = clean(text);
+    if (DECIMAL.test(t)) { const v = Number(t); return v >= 0 && v < 360 ? v : NaN; }
+    const m = t.match(/^(\d{1,2})\s*[h:\s]\s*(\d{1,2})\s*[m:\s]\s*(\d{1,2}(?:\.\d*)?)\s*s?$/i);
+    if (!m) return NaN;
+    const [h, mi, s] = [Number(m[1]), Number(m[2]), Number(m[3])];
+    return h < 24 && mi < 60 && s < 60 ? (h + mi / 60 + s / 3600) * 15 : NaN;
+  }
+  function parseDec(text) {
+    const t = clean(text).replace(/°/g, 'd').replace(/[′']/g, 'm').replace(/[″"]/g, 's');
+    if (DECIMAL.test(t)) { const v = Number(t); return v >= -90 && v <= 90 ? v : NaN; }
+    const m = t.match(/^([+-]?)(\d{1,2})\s*[d:\s]\s*(\d{1,2})\s*[m:\s]\s*(\d{1,2}(?:\.\d*)?)\s*s?$/i);
+    if (!m) return NaN;
+    const [d, mi, s] = [Number(m[2]), Number(m[3]), Number(m[4])];
+    if (mi >= 60 || s >= 60) return NaN;
+    const v = (m[1] === '-' ? -1 : 1) * (d + mi / 60 + s / 3600);
+    return v >= -90 && v <= 90 ? v : NaN;
+  }
+  function sepArcsec(a, b) {
+    const k = Math.PI / 180, p1 = a.dec * k, p2 = b.dec * k, dl = (a.ra - b.ra) * k;
+    const h = Math.sin((p1 - p2) / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
+    return 2 * Math.asin(Math.min(1, Math.sqrt(h))) / k * 3600;
+  }
+  const keyOf = (r) => JSON.stringify([r7(normRa(r.ra)), r7(r.dec), r.fov]);
+
+  // ---------------------------------------------------------------- talking to Python
+  function flush(now) {
+    clearTimeout(S.flushTimer);
+    const send = () => {
+      const key = keyOf(S.cur);
+      if (key === S.sentKey) return;
+      S.sentKey = key;
+      S.api.setStateValue('region', { ra: r7(normRa(S.cur.ra)), dec: r7(S.cur.dec), fov: S.cur.fov });
+    };
+    if (now) send(); else S.flushTimer = setTimeout(send, 320);
+  }
+
+  // ---------------------------------------------------------------- the readouts
+  function paint(skip) {
+    const { ra, dec, fov } = S.cur, ra_in = $('#rg-ra'), dec_in = $('#rg-dec');
+    if (skip !== 'ra' && document.activeElement !== ra_in) { ra_in.value = fmtRa(ra); mark(ra_in, false); }
+    if (skip !== 'dec' && document.activeElement !== dec_in) { dec_in.value = fmtDec(dec); mark(dec_in, false); }
+    $('.rg-sexa-ra').textContent = sexaRa(ra);
+    $('.rg-sexa-dec').textContent = sexaDec(dec);
+    const am = fov * 60;
+    if (skip !== 'fov') $('#rg-fov').value = String(am);
+    if (skip !== 'fovn' && document.activeElement !== $('#rg-fovn')) { $('#rg-fovn').value = fmtArcmin(fov); mark($('#rg-fovn'), false); }
+    $('#rg-fov').style.setProperty('--fill', `${((am - D().fov_min * 60) / ((D().fov_max - D().fov_min) * 60)) * 100}%`);
+    const sx = Math.round(fov * 3600 / D().spherex_px), cube = Math.round(fov * 3600 / D().cube_px);
+    $('.rg-fovhint').textContent = D().level === 'simple'
+      ? `Es el trozo de cielo que se estudiará: un círculo de ${fmtArcmin(fov)}′ de diámetro (la Luna llena mide unos 30′).`
+      : `${fmtArcmin(fov)}′ = ${fov.toFixed(4)}° de diámetro · ≈ ${sx} px SPHEREx (${D().spherex_px}″) · ≈ ${cube} px del cubo (${D().cube_px}″)`;
+    chip();
+    identity();
+  }
+  function chip() {
+    let t = `Campo ${fmtArcmin(S.cur.fov)}′`;
+    if (S.aladin) {
+      const v = S.aladin.getFoV()[0];
+      t += ` · vista ${v >= 1 ? v.toFixed(2) + '°' : (v * 60).toFixed(1) + '′'}`;
+    }
+    $('.rg-chip').textContent = t;
+  }
+  function mark(input, bad, msg) {
+    input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    const m = input.closest('.rg-field').querySelector('.rg-err');
+    if (m) m.textContent = bad ? msg : '';
+  }
+  // The name belongs to the region only while the centre is still on the object.
+  function identity() {
+    const o = D().object, line = $('.rg-object'), notes = $('.rg-notes');
+    const on = o && o.anchor && sepArcsec(S.cur, { ra: o.anchor[0], dec: o.anchor[1] }) <= D().anchor_arcsec;
+    line.classList.toggle('rg-err-text', false);
+    if (S.resolving) { line.textContent = `Buscando «${S.resolving}»…`; notes.replaceChildren(); return; }
+    if (D().notice) { line.textContent = D().notice; line.classList.add('rg-err-text'); notes.replaceChildren(); return; }
+    if (on) {
+      line.innerHTML = '';
+      const b = document.createElement('b'); b.textContent = o.name; line.append(b, document.createTextNode(o.detail ? ` · ${o.detail}` : ''));
+      notes.replaceChildren(...(o.notes || []).map((n) => { const p = document.createElement('p'); p.textContent = n; return p; }));
+    } else {
+      line.textContent = o && o.name ? `Región libre (el centro ya no está sobre ${o.name}).` : 'Región libre, definida por sus coordenadas.';
+      notes.replaceChildren();
+    }
+  }
+
+  // ---------------------------------------------------------------- the map
+  function drawCircle(radius) {
+    if (!S.aladin) return;
+    const r = radius === undefined ? S.cur.fov / 2 : radius;
+    S.halo.removeAll(); S.ring.removeAll();
+    S.halo.add(S.A.circle(S.cur.ra, S.cur.dec, r));
+    S.ring.add(S.A.circle(S.cur.ra, S.cur.dec, r));
+    S.drawn = r;
+  }
+  function tweenCircle() {
+    cancelAnimationFrame(S.raf);
+    const from = S.drawn === undefined ? S.cur.fov / 2 : S.drawn, to = S.cur.fov / 2;
+    if (!S.aladin || reduced() || Math.abs(from - to) < 1e-9) { drawCircle(to); return; }
+    const t0 = performance.now(), dur = 160;
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / dur), e = 1 - (1 - k) ** 3;
+      drawCircle(from + (to - from) * e);
+      if (k < 1) S.raf = requestAnimationFrame(step);
+    };
+    S.raf = requestAnimationFrame(step);
+  }
+  // Keep the whole field visible: only zooms when the circle no longer fits (never to "follow" the FOV).
+  function keepVisible() {
+    if (!S.aladin) return;
+    const [vx, vy] = S.aladin.getFoV(), min = Math.min(vx, vy || vx);
+    if (S.cur.fov > min * 0.92) zoomTo(S.cur.fov * 1.6);
+  }
+  function zoomTo(fov) {
+    if (!reduced() && typeof S.aladin.zoomToFoV === 'function') S.aladin.zoomToFoV(fov, 0.2);
+    else S.aladin.setFoV(fov);
+  }
+  function frame() { if (S.aladin) zoomTo(Math.max(S.cur.fov * 2.5, 0.05)); }
+  function goto(ra, dec, animate) {
+    if (!S.aladin) return;
+    const [vra, vdec] = S.aladin.getRaDec();
+    const far = sepArcsec({ ra: vra, dec: vdec }, { ra, dec }) / 3600 > 6 * S.aladin.getFoV()[0];
+    const done = () => { S.lock = false; drawCircle(); chip(); };
+    S.lock = true;
+    drawCircle();
+    if (animate && !reduced() && !far && typeof S.aladin.animateToRaDec === 'function') {
+      clearTimeout(S.unlock);
+      S.aladin.animateToRaDec(ra, dec, 0.2, () => { S.aladin.gotoRaDec(ra, dec); done(); });
+      S.unlock = setTimeout(() => { if (S.lock) { S.aladin.gotoRaDec(ra, dec); done(); } }, 600);   // safety net
+    } else {
+      S.aladin.gotoRaDec(ra, dec);
+      done();
+    }
+  }
+  function onMapMove() {
+    if (S.lock || !S.aladin) return;
+    const [ra0, dec] = S.aladin.getRaDec(), ra = normRa(ra0);
+    if (sepArcsec({ ra, dec }, S.cur) < 0.001) { chip(); return; }      // redraw nudge, not a move
+    S.cur = { ...S.cur, ra, dec };
+    drawCircle(); paint(); flush();
+  }
+
+  // ---------------------------------------------------------------- changes made in the fields
+  function setCentre(ra, dec, skip) {
+    S.cur = { ...S.cur, ra: normRa(ra), dec };
+    paint(skip); goto(S.cur.ra, S.cur.dec, true); flush();
+  }
+  function setFov(arcmin, skip) {
+    const lo = D().fov_min * 60, hi = D().fov_max * 60;
+    S.cur = { ...S.cur, fov: fovDeg(Math.min(hi, Math.max(lo, arcmin))) };
+    paint(skip); tweenCircle(); keepVisible(); flush();
+  }
+  function coordField(input, parse, which, msg) {
+    let timer;
+    const apply = (strict) => {
+      clearTimeout(timer);
+      const v = parse(input.value);
+      if (Number.isNaN(v)) { if (strict && input.value.trim() !== '') mark(input, true, msg); return; }
+      mark(input, false);
+      const other = which === 'ra' ? S.cur.dec : S.cur.ra;
+      if (which === 'ra') setCentre(v, other, 'ra'); else setCentre(other, v, 'dec');
+    };
+    input.addEventListener('input', () => {          // a value still being typed must not move the map yet
+      clearTimeout(timer); mark(input, false);
+      timer = setTimeout(() => apply(true), 750);
+    });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); apply(true); } });
+    input.addEventListener('blur', () => { apply(true); if (input.getAttribute('aria-invalid') !== 'true') paint(); });
+  }
+
+  // ---------------------------------------------------------------- object search
+  const norm = (s) => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/\b(m|ngc|ic|hd|hip)\s*(?=\d)/g, '$1 ').replace(/\s+/g, ' ').trim();
+  function suggestions() {
+    const input = $('#rg-q'), list = $('#rg-list'), q = norm(input.value);
+    S.items = [];
+    if (q && document.activeElement === input) {
+      const local = D().local.filter((x) => [x.id, ...x.aliases].some((a) => norm(a).includes(q))).slice(0, 6);
+      const remote = norm(D().remote_query || '') === q ? D().remote : [];
+      const seen = new Set();
+      for (const it of [...local, ...remote]) { if (!seen.has(it.id)) { seen.add(it.id); S.items.push(it); } }
+      S.items = S.items.slice(0, 9);
+    }
+    list.replaceChildren(...S.items.map((it, i) => {
+      const li = document.createElement('li');
+      li.id = `rg-opt-${i}`; li.setAttribute('role', 'option'); li.setAttribute('aria-selected', i === S.active ? 'true' : 'false');
+      const a = document.createElement('span'); a.className = 'rg-opt-name'; a.textContent = it.id;
+      const b = document.createElement('span'); b.className = 'rg-opt-meta';
+      const alias = (it.aliases || []).filter((x) => x !== it.id).slice(0, 3).join(', ');
+      b.textContent = [it.type, alias].filter(Boolean).join(' · ');
+      li.append(a, b);
+      li.addEventListener('mousedown', (e) => { e.preventDefault(); pick(it.id); });
+      return li;
+    }));
+    list.hidden = S.items.length === 0;
+    input.setAttribute('aria-expanded', String(!list.hidden));
+    if (S.active >= 0 && S.active < S.items.length) input.setAttribute('aria-activedescendant', `rg-opt-${S.active}`);
+    else input.removeAttribute('aria-activedescendant');
+  }
+  function pick(name) {
+    const text = String(name).trim();
+    if (!text) return;
+    clearTimeout(S.queryTimer);
+    $('#rg-q').value = text; S.active = -1; S.resolving = text;
+    $('#rg-list').hidden = true; $('#rg-q').setAttribute('aria-expanded', 'false');
+    identity();
+    S.api.setTriggerValue('pick', { name: text, n: Date.now() });
+  }
+
+  // ---------------------------------------------------------------- layers and overlays
+  function setLayer(id) {
+    const L = D().layers.find((l) => l.id === id) || D().layers[0];
+    $('#rg-layer').value = L.id;
+    $('.rg-layerinfo').textContent = D().level === 'simple'
+      ? `Mapa de contexto: ${L.label}. Es una imagen de otra misión (${L.epoch}), no de SPHEREx.`
+      : `${L.mission} · ${L.product} · ${L.bands} · ${L.epoch}. Mapa de contexto servido por NASA/IPAC IRSA; no son datos SPHEREx.`;
+    if (!S.aladin) return;
+    try {
+      S.aladin.setImageSurvey(S.aladin.newImageSurvey(L.url, { name: L.label, imgFormat: L.format }));
+    } catch (e) { status(`No se pudo cargar ${L.label}: ${e.message || e}`, true); }
+  }
+  function status(text, bad) { const el = $('.rg-status'); el.textContent = text || ''; el.classList.toggle('rg-err-text', !!bad); el.hidden = !text; }
+  function overlays() {
+    if (!S.aladin) return;
+    const o = D().object, mk = o && o.anchor ? JSON.stringify([o.name, o.anchor]) : null;
+    if (mk !== S.markerKey) {
+      S.markerKey = mk; S.marker.removeAll();
+      if (o && o.anchor) S.marker.addSources([S.A.marker(o.anchor[0], o.anchor[1], { popupTitle: o.name, popupDesc: o.marker_note || '' })]);
+    }
+    if (S.gaiaKey !== D().gaia_key) {
+      S.gaiaKey = D().gaia_key; S.gaia.removeAll();
+      if (D().gaia && D().gaia.length) { S.gaia.addSources(D().gaia.map((s) => S.A.source(s.ra, s.dec, s))); S.gaia.show(); }
+    }
+    $('.rg-gaiainfo').textContent = D().gaia_note || '';
+  }
+
+  // ---------------------------------------------------------------- applying data from Python
+  function apply() {
+    const d = D();
+    root.querySelector('.sc-region').dataset.level = d.level;
+    if (S.rev !== d.rev) {
+      const mounted = S.rev !== null;
+      S.rev = d.rev; S.resolving = null;
+      S.cur = { ra: normRa(d.region.ra), dec: d.region.dec, fov: d.region.fov };
+      S.sentKey = keyOf(S.cur);
+      clearTimeout(S.flushTimer);
+      if (document.activeElement !== $('#rg-q')) $('#rg-q').value = d.object ? d.object.name : '';
+      else if (d.object) $('#rg-q').value = d.object.name;
+      if (S.aladin) { goto(S.cur.ra, S.cur.dec, mounted); if (mounted) frame(); }
+    } else if (S.cur && Math.abs(S.cur.fov - d.region.fov) < 1e-4 && keyOf(S.cur) === S.sentKey) {
+      S.cur.fov = d.region.fov; S.sentKey = keyOf(S.cur);     // adopt Python's rounding of the same field
+    }
+    if (d.notice || (d.pick_done && d.pick_done === S.pickSeen)) S.resolving = null;
+    S.pickSeen = d.pick_done;
+    $('#rg-gaia').checked = !!d.gaia_on;
+    paint(); suggestions(); overlays();
+  }
+
+  // ---------------------------------------------------------------- first mount
+  if (first) {
+    const d = D();
+    const fov = $('#rg-fov');
+    fov.min = String(d.fov_min * 60); fov.max = String(d.fov_max * 60); fov.step = '0.5';
+    $('.rg-fovmin').textContent = `${d.fov_min * 60}′`; $('.rg-fovmax').textContent = `${d.fov_max * 60}′`;
+    fov.addEventListener('input', () => setFov(Number(fov.value), 'fov'));
+    const fovn = $('#rg-fovn'), fovMsg = `Entre ${d.fov_min * 60}′ y ${d.fov_max * 60}′`;
+    let fovTimer;
+    const applyFov = (strict) => {
+      clearTimeout(fovTimer);
+      const t = clean(fovn.value), v = DECIMAL.test(t) ? Number(t) : NaN;
+      if (Number.isNaN(v) || v < d.fov_min * 60 - 1e-9 || v > d.fov_max * 60 + 1e-9) { if (strict && t !== '') mark(fovn, true, fovMsg); return; }
+      mark(fovn, false); setFov(v, 'fovn');
+    };
+    fovn.addEventListener('input', () => { clearTimeout(fovTimer); mark(fovn, false); fovTimer = setTimeout(() => applyFov(true), 750); });
+    fovn.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyFov(true); } });
+    fovn.addEventListener('blur', () => { applyFov(true); if (fovn.getAttribute('aria-invalid') !== 'true') paint(); });
+    coordField($('#rg-ra'), parseRa, 'ra', 'RA entre 0° y 360° (o hh mm ss)');
+    coordField($('#rg-dec'), parseDec, 'dec', 'Dec entre −90° y +90° (o ±dd mm ss)');
+
+    const q = $('#rg-q');
+    q.addEventListener('input', () => {
+      S.active = -1; suggestions();
+      clearTimeout(S.queryTimer);
+      S.queryTimer = setTimeout(() => S.api.setStateValue('query', q.value), 550);
+    });
+    q.addEventListener('focus', suggestions);
+    q.addEventListener('blur', () => { $('#rg-list').hidden = true; q.setAttribute('aria-expanded', 'false'); });
+    q.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        if (!S.items.length) return;
+        e.preventDefault();
+        S.active = (S.active + (e.key === 'ArrowDown' ? 1 : -1) + S.items.length + (S.active < 0 && e.key === 'ArrowUp' ? 1 : 0)) % S.items.length;
+        suggestions();
+      } else if (e.key === 'Enter') {
+        e.preventDefault(); pick(S.active >= 0 && S.items[S.active] ? S.items[S.active].id : q.value);
+      } else if (e.key === 'Escape') { S.active = -1; $('#rg-list').hidden = true; q.setAttribute('aria-expanded', 'false'); }
+    });
+
+    for (const L of d.layers) { const o = document.createElement('option'); o.value = L.id; o.textContent = L.label; $('#rg-layer').append(o); }
+    $('#rg-layer').addEventListener('change', (e) => { setLayer(e.target.value); S.api.setStateValue('layer', e.target.value); });
+    $('#rg-gaia').addEventListener('change', (e) => S.api.setStateValue('gaia', e.target.checked));
+    $('.rg-frame').addEventListener('click', frame);
+    for (const b of root.querySelectorAll('.rg-cta')) {
+      b.addEventListener('click', () => {
+        clearTimeout(S.flushTimer);
+        S.sentKey = keyOf(S.cur);
+        S.api.setTriggerValue('open', { view: b.dataset.view, ra: r7(normRa(S.cur.ra)), dec: r7(S.cur.dec), fov: S.cur.fov, n: Date.now() });
+      });
+    }
+
+    apply();
+    setLayer(d.layer);
+    status('Cargando el atlas…');
+    const slow = setTimeout(() => {
+      if (!S.aladin) status('El atlas tarda en cargar (necesita WebGL2 y acceso a jsDelivr e IRSA). El nombre, las coordenadas y el campo funcionan igualmente.', true);
+    }, 20000);
+    import(d.aladin).then(async ({ default: A }) => {
+      await A.init;
+      S.A = A;
+      S.aladin = A.aladin($('.rg-map'), {
+        target: `${S.cur.ra} ${S.cur.dec}`, fov: Math.max(S.cur.fov * 2.5, 0.05), cooFrame: 'ICRSd', survey: [],
+        showReticle: true, reticleColor: '#ffffff', reticleSize: 16, showCooLocation: false, showZoomControl: true,
+        showFullscreenControl: false, showLayersControl: false, showGotoControl: false, showShareControl: false,
+        showSettingsControl: false, showSimbadPointerControl: false, showProjectionControl: false, showFrame: false,
+        showCooGrid: false, showCooGridControl: false, showStatusBar: false, showContextMenu: false,
+        showFov: false, log: false,
+        backgroundColor: 'rgb(13,15,18)',
+      });
+      S.halo = A.graphicOverlay({ color: 'rgba(8,10,12,0.72)', lineWidth: 5 }); S.aladin.addOverlay(S.halo);
+      S.ring = A.graphicOverlay({ color: '#ff8a3d', lineWidth: 2 }); S.aladin.addOverlay(S.ring);
+      S.marker = A.catalog({ name: 'Objeto buscado', color: '#ffffff', sourceSize: 14 }); S.aladin.addCatalog(S.marker);
+      S.gaia = A.catalog({ name: 'Gaia DR3 (J2016.0)', color: '#7fd6ff', shape: 'circle', sourceSize: 8 }); S.aladin.addCatalog(S.gaia);
+      // Aladin redraws overlays only on a view change: nudge it when the box is resized.
+      S.resize = new ResizeObserver(() => {
+        if (!S.aladin || S.lock) return;
+        const [r, dd] = S.aladin.getRaDec(); S.lock = true; S.aladin.gotoRaDec(r, dd); S.lock = false; drawCircle(); chip();
+      });
+      S.resize.observe($('.rg-map'));
+      S.aladin.on('positionChanged', onMapMove);
+      S.aladin.on('zoomChanged', () => { chip(); });
+      S.aladin.on('click', (e) => { if (e && e.ra !== undefined && !e.isDragging) setCentre(e.ra, e.dec); });
+      clearTimeout(slow);
+      status('');
+      setLayer($('#rg-layer').value);
+      S.markerKey = undefined; S.gaiaKey = undefined;
+      S.lock = true; S.aladin.gotoRaDec(S.cur.ra, S.cur.dec); S.lock = false;
+      drawCircle(); overlays(); chip();
+      root.querySelector('.sc-region').classList.add('rg-ready');
+    }).catch((e) => {
+      clearTimeout(slow);
+      status(`No se pudo iniciar el atlas (${e.message || e}). El nombre, las coordenadas y el campo funcionan igualmente.`, true);
+    });
+    return () => { clearTimeout(S.flushTimer); clearTimeout(S.queryTimer); if (S.resize) S.resize.disconnect(); };
+  }
+  apply();
+}

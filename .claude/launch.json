@@ -6,6 +6,12 @@
       "runtimeExecutable": ".venv/Scripts/streamlit.exe",
       "runtimeArgs": ["run", "app.py", "--server.port", "8501"],
       "port": 8501
+    },
+    {
+      "name": "skyclues-dev",
+      "runtimeExecutable": ".venv/Scripts/streamlit.exe",
+      "runtimeArgs": ["run", "app.py", "--server.port", "8520"],
+      "port": 8520
     }
   ]
 }
