@@ -254,7 +254,10 @@ def render(shared: dict | None) -> None:
 
     # shareable URL and region bookkeeping
     region_key = (round(ra_c, 6), round(dec_c, 6), fov)
-    if st.session_state.get("sx_region_key") != region_key:
+    # Streamlit drops the value of a widget that was not drawn in a run (e.g. while Time Explorer is
+    # shown), so a missing pick position must be rebuilt even when the region did not change.
+    if st.session_state.get("sx_region_key") != region_key or "sx_pick_ra" not in st.session_state \
+            or "sx_pick_dec" not in st.session_state:
         st.session_state["sx_region_key"] = region_key
         st.session_state["sx_pick_ra"], st.session_state["sx_pick_dec"] = ra_c, dec_c
         st.session_state["sx_spec_params"] = None

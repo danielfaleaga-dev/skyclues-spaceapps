@@ -419,3 +419,26 @@ def test_insufficient_coverage_message_in_app(app_cube, monkeypatch):
     at.run()
     assert not at.exception
     assert any('Datos insuficientes' in e.value for e in at.error)
+
+
+def test_returning_to_spectrum_explorer_with_the_same_region_keeps_working(app_cube):
+    """Regression (already present in 2ec4881): Streamlit drops the pick widgets while Time Explorer
+    is shown, and a second visit with an unchanged region raised KeyError 'sx_pick_ra'."""
+    at = AppTest.from_file(APP, default_timeout=60).run()
+    stem = next(s for s in config.VALIDATED_EXAMPLES if 'm101' in s)
+    at.button(key='example_' + stem).click().run()
+    explorer = at.radio(key='explorer').options
+    for _ in range(2):
+        at.radio(key='explorer').set_value(explorer[1]).run()
+        assert not at.exception
+        at.radio(key='explorer').set_value(explorer[0]).run()
+        assert not at.exception
+    at.radio(key='explorer').set_value(explorer[1]).run()
+    assert not at.exception
+    assert at.session_state['sx_pick_ra'] == pytest.approx(at.session_state['sx_region_key'][0])
+    at.radio(key='sx_mode').set_value(mpage.MODES[1]).run()           # also through the multiband mode
+    at.radio(key='explorer').set_value(explorer[0]).run()
+    at.radio(key='explorer').set_value(explorer[1]).run()
+    assert not at.exception
+    at.radio(key='sx_mode').set_value(mpage.MODES[0]).run()
+    assert not at.exception
