@@ -265,3 +265,13 @@ def test_reference_fits_untouched():
     man = json.loads((config.ROOT / "data/reference/MANIFEST.json").read_text(encoding="utf-8"))
     entry = man["files"][REF_FITS.name]
     assert hashlib.sha256(REF_FITS.read_bytes()).hexdigest() == entry["sha256"]
+
+
+def test_failed_season_is_reported_with_its_reason(stars):
+    frames, _ = simulate(stars, seasons=((0.0, 2),), seed=14)
+    ents = [motion._Entry(k, f.image, motion.science_data(f.image), f.image.variance, motion.usable_mask(f.image),
+                          np.zeros((N, N), bool), f.image.meta["MJD-AVG"], 0.0, 0.0, 0.01, 0.01)
+            for k, f in enumerate(frames)]
+    why = []
+    assert motion.season_fit(ents, lambda e: (500.0, 0.0), RA0, DEC0, 20.0, why=why) is None   # outside the cutout
+    assert why and "borde" in why[0]

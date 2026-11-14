@@ -61,3 +61,12 @@ def test_real_eps_ind_b_d3_reproduces_from_cached_originals():
     assert math.hypot(a["dxi"] - b["dxi"], a["deta"] - b["deta"]) < 0.05
     for f, u in zip(saved["files"], urls):
         assert archive.sha256(got[u]) == f["sha256"]
+
+
+def test_extended_baseline_offers_images_per_season(monkeypatch):
+    at = AppTest.from_file(APP, default_timeout=120)
+    at.run()
+    assert not at.exception
+    at.radio(key="mv_images").set_value(motion_page.IMAGE_MODES[1]).run()
+    assert not at.exception
+    assert at.select_slider(key="mv_per_season").value == motion.PER_SEASON

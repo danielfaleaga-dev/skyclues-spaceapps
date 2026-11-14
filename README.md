@@ -22,6 +22,18 @@ En **Composición multibanda (RGB)** se eligen tres canales del cubo para los ca
 
 Buscador con sugerencias, enlaces compartibles y actualización de observaciones: ver [`RELEASE_READINESS.md`](RELEASE_READINESS.md).
 
+## Localizar una región: Por nombre, Coordenadas o Atlas
+
+Encima de los exploradores, **Localizar una región del cielo** ofrece tres métodos que comparten la misma región (`ra/dec/fov` de la URL) con Time Explorer y Spectrum Explorer. El **Atlas** usa Aladin Lite 3.8.1 con mapas HiPS oficiales servidos por NASA/IPAC IRSA: 2MASS, AllWISE color, W1, W2 y DSS2, cada uno con misión, producto, bandas y época. Arrastre, haga zoom, elija el diámetro (3–30′, círculo amarillo) y pulse **Seleccionar esta región**. Después, **Abrir región en Time/Spectrum Explorer** conserva las coordenadas exactas. Si la vista supera 30′, se avisa y «Ajustar al zoom» propone el máximo, sin recortar en silencio. Gaia DR3 puede superponerse para la región seleccionada. Los mapas son de otras misiones y épocas: no son datos SPHEREx ni una secuencia temporal. El HiPS combinado de SPHEREx DR1 se documenta, pero no se ofrece como capa (ver `PROJECT_STATE.md`).
+
+## Buscar algo que se mueve
+
+Pestaña de Time Explorer. Elija la fuente (objetivo del catálogo, fuente detectada en la época 1 o RA/Dec) y las imágenes: las épocas de la secuencia, o **Ampliar la base temporal** con el mismo detector y 2–8 imágenes por temporada. SkyClues mide la posición de la fuente en cada exposición original con la ePSF oficial y registra cada imagen con estrellas Gaia DR3 estacionarias. Después ajusta una posición por temporada y compara la primera con la última, con incertidumbres calibradas por un control estacionario. Resultados posibles: *Movimiento medido*, *Evidencia insuficiente*, *Observaciones incompatibles* o *Datos insuficientes*. La predicción del catálogo solo se compara al final. Las investigaciones reales (ε Ind B, WISE 0855, Barnard y un control en M101) están en `results/motion_*.json` y se reproducen así:
+
+```bash
+.venv\Scripts\python scripts\investigate_motion.py --object "eps Ind B" --detector 3 --name motion_eps_ind_b_d3
+```
+
 ## Referencias Gaia y AllWISE
 
 En ambos exploradores, abra **Referencias astronómicas · Gaia / WISE** y active el visor. Conserva el centro ICRS y el FOV del explorador; no tiene navegación independiente. **Consultar Gaia DR3** recupera hasta 500 fuentes del archivo ESA (círculo del FOV en J2016.0, orden por magnitud G). Puede pulsar un marcador o elegir su identificador para ver parámetros y unidades. Gaia, posiciones calculadas y AllWISE tienen interruptores independientes dentro del visor; no reconstruyen la imagen SPHEREx. La consulta y la época se actualizan dentro de un fragmento Streamlit.
@@ -41,6 +53,8 @@ El visor usa [Aladin Lite 3.8.1, paquete oficial CDS](https://github.com/cds-ast
 .venv\Scripts\python scripts\validate_references.py
 .venv\Scripts\python scripts\validate_multiband.py
 ```
+
+`tests/test_motion.py` contiene experimentos **sintéticos**, identificados como tales, del método de movimiento; tarda unos 5 minutos. `tests/test_motion_app.py` incluye una reproducción real marcada `network`.
 
 Las pruebas `network` usan FITS locales o NASA/IPAC IRSA y requieren que el servicio correspondiente esté disponible. Las offline aíslan la caché y usan cubos sintéticos identificados como pruebas. `requirements-dev.txt` incorpora Photutils y astropy-healpix como verificadores independientes, sin añadirlos al runtime. La prueba del reproductor requiere Node.js. El script reproduce la extracción del tutorial (apertura 5 px, anillo 40–60 px), contrasta valores y metadatos, comprueba recursos y escribe `results/spectrum_validation.json`.
 

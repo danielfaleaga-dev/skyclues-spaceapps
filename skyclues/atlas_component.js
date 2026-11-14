@@ -92,6 +92,9 @@ export default function (c) {
       st.circle = A.graphicOverlay({ color: '#ffd23f', lineWidth: 2 }); st.aladin.addOverlay(st.circle);
       st.marker = A.catalog({ name: 'Objeto buscado', color: '#ff7a59', sourceSize: 14 }); st.aladin.addCatalog(st.marker);
       st.gaia = A.catalog({ name: 'Gaia DR3 (J2016.0)', color: '#69e2ff', shape: 'circle', sourceSize: 8 }); st.aladin.addCatalog(st.gaia);
+      // Aladin redraws overlays (region circle, Gaia) only on a view change: force one when the box resizes.
+      st.resize = new ResizeObserver(() => { if (st.aladin) { const [r, d] = st.aladin.getRaDec(); st.aladin.gotoRaDec(r, d); } });
+      st.resize.observe(el('.map'));
       st.aladin.on('positionChanged', readout);
       st.aladin.on('zoomChanged', readout);
       st.aladin.on('click', (e) => { if (e && e.ra !== undefined && !e.isDragging) st.aladin.gotoRaDec(e.ra, e.dec); });

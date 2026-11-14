@@ -23,7 +23,7 @@
   "endpoint": "https://gea.esac.esa.int/tap-server/tap/sync",
   "table": "gaiadr3.gaia_source",
   "query": "SELECT TOP 501 source_id,ra,dec,ref_epoch,pmra,pmdec,parallax,radial_velocity,phot_g_mean_mag,ruwe,ra_error,dec_error,pmra_error,pmdec_error,parallax_error FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',269.4463642730,4.7689192520,0.1000000000)) ORDER BY phot_g_mean_mag ASC, source_id ASC",
-  "retrieved_utc": "2026-11-14T21:43:05.413599+00:00",
+  "retrieved_utc": "2026-11-14T22:09:35.415892+00:00",
   "sha256": "d192687b2f258b5097cc8a6368f223eb63ddae637818199a8c4791bb8234d475",
   "truncated": true,
   "catalogue_epoch": 2016.0
@@ -48,7 +48,7 @@
     -0.07860397935740389
    ],
    "registration_err_arcsec": [
-    0.050340933464400994,
+    0.050340933464401,
     0.053042719683429586
    ],
    "file": "level2_2025W34_2B_0030_3D6_spx_l2b-v27-2026-229__2639d02d69bff316.fits",
@@ -78,7 +78,7 @@
     -0.022648469239024725
    ],
    "registration_err_arcsec": [
-    0.05538706878702146,
+    0.055387068787021466,
     0.058359679918020546
    ],
    "file": "level2_2025W34_2B_0030_4D6_spx_l2b-v27-2026-229__a20e2dc5f9ac771f.fits",
@@ -108,7 +108,7 @@
     0.01961937732122782
    ],
    "registration_err_arcsec": [
-    0.05268361107211105,
+    0.05268361107211106,
     0.055511128254801916
    ],
    "file": "level2_2025W35_1A_0008_1D6_spx_l2b-v27-2026-230__4135ade13a42b099.fits",
@@ -138,7 +138,7 @@
     -0.03331520294616133
    ],
    "registration_err_arcsec": [
-    0.06035665890539062,
+    0.060356658905390624,
     0.06359598678500791
    ],
    "file": "level2_2025W35_1A_0008_2D6_spx_l2b-v27-2026-230__1456ce573f781472.fits",
@@ -168,7 +168,7 @@
     -0.025168992649807553
    ],
    "registration_err_arcsec": [
-    0.053984636882888584,
+    0.05398463688288859,
     0.056881979818982395
    ],
    "file": "level2_2026W19_1A_0046_1D6_spx_l2b-v27-2026-245__640500904051c0d3.fits",
@@ -198,7 +198,7 @@
     -0.10151086393045385
    ],
    "registration_err_arcsec": [
-    0.05268361107211105,
+    0.05268361107211106,
     0.055511128254801916
    ],
    "file": "level2_2026W19_1A_0216_1D6_spx_l2b-v27-2026-245__b0c23cba56350269.fits",
@@ -228,7 +228,7 @@
     0.11846397490840962
    ],
    "registration_err_arcsec": [
-    0.05690480373568684,
+    0.05690480373568685,
     0.059958871349238885
    ],
    "file": "level2_2026W19_1A_0326_1D6_spx_l2b-v27-2026-245__9fa84847d17396de.fits",
@@ -258,7 +258,7 @@
     0.06453085586621454
    ],
    "registration_err_arcsec": [
-    0.05855455997089466,
+    0.05855455997089467,
     0.06169716961881706
    ],
    "file": "level2_2026W19_1A_0403_1D6_spx_l2b-v27-2026-245__87596c8bfe6267f7.fits",
@@ -288,7 +288,7 @@
     0.029076979582139808
    ],
    "registration_err_arcsec": [
-    0.048285327124312494,
+    0.0482853271243125,
     0.05087678942800633
    ],
    "file": "level2_2026W34_1A_0308_1D6_spx_l2b-v27-2026-243__a54dccf8000e28e9.fits",
@@ -317,7 +317,7 @@
     -0.01429231031884236
    ],
    "registration_err_arcsec": [
-    0.05147233166184205,
+    0.051472331661842056,
     0.05423483975962248
    ],
    "file": "level2_2026W34_1A_0308_2D6_spx_l2b-v27-2026-243__84536997ca77962f.fits",
@@ -346,7 +346,7 @@
     0.04557456236674537
    ],
    "registration_err_arcsec": [
-    0.050340933464400994,
+    0.050340933464401,
     0.053042719683429586
    ],
    "file": "level2_2026W34_1A_0308_3D6_spx_l2b-v27-2026-243__0e2eb1c0bb96025c.fits",
@@ -375,7 +375,7 @@
     -0.001725931603043439
    ],
    "registration_err_arcsec": [
-    0.04928100563247243,
+    0.04928100563247244,
     0.05192590577068382
    ],
    "file": "level2_2026W34_1A_0308_4D6_spx_l2b-v27-2026-243__cff6c4464867b31f.fits",
@@ -399,7 +399,7 @@
    1.0189486047496843
   ],
   "rms_arcsec": [
-   0.24142663562156247,
+   0.2414266356215625,
    0.25438394714003165
   ],
   "wcs_scatter_arcsec": [
@@ -407,7 +407,9 @@
    0.057948633228365465
   ]
  },
- "warnings": [],
+ "warnings": [
+  "Temporada 2026-08-18 (4 imágenes) sin ajuste válido: el χ² del ajuste no tiene un mínimo definido (curvatura no positiva; típico de un núcleo saturado o enmascarado)."
+ ],
  "seasons": [
   {
    "dxi": -0.09946239298431964,
@@ -416,11 +418,11 @@
    "eta": 1.990691921310541,
    "cov": [
     [
-     0.7837995098572448,
-     0.2311374445890832
+     0.7837995098572447,
+     0.23113744458908317
     ],
     [
-     0.23113744458908314,
+     0.2311374445890831,
      0.535916209674725
     ]
    ],
@@ -436,7 +438,7 @@
    ],
    "significance": 555.772870392078,
    "chi2_red_local": 1688.154156061376,
-   "internal_chi2_red": 14.2755346076773,
+   "internal_chi2_red": 14.275534607677299,
    "n_single_fits": 4,
    "mjd": 60910.38422824565,
    "n_images": 4,
@@ -503,7 +505,7 @@
     1.1078514561572008
    ],
    "err_registration": [
-    0.029025326774606498,
+    0.0290253267746065,
     0.030583109328199562
    ],
    "significance": 536.568806143169,
@@ -552,6 +554,18 @@
     "2026W19_1A_0403_1"
    ],
    "usable": true
+  }
+ ],
+ "seasons_failed": [
+  {
+   "date_utc": "2026-08-18",
+   "obs_ids": [
+    "2026W34_1A_0308_1",
+    "2026W34_1A_0308_2",
+    "2026W34_1A_0308_3",
+    "2026W34_1A_0308_4"
+   ],
+   "reason": "el χ² del ajuste no tiene un mínimo definido (curvatura no positiva; típico de un núcleo saturado o enmascarado)"
   }
  ],
  "control": {
@@ -684,10 +698,10 @@
     "dxi": -0.12305167595632141,
     "deta": 0.29629413899865886,
     "err_dxi": 0.23633516759367543,
-    "err_deta": 0.24395925641676972,
-    "significance": 1.2684991278568802,
+    "err_deta": 0.2439592564167697,
+    "significance": 1.2684991278568805,
     "delta_t_days": 254.52363901220815,
-    "significance_calibrated": 1.2684991278568802
+    "significance_calibrated": 1.2684991278568805
    },
    {
     "gaia_source_id": "4472834402972715136",
@@ -728,7 +742,7 @@
     "dxi": 0.21007111119014094,
     "deta": -0.008488636470407995,
     "err_dxi": 0.12768267690586588,
-    "err_deta": 0.11693257373451921,
+    "err_deta": 0.11693257373451922,
     "significance": 1.6499464598375118,
     "delta_t_days": 254.26979855748505,
     "significance_calibrated": 1.6499464598375118
@@ -875,11 +889,11 @@
  "displacement": {
   "dxi": 0.10702522924350587,
   "deta": 4.972632390602274,
-  "err_dxi": 1.0353274665566967,
+  "err_dxi": 1.0353274665566965,
   "err_deta": 3.7667230791771007,
   "cov": [
    [
-    1.0719029630067078,
+    1.0719029630067076,
     -1.4530059398085664
    ],
    [
@@ -891,7 +905,7 @@
   "delta_t_days": 254.32761415282584,
   "first": "2025-08-21",
   "last": "2026-05-04",
-  "err_dxi_calibrated": 1.0353274665566967,
+  "err_dxi_calibrated": 1.0353274665566965,
   "err_deta_calibrated": 3.7667230791771007,
   "significance_calibrated": 1.4677253016486616,
   "total_arcsec": 4.973784001317459,
@@ -908,7 +922,7 @@
   "consistent_3sigma": true,
   "note": "Predicción calculada con la astrometría del catálogo (incluye paralaje si existe). Solo se compara al final; no interviene en la búsqueda, el ajuste ni la decisión."
  },
- "created_utc": "2026-11-14T21:49:30.435026+00:00",
+ "created_utc": "2026-11-14T22:15:11.689639+00:00",
  "object": "Barnard's star",
  "astrometry": {
   "name": "NAME Barnard's star",

@@ -8,29 +8,37 @@ screenshots, RGB composites or resampled products.
 
 Method (all steps are reported in the result):
 
-1. **PSF fit** of a 9×9 native-pixel stamp with the official ePSF of the zone of
-   the detector where the source falls (cubic interpolation of the ×5 oversampled
-   model), a free flux and a constant local background. Weighted least squares
+1. **PSF fit** (single images) of a 9×9 native-pixel stamp with the official ePSF
+   of the detector zone where the source falls (cubic interpolation of the ×5
+   oversampled model), a free flux and a constant local background. Weighted least squares
    with the official VARIANCE; pixels flagged unusable/artifact (HALO included) are
    excluded. Position covariance from the fit, scaled by the reduced χ² when > 1.
    Without EPSF a Gaussian of the header PSF_FWHM is used and identified.
-2. **Registration** with stationary sources: Gaia DR3 stars of the field (bright
-   enough, isolated, with proper motion) are fitted in every image. Their Gaia
-   proper motion is applied between dates; a free per-star zero point absorbs
-   colour/blend offsets; the per-image offset of the WCS is solved jointly. The
-   absolute offset with respect to Gaia is reported as WCS quality. Without Gaia,
-   sources detected in the first image are used and assumed stationary (stated).
-3. **Seasons**: images closer than ``SEASON_GAP_DAYS`` form a season; the season
-   position is a weighted mean, with errors inflated by the internal scatter.
-4. **Displacement** first → last season in the tangent plane, its covariance and
-   significance S = √(Δᵀ C⁻¹ Δ).
+2. **Registration** with stationary sources: Gaia DR3 stars of the field (G ≤ 19,
+   isolated, with proper motion, away from the target) are fitted in every image.
+   Their Gaia proper motion is applied between dates; a free per-star zero point
+   absorbs colour/blend offsets; the per-image offset of the WCS is solved jointly
+   (4σ clipping). The absolute offset with respect to Gaia is reported as WCS
+   quality. Images with fewer than 3 references get an empirical error (the WCS
+   scatter measured on the others). Without Gaia, or when no image can be
+   registered, the outcome is ``INSUFFICIENT_EVIDENCE``: no unverified assumption
+   of stationarity is made.
+3. **Seasons**: images closer than ``SEASON_GAP_DAYS`` form a season. One position
+   per season is fitted jointly to all its exposures (profile likelihood: common
+   position, free flux and background per image), refined by Newton steps; the
+   covariance comes from the Hessian, scaled by the local χ², plus the
+   registration errors, and is inflated by the internal scatter of single-image
+   fits. A season whose fit fails is listed with its reason.
+4. **Displacement** first → last good season (detection ≥ 10σ) in the tangent
+   plane, its covariance and significance S = √(Δᵀ C⁻¹ Δ).
 5. **Stationary control**: every reference star is run through the same chain
-   (leave-one-out registration). Its displacement must be compatible with zero
-   (after its Gaia proper motion). The control calibrates the errors (factor ≥ 1)
-   and gives the largest significance reached by a stationary source.
+   (leave-one-out registration) around its Gaia track. Its displacement must be
+   compatible with zero. The control calibrates the errors (factor ≥ 1) and gives
+   the largest significance reached by a stationary source.
 6. **Outcome**: ``MOTION_MEASURED`` only if S ≥ 5 after calibration, beyond every
-   control, with enough references and target S/N; otherwise
-   ``INSUFFICIENT_EVIDENCE``, ``INCOMPATIBLE_OBSERVATIONS`` or ``INSUFFICIENT_DATA``.
+   control, with ≥ 3 control stars, no confusion, and ≥ 3 single fits per season
+   when the core is saturated; otherwise ``INSUFFICIENT_EVIDENCE``,
+   ``INCOMPATIBLE_OBSERVATIONS`` or ``INSUFFICIENT_DATA``.
 
 Catalogue predictions (SIMBAD/Gaia) are only *compared* with the measurement at
 the end; they are never used to locate or fit the source.
@@ -655,10 +663,16 @@ class _SeasonModel:
         return (total, null, per) if detail else total
 
 
-def season_fit(entries, track, ra0, dec0, radius: float, coarse: float | None = None) -> dict | None:
-    """Joint maximum-likelihood position of one source in one season (see _SeasonModel)."""
+def season_fit(entries, track, ra0, dec0, radius: float, coarse: float | None = None,
+               why: list | None = None) -> dict | None:
+    """Joint maximum-likelihood position of one source in one season (see _SeasonModel).
+
+    Returns None when no valid fit exists; the reason is appended to ``why`` if given.
+    """
+    why = why if why is not None else []
     model = _SeasonModel(entries, track, ra0, dec0, radius)
     if not model.parts:
+        why.append("el círculo de búsqueda toca el borde del recorte o la máscara en todas las imágenes")
         return None
     coarse = coarse or (1.0 if radius > 6 else 0.5)
     g = np.arange(-radius, radius + 1e-9, coarse)
@@ -697,7 +711,12 @@ def season_fit(entries, track, ra0, dec0, radius: float, coarse: float | None = 
         best = best + step
         if np.hypot(*step) < 0.002:
             break
-    if H is None or np.hypot(*best) > radius + 1:
+    if H is None:
+        why.append("el χ² del ajuste no tiene un mínimo definido (curvatura no positiva; típico de un núcleo "
+                   "saturado o enmascarado)")
+        return None
+    if np.hypot(*best) > radius + 1:
+        why.append("el mínimo del ajuste queda fuera del círculo de búsqueda")
         return None
     chi_b, null_b, per = model.chi2([best[0]], [best[1]], detail=True)
     cov = 2 * np.linalg.inv(H)
@@ -718,6 +737,7 @@ def season_fit(entries, track, ra0, dec0, radius: float, coarse: float | None = 
     # registration: offsets errors are independent between images; weight by S/N²
     wts = np.array([max(i["snr"], 0) ** 2 for i in images])
     if wts.sum() <= 0:
+        why.append("flujo ajustado nulo en todas las imágenes")
         return None
     wn = wts / wts.sum()
     ents = {p["e"].k: p["e"] for p in model.parts}
@@ -839,9 +859,15 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
     groups = seasons([e.mjd for e in ents])
     xs, ys = _tangent(ra0, dec0, ra0, dec0)
     fits_ = []
+    failed = []
     for g in groups:
-        sf = season_fit([ents[i] for i in g], lambda e: (xs, ys), ra0, dec0, search_radius_arcsec)
+        why = []
+        sf = season_fit([ents[i] for i in g], lambda e: (xs, ys), ra0, dec0, search_radius_arcsec, why=why)
         if sf is None:
+            date = _mjd_date(min(ents[i].mjd for i in g))
+            failed.append({"date_utc": date, "obs_ids": [rows[ents[i].k]["obs_id"] for i in g],
+                           "reason": "; ".join(why) or "sin ajuste válido"})
+            warns.append(f"Temporada {date} ({len(g)} imágenes) sin ajuste válido: {'; '.join(why) or '—'}.")
             continue
         sf["date_utc"] = _mjd_date(min(ents[i].mjd for i in g))
         sf["obs_ids"] = [rows[ents[i].k]["obs_id"] for i in g]
@@ -849,6 +875,7 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
             rows[im["k"]].update(snr=im["snr"], saturated_core=im["saturated_core"])
         fits_.append(sf)
     result["seasons"] = fits_
+    result["seasons_failed"] = failed
     good = [s for s in fits_ if s["significance"] >= MIN_SEASON_SNR]
     for s in fits_:
         s["usable"] = s in good

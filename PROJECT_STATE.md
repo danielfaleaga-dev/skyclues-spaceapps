@@ -1,6 +1,185 @@
 # SkyClues — estado del proyecto
 
-Última actualización: 14-11-2026, Claude Code: integración local de `feature/release-readiness` (Codex A) y `feature/multiband` (Claude Code A) en `main`. El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md). Las secciones anteriores conservadas más abajo son antecedentes; la primera sección prevalece sobre sus pendientes.
+Última actualización: 14-11-2026, Claude Code A: Atlas astronómico e investigación «Buscar algo que se mueve» en la rama `feature/atlas-motion` (publicada en GitHub; `main` sin cambios). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md). Las secciones anteriores conservadas más abajo son antecedentes; la primera sección prevalece sobre sus pendientes.
+
+## Atlas astronómico e investigación «Buscar algo que se mueve» (14-11-2026)
+
+Rama `feature/atlas-motion`, creada desde la base integrada `781070e` (`main`, con `bee8fa8` y `47e7bd7`) y publicada en `origin/feature/atlas-motion` a petición del usuario («ve aplicando todo a guithub»). `main` no se ha tocado; sin despliegue, publicación ni envío a NASA. FITS de `data/reference` sin cambios (SHA-256 comprobado por prueba).
+
+### A. Atlas
+
+- **Arquitectura:** el Atlas no es un tercer explorador. Encima de los dos exploradores hay un selector «Localizar una región del cielo: **Por nombre | Coordenadas | Atlas**». Los tres escriben el mismo estado común: parámetros `ra/dec/fov` de la URL y `st.session_state["sky_region"]` (`navigation.current_region`, `set_region`, `open_region`). Al cambiar de región se vacían los campos de coordenadas de ambos exploradores para que se reinicialicen con ella.
+- **Visor:** Aladin Lite 3.8.1 (el mismo paquete fijado de `references.ALADIN_JS`), componente `st.components.v2` (`atlas.py` + `atlas_component.js`) con una única instancia por montaje. Arrastrar, rueda o botones de zoom, clic para centrar, pantalla completa. Muestra el centro ICRS en grados y sexagesimal, el tamaño de la vista y la región en un círculo amarillo. Python solo recentra el mapa cuando envía un `nonce` nuevo, así que tras una selección se conserva la vista del usuario.
+- **FOV:** preajustes 3/6/12/18/30′ (límites de los exploradores). Si la vista supera 30′ aparece un aviso explícito y «Ajustar al zoom» propone el máximo admitido (30′) indicándolo («no se recorta en silencio»). Una selección fuera de límites se rechaza con un error visible y no cambia la región.
+- **Capas** (HiPS oficiales servidos por NASA/IPAC IRSA, propiedades comprobadas HTTP 200): 2MASS J·H·K color, AllWISE W4·W2·W1 color, AllWISE W1, AllWISE W2, DSS2 color. Cada capa muestra misión, identificador IVOA, bandas y época, y lleva la nota de que no son datos SPHEREx. **Gaia DR3** se superpone como catálogo con la consulta ESA ya existente (servidor, J2016.0, máximo 500 fuentes) para el círculo seleccionado; si Gaia falla, el atlas sigue funcionando con un aviso.
+- **SPHEREx en el Atlas:** IRSA publica el HiPS combinado `ivo://IPAC/P/SPHEREx/DR1/cube` (versión 2026-11-01, cubo de 102 planos PNG). Sus teselas por plano no siguen la ruta HiPS estándar que carga Aladin Lite 3.8.1, por lo que **no se ofrece como capa**: se documenta en «Procedencia de las capas» y el cubo se sigue explorando en Spectrum Explorer. Ningún mapa del atlas es una secuencia temporal. No se compara entre misiones ni se infiere movimiento de esas diferencias.
+- **Integración con el nombre:** tras resolver un nombre, «Ver en Atlas» centra el mapa en la posición **calculada para hoy** y coloca un marcador con una nota. Si la región se selecciona sobre el marcador (a menos de 1″), al abrirla se conserva la astrometría de catálogo. Time Explorer calcula entonces la posición por fecha y Spectrum aplica su regla de época del cubo. Si el centro se movió, se abre como coordenadas fijas.
+- **Coordenadas:** RA/Dec en grados ICRS y diámetro en minutos de arco, con «Ver en Atlas», «Abrir en Time Explorer» y «Abrir en Spectrum Explorer». Las mismas validaciones (`targets.validate_*`).
+
+Recorridos en navegador real (servidor local):
+- Aladin se inicia con WebGL2 y carga 2MASS.
+- Desplazamiento a Orión con vista de 1.50°: aparece el aviso; «Ajustar al zoom» propone 30′ y dice que es el máximo.
+- Selección de 12′: URL `?ra=83.822100&dec=-5.391100&fov=0.2`. El mapa conserva la vista tras recargar el script.
+- «Abrir región en Time Explorer»: Nueva búsqueda, Coordenadas RA/Dec, RA 83.822100, Dec −5.391100, 12′ (0.200°).
+- Nombre «Barnard» → Ver en Atlas: centro RA 269.445972°, Dec +4.770782° (hoy) con la nota del marcador.
+- Abrir en Spectrum: el centro se recalcula con la regla de época del cubo (269.44627, +4.76820; canal 33).
+- Gaia en el atlas, campo de Barnard de 6′: 500 fuentes dibujadas sobre 2MASS, con el aviso de truncado por magnitud G. Captura: `results/atlas_browser.jpg`.
+- Al cambiar el tamaño de la ventana, Aladin no redibujaba el círculo ni Gaia hasta mover el mapa. Se corrigió con un `ResizeObserver` y se comprobó tras redimensionar.
+
+Pruebas: `tests/test_atlas.py`, 20 pruebas, todas satisfactorias:
+- estado común: prioridad URL → secuencia → M101, validación, reinicio de campos y procedencia del centro;
+- capas: oficiales IRSA, con misión, producto, bandas y época, y sin SPHEREx como capa;
+- AppTest: tres métodos con el atlas fuera del selector de exploradores; selección (evento del componente **simulado**) que abre Time y Spectrum con las coordenadas exactas; FOV de 1.5° rechazado sin recortar; astrometría conservada solo sobre el marcador; caída de Gaia **simulada** que mantiene el atlas usable; panel de coordenadas hacia ambos exploradores y hacia el atlas.
+
+Límites del Atlas:
+- Requiere WebGL2 y acceso del navegador a jsDelivr e IRSA. Si falla, aparece un mensaje a los 30 s y siguen disponibles «Por nombre» y «Coordenadas».
+- Gaia solo se consulta para la región seleccionada, no para la vista libre (la vista ilimitada no se consulta en masa). Los HiPS JPEG son contexto visual, sin fotometría.
+- El enlace compartible no guarda la capa ni la vista libre, solo la región.
+
+### B. Investigación «Buscar algo que se mueve»
+
+**Módulo:** `skyclues/motion.py` (`METHOD_VERSION = "skyclues-motion 1.0 (2026-11-14)"`). Trabaja solo con imágenes L2 individuales originales: IMAGE − ZODI, VARIANCE, FLAGS, la extensión **EPSF** oficial (441 zonas, ×5) y el WCS de cada archivo. Nunca usa el cubo, capturas, RGB ni productos remuestreados. No usa IA ni ML. Los pasos:
+
+1. Ajuste PSF ponderado con la ePSF de la zona del detector (flujo y fondo libres, máscara estricta, saturación OVERFLOW/NONLINEAR identificada).
+2. Registro con estrellas Gaia DR3 estacionarias:
+   - selección: G ≤ 19, aisladas 15″, a más de 25″ del objetivo, S/N ≥ 8, residuo ≤ 3″;
+   - se aplica su movimiento propio y cada estrella tiene un punto cero libre;
+   - el desplazamiento de cada imagen se resuelve de forma conjunta, con recorte 4σ.
+3. Una posición por temporada (separación > 10 d) ajustada conjuntamente a todas sus exposiciones (verosimilitud perfilada), con errores:
+   - del hessiano, escalados por el χ² local;
+   - más el error del registro;
+   - inflados por la dispersión de ajustes individuales.
+   Si una temporada no se puede ajustar, se registra con su motivo.
+4. Desplazamiento entre la primera y la última temporada con detección ≥ 10σ, con significación de Mahalanobis.
+5. Control estacionario: cada estrella de referencia, con registro *leave-one-out*, pasa por la misma cadena. Calibra los errores (factor ≥ 1) y fija el máximo alcanzado por una fuente fija.
+6. **MOTION_MEASURED** solo si se cumplen todas estas condiciones:
+   - S ≥ 5σ tras calibrar;
+   - S por encima del máximo del control;
+   - ≥ 3 estrellas de control;
+   - sin confusión;
+   - si el núcleo está saturado, ≥ 3 ajustes individuales por temporada.
+   Si no, **INSUFFICIENT_EVIDENCE**; con detectores mezclados, **INCOMPATIBLE_OBSERVATIONS**; con menos de dos temporadas, **INSUFFICIENT_DATA**. Sin Gaia, o si ninguna imagen se puede registrar, no se supone estacionariedad: evidencia insuficiente.
+7. La predicción de catálogo (SIMBAD) solo se **compara al final** y no interviene en la búsqueda, el ajuste ni la decisión (verificado por prueba).
+
+**Selección de imágenes** (`select_epochs`):
+- mismo detector, recortes de 12′;
+- temporadas con ≥ 3 imágenes y la base temporal más larga (primera, intermedia y última);
+- las imágenes más alejadas del borde del detector.
+
+La λ varía dentro de un detector (LVF). Las posiciones no dependen de λ a primer orden y cada imagen usa su propia ePSF. Esto no es la comparabilidad fotométrica S1–S9 de Time Explorer, que es más estricta.
+
+**Interfaz:** en Time Explorer, pestaña «Buscar algo que se mueve».
+- Fuente: el objetivo del catálogo, una fuente detectada en la época 1 (filtro adaptado) o RA/Dec, con un radio de búsqueda.
+- Imágenes: las épocas de la secuencia, o «Ampliar la base temporal», mismo detector, con 2–8 imágenes por temporada.
+- Lista de investigaciones reales guardadas.
+- Insignia de resultado y motivos; métricas, comparación con el catálogo, tabla por temporada, imágenes con SHA-256 y URL, control y JSON reproducible.
+- Las cifras de un resultado no validado se rotulan «Desplazamiento aparente (no validado)».
+
+**Casos reales** (todos en `results/motion_*.json`, generados con `scripts/investigate_motion.py`, recortes en caché, nunca modificados):
+
+| Caso | Det. | λ (µm) | Imágenes / temporadas | Resultado | Medida (calibrada) | Control | Catálogo (solo comparación) |
+|---|---|---|---|---|---|---|---|
+| ε Ind B | D2 | 1.26–1.37 | 12 / 3 | **MOTION_MEASURED** | 6.92 ± 0.32″ en 522 d, 22.5σ | 40 estrellas, máx 4.0σ | 6.55″ previsto, diferencia 1.2σ |
+| ε Ind B | D3 | 1.69–2.07 | 12 / 3 | **MOTION_MEASURED** | 6.22 ± 0.15″ en 516 d, 43.4σ | 43 estrellas, máx 6.2σ | 6.47″ previsto, diferencia 1.7σ |
+| WISE 0855 | D6 | 4.61–4.90 | 15 / 3 (6 por temporada) | **MOTION_MEASURED** (marginal) | 4.43 ± 0.76″ en 174 d, 5.8σ | 7 estrellas, máx 3.1σ | 4.73″ previsto, diferencia 2.0σ |
+| WISE 0855 (misma llamada que la app, 4 por temporada; `motion_wise0855_d6_app_4per.json`) | D6 | 4.61–4.90 | 11 / 3 (2 con ≥ 10σ; 2025-11 da 7.6σ) | INSUFFICIENT_EVIDENCE | 4.53 ± 1.08″ en 144 d, 4.4σ | 7 estrellas, máx 1.5σ | 3.99″ previsto, 2.8σ |
+| Barnard | D6 | 4.60–4.89 | 12 / 3 (2026-08 sin ajuste: núcleo saturado, χ² sin mínimo definido) | INSUFFICIENT_EVIDENCE (núcleo saturado) | 4.97 ± 3.77″ en 254 d, 1.5σ | 28 estrellas, máx 3.4σ | — |
+| Barnard | D1 | 0.88–0.99 | 12 / 3 | INSUFFICIENT_EVIDENCE (confusión + núcleo saturado) | ajuste aparente 15.1″, **no validado** | 40 estrellas, máx 2.4σ | 10.3″ previsto: el ajuste no es compatible (18σ) |
+| Control M101 (estrella Gaia con μ < 20 mas/año) | D2 | 1.28–1.39 | 12 / 3 | INSUFFICIENT_EVIDENCE (correcto) | 0.14 ± 0.08″ en 381 d, 1.7σ | 20 estrellas, máx 2.9σ | — |
+
+Interpretación:
+- **ε Ind B** se mide con dos detectores independientes. Las medidas concuerdan entre sí (diferencias en Δξ y Δη de 1.6σ y 1.2σ) y con el catálogo.
+- En D3, una de las 43 estrellas de control llegó a 6.2σ. La tasa de falsos positivos del control a 5σ no es nula (1/43), y por eso la decisión exige superar el máximo del control.
+- **WISE 0855** está en el límite: unas 5σ por exposición. Con 6 exposiciones por temporada se mide a 5.8σ. Con la selección por defecto de 4, la temporada de 2025-11 no llega a 10σ, la base se acorta a 144 d y el resultado es evidencia insuficiente. Ambos resultados son honestos y dependen de las exposiciones usadas, que quedan registradas.
+- **Barnard** (J ≈ 5) satura el núcleo en todas las temporadas. En D1 el ajuste salta a otra fuente: hay confusión. La regla lo rechaza, aunque la cifra aparente es de 20σ y no coincide con el catálogo: es un ejemplo de falso positivo evitado.
+- **M101** (campo de 6′ de la secuencia) no puede registrarse: hay 3 referencias Gaia aisladas y la luz de la galaxia da χ² de 28–79. El resultado es evidencia insuficiente con ese motivo. El control en 12′ no da falso positivo.
+
+**Experimentos sintéticos** (`tests/test_motion.py`, 24 pruebas, rotuladas SIMULADO). Usan imágenes con la ePSF oficial de un FITS real de `data/reference` (solo lectura), ruido gaussiano conocido, 14 estrellas Gaia simuladas y errores de WCS por imagen. Resultados:
+- se recupera un desplazamiento de (6, −4)″ dentro de 3σ;
+- 6 objetivos estacionarios con semillas distintas: ningún falso positivo;
+- *pulls* de 8 realizaciones con desviación < 1.6 y media < 1;
+- errores de WCS de σ = 1″ (más de 3 veces el máximo real de 0.32″) eliminados, residuo < 0.2″;
+- con σ = 2″, las imágenes con WCS desviado más de 3″ pierden las referencias y el método degrada de forma conservadora;
+- sin Gaia, evidencia insuficiente; con flujo de 5 (2–3σ por imagen), nunca medido; con flujo de 60, medido con errores honestos;
+- una temporada o una imagen dan datos insuficientes; detectores mezclados, incompatibles;
+- se informa la saturación;
+- una predicción de catálogo errónea no cambia la decisión;
+- una temporada sin ajuste se informa con su motivo;
+- selección de épocas, agrupación por temporadas, validación de entradas e integridad del FITS de referencia.
+
+**Estado:** **MEASUREMENT_SUPPORTED**, para fuentes no saturadas y aisladas, con ≥ 3 estrellas Gaia de referencia y ≥ 2 temporadas con detección ≥ 10σ:
+- desplazamientos de ≳ 1″ (≥ 5σ) en fuentes brillantes;
+- de varios segundos de arco en fuentes cercanas al límite.
+
+En el resto de casos (saturación, confusión, campos sin referencias, una temporada) el método solo permite inspección y lo dice. Incertidumbres:
+- errores de ajuste de 0.02–1.1″ por temporada;
+- registro de 0.01–0.03″ por temporada;
+- factor de calibración 1.00–1.15.
+
+La tasa media es aparente: incluye paralaje y la geometría de las fechas, y no es un ajuste de movimiento propio.
+
+Pruebas de la pestaña (`tests/test_motion_app.py`, 4):
+- las investigaciones guardadas son reales, con SHA-256 y URL de IRSA;
+- la pestaña se dibuja y una caída **simulada** de Gaia se explica sin fingir medida;
+- la base temporal ampliada ofrece el número de imágenes por temporada;
+- **red:** se reproduce ε Ind B D3 desde los 12 originales en caché y una consulta Gaia nueva (MOTION_MEASURED, diferencia < 0.05″, SHA-256 iguales antes y después).
+
+Recorrido en navegador real:
+- la pestaña aparece en Time Explorer;
+- la lista de 6 investigaciones guardadas muestra los resultados de la tabla;
+- en la secuencia WISE 0855 (2 imágenes) el resultado es evidencia insuficiente (la época de 2026 da 7.6σ, por debajo de 10σ);
+- con la base temporal ampliada, el resultado es el de la fila «app» de la tabla.
+
+### C. Integración
+
+- **Commits** en `feature/atlas-motion`:
+  - `5eb4a8e`: módulo de medida y casos iniciales;
+  - `83fa795`: Atlas, estado común, pestaña, pruebas y casos reales;
+  - el siguiente: motivos de temporadas fallidas, imágenes por temporada y documentación (`git log` da el hash).
+  Las ramas anteriores se conservan.
+- **Archivos nuevos:**
+  - `skyclues/atlas.py`, `skyclues/atlas_component.js`, `skyclues/motion.py`, `skyclues/motion_page.py`;
+  - `scripts/investigate_motion.py`;
+  - `tests/test_atlas.py`, `tests/test_motion.py`, `tests/test_motion_app.py`;
+  - `results/motion_*.json`.
+- **Archivos modificados:** `app.py` (selector de localización y pestaña), `skyclues/navigation.py` (estado común) y `skyclues/release_ui.py` (selector y panel de coordenadas). Los informes de búsqueda de Barnard y ε Ind B se renombraron a `results/motion_search_*.json` para que no se tomen como secuencia por defecto.
+- **Regresión** (`.venv\Scripts\python -m pytest -q`, red disponible): 298 pruebas satisfactorias sin `tests/test_motion.py` (3 min 14 s), más 24 sintéticas (4 min 30 s). En total **322 satisfactorias, 0 fallidas**, 1 aviso conocido de Astropy. Las 274 anteriores siguen pasando.
+- **Rendimiento:**
+  - una investigación con 12 recortes de 12′ tarda 2–7 min en el portátil de desarrollo, la mayor parte en el control *leave-one-out*;
+  - unos 4 MB por recorte, en caché y reutilizados;
+  - con las épocas de la secuencia, unos 6 s;
+  - las pruebas sintéticas tardan unos 4–5 min.
+- **Defectos corregidos durante la actividad:**
+  - el centro por defecto del atlas tomaba un informe nuevo;
+  - motivo erróneo en M101 («no se detecta» en lugar de «no se puede registrar»);
+  - cifras de resultados rechazados rotuladas como «medido»;
+  - temporada descartada sin motivo en Barnard D6.
+  - el círculo y Gaia del atlas no se redibujaban tras redimensionar.
+- **API para Codex** (detalle en el código):
+
+```python
+from skyclues import motion, navigation, atlas
+sel = motion.select_epochs(records, ra, dec, detector, per_season=4)      # dict: selected, season_dates, rule…
+frames = motion.fetch_frames(sel, ra, dec)                                # MotionFrame(image, record, cutout_url, path, sha256)
+inv = motion.investigate(frames, (ra_sel, dec_sel), gaia=references.fetch_gaia(ra, dec, 0.2),
+                         astrometry=astro_or_None, search_radius_arcsec=20)
+inv.outcome, inv.label, inv.reasons                                       # MOTION_MEASURED | INSUFFICIENT_EVIDENCE | …
+result = motion.to_jsonable(inv)   # displacement, seasons, seasons_failed, images, registration, control, catalogue_comparison
+navigation.current_region(st.session_state, st.query_params)              # {ra, dec, fov[, source, astrometry]}
+navigation.set_region(state, params, ra, dec, fov, source="Atlas")         # valida; ValueError si no
+navigation.open_region("temporal" | "espectral")                          # callback de botón
+```
+
+Reglas:
+- no mostrar nunca `displacement` sin `outcome`; si `outcome != MOTION_MEASURED`, las cifras son «aparentes (no validadas)»;
+- `catalogue_comparison` es contexto, no evidencia;
+- las capas del atlas no son datos SPHEREx.
+
+Pendiente o fuera de alcance:
+- `main` no se ha actualizado con esta rama (decisión del usuario);
+- no hay vista del atlas con capa SPHEREx;
+- no hay ajuste de movimiento propio y paralaje;
+- fuentes saturadas o en campos densos sin un modelo más completo de las alas.
 
 ## Integración local de los dos desarrollos (14-11-2026)
 
@@ -32,7 +211,7 @@ Base común `2ec4881`. Rama temporal `integration/skyclues-complete`, fusiones e
 - Un servidor Streamlit arrancado antes de la integración debe reiniciarse (no recarga `skyclues/`; ver problema abierto 8).
 - Siguen vigentes los límites de servicios y científicos de las secciones siguientes y de `RELEASE_READINESS.md`.
 
-Sin push, despliegue, publicación ni envío a NASA. Ramas y worktrees originales conservados. La investigación de movimiento no se ha iniciado (requiere una orden aparte).
+Sin push, despliegue, publicación ni envío a NASA. Ramas y worktrees originales conservados. (La investigación de movimiento se inició después; ver la primera sección.)
 
 ## Referencias astronómicas Gaia / WISE — integradas
 
@@ -210,7 +389,7 @@ Reglas nuevas: no presentar nunca `target_position` como detección; mostrar `re
 ## Problemas abiertos
 1. No hay vista con el norte arriba: los ejes son los del detector de la época 1.
 2. La λ por píxel tiene precisión de visualización (WCS-WAVE); CWAVE/CBAND no están implementados.
-3. RW Aur, R Dra, Barnard y ε Ind B no se han ejecutado en SPHEREx (la propagación ya está probada con sus datos de SIMBAD).
+3. RW Aur y R Dra no se han ejecutado en SPHEREx. Barnard, ε Ind B y WISE 0855 tienen investigaciones de movimiento reales (primera sección).
 4. `find_pair` (camino antiguo de parejas, solo CLI) no centra por movimiento propio; la app usa siempre secuencias. `evaluate_pair` sí acepta `astrometry`.
 5. El extremo TAP de SIMBAD en CDS (`simbad.cds.unistra.fr/simbad/sim-tap`) devolvió 404 el 14-11-2026; se usa el espejo de Harvard automáticamente. Sin SIMBAD, la búsqueda por nombre usa Sesame sin movimiento propio y lo avisa.
 6. No se aplica aberración: se asume que el WCS de SPHEREx está ajustado a posiciones astrométricas (catálogo). Efecto en todo caso común a todo el campo.

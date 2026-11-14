@@ -30,14 +30,15 @@ def _gaia_or_none(ra, dec, fov):
 
 @st.cache_data(max_entries=8, show_spinner=False)
 def _investigate_extended(ra: float, dec: float, detector: int, per_season: int, radius: float,
-                          start_ra: float, start_dec: float, astro_json: str | None) -> dict:
+                          start_ra: float, start_dec: float, astro_json: str | None,
+                          label: str = "selección en Time Explorer") -> dict:
     recs = archive.query_images(ra, dec)
     sel = motion.select_epochs(recs, ra, dec, detector, per_season=per_season)
     frames = motion.fetch_frames(sel, ra, dec)
     gaia, err = _gaia_or_none(ra, dec, sel["field_deg"])
     astro = Astrometry.from_dict(json.loads(astro_json)) if astro_json else None
     inv = motion.investigate(frames, (start_ra, start_dec), gaia=gaia, astrometry=astro,
-                             search_radius_arcsec=radius, source_label="selección en Time Explorer")
+                             search_radius_arcsec=radius, source_label=label)
     out = motion.to_jsonable(inv)
     out["selection"] = {k: v for k, v in sel.items() if k != "selected"}
     if err:
@@ -178,14 +179,24 @@ def render(seq, report_json: str) -> None:
     span = seq.metrics["span_days"]
     img_mode = st.radio("Imágenes", IMAGE_MODES, key="mv_images", horizontal=True,
                         captions=[f"{seq.n} imágenes · {span:.0f} d · campo {seq.field_deg * 60:g}′",
-                                  f"D{f0.detector}, temporadas más separadas, hasta "
-                                  f"{motion.MAX_SEASONS * motion.PER_SEASON} recortes de "
-                                  f"{motion.MOTION_FIELD_DEG * 60:g}′ (~4 MB cada uno, en caché)"])
+                                  f"D{f0.detector}, hasta {motion.MAX_SEASONS} temporadas lo más separadas posible, "
+                                  f"recortes de {motion.MOTION_FIELD_DEG * 60:g}′"])
+    per_season = motion.PER_SEASON
+    if img_mode == IMAGE_MODES[1]:
+        per_season = st.select_slider(
+            "Imágenes por temporada", [2, 3, 4, 6, 8], value=motion.PER_SEASON, key="mv_per_season",
+            help="Más exposiciones por temporada mejoran la señal de una fuente débil y la comprobación de "
+                 "consistencia interna, a cambio de más recortes (~4 MB cada uno).")
+        st.caption(f"Hasta {motion.MAX_SEASONS * per_season} recortes (~{4 * motion.MAX_SEASONS * per_season} MB, "
+                   "se reutilizan desde la caché). El resultado depende de las exposiciones elegidas: se registra en "
+                   "el informe.")
     if img_mode == IMAGE_MODES[0] and span < 30:
         st.caption(f"Esta secuencia abarca {span:.0f} días: solo se detectarían movimientos grandes. La base "
                    "temporal ampliada suele cubrir un año.")
     run = st.button("Investigar movimiento", type="primary", key="mv_run")
-    key = json.dumps([report_json[:64], len(report_json), src_mode, start, radius, img_mode], default=str)
+    key = json.dumps([report_json[:64], len(report_json), src_mode, start, radius, img_mode, per_season],
+                     default=str)
+    label = a.name if src_mode == SOURCE_MODES[0] and a else src_mode
     if run:
         with st.status("Midiendo posiciones en las imágenes originales…", expanded=True) as box:
             try:
@@ -195,16 +206,16 @@ def render(seq, report_json: str) -> None:
                     box.write("Ajustando la ePSF y registrando cada época…")
                     inv = motion.investigate(seq.frames, start, gaia=gaia, astrometry=a,
                                              search_radius_arcsec=float(radius),
-                                             source_label=a.name if src_mode == SOURCE_MODES[0] and a else src_mode)
+                                             source_label=label)
                     out = motion.to_jsonable(inv)
                     if err:
                         out.setdefault("warnings", []).append(err)
                 else:
                     box.write("Seleccionando temporadas y descargando recortes (o leyendo la caché)…")
                     out = _investigate_extended(round(float(start[0]), 6), round(float(start[1]), 6),
-                                                int(f0.detector), motion.PER_SEASON, float(radius),
+                                                int(f0.detector), int(per_season), float(radius),
                                                 float(start[0]), float(start[1]),
-                                                json.dumps(a.to_dict()) if a else None)
+                                                json.dumps(a.to_dict()) if a else None, label)
                 box.update(label=f"Investigación completada: {out['outcome_label']}", state="complete", expanded=False)
                 st.session_state["mv_result"] = {"key": key, "result": out}
             except (archive.ArchiveError, motion.MotionInputError, ValueError) as err:
