@@ -1,2 +1,4 @@
 -r requirements.txt
 pytest==9.2.0
+photutils==3.0.0
+astropy-healpix==2.0.1

@@ -1,9 +1,56 @@
 # SkyClues — estado del proyecto
 
-Última actualización: 14-11-2026, Claude Code A (corrección de la auditoría científica y funcional independiente del commit `d62b945`). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md).
+Última actualización: 14-11-2026, Codex: validación e integración de Spectrum Explorer sobre `e359426`. El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md). Las secciones de Claude A/B más abajo son antecedentes; esta sección prevalece sobre sus pendientes.
 
 ## Objetivo inmediato
-Primera versión pública (pendiente de autorización para desplegar). Decidir si se publican los FITS de los ejemplos (ya versionados en un commit local separado, ver «Decisiones pendientes»), hacer el refinamiento visual (Codex) y desplegar en Streamlit Community Cloud.
+Completar funcionalidades y validación antes del refinamiento visual. Esta actividad no autoriza push, publicación, despliegue ni gastos.
+
+## Validación de Spectrum Explorer — Codex
+
+Estado de entrada confirmado: repositorio canónico `SkyClues`, árbol limpio y HEAD `e35942677806403eac596f53fcd75ad640af0989`. No se reconstruyeron los exploradores ni se modificaron FITS originales.
+
+### Defectos corregidos
+
+- **HTTP/FITS:** se rechazan Content-Range sin tamaño verificable o fuera del archivo, desaparición/cambio del ETag y multipart sin cierre. Los timeouts durante el cuerpo se clasifican como transitorios. Una cabecera truncada sin END produce error en lugar de un bucle. Se comprueban 102 planos, BLANKCH y concordancia de canales/área de píxel entre teselas. HTTP 200 sigue cerrándose sin leer el cuerpo.
+- **Caché:** SHA-256 por rango detecta corrupción incluso si conserva la longitud. Los rangos antiguos sin digest se descargan de nuevo; los bytes originales no se reinterpretan como válidos. Se prueban memoria/disco/refresh, separación por ETag, cuota y lotes ≤64. Las estadísticas cuentan intentos y cuerpos HTTP realmente consumidos, incluidos delimitadores multipart; no HTTP/TLS ni `properties` (cliente genérico).
+- **Espectro:** NHITS≤0 invalida la apertura y el brillo del píxel; los canales BLANKCH no muestran brillo aunque aparezcan valores contradictorios. En mapas, datos contradictorios en un canal declarado vacío provocan error. Se acota el trabajo de subpíxeles.
+- **Método:** se retiró la afirmación de equivalencia exacta con el tutorial. SkyClues usa círculos sobre el cielo y 5×5 submuestras; el tutorial usa círculos en coordenadas de píxel y solapamiento exacto de Photutils. Se conserva el método existente y se identifica explícitamente su diferencia, sin inventar errores. La dispersión del fondo no se presenta como incertidumbre fotométrica.
+- **Movimiento propio:** se eliminó la alternativa de propagar a la fecha actual cuando faltan fechas. Se conserva el catálogo con aviso. El punto medio de MJD-BEG/END se identifica como referencia para una posición esperada, no como época efectiva del cubo. WISE 0855: catálogo J2000.0, entradas 2025-05-05 a 2026-05-14, punto medio 2025-11-08, desplazamiento esperado 8.333″. No se afirma detección.
+- **Integración:** transferir desde Time conserva RA/Dec/FOV, también para WISE; la marca de posición esperada se calcula por separado. Volver a Time inicia una búsqueda por coordenadas fijas y elimina el informe anterior para no mostrar datos de otra región. Las URL espectrales inválidas se rechazan antes de leer el cubo.
+- **Lectura funcional:** mapa y espectro se ajustan a su columna sin tapar métricas; el mapa conserva igual escala angular en ambos ejes. Escala de color con ticks en espacio estirado y texto de tamaño legible. λ y su intervalo aparecen completos con unidades en una leyenda aunque una métrica se acorte. Sin refinamiento visual general.
+
+### Evidencia científica independiente
+
+Reproducción ejecutable: `scripts/validate_spectrum.py`; resultados por los **102 canales** y metadatos en [`results/spectrum_validation.json`](results/spectrum_validation.json).
+
+- Posición oficial: RA 60.8109955°, Dec 51.3404038°, Npix445; λ de SPECTRAL_CHANNELS frente a `data_cube_crval3_arr`: diferencia máxima 2.37e−7 µm (redondeo float32). Se contrastó NaN ⇔ NHITS=0 en recortes de canales 51/52/63; 51/52 vacíos en la región probada. No se descargaron planos enteros para afirmar una comprobación global.
+- La implementación independiente usa SkyCoord para **todos** los subpíxeles, sin los ayudantes geométricos del motor. Diferencia máxima del flujo sobre los 100 canales válidos: **3.09e−5 mJy**.
+- Canal 63 (3.292999983 µm): SkyClues 2/4–7 px = **355.745064 mJy**, brillo del píxel = **12.005079 MJy/sr**, fondo = **3.866850 MJy/sr**. Photutils con círculos de rejilla 2/4–7 = **328.854263 mJy**; la diferencia geométrica no es un error estadístico ni una equivalencia exacta.
+- Reproducción del tutorial con **Photutils, apertura 5 px y anillo 40–60 px**, todos los canales: canal 63 = **2548.417547 mJy**. El cambio de apertura y fondo impide equipararlo a los 355 mJy del valor predeterminado. Los vecinos inmediatos 62/64 dan **108.521952 / 209.637216 mJy** en SkyClues: la cifra «45–61 mJy en los vecinos» del relevo anterior no describe esos dos canales.
+- Área HEALPix = **3.901114878e−9 sr** frente a **3.901076445e−9 sr** derivada localmente del WCS como en el tutorial (diferencia ≈0.001 %). Se registra SHA-256 del recorte independiente y ETag del FITS.
+- HEALPix comparado con astropy-healpix en 3005 coordenadas, órdenes 0/5/14. Cabeceras/WCS reales comprobadas en el campo oficial y dos regiones polares, Npix1023 y Npix10240.
+
+### Recursos medidos
+
+En el campo oficial de 6′, lectura fría de los rangos requeridos: cabecera **80,640 B / 4 peticiones**, mapa **203,134 B / 1**, espectro **6,511,852 B / 6**. Mapa+espectro: **9.91 s**, pico **10,111,542 B** con tracemalloc (memoria Python de esas operaciones, no RSS total de Streamlit). Repetición del espectro: **0 peticiones**, 6,475,776 B de caché. Los verificadores independientes consumieron otros ~36.1 MB; ninguna tesela completa de 320.9 MB. No extrapolar estas cifras a campos/aperturas máximos o bordes entre teselas.
+
+### Pruebas y estado externo
+
+- Nuevas: `test_spectral_offline.py` (37), `test_spectral_app.py` (11), `test_spectral_live.py` (1): **49 pruebas**. Cubo sintético independiente servido por rangos, oráculos científicos y AppTest con red bloqueada.
+- **Pasada final completa: 173 passed, 1 warning, 71.13 s**, incluidas las **49 nuevas** y las 124 anteriores. El aviso de Astropy informa de NaN descartados en el anillo del verificador independiente, no de datos rellenados. Las cuatro búsquedas reales de Time/SIA2 también pasan. Las 66 pruebas offline anteriores siguen intactas.
+- Las primeras ejecuciones dentro del sandbox de Windows fallaron por permisos de `os.replace` en temporales. Al ejecutar fuera del sandbox pasaron; no se alteró la escritura atómica de Time Explorer para acomodar el entorno.
+- IRSA SIA2 respondió **HTTP 200** a una consulta directa acotada; las pruebas de búsqueda real de la app y SIA2 pasaron. La caída 502 del relevo no se reproduce en esta comprobación. No se ha hecho una auditoría nueva de disponibilidad continua o equivalencia entre rutas.
+- **Navegador real, localhost:8503:** escala asinh legible (0.788, 2.4, 4.95, 9.96, 20.4 MJy/sr), mapa sin solapamiento y con la misma escala angular en ambos ejes. Clic → RA 60.791315°, Dec 51.328439°, correspondiente al píxel nativo (240,216) con error <0.00013 px por el redondeo mostrado. El aviso conserva explícitamente el espectro anterior hasta pulsar actualizar; después se verifica la nueva posición en el espectro. Canales 51 y 52: mapa vacío y aviso visible. Regreso a Time: centro original 60.810995°, 51.340404° y FOV 6′, sin informe antiguo. Ejemplo temporal real de WISE → Spectrum → canal 94: centro conservado 133.760100°, −7.242247°, FOV 6′ y advertencia completa de época/intervalo/posición esperada. Los controles y las magnitudes fueron revisados funcionalmente; no se rediseñó la interfaz.
+
+### Repositorio y entrega local
+
+Cambios preparados para un único commit local de validación sobre `e359426`: motor, correcciones funcionales del visor, 49 pruebas, verificador independiente, informe numérico, README/CONTEXT/STATE y dependencias de desarrollo. Los cuatro commits locales anteriores (`bf9152b`, `65396a3`, `e3410de`, `e359426`) se conservan. **Sin push ni despliegue.** El hash del commit de esta validación se consulta con `git log -1 --oneline` (este documento está contenido en él).
+
+### Límites y siguiente resultado técnico
+
+El resultado sigue siendo exploratorio, sin incertidumbres ni corrección de apertura. La validación numérica independiente está concentrada en el campo oficial: siguiente prioridad técnica, ampliar a **2–3 posiciones, fuentes compactas y cruces de teselas**, medir la sensibilidad a apertura/fondo y comprobar presupuesto de memoria en el FOV/apertura máximos. No confundir esas futuras comprobaciones con espectrofotometría calibrada. El refinamiento visual general, multibanda avanzada y publicación siguen fuera del alcance.
+
+## Historial anterior a esta validación
 
 ## Auditoría independiente de `d62b945` (PASS_WITH_CORRECTIONS) — correcciones
 | Hallazgo | Estado | Causa | Corrección | Prueba |

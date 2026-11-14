@@ -93,8 +93,8 @@ def _qp_region():
             ra, dec = validate_coordinates(qp.get("ra"), qp.get("dec"))
         if "fov" in qp:
             fov = validate_fov_deg(qp.get("fov"))
-    except ValueError:
-        return None, None, None
+    except ValueError as err:
+        raise ValueError(f"Parámetros de la URL no válidos: {err}") from err
     return ra, dec, fov
 
 
@@ -173,6 +173,7 @@ def to_time_explorer(ra: float, dec: float, fov: float) -> None:
     """Callback: open the same region in Time Explorer (new search with these coordinates)."""
     st.session_state["explorer"] = "Time Explorer · tiempo"
     st.session_state["mode"] = "Nueva búsqueda"
+    st.session_state.pop("report", None)
     for k in ("ra_in", "dec_in", "fov_preset", "fov_custom", "how"):
         st.session_state.pop(k, None)
     st.query_params.clear()
@@ -199,7 +200,11 @@ def _step_channel(delta: int, numbers: list[int]) -> None:
 # ----------------------------------------------------------------------------- page
 def render(shared: dict | None) -> None:
     with st.sidebar:
-        region = region_sidebar(shared)
+        try:
+            region = region_sidebar(shared)
+        except ValueError as err:
+            st.error(str(err))
+            return
         st.markdown("---")
         st.caption("Datos: NASA/IPAC IRSA · SPHEREx DR1 All-Sky spectral cube (doi:10.26131/IRSA679), leído "
                    "por rangos de bytes de los FITS oficiales (sin descargar teselas completas).")
@@ -226,7 +231,10 @@ def render(shared: dict | None) -> None:
     epoch_info = {"propagated": False}
     if astro is not None and astro.has_proper_motion:
         try:
-            ra_c, dec_c, epoch_info = cached_epoch(json.dumps(astro.to_dict(), sort_keys=True))
+            expected_ra, expected_dec, epoch_info = cached_epoch(json.dumps(astro.to_dict(), sort_keys=True))
+            # A transferred field must keep its exact centre; the expected target is a separate marker.
+            if region["source"] != SOURCES[0]:
+                ra_c, dec_c = expected_ra, expected_dec
         except Exception as err:  # noqa: BLE001
             _show_error(err, "No se pudo leer la cabecera de la tesela")
             return
@@ -256,11 +264,14 @@ def render(shared: dict | None) -> None:
 
     st.markdown(f'<span class="sc-badge">Centro RA {ra_c:.5f}° · Dec {dec_c:+.5f}° · campo {fov * 60:.1f}′</span> '
                 f'&nbsp; <span class="sc-badge">{region["label"]}</span>', unsafe_allow_html=True)
+    if epoch_info.get("warning"):
+        st.warning(epoch_info["warning"] + f" Época de referencia: {astro.epoch_jyear:.2f}. No es una detección.")
     if epoch_info.get("propagated") and "mjd_mid" in epoch_info:
         mv = epoch_info["motion_over_inputs_arcsec"]
         st.markdown(
             f'<div class="sc-note"><b>Objetivo en movimiento: {astro.name}</b> ({astro.total_pm_arcsec_yr:.2f}″/año). '
-            f'Posición <b>calculada</b> para la fecha media de las exposiciones que forman esta tesela del cubo '
+            f'Época de referencia del catálogo: {astro.epoch_jyear:.2f}. Posición <b>esperada, calculada</b> para '
+            f'el punto medio del intervalo de entradas de esta tesela (no es una época efectiva de observación) '
             f'({epoch_info["date_mid"]}; entradas del {epoch_info["date_beg"]} al {epoch_info["date_end"]}). '
             f'Durante ese intervalo el objeto se desplaza {mv:.1f}″ ({mv / 12.883:.2f} píxeles del cubo): en el '
             'promedio puede aparecer alargado. La cruz es un cálculo, no una detección.</div>', unsafe_allow_html=True)
@@ -294,15 +305,17 @@ def render(shared: dict | None) -> None:
                              st.session_state.get("sx_rin", config.CUBE_APERTURE_DEFAULT_PX[1]),
                              st.session_state.get("sx_rout", config.CUBE_APERTURE_DEFAULT_PX[2]))
         tile0 = cmap.patches[0].tile
-        chart = sv.field_chart(png, info, pixels, cmap, target=(ra_c, dec_c), pick=pick, aperture=ap_now,
+        target = (expected_ra, expected_dec) if epoch_info.get("propagated") else (ra_c, dec_c)
+        chart = sv.field_chart(png, info, pixels, cmap, target=target, pick=pick, aperture=ap_now,
                                pixel_arcsec=tile0.pixel_scale_arcsec)
         st.altair_chart(chart, on_select=_set_pick_from_chart, selection_mode="pick", key="sx_field",
-                        width="content")
+                        width="stretch")
         st.image(sv.colorbar_png(info))
         st.caption(
             "Geometría WCS: cada píxel nativo del cubo (12.9″) se dibuja en su posición, con su valor original, sin "
-            f"remuestreo ni suavizado; norte arriba, este a la izquierda (1 píxel de pantalla ≈ "
-            f"{info['screen_arcsec_per_px']:.1f}″). Escala de visualización propia de cada canal "
+            f"remuestreo ni suavizado; norte arriba, este a la izquierda (raster base de "
+            f"{info['npix']} píxeles, {info['screen_arcsec_per_px']:.1f}″/px; su tamaño en pantalla se adapta al visor). "
+            f"Escala de visualización propia de cada canal "
             f"({'percentiles 1–99.5 del campo, asinh' if layer == 'image' else 'lineal'}); compare intensidades entre "
             "canales con el espectro. Rosa: sin datos (NaN, NHITS = 0). Gris claro: fuera de la región leída. "
             "Cruz azul: objetivo; rombo ámbar: posición del espectro, con su apertura y su anillo de fondo. "
@@ -315,7 +328,7 @@ def render(shared: dict | None) -> None:
                        f"vacío (todo NaN, NHITS = 0; cabecera BLANKCH = '{tile0.header('PRIMARY').get('BLANKCH')}') "
                        "para conservar la numeración. SkyClues no lo rellena ni lo interpola.")
         c1, c2 = st.columns(2)
-        c1.metric("λ central", f"{ch.wavelength_um:.3f} µm")
+        c1.metric("λ central (µm)", f"{ch.wavelength_um:.3f}")
         c2.metric("Detector · subcanal", f"D{ch.detector} · {ch.subchannel}")
         c1.metric("Intervalo del canal", f"{ch.wl_min_um:.3f}–{ch.wl_max_um:.3f} µm")
         c2.metric("Resolución R = λ/Δλ", f"{ch.resolving_power:.0f}")
@@ -323,7 +336,8 @@ def render(shared: dict | None) -> None:
         c1.metric("Píxeles con datos en el campo", f"{s['valid_fraction']:.1%}", f"{s['n_valid']} de {s['n_field']}",
                   delta_color="off")
         c2.metric("NHITS mediano", f"{s['nhits_median']:.0f}", f"mínimo {s['nhits_min']}", delta_color="off")
-        st.caption(f"Canal {ch.number} de 102 = plano {ch.plane} del cubo (0-based) · ancho {ch.bandwidth_um:.3f} µm · "
+        st.caption(f"λ {ch.wavelength_um:.3f} µm · intervalo {ch.wl_min_um:.3f}–{ch.wl_max_um:.3f} µm · "
+                   f"Canal {ch.number} de 102 = plano {ch.plane} del cubo (0-based) · ancho {ch.bandwidth_um:.3f} µm · "
                    f"teselas HEALPix {', '.join(str(t) for t in s['tiles'])} · píxeles del campo con OVERFLOW: "
                    f"{s['flag_pixels']['OVERFLOW']}, OUTLIER: {s['flag_pixels']['OUTLIER']}, SOURCE: "
                    f"{s['flag_pixels']['SOURCE']}. λ, intervalo y R proceden de la tabla SPECTRAL_CHANNELS del FITS.")
@@ -360,7 +374,7 @@ def render(shared: dict | None) -> None:
         return
     qlabel = st.radio("Magnitud representada", list(QUANTITY_LABELS), horizontal=True, key="sx_quantity")
     quantity = QUANTITY_LABELS[qlabel]
-    st.altair_chart(sv.spectrum_chart(spec, quantity, selected_channel=ch.number), width="content")
+    st.altair_chart(sv.spectrum_chart(spec, quantity, selected_channel=ch.number), width="stretch")
     n_missing = sum(r["status"] != "ok" for r in spec.rows)
     st.caption(
         f"Posición RA {spec.ra:.5f}°, Dec {spec.dec:+.5f}°. {spec.n_measured} de 102 canales con valor; {n_missing} sin "
@@ -372,13 +386,15 @@ def render(shared: dict | None) -> None:
         st.warning(w)
     st.markdown(
         '<div class="sc-note"><b>Qué es y qué no es este espectro.</b> Fotometría de apertura sobre el cubo '
-        f'combinado, con el método del tutorial oficial de IRSA: suma de la apertura circular de {spec.aperture.r_ap:g} '
+        f'combinado, adaptando el método del tutorial de IRSA: apertura circular sobre el cielo de {spec.aperture.r_ap:g} '
         f'píxeles ({spec.aperture.r_ap * spec.pixel_scale_arcsec:.0f}″; fracciones de píxel con {spec.subpixels}×'
         f'{spec.subpixels} submuestras), menos la media con recorte 3σ del anillo {spec.aperture.r_in:g}–'
         f'{spec.aperture.r_out:g} píxeles por el área de la apertura, multiplicada por el ángulo sólido del píxel '
         f'({spec.pixel_solid_angle_sr:.4e} sr, píxeles HEALPix de igual área) → mJy. IRSA advierte que un espectro '
         'extraído del cubo <b>solo es apropiado para visualización</b>: no tiene incertidumbres (el cubo no incluye '
-        'varianza), no corrige la fracción de la PSF fuera de la apertura, puede incluir fuentes vecinas y el '
+        'varianza; la dispersión del fondo no es un error del flujo). El tutorial usa círculos en coordenadas de '
+        'píxel y Photutils con solapamiento exacto; aquí se usan distancias angulares y submuestras, por lo que '
+        'los valores pueden diferir. No corrige la fracción de la PSF fuera de la apertura, puede incluir fuentes vecinas y el '
         'rayado del mosaico cerca de líneas intensas. No es una medida de precisión del flujo de una estrella ni '
         'permite afirmar la presencia de líneas o materiales. Para espectrofotometría científica, use la '
         f'<a href="{config.SPECTROPHOTOMETRY_TOOL_URL}" target="_blank">herramienta oficial SPHEREx '
@@ -413,15 +429,16 @@ def render(shared: dict | None) -> None:
             f"- **Producto:** SPHEREx DR1 All-Sky spectral cube, doi:{config.CUBE_DOI}. Ficheros FITS por tesela HEALPix "
             f"de orden 5 ({config.CUBE_DATA_URL}), los mismos del [tutorial oficial]({config.CUBE_TUTORIAL_URL}).\n"
             "- **Lectura:** solo las filas necesarias, por rangos de bytes HTTP (cada tesela pesa ~320 MB y nunca se "
-            "descarga entera); bytes verificados con Content-Range, tamaño y ETag. Este proceso ha leído "
-            f"{stats['bytes_network'] / 2**20:.1f} MB de IRSA en {stats['requests']} peticiones.\n"
+            "descarga entera); bytes verificados con Content-Range, tamaño y ETag; caché local con SHA-256. "
+            f"Este proceso ha leído {stats['bytes_network'] / 2**20:.1f} MiB de cuerpos HTTP "
+            f"en {stats['requests']} intentos (sin contar cabeceras HTTP/TLS).\n"
             "- **Valores:** IMAGE en MJy/sr con la luz zodiacal ya restada por el pipeline; cada píxel es la media de "
             "NHITS píxeles de entrada (asignación al píxel más próximo, sin suavizado). Los píxeles de entrada con "
             "TRANSIENT, SUR_ERROR, NONFUNC, DICHROIC, MISSING_DATA, HOT, COLD, PHANMISS, NONLINEAR, PERSIST, "
             "CROSSTALK, STREAK, BLOOM, SNOWBALL, HALO o SATELLITE_HALO se excluyeron antes de promediar; FLAGS solo "
             "conserva OVERFLOW, SOURCE y OUTLIER (Explanatory Supplement v2.1, §2.5 y §3.4).\n"
-            "- **λ:** de la tabla SPECTRAL_CHANNELS de cada FITS (λ central, WL_MIN, WL_MAX, R). Canal n = plano "
-            "n − 1 = 17·(detector − 1) + subcanal.\n"
+            "- **λ:** de la tabla SPECTRAL_CHANNELS de cada FITS (λ central, WL_MIN, WL_MAX, R). "
+            "Canal n = 17·(detector − 1) + subcanal; plano = n − 1.\n"
             "- **Limitaciones:** producto combinado de fechas distintas (no temporal); píxel de 12.9″ (≈ 2 píxeles "
             "Level 2); rayado del mosaico cerca de líneas intensas (He 1.083 µm, Paα, PAH 3.3 µm, Brα) que no se "
             "promedia; los canales 51 y 52 están vacíos en DR1; espectro sin incertidumbres ni corrección de "

@@ -101,21 +101,21 @@ def field_png(cmap: sc.ChannelMap, layer: str = "image", npix: int = DISPLAY_NPI
 
 
 @render.serialized
-def colorbar_png(info: dict, width_in: float = 5.4) -> bytes:
+def colorbar_png(info: dict, width_in: float = 3.0) -> bytes:
     from matplotlib.cm import ScalarMappable
     import matplotlib as mpl
 
     norm = ImageNormalize(vmin=info["vmin"], vmax=info["vmax"],
                           stretch=AsinhStretch(0.1) if info["stretch"] == "asinh" else LinearStretch(), clip=True)
-    fig = Figure(figsize=(width_in, 0.62), dpi=130, facecolor="white")
-    ax = fig.add_axes([0.04, 0.55, 0.92, 0.3])
+    fig = Figure(figsize=(width_in, 0.88), dpi=130, facecolor="white")
+    ax = fig.add_axes([0.08, 0.65, 0.84, 0.23])
     cb = fig.colorbar(ScalarMappable(norm=norm, cmap=mpl.colormaps[info["cmap"]]), cax=ax, orientation="horizontal")
     # Ticks evenly spaced in display (stretched) space, so asinh does not crowd them at one end.
     cb.set_ticks(np.asarray(norm.inverse(np.linspace(0.0, 1.0, 5)), float))
     cb.ax.xaxis.set_major_formatter(mpl.ticker.FormatStrFormatter("%.3g"))
-    cb.ax.tick_params(labelsize=7, colors=INK)
+    cb.ax.tick_params(labelsize=9, colors=INK)
     cb.set_label("MJy/sr (IMAGE, zodiacal ya restado)" if info["layer"] == "image"
-                 else "NHITS: píxeles de entrada promediados", fontsize=7, color=INK)
+                 else "NHITS: píxeles de entrada promediados", fontsize=8, color=INK)
     buf = io.BytesIO()
     with render.RENDER_LOCK:
         fig.savefig(buf, format="png", dpi=130, facecolor="white")
@@ -167,7 +167,9 @@ def field_chart(png: bytes, info: dict, pixels: pd.DataFrame, cmap: sc.ChannelMa
 
     R = info["half_arcsec"]
     xs = alt.Scale(domain=[-R, R], reverse=True, nice=False, zero=False)
-    ys = alt.Scale(domain=[-R, R], nice=False, zero=False)
+    # Keep one angular unit equally long on both axes as the column changes width.
+    # A narrow viewport gets extra vertical context, never a stretched sky image.
+    ys = alt.Scale(domain=alt.ExprRef(expr=f"[-{R}*height/width, {R}*height/width]"), nice=False, zero=False)
     tx, ty = "Desplazamiento al este (″) · este a la izquierda", "Desplazamiento al norte (″)"
     X = alt.X("este:Q", scale=xs, title=tx)
     Y = alt.Y("norte:Q", scale=ys, title=ty)
@@ -215,8 +217,8 @@ def field_chart(png: bytes, info: dict, pixels: pd.DataFrame, cmap: sc.ChannelMa
             color=alt.Color("m:N", scale=alt.Scale(domain=["objetivo", "posición del espectro"],
                                                    range=["#1f5fbf", "#eda100"]), legend=None),
             tooltip=[alt.Tooltip("m:N", title="marca")]))
-    return alt.layer(*layers).properties(width=size, height=size,
-                                         autosize=alt.AutoSizeParams(type="pad", contains="content"))
+    return alt.layer(*layers).properties(width="container", height=size,
+                                         autosize=alt.AutoSizeParams(type="fit", contains="padding"))
 
 
 QUANTITIES = {
@@ -273,7 +275,7 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
         layers.insert(3, alt.Chart(pd.DataFrame({"x": [lam]})).mark_rule(color=INK_2, strokeDash=[2, 2]).encode(
             x=alt.X("x:Q", scale=xsc)))
     return alt.layer(*layers).properties(
-        width=width, height=height, autosize=alt.AutoSizeParams(type="pad", contains="content")
+        width="container", height=height, autosize=alt.AutoSizeParams(type="fit", contains="padding")
     ).resolve_scale(color="independent")
 
 

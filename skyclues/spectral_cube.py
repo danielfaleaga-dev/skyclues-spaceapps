@@ -34,8 +34,9 @@ Integrity rules of the byte-range reader:
 * bytes are kept exactly as served (optional verbatim disk cache, never modified);
   NaN and NHITS = 0 are kept as "no data", never filled or interpolated.
 
-The exploratory spectrum follows the method of the official tutorial (circular aperture,
-sigma-clipped annulus background, sum x pixel solid angle -> mJy). The tutorial and IRSA
+The exploratory spectrum adapts the official tutorial (circular sky aperture rather than
+Photutils' pixel-coordinate circle; 5x5 subpixels rather than exact overlaps, sigma-clipped
+annulus background, sum x pixel solid angle -> mJy). The tutorial and IRSA
 state that a spectrum from the cube is only suitable for visualization; science-grade
 spectrophotometry uses the IRSA SPHEREx Spectrophotometry Tool (forced photometry on the
 Level-2 images), which has no documented programmatic interface.
@@ -89,7 +90,9 @@ _stats = {"requests": 0, "bytes_network": 0, "bytes_cache": 0}
 
 
 def io_stats(reset: bool = False) -> dict:
-    """Requests and bytes read so far by this process (network vs verbatim disk cache)."""
+    """HTTP attempts and body bytes consumed (including multipart framing), or cached payload bytes.
+    Counts exclude HTTP headers, TLS overhead and hips_properties (the generic archive client).
+    """
     with _stats_lock:
         out = dict(_stats)
         if reset:
@@ -170,7 +173,11 @@ def _parse_content_range(value: str | None) -> tuple[int, int, int]:
     m = re.fullmatch(r"\s*bytes\s+(\d+)-(\d+)/(\d+|\*)\s*", value or "")
     if not m:
         raise CubeFormatError(f"Content-Range no válido: {value!r}")
-    return int(m[1]), int(m[2]) + 1, (int(m[3]) if m[3] != "*" else -1)
+    a, b = int(m[1]), int(m[2]) + 1
+    total = int(m[3]) if m[3] != "*" else -1
+    if not (0 <= a < b <= total):
+        raise CubeFormatError(f"Content-Range sin tamaño verificable o fuera del archivo: {value!r}")
+    return a, b, total
 
 
 def _parse_multipart(body: bytes, boundary: bytes) -> list[tuple[int, int, int, bytes]]:
@@ -180,7 +187,7 @@ def _parse_multipart(body: bytes, boundary: bytes) -> list[tuple[int, int, int, 
     while pos >= 0:
         pos += len(delim)
         if body[pos:pos + 2] == b"--":
-            break
+            return parts
         hdr_end = body.find(b"\r\n\r\n", pos)
         if hdr_end < 0:
             raise CubeFormatError("respuesta multipart truncada (cabecera de parte)")
@@ -192,8 +199,11 @@ def _parse_multipart(body: bytes, boundary: bytes) -> list[tuple[int, int, int, 
         if len(data) != stop - start:
             raise CubeFormatError("respuesta multipart truncada (datos)")
         parts.append((start, stop, total, data))
-        pos = body.find(delim, hdr_end + 4 + len(data))
-    return parts
+        pos = hdr_end + 4 + len(data)
+        if body[pos:pos + 2] != b"\r\n" or not body.startswith(delim, pos + 2):
+            raise CubeFormatError("respuesta multipart sin delimitador de cierre")
+        pos += 2
+    raise CubeFormatError("respuesta multipart sin delimitador")
 
 
 def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
@@ -206,6 +216,7 @@ def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
     expected = sum(b - a for a, b in spec)
     cap = expected + 256 * len(spec) + 8192          # multipart headers are small
     try:
+        _count("requests", 1)
         resp = _session().get(url, headers={"Range": header}, stream=True, timeout=config.HTTP_TIMEOUT_S)
     except (requests.Timeout, requests.ConnectionError) as err:
         raise archive.ArchiveTransientError(f"{type(err).__name__}: {str(err)[:160]}") from err
@@ -219,7 +230,7 @@ def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
                 raise archive.ArchiveTransientError(f"HTTP {code} de IRSA (cubo espectral)")
             raise archive.ArchivePermanentError(f"HTTP {code} de IRSA (cubo espectral, no se reintenta)")
         got_etag = resp.headers.get("ETag")
-        if etag and got_etag and got_etag != etag:
+        if etag and got_etag != etag:
             raise FileChangedError(f"El cubo cambió en IRSA (ETag {got_etag} ≠ {etag})")
         try:
             clen = int(resp.headers.get("Content-Length", "-1"))
@@ -230,11 +241,12 @@ def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
         chunks, got = [], 0
         try:
             for chunk in resp.iter_content(1 << 16):
+                _count("bytes_network", len(chunk))
                 got += len(chunk)
                 if got > cap:
                     raise RangeNotHonoured("respuesta mayor que lo pedido; lectura interrumpida")
                 chunks.append(chunk)
-        except (requests.ConnectionError, requests.exceptions.ChunkedEncodingError) as err:
+        except (requests.Timeout, requests.ConnectionError, requests.exceptions.ChunkedEncodingError) as err:
             raise archive.ArchiveTransientError(f"transferencia interrumpida: {str(err)[:120]}") from err
         body = b"".join(chunks)
         ctype = resp.headers.get("Content-Type", "")
@@ -301,7 +313,7 @@ def _cache_room(n: int) -> bool:
     with _cache_lock:
         if _cache_bytes is None:
             root = config.CACHE_DIR / "cube"
-            _cache_bytes = sum(p.stat().st_size for p in root.rglob("*.bin")) if root.exists() else 0
+            _cache_bytes = sum(p.stat().st_size for p in root.rglob("*") if p.is_file()) if root.exists() else 0
         if _cache_bytes + n > config.CUBE_CACHE_MAX_MB * 2**20:
             return False
         _cache_bytes += n
@@ -325,17 +337,19 @@ def read_ranges(url: str, ranges: list[tuple[int, int]], size: int, etag: str | 
     out, todo = {}, []
     for r in want:
         p = _chunk_path(url, etag, *r)
-        if use_cache and p.exists() and p.stat().st_size == r[1] - r[0]:
-            out[r] = p.read_bytes()
-            _count("bytes_cache", len(out[r]))
-        else:
-            todo.append(r)
+        digest = p.with_suffix(".sha256")
+        if use_cache and etag and p.exists() and digest.exists():
+            data = p.read_bytes()
+            if len(data) == r[1] - r[0] and hashlib.sha256(data).hexdigest() == digest.read_text().strip():
+                out[r] = data
+                _count("bytes_cache", len(data))
+                continue
+        todo.append(r)
     step = config.CUBE_MAX_RANGES_PER_REQUEST
     batches = [todo[i:i + step] for i in range(0, len(todo), step)]
 
     def one(batch):
         got = _with_retries(lambda: _request_ranges(url, batch, size, etag))[0]
-        _count("requests", 1)
         return got
 
     if len(batches) > 1:      # small pool, as for the Level-2 cutouts (IRSA throttles with 503)
@@ -348,10 +362,11 @@ def read_ranges(url: str, ranges: list[tuple[int, int]], size: int, etag: str | 
     for got in results:
         for r, data in got.items():
             out[r] = data
-            _count("bytes_network", len(data))
-            if use_cache and _cache_room(len(data)):
+            if use_cache and etag and _cache_room(len(data) + 64):
                 try:
-                    archive.atomic_write(_chunk_path(url, etag, *r), data)
+                    p = _chunk_path(url, etag, *r)
+                    archive.atomic_write(p, data)
+                    archive.atomic_write(p.with_suffix(".sha256"), hashlib.sha256(data).hexdigest())
                 except OSError:
                     pass                      # read-only disk: the bytes are still used
     return out
@@ -412,8 +427,6 @@ class _SpanReader:
         def once():
             return _request_ranges(self.url, [(a, stop)], self.size, self.etag)
         got, etag, total, lm = _with_retries(once)
-        _count("requests", 1)
-        _count("bytes_network", stop - a)
         if self.size is None:
             self.size, self.etag, self.last_modified = total, etag, lm
         data = got[(a, stop)]
@@ -573,6 +586,8 @@ def _validate_layout(t: CubeTile) -> None:
     if t.bunit != "MJy/sr":
         raise CubeFormatError(f"BUNIT {t.bunit!r} ≠ 'MJy/sr'")
     nz = t.shape[0]
+    if nz != 102 or t.blank_spec != {(3, 17), (4, 1)}:
+        raise CubeFormatError("DR1 requiere 102 planos y BLANKCH D3:17,D4:01")
     if len(t.channels_table) != nz:
         raise CubeFormatError(f"SPECTRAL_CHANNELS tiene {len(t.channels_table)} filas para {nz} planos")
     nx = t.shape[2]
@@ -596,6 +611,8 @@ def read_layout(ipix: int, order: int = config.CUBE_ORDER, url: str | None = Non
     while off < rd.size:
         buf = b""
         while (end := _end_card(buf)) is None:
+            if off + len(buf) >= rd.size:
+                raise CubeFormatError("cabecera FITS truncada, sin END")
             if len(buf) > 40 * BLOCK:
                 raise CubeFormatError("cabecera FITS sin END")
             buf += rd.read(off + len(buf), min(off + len(buf) + BLOCK, rd.size))
@@ -832,6 +849,8 @@ def channel_map(ra: float, dec: float, field_deg: float, plane: int) -> ChannelM
     boxes = tile_boxes(ra, dec, field_deg / 2)
     patches, ch = [], None
     for b in boxes:
+        if ch is not None and b.tile.channels != boxes[0].tile.channels:
+            raise CubeFormatError("teselas con definiciones espectrales distintas")
         try:
             got = b.tile.read_rows({e: [plane] for e in CUBE_EXTENSIONS}, b.y0, b.y1, b.x0, b.x1)
         except FileChangedError:
@@ -839,6 +858,8 @@ def channel_map(ra: float, dec: float, field_deg: float, plane: int) -> ChannelM
             raise
         patches.append(Patch(b.tile, b.x0, b.y0, got["IMAGE"][0].astype(np.float64), got["NHITS"][0],
                              got["FLAGS"][0]))
+        if b.tile.channels[plane].blank and (np.isfinite(got["IMAGE"]).any() or np.any(got["NHITS"] != 0)):
+            raise CubeFormatError("canal BLANKCH con datos inesperados; no se muestra")
         ch = ch or b.tile.channels[plane]
     return ChannelMap(ch, ra, dec, field_deg, patches)
 
@@ -895,8 +916,9 @@ class Spectrum:
 
 def _aperture_weights(tile: CubeTile, x0: int, y0: int, shape, ra: float, dec: float, r_px: float,
                       pix_arcsec: float, n: int) -> np.ndarray:
-    """Fraction of each pixel inside a circle of r_px pixels: n x n sub-pixel samples in the
-    tile's pixel coordinates (equivalent to photutils' 'subpixel' method), distances on the sky."""
+    """Fraction inside a sky circle with radius r_px * pix_arcsec, sampled n x n.
+    Unlike Photutils CircularAperture, the circle is defined on the sky, not the pixel grid.
+    """
     ny, nx = shape
     yy, xx = np.mgrid[0:ny, 0:nx]
     rc, dc = tile.wcs.pixel_to_world_values(xx + x0, yy + y0)
@@ -914,7 +936,7 @@ def _aperture_weights(tile: CubeTile, x0: int, y0: int, shape, ra: float, dec: f
 
 
 def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, subpixels: int = 5) -> Spectrum:
-    """Exploratory spectrum at (ra, dec) from the cube (official tutorial method).
+    """Exploratory spectrum at (ra, dec), adapting the tutorial with sky apertures.
 
     Per channel: aperture sum of IMAGE (pixel fractions by sub-pixel sampling), minus the
     sigma-clipped (3 sigma, 10 iterations) mean of the annulus (pixel centres) times the
@@ -926,6 +948,8 @@ def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, su
     from astropy.stats import sigma_clipped_stats
 
     ap = (aperture or Aperture()).validate()
+    if not isinstance(subpixels, int) or not 1 <= subpixels <= 25:
+        raise ValueError("subpixels debe ser un entero entre 1 y 25")
     home = tile_for(ra, dec)
     pix = home.pixel_scale_arcsec
     boxes = tile_boxes(ra, dec, (ap.r_out + 1) * pix / 3600)
@@ -945,8 +969,8 @@ def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, su
     xc, yc = int(round(float(xh))), int(round(float(yh)))     # pixel that contains (ra, dec)
     for b in boxes:
         t = b.tile
-        if t.shape[0] != nz:
-            raise CubeFormatError("teselas con distinto número de canales")
+        if t.channels != home.channels or t.pixel_solid_angle_sr != home.pixel_solid_angle_sr:
+            raise CubeFormatError("teselas con canales o ángulos sólidos distintos")
         ny, nx = b.y1 - b.y0 + 1, b.x1 - b.x0 + 1
         yy, xx = np.mgrid[0:ny, 0:nx]
         rc, dc = t.wcs.pixel_to_world_values(xx + b.x0, yy + b.y0)
@@ -983,6 +1007,7 @@ def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, su
             ap_bad |= ~np.all(np.isfinite(vals), axis=1)
             ap_sum += np.nansum(vals * wa[m][None, :], axis=1)
             nh = aux["NHITS"][:, m]
+            ap_bad |= np.any(nh <= 0, axis=1)
             nh_min = np.minimum(nh_min, nh.min(axis=1))
             nh_sum += (nh * wa[m][None, :]).sum(axis=1)
             flags_or |= np.bitwise_or.reduce(aux["FLAGS"][:, m].astype(np.int64), axis=1)
@@ -998,7 +1023,7 @@ def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, su
         row = {"canal": c.number, "plano": c.plane, "detector": c.detector, "subcanal": c.subchannel,
                "lambda_um": c.wavelength_um, "ancho_um": c.bandwidth_um, "lambda_min_um": c.wl_min_um,
                "lambda_max_um": c.wl_max_um, "R": c.resolving_power,
-               "pixel_mjysr": float(pixel_val[p]) if np.isfinite(pixel_val[p]) else None,
+               "pixel_mjysr": float(pixel_val[p]) if not c.blank and pixel_nh[p] > 0 and np.isfinite(pixel_val[p]) else None,
                "pixel_nhits": int(pixel_nh[p]), "pixel_flags": "|".join(flag_names(home, int(pixel_fl[p]))),
                "flujo_mjy": None, "fondo_mjysr": None, "fondo_sigma_mjysr": None,
                "n_fondo": int(a.size), "nhits_min_apertura": int(nh_min[p]) if nh_min[p] < 2**62 else 0,
@@ -1041,22 +1066,29 @@ def cube_epoch_position(astrometry, ra: float | None = None, dec: float | None =
         return ra0, dec0, {"propagated": False}
     from astropy.time import Time
 
-    guess = astrometry.position_at(Time.now())
-    t = tile_for(*guess)
+    # Locate the first tile at the catalogue position, never at the machine's current date.
+    t = tile_for(ra0, dec0)
     beg, end = t.mjd_range
-    if beg is None or end is None:
-        return guess[0], guess[1], {"propagated": True, "epoch": "fecha actual (la tesela no declara MJD-BEG/END)"}
+    def missing_dates():
+        return ra0, dec0, {"propagated": False, "reference_epoch_jyear": astrometry.epoch_jyear,
+                          "warning": "La tesela no declara un intervalo MJD-BEG/END válido. Se conserva la "
+                          "posición de catálogo; no se calcula una posición para una fecha arbitraria."}
+    if beg is None or end is None or not np.isfinite([beg, end]).all() or beg > end:
+        return missing_dates()
     mid = 0.5 * (beg + end)
     ra_m, dec_m = astrometry.position_at(mid)
     if int(healpix_nest(config.CUBE_ORDER, ra_m, dec_m)) != t.ipix:
         t = tile_for(ra_m, dec_m)
         beg, end = t.mjd_range
+        if beg is None or end is None or not np.isfinite([beg, end]).all() or beg > end:
+            return missing_dates()
         mid = 0.5 * (beg + end)
         ra_m, dec_m = astrometry.position_at(mid)
     r0, d0 = astrometry.position_at(beg)
     r1, d1 = astrometry.position_at(end)
     return ra_m, dec_m, {
-        "propagated": True, "mjd_mid": mid, "mjd_beg": beg, "mjd_end": end,
+        "propagated": True, "reference_epoch_jyear": astrometry.epoch_jyear,
+        "mjd_mid": mid, "mjd_beg": beg, "mjd_end": end,
         "date_mid": Time(mid, format="mjd").isot[:10], "date_beg": Time(beg, format="mjd").isot[:10],
         "date_end": Time(end, format="mjd").isot[:10],
         "motion_over_inputs_arcsec": float(separation_deg(r0, d0, r1, d1) * 3600)}

@@ -4,7 +4,7 @@ Referencia de entrada para cualquier agente. Recoge lo que **no cambia** de una 
 
 ## Qué es
 
-Aplicación web de ciencia ciudadana para el desafío **Planet X and SPHEREx** de NASA Space Apps Challenge 2026 (dificultad avanzada). Permite que cualquier persona introduzca una región del cielo (RA/Dec) y explore cómo cambian las **observaciones infrarrojas auténticas de SPHEREx** entre fechas, distinguiendo los cambios astronómicos de los efectos instrumentales.
+Aplicación web de ciencia ciudadana para el desafío **Planet X and SPHEREx** de NASA Space Apps Challenge 2026 (dificultad avanzada). Permite explorar observaciones infrarrojas auténticas de SPHEREx entre fechas con **Time Explorer**, y por longitud de onda con **Spectrum Explorer**. Ambas modalidades comparten regiones RA/Dec y FOV, pero conservan la distinción entre exposiciones individuales y el cubo combinado.
 
 - Desafío: https://www.spaceappschallenge.org/2026/challenges/planet-x-and-spherex/
 - Lo central del desafío es buscar por coordenadas, recuperar las imágenes de esa región y ver una secuencia temporal tipo vídeo para detectar objetos que cambian.
@@ -33,14 +33,21 @@ Aplicación web de ciencia ciudadana para el desafío **Planet X and SPHEREx** d
 8. El cubo HiPS global de DR1 es un **producto combinado**: sirve para explorar el espectro, nunca como secuencia temporal.
 9. Los detectores automáticos de movimiento y variabilidad de SkyCluesLab fueron experimentales y de baja sensibilidad. No se reconstruyen en el núcleo.
 10. Las métricas de comparabilidad usan siempre la máscara estricta. Cualquier vista exploratoria (por ejemplo, píxeles HALO visibles) identifica los píxeles afectados y no modifica las métricas. Un producto remuestreado se etiqueta como tal.
+11. Spectrum Explorer lee los 102 planos auténticos del FITS DR1; λ, intervalos y R proceden de SPECTRAL_CHANNELS. Canal = 17·(detector−1)+subcanal; plano = canal−1. Los canales 51/52 permanecen sin datos. IMAGE está en MJy/sr y ya tiene el modelo zodiacal restado; NHITS describe las contribuciones al mosaico.
+12. Lectura parcial: máximo 64 rangos por petición, 48 MiB por llamada y 3 trabajadores. HTTP 200 no se consume; se validan Content-Range, tamaño, ETag y cierre multipart. Caché verbatim acotada a 200 MiB con SHA-256 por rango; las entradas antiguas sin digest se recuperan de nuevo. No se modifican FITS originales.
+13. El espectro es exploratorio: apertura circular **sobre el cielo**, fracciones 5×5, fondo de anillo con media recortada 3σ/10 iteraciones y conversión a mJy con el área HEALPix. Es una adaptación del tutorial, que usa círculos en coordenadas de píxel y Photutils con solapamiento exacto: no se promete igualdad numérica. No hay incertidumbres del flujo ni corrección de apertura; la dispersión del fondo no es un error fotométrico. Sin cobertura en apertura/fondo no se asigna flujo.
+14. Un cubo no tiene una sola época efectiva. Para objetos con movimiento propio se identifica la época del catálogo, el intervalo MJD-BEG/END y una posición **esperada** calculada en su punto medio, nunca una detección. Si faltan fechas válidas se conserva la posición de catálogo con aviso. Transferir una región desde Time Explorer mantiene su centro exacto; la posición esperada se muestra por separado.
 
-## Funcionalidades previstas (aún no implementadas salvo indicación en STATE)
+## Funcionalidades y continuidad
 
 - **Time Explorer** (núcleo): búsqueda por RA/Dec o nombre, secuencia cronológica animada con pausa y navegación por fechas, comparación A/B y blink, campo de visión (FOV) seleccionable por el usuario (recomendación oficial del desafío; es la región consultada, no un zoom), URL compartible, metadatos de calidad.
-- **Spectrum Explorer** (posterior, Claude Code B): la misma región en distintas longitudes de onda con el cubo espectral DR1 (`spherex_dr1_cube` / HiPS), selector de canal y, más adelante, espectros de fuentes. Siempre etiquetado como producto combinado.
+- **Spectrum Explorer** implementado: selector de canal, IMAGE/NHITS, selección por clic o coordenadas, extracción exploratoria de posición, CSV con procedencia y transferencia de regiones. Las pruebas y limitaciones concretas están en STATE.
+- Terminar y validar funcionalidades antes del refinamiento visual final. Sin combinación multibanda avanzada en esta etapa.
 - Aladin Lite como contexto del cielo, y catálogos Gaia/WISE como apoyo a la interpretación.
 
 ## Organización de agentes
+
+La asignación de esta actividad es puntual; los nombres siguientes documentan la colaboración histórica, no responsabilidades permanentes ni autorización para delegar.
 
 - **Claude Code A**: motor científico (IRSA, FITS, WCS, calidad y selección de observaciones comparables).
 - **Codex**: interfaz, animación temporal, integración, pruebas y apoyo al despliegue.
