@@ -224,7 +224,7 @@ def quarantine(path: Path) -> Path:
     return dest
 
 _FILE_RE = re.compile(
-    r"level2_(?P<obsid>[0-9A-Z_]+)D(?P<det>[1-6])_spx_l2b-v(?P<ver>\d+)-(?P<pdate>\d{4}-\d{3})\.fits"
+    r"level2_(?P<obsid>[0-9A-Z_]+)D(?P<det>[1-6])_spx_l2b(?:_retry)?-v(?P<ver>\d+)-(?P<pdate>\d{4}-\d{3})\.fits"
 )
 
 
@@ -247,6 +247,8 @@ class ObservationRecord:
     l2b_version: str
     processing_date: str
     file_name: str
+    publisher_did: str = ""
+    product_level: str = ""
 
     @property
     def mjd_mid(self) -> float:
@@ -304,21 +306,53 @@ def atomic_write(path: Path, data: bytes | str) -> Path:
     return path
 
 
+class ObservationBatch(list):
+    """List-compatible query result with per-request provenance (not global session state)."""
+    def __init__(self, records, provenance):
+        super().__init__(records)
+        self.provenance = provenance
+
+
 def query_images(ra: float, dec: float, radius_deg: float = 1.0 / 3600,
                  collections=config.WIDE_COLLECTIONS,
                  max_age_s: float = config.METADATA_CACHE_MAX_AGE_S) -> list[ObservationRecord]:
-    """SIA2 search for SPHEREx spectral images overlapping a sky circle.
-
-    Results are cached as JSON for ``max_age_s`` (archive metadata only; IRSA
-    ingests new data weekly). Pass ``max_age_s=0`` to force a fresh query.
-    """
+    """Query on demand; max_age_s=0 bypasses metadata cache, never masks a service outage."""
+    from .targets import validate_coordinates
+    from .releases import reconcile_products, validate_collections
+    from datetime import datetime, timezone
+    import math
+    ra, dec = validate_coordinates(ra, dec)
+    if not math.isfinite(radius_deg) or not 0 < radius_deg <= .5:
+        raise ValueError("Radio de consulta inválido")
+    collections = validate_collections(collections)
     key = f"{ra:.7f}|{dec:.7f}|{radius_deg:.7f}|{','.join(collections)}"
     cpath = _meta_cache_path("sia", key)
+    cached = None
     if max_age_s > 0 and cpath.exists() and time.time() - cpath.stat().st_mtime < max_age_s:
-        return [ObservationRecord(**d) for d in json.loads(cpath.read_text(encoding="utf-8"))]
-    records = _query_images_live(ra, dec, radius_deg, collections)
-    atomic_write(cpath, json.dumps([asdict(r) for r in records]))
-    return records
+        try:
+            cached = json.loads(cpath.read_text(encoding="utf-8"))
+            # Legacy lists have no verified retrieval date: refresh once, do not invent one.
+            if not isinstance(cached, dict) or cached.get("schema") != 2:
+                cached = None
+        except (OSError, ValueError):
+            cached = None
+    if cached is not None:
+        records = [ObservationRecord(**d) for d in cached["records"]]
+        queried = cached["queried_utc"]
+        origin = "cache"
+    else:
+        records = _query_images_live(ra, dec, radius_deg, collections)
+        queried = datetime.now(timezone.utc).isoformat()
+        origin = "IRSA"
+        try:
+            atomic_write(cpath, json.dumps({"schema": 2, "queried_utc": queried,
+                                           "records": [asdict(r) for r in records]}))
+        except OSError:
+            pass  # read-only storage: fresh result remains usable, without claiming persistence
+    selected, replacements = reconcile_products(records)
+    return ObservationBatch(selected, {"origin": origin, "queried_utc": queried,
+        "endpoint": config.SIA_URL, "collections": list(collections), "forced": max_age_s == 0,
+        "raw_count": len(records), "selected_count": len(selected), "replacements": replacements})
 
 
 def _with_retries(what: str, fn, sleep=None):
@@ -377,6 +411,10 @@ def _query_images_live(ra, dec, radius_deg, collections) -> list[ObservationReco
                 continue
             url = str(row["access_url"])
             m = _FILE_RE.search(url)
+            if m is None or str(row['obs_collection']).strip() != coll:
+                raise ArchivePermanentError('Producto SIA2 fuera del perfil L2b verificado; no se interpreta.')
+            if 'calib_level' in tab.colnames and str(row['calib_level']) != '2':
+                raise ArchivePermanentError('Nivel de producto incompatible con imagen L2b.')
             records.append(ObservationRecord(
                 obs_id=str(row["obs_id"]),
                 collection=str(row["obs_collection"]) or coll,
@@ -393,6 +431,8 @@ def _query_images_live(ra, dec, radius_deg, collections) -> list[ObservationReco
                 l2b_version=m.group("ver") if m else "",
                 processing_date=m.group("pdate") if m else "",
                 file_name=url.rsplit("/", 1)[-1],
+                publisher_did=str(row["obs_publisher_did"]) if "obs_publisher_did" in tab.colnames else "",
+                product_level=str(row["calib_level"]) if "calib_level" in tab.colnames else "",
             ))
     return records
 
