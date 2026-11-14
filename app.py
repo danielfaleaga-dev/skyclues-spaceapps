@@ -13,7 +13,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from astropy.time import Time
 
-from skyclues import archive, config, player, render
+from skyclues import archive, config, player, render, spectrum_page
 from skyclues.astrometry import Astrometry
 from skyclues.quality import flag_census
 from skyclues.sequence import STRICT, find_sequence, load_sequence, report_urls, save_report
@@ -41,6 +41,9 @@ st.markdown(
 )
 
 STATUS_LABEL = {"pass": "✔ cumple", "warn": "▲ aviso", "fail": "✖ no cumple"}
+# Two explorers, kept scientifically separate: individual observations of different dates
+# (Time) and the combined DR1 spectral cube (Spectrum). They share only the region.
+EXPLORERS = ["Time Explorer · tiempo", "Spectrum Explorer · longitud de onda"]
 MODES = ["Secuencia de referencia", "Nueva búsqueda"]
 GEOMETRY_OPTIONS = {
     "WCS: píxeles nativos, sin remuestreo de valores": "exact",
@@ -137,9 +140,37 @@ if st.session_state.get("ref_label") not in refs:
 def open_example(stem: str):
     label = label_for(stem, refs)
     if label:
+        st.session_state["explorer"] = EXPLORERS[0]
         st.session_state["mode"] = MODES[0]
         st.session_state["ref_label"] = label
 
+
+def to_spectrum_explorer():
+    """Open the region shown in Time Explorer in Spectrum Explorer (same centre, field, astrometry)."""
+    shared = st.session_state.get("shared_region")
+    st.session_state["explorer"] = EXPLORERS[1]
+    st.session_state["sx_source"] = spectrum_page.SOURCES[0]
+    if shared:
+        st.session_state.pop("sx_fov_custom", None)
+        st.session_state.update(spectrum_page.fov_widget_state(shared["fov"]))
+
+
+# ---------------------------------------------------------------- explorer
+if "explorer" not in st.session_state:
+    st.session_state["explorer"] = EXPLORERS[1] if qp.get("explorer") == "espectral" else EXPLORERS[0]
+with st.sidebar:
+    explorer = st.radio(
+        "Explorador", EXPLORERS, key="explorer",
+        help="Time Explorer: observaciones individuales de fechas distintas (¿cambia el cielo con el tiempo?). "
+             "Spectrum Explorer: cubo combinado DR1 en 102 canales (¿cómo cambia con la longitud de onda?). "
+             "Comparten la región, no las imágenes.")
+    st.markdown("---")
+if explorer == EXPLORERS[1]:
+    spectrum_page.render(st.session_state.get("shared_region"))
+    st.stop()
+if st.query_params.get("explorer"):
+    del st.query_params["explorer"]
+    st.query_params.pop("canal", None)
 
 # ---------------------------------------------------------------- sidebar
 with st.sidebar:
@@ -348,6 +379,11 @@ with st.spinner("Verificando la integridad de los FITS y alineando épocas…"):
         st.error(f"No se pudo cargar la secuencia: {err}")
         st.stop()
 m = seq.metrics
+# Region shared with Spectrum Explorer (centre, field and catalogue astrometry; never the images).
+st.session_state["shared_region"] = {
+    "ra": float(seq.ra), "dec": float(seq.dec), "fov": float(seq.field_deg),
+    "label": (Path(refs[ref_label]).stem if mode == MODES[0] else "búsqueda de Time Explorer"),
+    "astrometry": seq.astrometry.to_dict() if seq.astrometry is not None else None}
 
 # ---------------------------------------------------------------- summary
 status_cls = "sc-ok" if seq.admissible and not seq.warnings else ("sc-warn" if seq.admissible else "sc-fail")
@@ -368,6 +404,8 @@ if seq.target_moves:
         unsafe_allow_html=True)
 elif centre_rule:
     st.caption(f"Centro del campo: {centre_rule}.")
+st.button("Ver esta región en Spectrum Explorer", key="to_spectrum", on_click=to_spectrum_explorer,
+          help="La misma región en los 102 canales del cubo combinado DR1 (no es una secuencia temporal).")
 c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("Épocas", seq.n)
 c2.metric("Intervalo total", f"{m['span_days']:.1f} d")

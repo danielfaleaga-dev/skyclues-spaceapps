@@ -115,3 +115,31 @@ Reglas nuevas: no presentar nunca `target_position` como detección; mostrar `re
 - **Claude A:** ejecutar Barnard y ε Ind B con la búsqueda por nombre (posición propagada) y documentar si el desplazamiento es visible entre épocas; objetos variables (RW Aur, R Dra).
 - **Codex:** refinamiento visual y accesibilidad, respetando las reglas nuevas de la API.
 - **Claude B:** Spectrum Explorer (ver CONTEXT).
+
+## Relevo Spectrum Explorer (Claude B → Codex, 14-11-2026; trabajo interrumpido por límite de uso)
+
+### Implementado (sin pruebas automáticas propias todavía)
+- `skyclues/spectral_cube.py`: motor del cubo SPHEREx DR1 All-Sky (doi:10.26131/IRSA679), teselas HiPS orden 5 en `CUBE_DATA_URL` (config.py). Lectura por **rangos HTTP** (FITS sin comprimir): máx. 64 rangos/petición (con ~100+ IRSA devuelve el archivo entero, 320 MB); una respuesta 200 nunca se lee (`RangeNotHonoured`); se verifican Content-Range, tamaño y ETag (`FileChangedError`). Caché verbatim de rangos en `data/cache/cube/` (tope 200 MB) y de cabeceras en `data/cache/meta/cube_o5_<ipix>.json` (12 h). HEALPix NESTED en numpy (`healpix_nest`, verificado: tutorial (60.8109955, 51.3404038) → tesela 445) y comprobado contra NPIX/WCS de cada tesela. Canal n = plano n−1 = 17·(det−1)+sub; canales 51 y 52 (BLANKCH D3:17, D4:01) sin datos, nunca interpolados. λ desde la tabla SPECTRAL_CHANNELS del FITS. Espectro exploratorio = método del tutorial oficial (apertura circular con 5×5 subpíxeles, anillo con sigma_clipped_stats 3σ/10 it., flujo mJy = neto × Ω × 1e9, Ω = 3.9011e-9 sr); sin valor si hay NaN en la apertura o fondo < max(10, 50 %) de píxeles. También brillo del píxel (MJy/sr). Sin incertidumbres inventadas. Propagación de movimiento propio a la época media de la tesela (`cube_epoch_position`).
+- `skyclues/spectral_view.py`: mapa de canal en geometría exacta (pcolormesh de cada píxel nativo, sin remuestreo), gráfico Altair interactivo (clic = posición del espectro), gráfico del espectro (puntos por canal, barras = ancho de banda, marcas rosas = canales sin valor, huecos = OVERFLOW/OUTLIER), barra de color.
+- `skyclues/spectrum_page.py`: página Streamlit (región compartida con Time Explorer, RA/Dec, campos predefinidos, SIMBAD; selector de canal; capas IMAGE/NHITS; apertura configurable; CSV con procedencia; procedencia y limitaciones; enlace a la herramienta oficial de espectrofotometría de IRSA, que no tiene API).
+- `app.py`: selector de explorador en la barra lateral, botón «Ver esta región en Spectrum Explorer», `shared_region` en session_state, query params `explorer=espectral&canal=`.
+- `config.py`: bloque de constantes del cubo.
+
+### Verificado en vivo (IRSA, 14-11-2026)
+- Posición del tutorial: pico PAH en el canal 63 (3.293 µm), 355 mJy frente a 45–61 mJy en los vecinos; canales 51/52 con estado «blank».
+- Recursos: cabecera ≈ 80 KB/4 peticiones; mapa de canal de 6′ ≈ 283 KB; espectro ≈ 6.7 MB/6 peticiones; pico tracemalloc ≈ 28 MB.
+- Navegador (puerto 8502): mapa, clic → espectro, canal 51 con aviso, traspaso Time → Spectrum con WISE 0855 (posición propagada a 2025-11-08, 8.3″), canal 94 (4.704 µm). Sin errores en consola ni servidor.
+- AppTest sin interfaz: canal 51 avisa y los query params se actualizan.
+- Estado de IRSA: SIA2 `/SIA/capabilities` seguía en 502; HiPS e IBE (rangos) funcionaban.
+- `pytest -m "not network"`: 66 passed (Time Explorer intacto).
+- Último cambio sin verificar en navegador: ticks de la barra de color equiespaciados en el espacio estirado (`colorbar_png`), porque con asinh se solapaban.
+
+### Pendiente (en este orden)
+1. `tests/test_spectral_offline.py`: cubo sintético pequeño servido por un lector de rangos falso (monkeypatch de `spectral_cube._request_ranges` o `requests`). Cubrir: lectura de cabeceras, fórmula de canal, canales en blanco → NaN y estado «blank», guarda de 200 (el cuerpo no se lee), cambio de ETag, reintentos solo transitorios, parseo multipart, apertura que recupera un flujo inyectado conocido en mJy, NaN en la apertura → sin valor, `healpix_nest` = 445, Ω = ángulo sólido local del WCS. Fixture `tmp_store` de `tests/conftest.py` para aislar la caché.
+2. `tests/test_spectral_live.py` (marcar `network`; pocas peticiones): λ de SPECTRAL_CHANNELS = `data_cube_crval3_arr` de HiPS properties; planos 50/51 todo NaN con NHITS 0; NaN ⇔ NHITS = 0; NPIX = `healpix_nest` en varias posiciones (incl. polos); campo estable entre canales; espectro PAH; bytes/memoria.
+3. `tests/test_app.py`: AppTest de Spectrum Explorer por query params, aviso del canal 51, botón de traspaso Time → Spectrum y mensajes de fallo de IRSA (monkeypatch).
+4. Actualizar PROJECT_CONTEXT.md (Spectrum Explorer implementado; decisiones estables: lectura por rangos, límite de 64, nunca leer un 200) y README breve.
+5. Commit local. Sin push, sin despliegue.
+
+### Siguiente prioridad después de lo anterior (no iniciada)
+- Validación cruzada del espectro exploratorio con photutils o con la herramienta oficial de IRSA en 2–3 posiciones.
