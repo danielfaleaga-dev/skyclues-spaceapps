@@ -261,7 +261,7 @@ with tab_meta:
             "archivo": img.meta["FILE"], "SHA-256": dig[:16] + "…",
             "integridad": "coincide con el informe" if ok else "DIFERENTE del informe",
         })
-    st.dataframe(pd.DataFrame(rows).set_index("época").T, width="stretch")
+    st.dataframe(pd.DataFrame(rows).set_index("época").T.astype(str), width="stretch")
     st.markdown("**Recortes IRSA (reproducibles)**")
     st.code(f"A: {sel['a']['cutout_url']}\nB: {sel['b']['cutout_url']}", language=None)
     st.caption("Fuente: NASA/IPAC Infrared Science Archive. SPHEREx DR1 Spectral Images, doi:10.26131/IRSA678.")

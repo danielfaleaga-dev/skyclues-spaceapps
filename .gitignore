@@ -4,6 +4,9 @@ __pycache__/
 .venv/
 .pytest_cache/
 
+# Ad-hoc searches saved by the app UI (reference results are committed by name)
+results/search_*.json
+
 # Downloaded FITS cache (originals are re-fetchable from IRSA; never edited in place)
 data/cache/
 

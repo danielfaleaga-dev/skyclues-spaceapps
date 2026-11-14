@@ -53,9 +53,7 @@ def shared_norm(arrays, lo=1.0, hi=99.5, region=None) -> ImageNormalize:
 
 
 def _cmap():
-    cm = plt.get_cmap("gray").copy()
-    cm.set_bad(MASK_COLOR)
-    return cm
+    return plt.get_cmap("gray").with_extremes(bad=MASK_COLOR)
 
 
 def to_rgba(data: np.ndarray, norm: ImageNormalize) -> np.ndarray:
@@ -146,8 +144,7 @@ def coverage_figure(ev: PairEvaluation, wcs, ra, dec, field_deg):
 def dlambda_figure(ev: PairEvaluation, wcs, ra, dec, field_deg, limit=0.5):
     fig = plt.figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
     ax = fig.add_subplot(1, 1, 1, projection=wcs)
-    cm = plt.get_cmap("RdBu_r").copy()
-    cm.set_bad("#ffffff")
+    cm = plt.get_cmap("RdBu_r").with_extremes(bad="#ffffff")
     im = ax.imshow(ev.dlambda_bw, origin="lower", cmap=cm, vmin=-limit, vmax=limit, interpolation="nearest")
     _style_axes(ax)
     _mark_target(ax, ra, dec, field_deg)

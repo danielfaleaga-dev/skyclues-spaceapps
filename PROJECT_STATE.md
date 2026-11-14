@@ -9,7 +9,7 @@ Hito 3 (visor temporal): pasar de una pareja A/B a una **secuencia de N épocas 
 | Componente | Verificación |
 |---|---|
 | Entorno: Python 3.11 en `.venv`, `requirements.txt` con versiones fijadas | instalado y en uso |
-| App Streamlit `app.py` (tema claro) | arranca en `localhost:8501`; se revisaron en el navegador las pestañas A/B, Cobertura y espectro, y época B |
+| App Streamlit `app.py` (tema claro) | arranca en `localhost:8501`; revisada en el navegador; `tests/test_app.py` recorre la vista de referencia y una búsqueda nueva completa con AppTest |
 | Consulta SIA2 a IRSA en `spherex_dr1` y `spherex_qr3` (`skyclues/archive.py`) | prueba real: 376 imágenes de M101 |
 | Recortes IBE con caché y reintentos ante el 503 «Server busy» | prueba real; SHA-256 comprobado |
 | Lectura MEF: IMAGE, FLAGS, VARIANCE, ZODI, WCS celeste TAN-SIP y WCS espectral `W` (WAVE-TAB) (`fitsdata.py`) | prueba real: ida y vuelta WCS < 1e-3 px; λ dentro de la banda |
@@ -29,9 +29,15 @@ M101, RA 210.802429, Dec +54.34875, campo de 0.1°. Colección QR3, detector D2.
 - Prueba nula (`results/pair_m101_null_test.json`): mediana de A − B = −0.0002 MJy/sr frente a una señal de 0.90; χ con mediana −0.005 y dispersión robusta 1.36 (inflada por el desfase subpíxel del vecino más próximo).
 - Alternativa evaluada en una iteración anterior: DR1 D2, 16-05-2025 frente a 07-12-2025 (Δt = 205 d). Es admisible pero C4 da aviso: los gradientes LVF son antiparalelos y Δλ alcanza 0.52 anchos de banda en el borde.
 
+## Segunda pareja: WISE 0855−0714 (`results/pair_wise0855.json`)
+Campo de 0.1° centrado en las coordenadas del enunciado de NASA, **sin propagar** el movimiento propio. Colección DR1, detector D5.
+- A: `2025W19_1B_0181_3`, 06-05-2025 · B: `2026W20_1A_1166_1`, 14-05-2026
+- Δt = 373.2 d · λ = 4.3702 µm en ambas · |Δλ| máximo 0.01 anchos de banda · cobertura común válida 92.6 % · los 9 criterios pasan · el ZODI difiere (0.286 frente a 0.333 MJy/sr)
+- **Sin analizar todavía.** El movimiento propio de la literatura (unos 8″/año, no verificado en esta sesión) daría un desplazamiento de unos 1.3 px entre A y B. Es un caso interesante, pero no se ha medido nada ni se afirma una detección.
+
 ## Pruebas
 ```
-.venv\Scripts\python -m pytest -q          # 19 passed (8 sin red + 11 con IRSA o caché), 14-11-2026
+.venv\Scripts\python -m pytest -q          # 21 passed (8 sin red + 11 con IRSA o caché + 2 de la app sin interfaz), 14-11-2026
 .venv\Scripts\python -m pytest -m "not network"
 .venv\Scripts\python scripts\find_pair.py --ra 210.802429 --dec 54.34875 --field 0.1 --name pair_m101   # ~110 s en frío
 .venv\Scripts\python scripts\null_test.py
@@ -47,7 +53,7 @@ M101, RA 210.802429, Dec +54.34875, campo de 0.1°. Colección QR3, detector D2.
 3. Los recortes siguen los ejes del detector y aún no hay vista con el norte arriba.
 4. Una búsqueda en frío tarda unos 110 s (SIA2 más 8 recortes de unos 4 MB, por la extensión EPSF) e IRSA devuelve 503 bajo carga.
 5. La λ por píxel viene de WCS-WAVE, con precisión de visualización (~1 nm). Para ciencia hacen falta CWAVE/CBAND, que no están implementados.
-6. Solo se ha validado M101. Los objetos de NASA no se han ejecutado.
+6. Las pruebas automáticas validan M101; WISE 0855 solo tiene la pareja. RW Aur, R Dra, Barnard y ε Ind B no se han ejecutado, y la propagación del movimiento propio no está implementada.
 7. Streamlit no recarga los módulos de `skyclues/`: hay que reiniciar el servidor tras editarlos.
 
 ## Pendiente / siguiente tarea prioritaria
