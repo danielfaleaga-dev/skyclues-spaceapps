@@ -60,7 +60,7 @@ Nuevas: `tests/test_robustness_offline.py` (10) y `tests/test_robustness_live.py
 
 ## Decisiones pendientes (usuario)
 1. **¿Versionar los FITS de los ejemplos validados?** `scripts/bundle_reference.py` los copia a `data/reference/` (28 MB en 7 archivos idénticos a IRSA, con SHA-256 verificado). Ventaja: los ejemplos se abren al instante en la nube aunque IRSA esté saturado. Coste: unos 28 MB más en el historial de git. El código ya los usa si existen; no se han añadido al repositorio.
-2. Autorización para hacer push y desplegar.
+2. Autorización para desplegar. (El código ya está en GitHub, rama `main` de `danielfaleaga-dev/SkyClues`, subido el 14-11-2026 por petición del usuario; no se ha cambiado la visibilidad del repositorio.)
 
 ## API para Codex (`skyclues.sequence`, `skyclues.player`)
 ```python
