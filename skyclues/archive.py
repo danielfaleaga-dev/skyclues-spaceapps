@@ -6,16 +6,25 @@
   WCS-WAVE).
 
 Downloaded files are stored byte-for-byte as served by IRSA in
-``data/cache`` and are never modified.
+``data/cache`` and are never modified. Writes are atomic (unique temporary
+name + rename), and one process never downloads the same URL twice at the
+same time, so concurrent app sessions share the cache safely.
+
+``data/reference`` (optional, read-only) may hold verified copies of the
+cutouts used by the validated example sequences, under the same file names
+as the cache; ``fetch`` uses them before contacting IRSA.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
+import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -76,6 +85,37 @@ def _meta_cache_path(kind: str, key: str) -> Path:
     return config.CACHE_DIR / "meta" / f"{kind}_{h}.json"
 
 
+def atomic_write(path: Path, data: bytes | str) -> Path:
+    """Write ``data`` to ``path`` through a unique temporary file and an atomic rename.
+
+    Readers never see a partial file, and concurrent writers of the same path
+    cannot interleave (the last complete write wins; contents are identical).
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f"{path.name}.{os.getpid()}-{uuid.uuid4().hex[:12]}.part")
+    try:
+        if isinstance(data, str):
+            tmp.write_text(data, encoding="utf-8")
+        else:
+            tmp.write_bytes(data)
+        for attempt in range(20):
+            try:
+                os.replace(tmp, path)
+                break
+            except PermissionError:
+                # Windows refuses a rename onto a file that another writer is
+                # replacing or a reader holds open: wait briefly and retry.
+                if attempt == 19:
+                    if path.exists():   # another writer completed the same file
+                        break
+                    raise
+                time.sleep(0.05 * (attempt + 1))
+    finally:
+        if tmp.exists():
+            tmp.unlink(missing_ok=True)
+    return path
+
+
 def query_images(ra: float, dec: float, radius_deg: float = 1.0 / 3600,
                  collections=config.WIDE_COLLECTIONS,
                  max_age_s: float = config.METADATA_CACHE_MAX_AGE_S) -> list[ObservationRecord]:
@@ -89,8 +129,7 @@ def query_images(ra: float, dec: float, radius_deg: float = 1.0 / 3600,
     if max_age_s > 0 and cpath.exists() and time.time() - cpath.stat().st_mtime < max_age_s:
         return [ObservationRecord(**d) for d in json.loads(cpath.read_text(encoding="utf-8"))]
     records = _query_images_live(ra, dec, radius_deg, collections)
-    cpath.parent.mkdir(parents=True, exist_ok=True)
-    cpath.write_text(json.dumps([asdict(r) for r in records]), encoding="utf-8")
+    atomic_write(cpath, json.dumps([asdict(r) for r in records]))
     return records
 
 
@@ -148,26 +187,43 @@ def _cache_path(url: str) -> Path:
     return config.CACHE_DIR / f"{name}__{key}.fits"
 
 
-def fetch(url: str, refresh: bool = False) -> Path:
-    """Download ``url`` to the cache (if absent) and return the local path."""
+_url_locks: dict[str, threading.Lock] = {}
+_url_locks_guard = threading.Lock()
+
+
+def _lock_for(url: str) -> threading.Lock:
+    with _url_locks_guard:
+        return _url_locks.setdefault(url, threading.Lock())
+
+
+def local_copy(url: str) -> Path | None:
+    """Existing local file for ``url`` (reference store first, then cache), or None."""
     path = _cache_path(url)
-    if path.exists() and not refresh:
-        return path
-    path.parent.mkdir(parents=True, exist_ok=True)
-    last = None
-    for attempt in range(config.HTTP_RETRIES):
-        try:
-            r = requests.get(url, headers=config.HTTP_HEADERS, timeout=config.HTTP_TIMEOUT_S)
-            if r.status_code == 200 and r.content[:6] == b"SIMPLE":
-                tmp = path.with_suffix(".part")
-                tmp.write_bytes(r.content)
-                tmp.replace(path)
-                return path
-            last = f"HTTP {r.status_code}: {r.text[:80]!r}"
-        except requests.RequestException as err:
-            last = repr(err)
-        # IRSA answers 503 "Server busy, retry later" under load: back off.
-        time.sleep(min(60, 5 * 2 ** attempt))
+    ref = config.REFERENCE_DIR / path.name
+    if ref.exists():
+        return ref
+    return path if path.exists() else None
+
+
+def fetch(url: str, refresh: bool = False) -> Path:
+    """Return a local copy of ``url``, downloading it to the cache only if needed."""
+    if not refresh and (hit := local_copy(url)) is not None:
+        return hit
+    path = _cache_path(url)
+    with _lock_for(url):
+        if path.exists() and not refresh:      # another thread finished it meanwhile
+            return path
+        last = None
+        for attempt in range(config.HTTP_RETRIES):
+            try:
+                r = requests.get(url, headers=config.HTTP_HEADERS, timeout=config.HTTP_TIMEOUT_S)
+                if r.status_code == 200 and r.content[:6] == b"SIMPLE":
+                    return atomic_write(path, r.content)
+                last = f"HTTP {r.status_code}: {r.text[:80]!r}"
+            except requests.RequestException as err:
+                last = repr(err)
+            # IRSA answers 503 "Server busy, retry later" under load: back off.
+            time.sleep(min(60, 5 * 2 ** attempt))
     raise RuntimeError(f"Download failed after {config.HTTP_RETRIES} attempts: {url} ({last})")
 
 
@@ -175,10 +231,25 @@ def fetch_cutout(rec: ObservationRecord, ra: float, dec: float, size_deg: float)
     return fetch(cutout_url(rec.access_url, ra, dec, size_deg))
 
 
-def fetch_many(urls: list[str], workers: int = config.DOWNLOAD_WORKERS) -> dict[str, Path | Exception]:
-    """Download several URLs concurrently (small pool: IRSA throttles with 503)."""
+def fetch_many(urls: list[str], workers: int = config.DOWNLOAD_WORKERS,
+               progress=None) -> dict[str, Path | Exception]:
+    """Download several URLs concurrently (small pool: IRSA throttles with 503).
+
+    Duplicates are fetched once; files already on disk are not downloaded.
+    ``progress(done, total, n_downloaded)`` is called after each URL.
+    """
     unique = list(dict.fromkeys(urls))
     out: dict[str, Path | Exception] = {}
+    todo = []
+    for u in unique:
+        hit = local_copy(u)
+        if hit is not None:
+            out[u] = hit
+        else:
+            todo.append(u)
+    total, downloaded = len(unique), 0
+    if progress:
+        progress(len(out), total, 0)
 
     def one(u):
         try:
@@ -187,9 +258,13 @@ def fetch_many(urls: list[str], workers: int = config.DOWNLOAD_WORKERS) -> dict[
             return u, err
 
     with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
-        for u, res in pool.map(one, unique):
+        for fut in as_completed([pool.submit(one, u) for u in todo]):
+            u, res = fut.result()
             out[u] = res
-    return out
+            downloaded += not isinstance(res, Exception)
+            if progress:
+                progress(len(out), total, downloaded)
+    return {u: out[u] for u in unique}
 
 
 def sha256(path: Path) -> str:

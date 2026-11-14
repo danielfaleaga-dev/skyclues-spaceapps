@@ -1,8 +1,20 @@
 """Temporal player for a TemporalSequence (HTML/JS embedded in Streamlit).
 
-Each frame is one authentic observation rendered on the common reference
-grid with ONE shared intensity normalisation. There are no intermediate or
-interpolated frames: the player only switches between the N real images.
+Each frame is one authentic observation rendered with ONE shared intensity
+normalisation. There are no intermediate or interpolated frames: the player
+only switches between the N real images.
+
+Two geometries (``geometry=``):
+
+* ``"exact"`` (default): every native pixel is drawn as a quadrilateral at its
+  true position on the sky (both WCS, TAN-SIP), with its own unchanged value.
+  No resampling, so a fixed star does not jump by nearest-neighbour rounding.
+* ``"nearest"``: the frame placed on the reference grid by nearest neighbour
+  (the grid used for the statistics; position error up to 0.5 px).
+
+``show_halo=True`` is the exploratory display: pixels masked only by HALO
+("caution recommended" in the SPHEREx documentation) are drawn in a distinct
+copper scale. Comparability metrics never change with these options.
 
 The playback logic lives in ``PLAYER_CORE_JS`` (a DOM-free state machine) so
 it can be tested with Node; ``player_html`` adds the DOM glue.
@@ -23,12 +35,22 @@ from astropy.time import Time  # noqa: E402
 from matplotlib.cm import ScalarMappable  # noqa: E402
 
 from . import render  # noqa: E402
+from .quality import CAUTION  # noqa: E402
 from .sequence import TemporalSequence  # noqa: E402
 
 FIG_SIZE_IN = (5.6, 5.0)
 DPI = 110
 AX_RECT = [0.15, 0.11, 0.66, 0.85]
 CB_RECT = [0.86, 0.11, 0.03, 0.85]
+GEOMETRIES = ("exact", "nearest")
+GEOMETRY_LABEL = {
+    "exact": "geometría exacta: cada píxel nativo en su posición real (WCS), sin remuestreo",
+    "nearest": "REMUESTREADO por vecino más próximo (error de posición hasta ½ px por eje, ≈0.7 px)",
+}
+FRAME_STAMP = {
+    "exact": "Píxeles nativos en su posición WCS · sin remuestreo",
+    "nearest": "REMUESTREADO · vecino más próximo en la rejilla de la época 1",
+}
 
 
 def sequence_norm(seq: TemporalSequence, subtract_zodi: bool = True):
@@ -40,19 +62,44 @@ def sequence_norm(seq: TemporalSequence, subtract_zodi: bool = True):
 
 def frame_rgba(seq: TemporalSequence, i: int, norm, subtract_zodi: bool = True,
                restrict_to_common: bool = False) -> np.ndarray:
+    """RGBA of frame i on the reference grid (nearest-neighbour placement)."""
     data = seq.frame_data(i, subtract_zodi)
     return render.sequence_rgba(data, norm, seq.common_mask if restrict_to_common else None)
 
 
+def native_frame_rgba(seq: TemporalSequence, i: int, norm, subtract_zodi: bool = True,
+                      restrict_to_common: bool = False, show_halo: bool = False) -> np.ndarray:
+    """RGBA of frame i on its own native grid (for the exact-geometry display)."""
+    data = seq.native_data(i, subtract_zodi, CAUTION if show_halo else ())
+    return render.native_rgba(data, norm, seq.native_caution(i) if show_halo else None,
+                              seq.native_common(i) if restrict_to_common else None)
+
+
 def render_frame_png(seq: TemporalSequence, i: int, norm, subtract_zodi: bool = True,
-                     restrict_to_common: bool = False) -> bytes:
+                     restrict_to_common: bool = False, geometry: str = "exact",
+                     show_halo: bool = False) -> bytes:
     """PNG of frame i with a fixed layout (identical axes for every frame)."""
+    if geometry not in GEOMETRIES:
+        raise ValueError(f"geometry must be one of {GEOMETRIES}")
     fig = plt.figure(figsize=FIG_SIZE_IN, dpi=DPI, facecolor="white")
     ax = fig.add_axes(AX_RECT, projection=seq.wcs)
-    ax.imshow(frame_rgba(seq, i, norm, subtract_zodi, restrict_to_common), origin="lower",
-              interpolation="nearest")
     render._style_axes(ax)
+    if geometry == "exact":
+        render.draw_native(ax, seq.native_corners(i),
+                           native_frame_rgba(seq, i, norm, subtract_zodi, restrict_to_common, show_halo),
+                           seq.shape)
+    else:
+        rgba = frame_rgba(seq, i, norm, subtract_zodi, restrict_to_common)
+        if show_halo:
+            f = seq.frames[i]
+            caution = f.on_reference(seq.native_caution(i).astype(float)) == 1
+            data = f.on_reference(seq.native_data(i, subtract_zodi, CAUTION))
+            rgba = render.native_rgba(data, norm, caution, seq.common_mask if restrict_to_common else None)
+        ax.imshow(rgba, origin="lower", interpolation="nearest")
     render._mark_target(ax, seq.ra, seq.dec, seq.field_deg)
+    render.fix_extent(ax, seq.shape)
+    fig.text(0.01, 0.01, FRAME_STAMP[geometry] + (" · HALO visible (exploratorio)" if show_halo else ""),
+             fontsize=6.5, color=render.INK if geometry == "exact" else "#8a1a36")
     cax = fig.add_axes(CB_RECT)
     cb = fig.colorbar(ScalarMappable(norm=norm, cmap=render._cmap()), cax=cax)
     cb.set_label(("IMAGE − ZODI" if subtract_zodi else "IMAGE") + " [MJy/sr]", color=render.INK, fontsize=8)
@@ -274,24 +321,35 @@ _GLUE_JS = r"""
 """
 
 
-def player_html(seq: TemporalSequence, pngs: list[bytes], subtract_zodi: bool = True,
-                restrict_to_common: bool = False) -> str:
-    frames = ["data:image/png;base64," + base64.b64encode(p).decode() for p in pngs]
+def legend_html(subtract_zodi: bool = True, restrict_to_common: bool = False, geometry: str = "exact",
+                show_halo: bool = False) -> str:
     legend = (f'Magnitud: {"IMAGE − ZODI" if subtract_zodi else "IMAGE"} (MJy/sr), misma escala en todas las épocas.'
               f'<span class="sw" style="background:{render.MASK_COLOR}"></span>sin datos válidos en esa época')
     if restrict_to_common:
         legend += (f'<span class="sw" style="background:{render.OUTSIDE_COMMON_COLOR}"></span>'
                    'válido solo en algunas épocas')
+    if show_halo:
+        legend += (f'<span class="sw" style="background:{render.CAUTION_SWATCH}"></span>'
+                   'HALO (modo exploratorio: precaución recomendada; excluido de las métricas)')
     legend += (' · Cruz y círculo azules: objetivo y campo. Fotogramas = observaciones reales, sin interpolación '
-               'temporal. Rejilla de referencia: época 1 (vecino más próximo).')
+               f'temporal. Ejes: rejilla de la época 1; {GEOMETRY_LABEL[geometry]}.')
+    return legend
+
+
+def player_html(seq: TemporalSequence, pngs: list[bytes], subtract_zodi: bool = True,
+                restrict_to_common: bool = False, geometry: str = "exact", show_halo: bool = False) -> str:
+    frames = ["data:image/png;base64," + base64.b64encode(p).decode() for p in pngs]
     css = _CSS % {"mask": render.MASK_COLOR, "outside": render.OUTSIDE_COMMON_COLOR}
-    body = _BODY % {"legend": legend}
+    body = _BODY % {"legend": legend_html(subtract_zodi, restrict_to_common, geometry, show_halo)}
     glue = _GLUE_JS % {"frames": json.dumps(frames), "meta": json.dumps(frame_metadata(seq))}
     return (f"<!doctype html><html><head><meta charset='utf-8'><style>{css}</style></head>"
             f"<body>{body}<script>{PLAYER_CORE_JS}</script><script>{glue}</script></body></html>")
 
 
-def build_player(seq: TemporalSequence, subtract_zodi: bool = True, restrict_to_common: bool = False) -> str:
+def build_player(seq: TemporalSequence, subtract_zodi: bool = True, restrict_to_common: bool = False,
+                 geometry: str = "exact", show_halo: bool = False) -> str:
+    """Ready-to-embed HTML player. Display options never alter the sequence or its metrics."""
     norm = sequence_norm(seq, subtract_zodi)
-    pngs = [render_frame_png(seq, i, norm, subtract_zodi, restrict_to_common) for i in range(seq.n)]
-    return player_html(seq, pngs, subtract_zodi, restrict_to_common)
+    pngs = [render_frame_png(seq, i, norm, subtract_zodi, restrict_to_common, geometry, show_halo)
+            for i in range(seq.n)]
+    return player_html(seq, pngs, subtract_zodi, restrict_to_common, geometry, show_halo)

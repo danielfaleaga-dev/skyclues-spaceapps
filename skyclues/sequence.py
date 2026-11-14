@@ -7,7 +7,11 @@ chronologically, with:
 * the original Level-2 data of every frame (``frame.image``, never modified);
 * a common reference pixel grid (the earliest frame) onto which every frame
   is *placed* by nearest-neighbour lookup through its own WCS (values copied,
-  never interpolated, never invented);
+  never interpolated, never invented). This grid is used for the statistics
+  (masks, coverage, criteria); its position error is up to 0.5 px;
+* the exact geometry of every frame's *native* pixels in reference-grid
+  coordinates (``native_corners``), for display without resampling: each
+  native pixel keeps its value and is drawn at its true sky position;
 * per-frame validity masks, the comparison field and the common valid region;
 * global comparability criteria S1-S9, evaluated over the whole set (all
   frames at once, not only consecutive pairs).
@@ -17,6 +21,8 @@ Typical use::
     seq, report = find_sequence(ra, dec, field_deg=0.1)
     for i, f in enumerate(seq.frames):
         data = seq.frame_data(i)          # MJy/sr on the reference grid, NaN = no valid data
+        native = seq.native_data(i)       # MJy/sr on the frame's own grid (exact geometry)
+        X, Y = seq.native_corners(i)      # its pixel corners in reference pixel coordinates
         f.date_utc, f.obs_id, f.lambda_target_um, f.quality
     seq.common_mask, seq.field_mask, seq.wcs, seq.criteria
 """
@@ -112,6 +118,7 @@ class TemporalSequence:
     metrics: dict
     notes: list[str]
     reference_index: int = 0
+    _cache: dict = field(default_factory=dict, repr=False, compare=False)
 
     # -- convenience ------------------------------------------------------
     @property
@@ -151,6 +158,72 @@ class TemporalSequence:
         st[self.valid_stack[i]] = 1
         st[self.common_mask] = 0
         return st
+
+    # -- exact geometry (native pixels, no resampling) --------------------
+    def _to_reference(self, i: int, x: np.ndarray, y: np.ndarray):
+        if i == self.reference_index:
+            return x, y
+        ra, dec = self.frames[i].image.wcs.all_pix2world(x, y, 0)
+        return self.wcs.all_world2pix(ra, dec, 0)
+
+    def native_corners(self, i: int) -> tuple[np.ndarray, np.ndarray]:
+        """Corners of frame i's NATIVE pixels in reference-grid pixel coordinates.
+
+        Returns (X, Y), each of shape (ny + 1, nx + 1): native pixel (r, c) is
+        the quadrilateral X[r:r+2, c:c+2], Y[r:r+2, c:c+2], computed through
+        both celestial WCS (TAN-SIP). Only positions are transformed; pixel
+        values are never resampled.
+        """
+        key = ("corners", i)
+        if key not in self._cache:
+            ny, nx = self.frames[i].image.shape
+            yc, xc = np.mgrid[-0.5:ny:1.0, -0.5:nx:1.0]
+            self._cache[key] = self._to_reference(i, xc, yc)
+        return self._cache[key]
+
+    def native_centres(self, i: int) -> tuple[np.ndarray, np.ndarray]:
+        """Centres (x, y) of frame i's native pixels in reference-grid pixel coordinates."""
+        key = ("centres", i)
+        if key not in self._cache:
+            ny, nx = self.frames[i].image.shape
+            yy, xx = np.mgrid[0:ny, 0:nx].astype(float)
+            self._cache[key] = self._to_reference(i, xx, yy)
+        return self._cache[key]
+
+    def native_data(self, i: int, subtract_zodi: bool = True, ignore_names=()) -> np.ndarray:
+        """Surface brightness of frame i on its OWN pixel grid (new array, MJy/sr).
+
+        NaN where the pixel is invalid under the sequence mask. Flags in
+        ``ignore_names`` (e.g. ``quality.CAUTION``) are not masked: use only for
+        the exploratory display, together with ``native_caution``.
+        """
+        img = self.frames[i].image
+        values = img.image - img.zodi if subtract_zodi else img.image
+        return np.where(img.valid(self.mask_classes, ignore_names), values, np.nan)
+
+    def native_caution(self, i: int) -> np.ndarray:
+        """Native pixels of frame i masked only by a caution flag (HALO)."""
+        return self.frames[i].image.caution(self.mask_classes)
+
+    def native_common(self, i: int) -> np.ndarray:
+        """Native pixels of frame i whose centre falls on a reference pixel of the common region."""
+        x, y = self.native_centres(i)
+        ix, iy = np.rint(x).astype(int), np.rint(y).astype(int)
+        ny, nx = self.shape
+        inside = (ix >= 0) & (ix < nx) & (iy >= 0) & (iy < ny)
+        out = np.zeros(x.shape, bool)
+        out[inside] = self.common_mask[iy[inside], ix[inside]]
+        return out
+
+    def placement_error_px(self, i: int) -> np.ndarray:
+        """Distance (reference px) between each reference pixel centre and the
+        centre of the frame-i pixel that nearest-neighbour placement copies there."""
+        ref = self.frames[self.reference_index].image
+        ny, nx = ref.shape
+        yy, xx = np.mgrid[0:ny, 0:nx]
+        ra, dec = ref.wcs.all_pix2world(xx, yy, 0)
+        bx, by = self.frames[i].image.wcs.all_world2pix(ra, dec, 0)
+        return np.hypot(bx - np.rint(bx), by - np.rint(by))
 
     def summary(self) -> dict:
         return {
@@ -211,11 +284,13 @@ def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: flo
         bits = f.image.flag_defs.names_bitmask(SATURATION)
         sat_frac.append(float(np.count_nonzero((f.image.flags[iy, ix] & bits)[region]) / max(region.sum(), 1)))
         zodi_med.append(float(np.nanmedian(f.on_reference(f.image.zodi)[field_mask])))
+        halo_only = f.image.caution(mask_classes)[iy, ix] & region
         f.quality = {
             "L2DQAFLG": str(f.image.meta.get("L2DQAFLG")).strip(),
             "FINAST": f.image.meta.get("FINAST"),
             "valid_fraction_in_field": float(valid_stack[frames.index(f)][field_mask].mean()) if n_field else 0.0,
             "saturation_fraction_in_field": sat_frac[-1],
+            "halo_only_fraction_in_field": float(halo_only.sum() / max(region.sum(), 1)),
             "zodi_median_mjysr": zodi_med[-1],
             "psf_fwhm_arcsec": f.image.meta.get("PSF_FWHM"),
         }
@@ -415,19 +490,34 @@ def _option_row(o: TemporalSequence, origin: str) -> dict:
     }
 
 
+#: Search stages reported to ``progress(stage, fraction, message)`` by find_sequence.
+STAGES = ("catalog", "wavelengths", "download", "evaluate", "done")
+
+
 def find_sequence(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD_DEG,
                   collections=config.WIDE_COLLECTIONS, detectors=None,
                   max_frames: int = config.MAX_SEQUENCE_FRAMES,
                   max_candidates: int = config.MAX_SEQUENCE_CANDIDATES,
-                  mask_classes=STRICT, log=print):
-    """Search IRSA and return (best TemporalSequence | None, JSON-able report)."""
+                  mask_classes=STRICT, log=print, progress=None):
+    """Search IRSA and return (best TemporalSequence | None, JSON-able report).
+
+    ``progress(stage, fraction, message)``, if given, is called at every stage
+    (``STAGES``) and after each FITS cutout, with ``fraction`` in [0, 1].
+    """
+    def step(stage, frac, msg):
+        if progress:
+            progress(stage, min(1.0, max(0.0, frac)), msg)
+
     t0 = time.time()
+    step("catalog", 0.02, "Consultando el catálogo SPHEREx de IRSA (SIA2)…")
     records = archive.query_images(ra, dec, collections=collections)
     if detectors:
         records = [r for r in records if r.detector in set(detectors)]
     log(f"SIA2: {len(records)} imágenes contienen el objetivo ({', '.join(collections)})")
     cands = build_candidates(records, ra, dec, field_deg)
     log(f"Con el campo completo dentro del detector: {len(cands)}")
+    step("wavelengths", 0.10, f"{len(records)} imágenes contienen el objetivo; {len(cands)} cubren el campo "
+                              "completo. Estimando λ desde metadatos…")
     estimate_wavelengths(cands)
     proposals = propose_sequences(cands, max_frames)
     log(f"Conjuntos espectralmente compatibles propuestos: {len(proposals)} "
@@ -436,8 +526,16 @@ def find_sequence(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD
     chosen_props = proposals[:max_candidates]
     urls = [archive.cutout_url(m.rec.access_url, ra, dec, field_deg) for p in chosen_props for m in p["members"]]
     t1 = time.time()
-    got = archive.fetch_many(urls)
+
+    def on_file(done, total, downloaded):
+        step("download", 0.20 + 0.65 * done / max(total, 1),
+             f"Recortes FITS: {done} de {total} listos ({downloaded} descargados de IRSA, "
+             f"{done - downloaded} ya en caché local)")
+
+    step("download", 0.20, f"{len(proposals)} conjuntos compatibles; obteniendo {len(set(urls))} recortes FITS…")
+    got = archive.fetch_many(urls, progress=on_file)
     log(f"Recortes FITS: {len(set(urls))} en {time.time() - t1:.0f} s")
+    step("evaluate", 0.86, "Alineando épocas y evaluando los criterios S1–S9…")
 
     options, origins, failures = [], [], []
     for k, p in enumerate(chosen_props):
@@ -500,6 +598,7 @@ def find_sequence(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD
         "generated_utc": Time.now().isot[:19],
     }
     log(f"Total: {report['elapsed_s']} s")
+    step("done", 1.0, f"Búsqueda completada en {report['elapsed_s']} s")
     return best, report
 
 
@@ -523,11 +622,21 @@ def _jsonable(v):
     return str(v)
 
 
-def load_sequence(report: dict | str | Path, mask_classes=STRICT, verify: bool = True) -> TemporalSequence:
+def report_urls(report: dict) -> list[str]:
+    """Cutout URLs of the selected frames of a sequence or pair report."""
+    sel = report["selected"]
+    if report.get("kind") == "sequence":
+        return [f["cutout_url"] for f in sel["frames"]]
+    return [sel[k]["cutout_url"] for k in ("a", "b")]
+
+
+def load_sequence(report: dict | str | Path, mask_classes=STRICT, verify: bool = True,
+                  progress=None) -> TemporalSequence:
     """Rebuild a TemporalSequence from a saved sequence report or a pair report.
 
-    FITS are taken from the local cache (or re-downloaded from the stored
-    cutout URL). With ``verify`` the SHA-256 must match the report.
+    FITS are taken from the local reference store or cache, or re-downloaded
+    from the stored cutout URL (in parallel). With ``verify`` the SHA-256 must
+    match the report. ``progress(done, total, n_downloaded)`` as in ``fetch_many``.
     """
     if not isinstance(report, dict):
         report = json.loads(Path(report).read_text(encoding="utf-8"))
@@ -537,9 +646,12 @@ def load_sequence(report: dict | str | Path, mask_classes=STRICT, verify: bool =
         items = [(f["cutout_url"], f.get("sha256"), f) for f in sel["frames"]]
     else:  # pair report (pairing.find_pair)
         items = [(sel[k]["cutout_url"], sel[k].get("sha256"), sel[k]) for k in ("a", "b")]
+    got = archive.fetch_many([u for u, _, _ in items], progress=progress)
     frames = []
     for url, digest, rec in items:
-        path = archive.fetch(url)
+        path = got[url]
+        if isinstance(path, Exception):
+            raise RuntimeError(f"No se pudo obtener {url.split('?')[0].rsplit('/', 1)[-1]}: {path}") from path
         actual = archive.sha256(path)
         if verify and digest and actual != digest:
             raise ValueError(f"SHA-256 mismatch for {path.name}: the cached FITS differs from the report")
@@ -548,4 +660,4 @@ def load_sequence(report: dict | str | Path, mask_classes=STRICT, verify: bool =
 
 
 __all__ = ["Frame", "TemporalSequence", "evaluate_sequence", "find_sequence", "load_sequence",
-           "propose_sequences", "pruning_path", "choose", "save_report", "criterion"]
+           "propose_sequences", "pruning_path", "choose", "save_report", "criterion", "report_urls", "STAGES"]

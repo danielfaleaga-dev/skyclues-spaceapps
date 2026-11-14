@@ -1,81 +1,92 @@
 # SkyClues — estado del proyecto
 
-Última actualización: 14-11-2026, Claude Code A (misión 2: secuencias de N épocas y reproductor). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md).
+Última actualización: 14-11-2026, Claude Code A (misión 3: robustez científica, FOV y preparación de la primera versión pública). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md).
 
 ## Objetivo inmediato
-Hito 4 (experiencia de usuario): pulir la interfaz (Codex), añadir contexto con Aladin Lite y ejecutar los demás objetos de NASA.
+Primera versión pública (pendiente de autorización para desplegar): decidir si se versionan los FITS de los ejemplos (ver «Decisiones pendientes»), hacer el refinamiento visual (Codex) y desplegar en Streamlit Community Cloud.
 
 ## Terminado y verificado
 | Componente | Verificación |
 |---|---|
-| Entorno: Python 3.11 en `.venv`, `requirements.txt` con versiones fijadas | instalado y en uso |
-| Consulta SIA2 a `spherex_dr1` y `spherex_qr3`, con caché JSON de 12 h (`archive.py`) | prueba real |
-| Recortes IBE con caché intacta, SHA-256, reintentos ante 503 y **3 descargas en paralelo** (`fetch_many`) | prueba real |
-| Lectura MEF con WCS celeste y espectral (`fitsdata.py`); FLAGS leídos de MSKN (`quality.py`) | pruebas reales |
-| Estimación de λ sin descargar (homografía `s_region` + tabla WCS-WAVE por petición *range*, en caché de disco) | λ estimada = λ del FITS |
-| Parejas, criterios C1–C9 (`pairing.py`, `compare.py`) | sin cambios; pruebas originales en verde |
-| **Secuencias de N épocas, criterios globales S1–S9 sobre todo el conjunto (`sequence.py`)** | pruebas reales: intersección de máscaras, Δλ entre todos los pares, orden cronológico, alineación WCS < 0.75 px, datos idénticos al FITS y sin interpolar |
-| **Regla de selección:** solo opciones admisibles con S5 = pass y cobertura ≥ (mejor − 15 puntos); entre ellas, menos avisos y después más épocas | pruebas unitarias: una secuencia de 3 épocas con cobertura del 62 % no supera a una pareja del 97 % |
-| **Reproductor temporal (`player.py`, pestaña de la app):** reproducción, pausa, velocidad de 0.5 a 4 fps, repetición, anterior/siguiente, deslizador, blink A↔B (1–4 Hz), teclado y tabla de épocas | máquina de estados probada con Node; fotogramas con lienzo idéntico; HTML con N fotogramas reales; **probado en el navegador real**: siguiente/anterior, reproducción a 4 fps con repetición, pausa, blink 1↔4 y deslizador |
-| Color de máscara (rosa) en el reproductor y región no común (azul claro, opcional) | prueba píxel a píxel |
-| App Streamlit (`app.py`) basada en `TemporalSequence`; una pareja se trata como secuencia de 2 épocas | AppTest: vista de referencia, todos los resultados guardados y una búsqueda nueva |
+| Entorno: Python 3.11 en `.venv`; `requirements.txt` (solo runtime, versiones fijadas) y `requirements-dev.txt` (pytest) | instalado y en uso |
+| Consulta SIA2 a `spherex_dr1` y `spherex_qr3`, con caché JSON de 12 h | prueba real |
+| Recortes IBE: caché intacta con SHA-256, reintentos ante 503, 3 descargas en paralelo. **Novedades:** escritura atómica con nombre temporal único (reintento ante el bloqueo de Windows), una sola descarga por URL aunque la pidan varios hilos, y almacén opcional de solo lectura `data/reference/` | pruebas unitarias: 8 escritores concurrentes, 5 hilos → 1 descarga, prioridad de `data/reference/` sin red |
+| Lectura MEF con WCS celeste y espectral; FLAGS leídos de MSKN | pruebas reales |
+| Estimación de λ sin descargar (homografía `s_region` + tabla WCS-WAVE) | λ estimada = λ del FITS |
+| Parejas (C1–C9) y secuencias de N épocas (S1–S9 globales); regla de selección sin cambios | pruebas originales en verde |
+| **Geometría exacta (nueva, modo por defecto del reproductor):** cada píxel nativo de cada época se dibuja como un cuadrilátero en su posición WCS real (`TemporalSequence.native_corners`), con su valor original y sin remuestreo. La rejilla común por vecino más próximo se mantiene para las métricas y como vista opcional, con la etiqueta «REMUESTREADO» en la leyenda y en cada fotograma | pruebas reales: posición dibujada = posición WCS (< 0.01″); valores idénticos bit a bit al FITS; máscara = píxeles nativos inválidos |
+| **HALO (nuevo):** se añade SATELLITE_HALO (bit 29, siempre enmascarado). Modo exploratorio opcional: los píxeles enmascarados **solo** por HALO se muestran en escala cobre (el brillo conserva el orden), con su leyenda. Las métricas y criterios usan siempre la máscara estricta | pruebas: solo cambian los píxeles HALO; todos tienen el bit 28; los criterios, métricas y máscaras no cambian |
+| **Búsqueda con progreso (nuevo):** `find_sequence(progress=…)` informa de 5 etapas y de cada recorte (descargados / ya en caché); `load_sequence(progress=…)` descarga en paralelo. La app muestra una barra de progreso y mensajes claros cuando IRSA falla, sin datos parciales | prueba unitaria de etapas; probado en el navegador con una búsqueda real |
+| **Accesos rápidos a ejemplos validados (nuevo):** botones para M101 (4 épocas) y WISE 0855 (D6, 3 épocas) | AppTest y navegador |
+| **Campo de visión (FOV) seleccionable (nuevo; recomendación oficial del desafío):** valores predefinidos de 3′, 6′ (por defecto), 12′ y 18′, o un valor personalizado entre 3′ y 30′, con su equivalencia en grados y píxeles. Se aplica de verdad a la búsqueda: los candidatos deben contener el campo completo, λ se muestrea en todo el campo, el recorte IRSA tiene ese tamaño y la cobertura se calcula sobre ese campo. La URL lo guarda (`fov=`) y valores no válidos se acotan. Se distingue del zoom (tamaño en pantalla fijo) y se avisa de que los campos mayores tardan más | AppTest: búsqueda de 18′ → `field_deg = 0.3` y recortes `size=0.30000`; búsquedas reales de 18′ y 30′ (ver tabla) |
+| Reproductor: reproducción, pausa, velocidad, repetición, paso, deslizador, blink y teclado | **navegador real, tras los cambios**: siguiente/anterior, reproducción a 1 fps, pausa y blink 1↔2 |
 
-## Secuencias de referencia (datos reales; los informes están en `results/`)
-| Campo | Épocas | Fechas (UTC) | Intervalos (d) | λ en el objetivo | Cobertura común | Criterios |
+## Medidas de esta sesión (datos reales)
+- **Error del vecino más próximo:** en `sequence_m101`, las épocas 2 y 3 están giradas −5.97° respecto a la época 1. En la rejilla común, cada píxel puede desplazarse hasta **0.70 px (≈4.3″)**, y en el campo se duplican 20 píxeles nativos y se pierden otros 20. En `sequence_wise0855_mwir` la escala difiere un 0.54 % y el error llega a ±0.5 px por eje. La geometría exacta elimina ese error (< 0.01″). En dos estrellas brillantes de M101, el centroide varía 0.21 px entre épocas con el vecino más próximo y 0.13 px con la geometría nativa (muestra pequeña; es solo indicativo).
+- **HALO en M101:** los píxeles enmascarados solo por HALO son el 0.4–1.4 % del campo por época. Están alrededor de las estrellas brillantes, como describe el suplemento.
+- **FOV mayor (búsquedas reales en frío, limitadas a dos detectores):**
+
+| Campo | FOV | Píxeles/época | Resultado | Tiempo | Memoria | Reproductor |
 |---|---|---|---|---|---|---|
-| M101 (`sequence_m101`), QR3 D2 | 4 | 17-05, 22-05, 19-06 y 22-06-2026 | 4.5 · 28.3 · 3.5 (total 36.4) | 1.4151–1.4206 µm (dispersión 0.16 BW; máx. 0.24 en la región) | 94.0 % (2537 px) | 9/9 cumplen |
-| WISE 0855 (`sequence_wise0855_mwir`), DR1 D6, detectores limitados a D5–D6 | 3 | 26-04, 30-04 y 08-05-2026 | 4.7 · 8.2 (total 12.9) | 4.823–4.826 µm (0.07 BW; máx. 0.11) | 88.0 % | 9/9 cumplen |
-| WISE 0855 (`sequence_wise0855`), DR1 D3, todos los detectores | 3 | las mismas fechas | 4.7 · 8.2 | 2.156–2.159 µm (0.04 BW; máx. 0.07) | 86.8 % | 9/9 cumplen |
+| M101, D2 | 18′ (0.3°) | 176² | 2 épocas, 93.5 %, 9/9 cumplen | 113 s (descargas 112 s) | — | 0.7 s · 322 kB |
+| WISE 0855, D5–D6 | 30′ (0.5°) | 292² | 3 épocas D6, 86.0 %, 9/9 cumplen | 148 s (descargas 146 s) | pico 206 MB | 1.3 s · 916 kB |
 
-- Notas sobre WISE 0855: es una enana Y que emite sobre todo por encima de 3.5 µm, por eso la versión D5–D6 es la relevante. Con 12.9 días, el movimiento propio publicado (≈8″/año, no verificado aquí) supone ≈0.3″, muy por debajo de un píxel de 6.2″: **no se espera ver movimiento** en esta secuencia. La pareja `pair_wise0855` (DR1 D5, Δt = 373 d) sigue siendo la mejor línea base y el reproductor también la abre.
-- **Razones de rechazo registradas:** las opciones de 4 épocas en WISE 0855 (D2 con cobertura del 81.7 % y D5 del 83.6 %) se descartaron porque S4 dio aviso: los gradientes LVF eran antiparalelos y la dispersión llegaba a 0.50 y 0.51 BW. En M101, 4 es el máximo de épocas espectralmente compatibles entre los recortes evaluados (91 propuestas).
-- Las parejas originales (`pair_m101`, `pair_wise0855`) y la prueba nula siguen vigentes.
+  Con un campo mayor, la dispersión de λ entre épocas crece (0.29 BW en M101 a 18′), así que la regla de selección elige menos épocas. Cada recorte pesa unos 4 MB con cualquier FOV (lo domina la extensión EPSF).
+- **Servidor Streamlit:** 224 MB de memoria residente (pico 264 MB) tras abrir los dos ejemplos en las dos geometrías, con y sin HALO, y una búsqueda de 18′. Community Cloud ofrece entre 690 MB y 2.7 GB.
 
-## Rendimiento
-Búsqueda de secuencia en frío: 73 s en M101 y 70 s en WISE 0855, frente a ~110 s de la antigua búsqueda de parejas (el tiempo lo dominan los recortes de ~4 MB, que ahora se descargan de 3 en 3). En caliente, con metadatos y FITS en caché, tarda ~1 s.
+## Secuencias de referencia (sin cambios; informes en `results/`)
+| Campo | Épocas | Fechas (UTC) | λ en el objetivo | Cobertura común | Criterios |
+|---|---|---|---|---|---|
+| M101 (`sequence_m101`), QR3 D2 | 4 | 17-05, 22-05, 19-06 y 22-06-2026 (36.4 d) | 1.4151–1.4206 µm | 94.0 % | 9/9 |
+| WISE 0855 (`sequence_wise0855_mwir`), DR1 D6 | 3 | 26-04, 30-04 y 08-05-2026 (12.9 d) | 4.823–4.826 µm | 88.0 % | 9/9 |
+| WISE 0855 (`sequence_wise0855`), DR1 D3 | 3 | las mismas | 2.156–2.159 µm | 86.8 % | 9/9 |
+
+Las parejas `pair_m101` y `pair_wise0855` y la prueba nula siguen vigentes. Con 12.9 días no se espera ver el movimiento propio de WISE 0855 (≈0.3″).
 
 ## Pruebas
 ```
-.venv\Scripts\python -m pytest -q          # 38 passed, 14-11-2026 (19 originales del motor sin cambios, 3 de la app, 16 nuevas)
-.venv\Scripts\python -m pytest -m "not network"   # unitarias, incluida la máquina de estados del reproductor con Node
-.venv\Scripts\python scripts\find_sequence.py --ra 210.802429 --dec 54.34875 --field 0.1 --name sequence_m101
-.venv\Scripts\python scripts\find_sequence.py --ra 133.7951292 --dec -7.2451472 --field 0.1 --detectors 5 6 --name sequence_wise0855_mwir
-.venv\Scripts\streamlit run app.py
+.venv\Scripts\python -m pytest -q                 # 57 passed, 14-11-2026 (38 anteriores + 19 nuevas)
+.venv\Scripts\python -m pytest -m "not network"   # 23 unitarias (incluye la máquina de estados del reproductor con Node)
 ```
-Las 2 pruebas de la app de la misión 1 (vista de pareja y búsqueda de pareja) se adaptaron a la vista de secuencias. Las 19 pruebas del motor siguen sin cambios.
+Nuevas: `tests/test_robustness_offline.py` (10) y `tests/test_robustness_live.py` (6). `tests/test_app.py` pasa de 3 a 6 pruebas: ejemplos validados, opciones de visualización y FOV. Los selectores de las 3 pruebas existentes ahora usan claves de widget; sus aserciones no cambian. Las pruebas del motor (19) y de secuencias siguen sin cambios.
+
+## Despliegue en Streamlit Community Cloud (preparado; **no desplegado**)
+- `app.py` en la raíz; `requirements.txt` solo con dependencias de ejecución; `.streamlit/config.toml` con tema claro, sin estadísticas de uso y con la barra de herramientas mínima. No hacen falta `packages.txt` ni secretos.
+- Python: se elige en *Advanced settings* al desplegar (por defecto, 3.12). Recomendado: 3.11, la versión de desarrollo.
+- El reproductor es HTML y JS en `components.html`, sin dependencias externas ni CDN. Funciona en el navegador local.
+- El disco no es persistente: la caché se pierde al reiniciar y la primera visita vuelve a descargar los FITS (unos 30–60 s por ejemplo si IRSA responde).
+
+## Decisiones pendientes (usuario)
+1. **¿Versionar los FITS de los ejemplos validados?** `scripts/bundle_reference.py` los copia a `data/reference/` (unos 27 MB y 7 archivos idénticos a IRSA, con SHA-256 verificado). Ventaja: los ejemplos se abren al instante en la nube aunque IRSA esté saturado. Coste: unos 27 MB más en el historial de git. El código ya los usa si existen; no se han añadido al repositorio.
+2. Autorización para hacer push y desplegar.
 
 ## API para Codex (`skyclues.sequence`, `skyclues.player`)
 ```python
-from skyclues.sequence import find_sequence, load_sequence
-seq, report = find_sequence(ra, dec, field_deg=0.1, detectors=None, max_frames=8)   # o bien:
-seq = load_sequence("results/sequence_m101.json")      # también acepta informes de pareja (2 épocas)
-seq.n, seq.frames                                       # cronológico
-f = seq.frames[i]; f.date_utc, f.mjd, f.obs_id, f.collection, f.detector,
-f.lambda_target_um, f.bandwidth_target_um, f.quality, f.cutout_url, f.sha256, f.record
-f.image                                                 # SpectralImage original (IMAGE, FLAGS, VARIANCE, ZODI, WCS); no modificar
-seq.frame_data(i, subtract_zodi=True)                   # MJy/sr en la rejilla de referencia; NaN = sin dato válido
-seq.frame_status(i)                                     # 0 común · 1 válido solo aquí · 2 sin datos
-seq.wcs, seq.field_mask, seq.common_mask, seq.valid_stack, seq.lambda_spread_bw
-seq.criteria, seq.metrics, seq.notes, seq.admissible, seq.summary()
-from skyclues import player
-html = player.build_player(seq, subtract_zodi=True, restrict_to_common=False)  # componente listo
-norm = player.sequence_norm(seq); player.frame_rgba(seq, i, norm); player.render_frame_png(...)
+from skyclues.sequence import find_sequence, load_sequence, report_urls
+seq, report = find_sequence(ra, dec, field_deg=0.1, detectors=None, max_frames=8,
+                            progress=lambda stage, frac, msg: ...)     # stage ∈ sequence.STAGES
+seq = load_sequence("results/sequence_m101.json", progress=lambda done, total, n_downloaded: ...)
+seq.frame_data(i)            # rejilla común (vecino más próximo): para estadísticas
+seq.native_data(i)           # rejilla propia de la época: valores originales (NaN = inválido)
+seq.native_corners(i)        # esquinas (X, Y) de sus píxeles en coordenadas de la rejilla común
+seq.native_caution(i)        # píxeles enmascarados solo por HALO
+seq.placement_error_px(i)    # desplazamiento del vecino más próximo en cada píxel
+html = player.build_player(seq, subtract_zodi=True, restrict_to_common=False,
+                           geometry="exact" | "nearest", show_halo=False)
 ```
-Reglas: una única `sequence_norm` para todas las épocas; los NaN se dibujan siempre con `MASK_COLOR`; hay que indicar la magnitud mostrada (IMAGE − ZODI) y que la rejilla es la de la época 1. La lógica de reproducción está en `PLAYER_CORE_JS`, separada del DOM.
-
-## Archivos importantes
-`app.py` · `skyclues/{config,archive,geometry,fitsdata,quality,compare,pairing,sequence,player,render,targets}.py` · `scripts/{find_pair,find_sequence,null_test}.py` · `tests/` · `results/*.json` (versionados; `results/search_*` lo ignora git) · `data/cache/` (FITS intactos y `meta/` con SIA2 y WCS-WAVE; ignorado por git).
+Reglas: una única `sequence_norm`; los NaN se dibujan con `MASK_COLOR`; la geometría «nearest» debe mostrarse siempre como remuestreada; HALO solo es visible en modo exploratorio y con su color; las opciones de visualización no modifican nunca la secuencia ni sus métricas. Limitar el FOV con `targets.clamp_fov_deg` (3′–30′).
 
 ## Problemas abiertos
-1. La bandera **HALO** tapa estrellas brillantes con la máscara estricta. Falta confirmar su significado en la tabla 16 del suplemento (descargar el PDF en local).
-2. La alineación por vecino más próximo (≤ 0.5 px) hace que una estrella fija pueda «saltar» un píxel entre épocas. Una diferencia visual no es movimiento. Falta valorar un remuestreo subpíxel etiquetado.
-3. No hay vista con el norte arriba: la rejilla es la del detector de la época 1.
-4. La λ por píxel tiene precisión de visualización (WCS-WAVE); CWAVE/CBAND no están implementados.
-5. RW Aur, R Dra, Barnard y ε Ind B no se han ejecutado, y la propagación del movimiento propio no está implementada.
-6. Con 8 épocas o campos más grandes, el HTML del reproductor crece (~80 kB por fotograma).
-7. Streamlit no recarga `skyclues/`: hay que reiniciar el servidor tras editarlo.
+1. No hay vista con el norte arriba: los ejes son los del detector de la época 1.
+2. La λ por píxel tiene precisión de visualización (WCS-WAVE); CWAVE/CBAND no están implementados.
+3. RW Aur, R Dra, Barnard y ε Ind B no se han ejecutado, y la propagación del movimiento propio no está implementada.
+4. Con 8 épocas y un FOV de 30′, el HTML del reproductor rondaría los 2.4 MB (unos 300 kB por fotograma).
+5. Una búsqueda en frío depende de la velocidad de IRSA (unos 14–20 s por recorte, 3 en paralelo).
+6. Streamlit no recarga `skyclues/`: hay que reiniciar el servidor tras editarlo.
+7. No se ha probado con Python 3.12, la versión por defecto de Community Cloud (sí con 3.11 y en una instalación limpia con 3.14).
 
 ## Siguiente tarea prioritaria
-- **Codex:** refinamiento visual del reproductor y de la app, URL compartible con la secuencia elegida, accesibilidad y despliegue (con autorización).
-- **Claude A:** objetos variables (RW Aur, R Dra) con la misma API, propagación del movimiento propio para el marcador del objetivo (sin presentarla como detección) y la bandera HALO.
+- **Usuario:** decisiones pendientes 1 y 2.
+- **Codex:** refinamiento visual, accesibilidad y despliegue (con autorización).
+- **Claude A:** objetos variables (RW Aur, R Dra) y propagación del movimiento propio para el marcador del objetivo (sin presentarla como detección).
 - **Claude B:** Spectrum Explorer (ver CONTEXT).

@@ -63,9 +63,8 @@ def wave_table_from_url(access_url: str) -> dict:
         d = json.loads(cpath.read_text(encoding="utf-8"))
         return {**d, "X": np.array(d["X"]), "Y": np.array(d["Y"]), "VALUES": np.array(d["VALUES"])}
     tab = _wave_table_live(access_url)
-    cpath.parent.mkdir(parents=True, exist_ok=True)
-    cpath.write_text(json.dumps({**tab, "X": tab["X"].tolist(), "Y": tab["Y"].tolist(),
-                                 "VALUES": tab["VALUES"].tolist()}), encoding="utf-8")
+    archive.atomic_write(cpath, json.dumps({**tab, "X": tab["X"].tolist(), "Y": tab["Y"].tolist(),
+                                            "VALUES": tab["VALUES"].tolist()}))
     return tab
 
 

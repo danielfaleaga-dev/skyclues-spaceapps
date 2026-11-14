@@ -1,4 +1,6 @@
-# Python 3.11 (tested 2026-11-14 on Windows 11)
+# Runtime dependencies only (Streamlit Community Cloud installs this file).
+# Tested with Python 3.11 (Windows 11) and in a clean environment on Python 3.14, 2026-11-14.
+# Development and tests: requirements-dev.txt
 streamlit==1.67.0
 astropy==8.0.2
 pyvo==1.10.0
@@ -6,4 +8,3 @@ numpy==2.4.6
 pandas==3.1.1
 matplotlib==3.11.2
 requests==2.34.2
-pytest==9.2.0

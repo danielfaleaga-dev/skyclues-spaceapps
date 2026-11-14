@@ -22,3 +22,29 @@ def resolve_name(name: str):
 
     c = SkyCoord.from_name(name)
     return float(c.ra.deg), float(c.dec.deg)
+
+
+def clamp_fov_deg(value, default: float | None = None) -> float:
+    """Field-of-view diameter in degrees, limited to [FOV_MIN_DEG, FOV_MAX_DEG].
+
+    Invalid input (text, NaN, None) returns the default field.
+    """
+    import math
+
+    from . import config
+
+    default = config.DEFAULT_FIELD_DEG if default is None else default
+    try:
+        v = float(value)
+    except (TypeError, ValueError):
+        return default
+    if not math.isfinite(v):
+        return default
+    return round(min(max(v, config.FOV_MIN_DEG), config.FOV_MAX_DEG), 4)
+
+
+def fov_pixels(fov_deg: float) -> int:
+    """Approximate width of the field in SPHEREx pixels (6.15 arcsec/px)."""
+    from . import config
+
+    return int(round(fov_deg * 3600 / config.NOMINAL_PIXEL_SCALE_ARCSEC))

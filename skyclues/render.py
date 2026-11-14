@@ -23,6 +23,8 @@ from .fitsdata import SpectralImage  # noqa: E402
 
 MASK_COLOR = "#e0457b"            # no valid data in this frame
 OUTSIDE_COMMON_COLOR = "#b9cde8"  # valid here, but not in every frame of the sequence
+CAUTION_CMAP = "copper"           # HALO-only pixels, exploratory display (monotonic brightness, distinct hue)
+CAUTION_SWATCH = "#c98a4f"
 INK = "#14181f"
 GRID = "#9aa4b2"
 ACCENT = "#1f5fbf"
@@ -83,6 +85,50 @@ def sequence_rgba(data: np.ndarray, norm: ImageNormalize, common: np.ndarray | N
     if common is not None:
         rgba[np.isfinite(data) & ~common] = _c(OUTSIDE_COMMON_COLOR)
     return rgba
+
+
+def native_rgba(data: np.ndarray, norm: ImageNormalize, caution: np.ndarray | None = None,
+                common: np.ndarray | None = None) -> np.ndarray:
+    """RGBA for one frame on its own pixel grid.
+
+    Grey = valid; MASK_COLOR = no valid data; if ``caution`` is given, those
+    pixels (HALO only) are drawn with the same normalisation through the
+    CAUTION_CMAP, so their brightness is shown but they can never be mistaken
+    for ordinary valid sky; if ``common`` is given, valid pixels outside the
+    common region use OUTSIDE_COMMON_COLOR.
+    """
+    from matplotlib.colors import to_rgba as _c
+
+    rgba = to_rgba(data, norm)
+    finite = np.isfinite(data)
+    if common is not None:
+        rgba[finite & ~common] = _c(OUTSIDE_COMMON_COLOR)
+    if caution is not None:
+        sel = finite & caution
+        if sel.any():
+            scaled = np.clip(np.asarray(norm(data[sel]), float), 0.0, 1.0)
+            rgba[sel] = plt.get_cmap(CAUTION_CMAP)(0.25 + 0.75 * scaled)
+    return rgba
+
+
+def draw_native(ax, corners: tuple[np.ndarray, np.ndarray], rgba: np.ndarray, ref_shape) -> None:
+    """Draw native pixels as quadrilaterals at their true positions (exact geometry).
+
+    ``corners`` = (X, Y) in reference pixel coordinates (``TemporalSequence.native_corners``).
+    The axes background is MASK_COLOR: where this frame has no pixel, there is no data.
+    """
+    X, Y = corners
+    ax.set_facecolor(MASK_COLOR)
+    ax.pcolormesh(X, Y, rgba, shading="flat", antialiased=False, edgecolors="none", linewidth=0)
+    fix_extent(ax, ref_shape)
+
+
+def fix_extent(ax, ref_shape) -> None:
+    """Same limits and square pixels for every frame (the reference grid extent)."""
+    ny, nx = ref_shape
+    ax.set_xlim(-0.5, nx - 0.5)
+    ax.set_ylim(-0.5, ny - 0.5)
+    ax.set_aspect("equal")
 
 
 def _style_axes(ax):

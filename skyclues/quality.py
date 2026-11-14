@@ -10,6 +10,15 @@ assigned to one of three classes:
 * ``info``      - informational only (never masked).
 
 Unknown flag names are treated as ``artifact`` (conservative) and reported.
+
+HALO (bit 28) stays an ``artifact`` and is masked in every comparability
+metric. The SPHEREx Explanatory Supplement (v2.1, Table 16 and section 3.2.1)
+sets it on the edge neighbours of TRANSIENT pixels (often the charge spill of a
+bright star) and around snowballs, and recommends *caution* -- not exclusion --
+in science use; the official all-sky cube and photometry masks reject it.
+SkyClues therefore offers an *exploratory display* that shows HALO-only pixels
+with a distinct, labelled colour (``CAUTION``), never as ordinary valid sky.
+SATELLITE_HALO (bit 29) is "not recommended" and is never shown.
 """
 
 from __future__ import annotations
@@ -25,15 +34,24 @@ DOCUMENTED_BITS = {
     9: "MISSING_DATA", 10: "HOT", 11: "COLD", 12: "FULLSAMPLE", 14: "PHANMISS",
     15: "NONLINEAR", 17: "PERSIST", 19: "OUTLIER", 20: "CROSSTALK", 21: "SOURCE",
     22: "GHOST", 23: "GHOST_FPA", 24: "GHOST_EXT", 25: "STREAK", 26: "BLOOM",
-    27: "SNOWBALL", 28: "HALO",
+    27: "SNOWBALL", 28: "HALO", 29: "SATELLITE_HALO",
 }
 
 UNUSABLE = {"OVERFLOW", "SUR_ERROR", "NONFUNC", "MISSING_DATA", "HOT", "COLD", "NONLINEAR"}
 INFO = {"FULLSAMPLE", "SOURCE"}
 # Everything else that is defined is an artifact class (masked by default):
 # TRANSIENT, DICHROIC, PHANMISS, PERSIST, OUTLIER, CROSSTALK, GHOST*, STREAK,
-# BLOOM, SNOWBALL, HALO.
+# BLOOM, SNOWBALL, HALO, SATELLITE_HALO.
 SATURATION = {"OVERFLOW", "NONLINEAR"}
+# Artifact flags whose official recommendation is "caution" (exploratory display only).
+CAUTION = {"HALO"}
+
+# Official SPHEREx rejection lists (Explanatory Supplement v2.1), for reference.
+OFFICIAL_CUBE_REJECT = {"TRANSIENT", "SUR_ERROR", "NONFUNC", "DICHROIC", "MISSING_DATA", "HOT", "COLD",
+                        "PHANMISS", "NONLINEAR", "PERSIST", "CROSSTALK", "STREAK", "BLOOM", "SNOWBALL",
+                        "HALO", "SATELLITE_HALO"}
+OFFICIAL_PHOTOMETRY_REJECT = {"SUR_ERROR", "NONFUNC", "MISSING_DATA", "HOT", "COLD", "NONLINEAR", "PERSIST",
+                              "BLOOM", "SNOWBALL", "HALO", "SATELLITE_HALO"}
 
 
 @dataclass
@@ -83,13 +101,15 @@ DEFAULT_MASK_CLASSES = ("unusable", "artifact")
 
 
 def valid_pixel_mask(image, flags, variance, defs: FlagDefinitions,
-                     mask_classes: tuple[str, ...] = DEFAULT_MASK_CLASSES) -> np.ndarray:
+                     mask_classes: tuple[str, ...] = DEFAULT_MASK_CLASSES,
+                     ignore_names: frozenset | set | tuple = ()) -> np.ndarray:
     """True where the pixel holds a usable measurement.
 
     A pixel is invalid if IMAGE is non-finite, VARIANCE is non-finite or <= 0,
-    or any flag bit in ``mask_classes`` is set.
+    or any flag bit in ``mask_classes`` is set. Flags named in ``ignore_names``
+    are not masked (used only to *identify* caution pixels for display).
     """
-    bad_bits = defs.bitmask(mask_classes)
+    bad_bits = defs.bitmask(mask_classes) & ~defs.names_bitmask(set(ignore_names))
     ok = np.isfinite(image)
     if variance is not None:
         ok &= np.isfinite(variance) & (variance > 0)

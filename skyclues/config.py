@@ -8,7 +8,23 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = ROOT / "data" / "cache"
+REFERENCE_DIR = ROOT / "data" / "reference"   # optional read-only copies of the validated examples' FITS
 RESULTS_DIR = ROOT / "results"
+
+# Field of view (FOV): diameter of the sky region searched, downloaded and compared.
+# It is NOT a screen zoom. Below FOV_MIN_DEG the field holds too few pixels for
+# S5 (MIN_COMMON_VALID_PIXELS); above FOV_MAX_DEG alignment, evaluation and the
+# player grow beyond what a small shared server (Community Cloud) handles comfortably.
+FOV_PRESETS_ARCMIN = (3.0, 6.0, 12.0, 18.0)
+FOV_MIN_DEG = 0.05
+FOV_MAX_DEG = 0.5
+FOV_SLOW_DEG = 0.2            # warn about longer processing above this
+
+# Validated example sequences offered as quick access in the app (results/<name>.json).
+VALIDATED_EXAMPLES = {
+    "sequence_m101": "M101 · 4 épocas · 1.42 µm",
+    "sequence_wise0855_mwir": "WISE 0855 · 3 épocas · 4.82 µm",
+}
 
 # NASA/IPAC IRSA, IVOA Simple Image Access v2 (verified 2026-11-14).
 SIA_URL = "https://irsa.ipac.caltech.edu/SIA"

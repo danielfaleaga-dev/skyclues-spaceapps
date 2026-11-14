@@ -32,10 +32,11 @@ Aplicación web de ciencia ciudadana para el desafío **Planet X and SPHEREx** d
 7. Las posiciones de catálogo dependen de la época (Barnard ≈ 10.4″/año). Una posición propagada no es una detección.
 8. El cubo HiPS global de DR1 es un **producto combinado**: sirve para explorar el espectro, nunca como secuencia temporal.
 9. Los detectores automáticos de movimiento y variabilidad de SkyCluesLab fueron experimentales y de baja sensibilidad. No se reconstruyen en el núcleo.
+10. Las métricas de comparabilidad usan siempre la máscara estricta. Cualquier vista exploratoria (por ejemplo, píxeles HALO visibles) identifica los píxeles afectados y no modifica las métricas. Un producto remuestreado se etiqueta como tal.
 
 ## Funcionalidades previstas (aún no implementadas salvo indicación en STATE)
 
-- **Time Explorer** (núcleo): búsqueda por RA/Dec o nombre, secuencia cronológica animada con pausa y navegación por fechas, comparación A/B y blink, campo configurable, URL compartible, metadatos de calidad.
+- **Time Explorer** (núcleo): búsqueda por RA/Dec o nombre, secuencia cronológica animada con pausa y navegación por fechas, comparación A/B y blink, campo de visión (FOV) seleccionable por el usuario (recomendación oficial del desafío; es la región consultada, no un zoom), URL compartible, metadatos de calidad.
 - **Spectrum Explorer** (posterior, Claude Code B): la misma región en distintas longitudes de onda con el cubo espectral DR1 (`spherex_dr1_cube` / HiPS), selector de canal y, más adelante, espectros de fuentes. Siempre etiquetado como producto combinado.
 - Aladin Lite como contexto del cielo, y catálogos Gaia/WISE como apoyo a la interpretación.
 

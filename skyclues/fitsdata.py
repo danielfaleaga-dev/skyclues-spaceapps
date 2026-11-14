@@ -36,8 +36,15 @@ class SpectralImage:
     def shape(self):
         return self.image.shape
 
-    def valid(self, mask_classes=("unusable", "artifact")) -> np.ndarray:
-        return valid_pixel_mask(self.image, self.flags, self.variance, self.flag_defs, mask_classes)
+    def valid(self, mask_classes=("unusable", "artifact"), ignore_names=()) -> np.ndarray:
+        return valid_pixel_mask(self.image, self.flags, self.variance, self.flag_defs, mask_classes, ignore_names)
+
+    def caution(self, mask_classes=("unusable", "artifact")) -> np.ndarray:
+        """Pixels masked ONLY because of a caution flag (HALO): invalid under
+        ``mask_classes`` but valid if HALO is ignored. For exploratory display."""
+        from .quality import CAUTION
+
+        return self.valid(mask_classes, CAUTION) & ~self.valid(mask_classes)
 
     def detector_offset(self) -> tuple[float, float]:
         """Offset to convert cutout 0-based pixels to full-detector 1-based pixels."""

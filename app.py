@@ -6,6 +6,7 @@ Run:  streamlit run app.py
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -13,10 +14,10 @@ import streamlit as st
 import streamlit.components.v1 as components
 from astropy.time import Time
 
-from skyclues import config, player, render
+from skyclues import archive, config, player, render
 from skyclues.quality import flag_census
-from skyclues.sequence import find_sequence, load_sequence, save_report
-from skyclues.targets import PRESETS, resolve_name
+from skyclues.sequence import STRICT, find_sequence, load_sequence, report_urls, save_report
+from skyclues.targets import PRESETS, clamp_fov_deg, fov_pixels, resolve_name
 
 st.set_page_config(page_title="SkyClues", layout="wide")
 
@@ -39,7 +40,12 @@ st.markdown(
 )
 
 STATUS_LABEL = {"pass": "✔ cumple", "warn": "▲ aviso", "fail": "✖ no cumple"}
-STRICT, BASIC = ("unusable", "artifact"), ("unusable",)
+MODES = ["Secuencia de referencia", "Nueva búsqueda"]
+GEOMETRY_OPTIONS = {
+    "Exacta: píxeles nativos, sin remuestreo": "exact",
+    "Rejilla común: vecino más próximo (remuestreado)": "nearest",
+}
+FOV_LABELS = [f"{a:g}′" for a in config.FOV_PRESETS_ARCMIN] + ["Otro"]
 
 
 def reference_reports() -> dict[str, str]:
@@ -67,36 +73,70 @@ def reference_reports() -> dict[str, str]:
     return out
 
 
+def label_for(stem: str, refs: dict[str, str]) -> str | None:
+    return next((label for label, p in refs.items() if Path(p).stem == stem), None)
+
+
 @st.cache_resource(show_spinner=False, max_entries=8)
-def cached_sequence(report_json: str, mask: tuple):
-    return load_sequence(json.loads(report_json), mask_classes=mask)
+def cached_sequence(report_json: str):
+    # Comparability (masks, coverage, S1-S9) always uses the strict mask.
+    return load_sequence(json.loads(report_json), mask_classes=STRICT)
 
 
 @st.cache_data(show_spinner=False, max_entries=16)
-def cached_player(report_json: str, mask: tuple, subtract: bool, restrict: bool) -> str:
-    return player.build_player(cached_sequence(report_json, mask), subtract, restrict)
+def cached_player(report_json: str, subtract: bool, restrict: bool, geometry: str, halo: bool) -> str:
+    return player.build_player(cached_sequence(report_json), subtract, restrict, geometry, halo)
 
 
 def fmt_date(mjd: float) -> str:
     return Time(mjd, format="mjd").isot[:16].replace("T", " ") + " UTC"
 
 
+def irsa_error(err: Exception) -> str:
+    text = str(err)
+    if any(k in text for k in ("503", "busy", "Download failed", "SIA2 query failed", "Range request")):
+        return ("NASA/IPAC IRSA no respondió a tiempo (el servidor indica que está ocupado o no está disponible). "
+                "No se ha mostrado ningún dato parcial. Pruebe de nuevo en unos minutos o abra un ejemplo validado.")
+    return "No se pudo completar el acceso a IRSA. No se ha mostrado ningún dato parcial."
+
+
+refs = reference_reports()
+qp = st.query_params
+if "mode" not in st.session_state:
+    st.session_state["mode"] = MODES[1] if "ra" in qp else MODES[0]
+if st.session_state.get("ref_label") not in refs:
+    st.session_state.pop("ref_label", None)
+
+
+def open_example(stem: str):
+    label = label_for(stem, refs)
+    if label:
+        st.session_state["mode"] = MODES[0]
+        st.session_state["ref_label"] = label
+
+
 # ---------------------------------------------------------------- sidebar
 with st.sidebar:
+    examples = [(stem, title) for stem, title in config.VALIDATED_EXAMPLES.items() if label_for(stem, refs)]
+    if examples:
+        st.markdown("### Ejemplos validados")
+        for stem, title in examples:
+            st.button(title, key=f"example_{stem}", on_click=open_example, args=(stem,), width="stretch")
+        st.caption("Secuencias reales ya verificadas: se abren sin repetir la búsqueda.")
+        st.markdown("---")
+
     st.markdown("### Región del cielo")
-    qp = st.query_params
-    mode = st.radio("Origen", ["Secuencia de referencia", "Nueva búsqueda"], index=1 if "ra" in qp else 0)
+    mode = st.radio("Origen", MODES, key="mode")
     run_search = False
-    if mode == "Secuencia de referencia":
-        refs = reference_reports()
-        if refs:
-            ref_label = st.selectbox("Resultado guardado", list(refs))
-        else:
-            ref_label = None
+    fov = config.DEFAULT_FIELD_DEG
+    if mode == MODES[0]:
+        ref_label = st.selectbox("Resultado guardado", list(refs), key="ref_label") if refs else None
     else:
         how = st.radio("Definir por", ["Coordenadas RA/Dec", "Campo predefinido", "Nombre (Sesame/SIMBAD)"])
-        ra0 = float(qp.get("ra", 210.802429))
-        dec0 = float(qp.get("dec", 54.34875))
+        try:
+            ra0, dec0 = float(qp.get("ra", 210.802429)), float(qp.get("dec", 54.34875))
+        except ValueError:
+            ra0, dec0 = 210.802429, 54.34875
         if how == "Campo predefinido":
             name = st.selectbox("Campo", list(PRESETS))
             ra0, dec0 = PRESETS[name]["ra"], PRESETS[name]["dec"]
@@ -105,7 +145,7 @@ with st.sidebar:
                            "propagada a la fecha de observación.")
         elif how == "Nombre (Sesame/SIMBAD)":
             obj = st.text_input("Nombre del objeto", "M101")
-            if st.button("Resolver nombre"):
+            if st.button("Resolver nombre", key="resolve"):
                 try:
                     st.session_state["resolved"] = resolve_name(obj)
                 except Exception as err:
@@ -113,27 +153,61 @@ with st.sidebar:
             if "resolved" in st.session_state:
                 ra0, dec0 = st.session_state["resolved"]
             st.caption("Posición de catálogo (época J2000), sin propagar movimiento propio.")
-        ra = st.number_input("RA (grados, ICRS)", value=ra0, format="%.6f", min_value=0.0, max_value=360.0)
-        dec = st.number_input("Dec (grados, ICRS)", value=dec0, format="%.6f", min_value=-90.0, max_value=90.0)
-        fov = st.select_slider("Diámetro del campo (grados)", options=[0.05, 0.1, 0.15, 0.2],
-                               value=float(qp.get("fov", config.DEFAULT_FIELD_DEG)))
+        ra = st.number_input("RA (grados, ICRS)", value=min(max(ra0, 0.0), 360.0), format="%.6f",
+                             min_value=0.0, max_value=360.0)
+        dec = st.number_input("Dec (grados, ICRS)", value=min(max(dec0, -90.0), 90.0), format="%.6f",
+                              min_value=-90.0, max_value=90.0)
+
+        # Field of view: the sky region searched, downloaded and compared (not a screen zoom).
+        fov_q = clamp_fov_deg(qp.get("fov", config.DEFAULT_FIELD_DEG))
+        preset = next((lbl for lbl, a in zip(FOV_LABELS, config.FOV_PRESETS_ARCMIN)
+                       if abs(round(a / 60, 4) - fov_q) < 1e-6), "Otro")
+        fov_choice = st.radio(
+            "Campo de visión (diámetro en el cielo)", FOV_LABELS, index=FOV_LABELS.index(preset),
+            horizontal=True, key="fov_preset",
+            help="Tamaño angular de la región que se busca en IRSA, se descarga y se compara entre épocas "
+                 "(1′ = 1/60 de grado). No es el zoom de la pantalla. Todo el campo debe caer dentro del "
+                 "detector en cada época.")
+        if fov_choice == "Otro":
+            arcmin = st.number_input("Diámetro personalizado (minutos de arco)", min_value=config.FOV_MIN_DEG * 60,
+                                     max_value=config.FOV_MAX_DEG * 60, value=fov_q * 60, step=0.5,
+                                     format="%.1f", key="fov_custom")
+            fov = clamp_fov_deg(arcmin / 60)
+        else:
+            fov = round(config.FOV_PRESETS_ARCMIN[FOV_LABELS.index(fov_choice)] / 60, 4)
+        npx = fov_pixels(fov)
+        st.caption(f"{fov * 60:.1f}′ = {fov:.3f}° · ≈ {npx} × {npx} píxeles SPHEREx (6.15″/px). "
+                   f"Límites: {config.FOV_MIN_DEG * 60:g}′–{config.FOV_MAX_DEG * 60:g}′.")
+        if fov > config.FOV_SLOW_DEG:
+            st.warning(f"Campo grande ({npx}² píxeles por época): la alineación, la evaluación y el reproductor "
+                       "tardan más, y hay menos observaciones que contengan el campo completo.")
+
         dets = st.multiselect("Detectores", [1, 2, 3, 4, 5, 6], default=[1, 2, 3, 4, 5, 6],
                               help="D1–D3: 0.75–2.41 µm (SWIR) · D4–D6: 2.42–5.0 µm (MWIR)")
         max_frames = st.slider("Máximo de épocas", 2, 8, config.MAX_SEQUENCE_FRAMES)
-        run_search = st.button("Buscar secuencia comparable", type="primary")
+        if not dets:
+            st.caption("Elija al menos un detector.")
+        run_search = st.button("Buscar secuencia comparable", type="primary", key="search", disabled=not dets)
+        st.caption("Una búsqueda nueva suele tardar de 1 a 2 minutos: los recortes FITS se descargan de IRSA.")
 
     st.markdown("---")
     st.markdown("### Visualización")
+    geometry = GEOMETRY_OPTIONS[st.radio(
+        "Geometría de los fotogramas", list(GEOMETRY_OPTIONS), key="geometry",
+        help="Exacta: cada píxel de cada época se dibuja en su posición real del cielo (WCS) con su valor "
+             "original; nada se remuestrea. Rejilla común: cada época se copia a la rejilla de la época 1 por "
+             "vecino más próximo (la que usan las métricas); una estrella fija puede desplazarse hasta "
+             "½ píxel por eje.")]
     subtract = st.checkbox("Restar el modelo zodiacal (IMAGE − ZODI)", value=True,
                            help="El fondo zodiacal cambia con la fecha; restarlo evita confundirlo con un cambio del cielo.")
     restrict = st.checkbox("Destacar la región común a todas las épocas", value=False,
                            help="Los píxeles válidos solo en algunas épocas se tiñen de azul claro.")
-    mask_policy = st.radio(
-        "Máscara de calidad", ["Estricta: inutilizables + artefactos", "Básica: solo inutilizables"],
-        help="Inutilizables: OVERFLOW, SUR_ERROR, NONFUNC, MISSING_DATA, HOT, COLD, NONLINEAR. "
-             "Artefactos: TRANSIENT, PERSIST, OUTLIER, CROSSTALK, GHOST*, STREAK, BLOOM, SNOWBALL, HALO, "
-             "DICHROIC, PHANMISS. SOURCE y FULLSAMPLE nunca se enmascaran.")
-    MASK = STRICT if mask_policy.startswith("Estricta") else BASIC
+    halo = st.toggle(
+        "Modo exploratorio: mostrar píxeles HALO", value=False, key="halo",
+        help="HALO marca vecinos de píxeles con transitorios (a menudo el desbordamiento de carga de una estrella "
+             "brillante) y de 'snowballs'. La documentación de SPHEREx recomienda precaución al usarlos. En este modo "
+             "se muestran en escala cobre; nunca se cuentan como válidos en las métricas.")
+    st.caption("Las métricas y criterios usan siempre la máscara estricta: inutilizables + artefactos (HALO incluido).")
     st.markdown("---")
     st.caption("Datos: NASA/IPAC IRSA · SPHEREx DR1 y QR3 (SIA2). Cada fotograma es una observación real; "
                "la escala de intensidad es solo de visualización.")
@@ -145,43 +219,67 @@ st.markdown('<div class="sc-sub">Explorador temporal de observaciones SPHEREx au
 st.write("")
 
 # ---------------------------------------------------------------- data
-if mode == "Nueva búsqueda" and run_search:
-    st.query_params.update({"ra": f"{ra:.6f}", "dec": f"{dec:.6f}", "fov": str(fov)})
-    box = st.status("Consultando NASA/IPAC IRSA…", expanded=True)
+if mode == MODES[1] and run_search:
+    st.query_params.update({"ra": f"{ra:.6f}", "dec": f"{dec:.6f}", "fov": f"{fov:g}"})
+    box = st.status(f"Buscando observaciones comparables en NASA/IPAC IRSA (campo {fov * 60:.1f}′)…", expanded=True)
+    bar = box.progress(0.0, text="Iniciando la búsqueda…")
     try:
-        _, rep = find_sequence(ra, dec, fov, detectors=dets, max_frames=max_frames, log=lambda m: box.write(m))
-        box.update(label=f"Búsqueda completada en {rep['elapsed_s']} s", state="complete", expanded=False)
-        st.session_state["report"] = rep
-        save_report(rep, f"search_{ra:.4f}_{dec:+.4f}_{fov}")
+        _, rep = find_sequence(ra, dec, fov, detectors=dets, max_frames=max_frames, log=lambda m: None,
+                               progress=lambda stage, frac, msg: bar.progress(frac, text=msg))
     except Exception as err:
-        box.update(label="La consulta falló", state="error")
-        st.error(f"Error de acceso a IRSA: {err}")
+        box.update(label="La búsqueda no pudo completarse", state="error", expanded=True)
+        st.error(irsa_error(err))
+        with st.expander("Detalle técnico"):
+            st.code(f"{type(err).__name__}: {err}", language=None)
         st.stop()
+    box.update(label=f"Búsqueda completada en {rep['elapsed_s']} s", state="complete", expanded=False)
+    st.session_state["report"] = rep
+    try:
+        save_report(rep, f"search_{ra:.4f}_{dec:+.4f}_{fov:g}")
+    except OSError:
+        pass  # read-only deployments: the report stays in the session
 
-if mode == "Secuencia de referencia":
+if mode == MODES[0]:
     if not ref_label:
         st.info("No hay resultados guardados. Ejecute `python scripts/find_sequence.py` o use «Nueva búsqueda».")
         st.stop()
-    report = json.loads(open(refs[ref_label], encoding="utf-8").read())
+    report = json.loads(Path(refs[ref_label]).read_text(encoding="utf-8"))
 else:
     report = st.session_state.get("report")
     if report is None:
-        st.info("Defina una región y pulse «Buscar secuencia comparable».")
+        st.info("Defina una región y un campo de visión y pulse «Buscar secuencia comparable», "
+                "o abra uno de los ejemplos validados de la barra lateral.")
         st.stop()
 
 if not report.get("selected"):
     st.warning(f"No se encontró una secuencia admisible ({report.get('n_records', 0)} imágenes, "
                f"{report.get('n_candidates', 0)} con el campo completo). Pruebe un campo menor u otros detectores.")
     if report.get("options"):
-        st.dataframe(pd.DataFrame(report["options"]), hide_index=True)
+        st.dataframe(pd.DataFrame(report["options"]).astype(str), hide_index=True)
     st.stop()
 
 report_json = json.dumps(report, sort_keys=True, default=str)
-with st.spinner("Cargando FITS (caché local o IRSA) y alineando épocas…"):
+urls = report_urls(report)
+missing = [u for u in urls if archive.local_copy(u) is None]
+if missing:
+    box = st.status(f"Descargando {len(missing)} recortes FITS de IRSA…", expanded=True)
+    bar = box.progress(0.0, text="Conectando con IRSA…")
+    got = archive.fetch_many(urls, progress=lambda done, total, n: bar.progress(
+        done / max(total, 1), text=f"{done} de {total} recortes listos ({n} descargados)"))
+    failed = [r for r in got.values() if isinstance(r, Exception)]
+    if failed:
+        box.update(label="No se pudieron obtener todos los recortes", state="error", expanded=True)
+        st.error(irsa_error(failed[0]))
+        with st.expander("Detalle técnico"):
+            st.code("\n".join(str(e) for e in failed), language=None)
+        st.stop()
+    box.update(label="Recortes FITS obtenidos", state="complete", expanded=False)
+
+with st.spinner("Verificando la integridad de los FITS y alineando épocas…"):
     try:
-        seq = cached_sequence(report_json, MASK)
-    except ValueError as err:
-        st.error(f"Integridad de datos: {err}")
+        seq = cached_sequence(report_json)
+    except (ValueError, RuntimeError, OSError) as err:
+        st.error(f"No se pudo cargar la secuencia: {err}")
         st.stop()
 m = seq.metrics
 
@@ -189,7 +287,8 @@ m = seq.metrics
 status_cls = "sc-ok" if seq.admissible and not seq.warnings else ("sc-warn" if seq.admissible else "sc-fail")
 status_txt = ("Comparable" if not seq.warnings else "Comparable con avisos") if seq.admissible else "No comparable"
 st.markdown(f'<span class="sc-badge {status_cls}">{status_txt}</span> &nbsp; '
-            f'<span class="sc-badge">RA {seq.ra:.5f}° · Dec {seq.dec:+.5f}° · campo {seq.field_deg}°</span>',
+            f'<span class="sc-badge">RA {seq.ra:.5f}° · Dec {seq.dec:+.5f}° · campo de visión '
+            f'{seq.field_deg * 60:.1f}′ ({seq.field_deg:g}°)</span>',
             unsafe_allow_html=True)
 c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("Épocas", seq.n)
@@ -206,11 +305,15 @@ tab_play, tab_cov, tab_q, tab_meta, tab_opt, tab_obs = st.tabs(
 
 with tab_play:
     with st.spinner("Preparando fotogramas…"):
-        html = cached_player(report_json, MASK, subtract, restrict)
+        html = cached_player(report_json, subtract, restrict, geometry, halo)
     components.html(html, height=640, scrolling=True)
-    st.caption("Cada fotograma es una exposición SPHEREx real (sin fotogramas intermedios ni interpolación temporal). "
-               "Todas las épocas se colocan sobre la rejilla de la época 1 por vecino más próximo y comparten la "
-               "misma escala de intensidad. Una diferencia visual no es por sí sola una detección de movimiento "
+    geo_txt = ("Geometría exacta: cada píxel nativo se dibuja en su posición real del cielo con su valor original "
+               "(sin remuestreo); la rotación entre visitas se ve como píxeles inclinados." if geometry == "exact" else
+               "Producto REMUESTREADO: cada época se copia a la rejilla de la época 1 por vecino más próximo "
+               "(desplazamiento de hasta ½ píxel por eje).")
+    st.caption("Cada fotograma es una exposición SPHEREx real (sin fotogramas intermedios ni interpolación temporal), "
+               f"con la misma escala de intensidad. {geo_txt} El tamaño en pantalla es fijo: un campo de visión mayor "
+               "muestra más cielo, no es un zoom. Una diferencia visual no es por sí sola una detección de movimiento "
                "o variabilidad.")
 
 with tab_cov:
@@ -232,11 +335,16 @@ with tab_q:
     q = pd.DataFrame([{"época": i + 1, "fecha (UTC)": f.date_utc[:16], **{
         "L2 DQA": f.quality["L2DQAFLG"], "FINAST": f.quality["FINAST"],
         "válido en campo (%)": round(100 * f.quality["valid_fraction_in_field"], 1),
+        "solo HALO (%)": round(100 * f.quality.get("halo_only_fraction_in_field", float("nan")), 2),
         "saturación (%)": round(100 * f.quality["saturation_fraction_in_field"], 3),
         "ZODI (MJy/sr)": round(f.quality["zodi_median_mjysr"], 3),
-        "PSF FWHM (″)": round(float(f.quality["psf_fwhm_arcsec"] or float("nan")), 2)}}
+        "PSF FWHM (″)": round(float(f.quality["psf_fwhm_arcsec"] or float("nan")), 2),
+        "desplaz. máx. rejilla común (px)": round(float(seq.placement_error_px(i)[seq.field_mask].max()), 2)}}
         for i, f in enumerate(seq.frames)])
     st.dataframe(q, hide_index=True, width="stretch")
+    st.caption("«solo HALO»: píxeles del campo enmascarados únicamente por HALO (visibles en el modo exploratorio). "
+               "«desplaz. máx.»: distancia máxima entre un píxel de la rejilla común y el píxel nativo que el vecino "
+               "más próximo copia allí (0 en la época de referencia).")
     k = st.selectbox("FLAGS de la época", list(range(1, seq.n + 1)),
                      format_func=lambda i: f"{i} · {seq.frames[i - 1].date_utc[:16]}")
     img = seq.frames[k - 1].image
@@ -245,7 +353,9 @@ with tab_q:
     st.dataframe(df[df["pixels"] > 0].rename(columns={"name": "flag", "class": "clase", "pixels": "píxeles",
                                                       "fraction": "%", "description": "descripción"}),
                  hide_index=True, width="stretch")
-    st.caption("«unusable» y «artifact» se enmascaran (política estricta); «info» (SOURCE, FULLSAMPLE) no.")
+    st.caption("«unusable» y «artifact» se enmascaran; «info» (SOURCE, FULLSAMPLE) no. Referencia: SPHEREx "
+               "Explanatory Supplement v2.1, tabla 16 (HALO: «se recomienda precaución»; SATELLITE_HALO: "
+               "«no recomendado»).")
 
 with tab_meta:
     rows = []
@@ -302,5 +412,10 @@ with st.expander("Limitaciones científicas"):
         "- La λ por píxel procede de la tabla WCS-WAVE (precisión de visualización, ~1 nm).\n"
         "- Las diferencias entre épocas pueden deberse a ruido, fondo, PSF, persistencia, rayos cósmicos o Δλ "
         "residual; no implican por sí solas variabilidad ni movimiento astronómico.\n"
-        "- Alineación por vecino más próximo sobre la rejilla de la época 1 (error ≤ ½ píxel ≈ 3″).\n"
+        "- **Geometría:** el reproductor dibuja por defecto los píxeles nativos en su posición WCS, sin remuestreo. "
+        "Las métricas (máscaras, cobertura, S1–S9) usan la rejilla de la época 1 con vecino más próximo: "
+        "decide qué píxel se compara (hasta ½ píxel por eje, ≈4″), nunca altera los valores.\n"
+        "- **HALO:** excluido siempre de las métricas; el modo exploratorio solo lo muestra, marcado en cobre.\n"
+        "- **Campo de visión:** campos mayores exigen que la región completa caiga dentro del detector en cada "
+        "época, por lo que puede haber menos épocas comparables.\n"
         "- Las coordenadas de catálogo no se propagan por movimiento propio.")
