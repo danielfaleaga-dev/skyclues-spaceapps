@@ -1,0 +1,4 @@
+# Scientific data files are binary: never convert line endings (core.autocrlf)
+# or diff them as text. A converted FITS would no longer match its SHA-256.
+*.fits binary
+*.fits.* binary

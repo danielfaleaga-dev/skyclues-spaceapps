@@ -1,0 +1,91 @@
+{
+  "credit": "Datos: NASA/IPAC Infrared Science Archive (IRSA), misión SPHEREx.",
+  "description": "Copias byte a byte de recortes IRSA usados por los ejemplos validados de SkyClues. No modificar: la app comprueba su SHA-256 frente a los informes de results/.",
+  "files": {
+    "level2_2025W19_1B_0138_1D6_spx_l2b-v27-2026-197__6e87edb225b96701.fits": {
+      "bytes": 3997440,
+      "collection": "spherex_dr1",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W19_1B/l2b-v27-2026-197/6/level2_2025W19_1B_0138_1D6_spx_l2b-v27-2026-197.fits?center=133.7601003,-7.2422472&size=0.10000",
+      "date_utc": "2025-05-05T20:02:32.989",
+      "detector": 6,
+      "obs_id": "2025W19_1B_0138_1",
+      "release": "SPHEREx DR1 Spectral Images, NASA/IPAC IRSA, doi:10.26131/IRSA678",
+      "sha256": "5f7e89e494a140c5035d27eda367ee78da190b3b9060bb2944de3b32c706892f",
+      "source_file": "level2_2025W19_1B_0138_1D6_spx_l2b-v27-2026-197.fits",
+      "used_by": [
+        "sequence_wise0855_pm"
+      ]
+    },
+    "level2_2026W19_2A_0651_1D6_spx_l2b-v27-2026-245__310bcf5b1997b215.fits": {
+      "bytes": 3997440,
+      "collection": "spherex_dr1",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2026W19_2A/l2b-v27-2026-245/6/level2_2026W19_2A_0651_1D6_spx_l2b-v27-2026-245.fits?center=133.7601003,-7.2422472&size=0.10000",
+      "date_utc": "2026-05-09T04:40:38.387",
+      "detector": 6,
+      "obs_id": "2026W19_2A_0651_1",
+      "release": "SPHEREx DR1 Spectral Images, NASA/IPAC IRSA, doi:10.26131/IRSA678",
+      "sha256": "ae663e34a4883fc35eadd2b249fa7325890cec35c0c36b602c20d8a829087ba5",
+      "source_file": "level2_2026W19_2A_0651_1D6_spx_l2b-v27-2026-245.fits",
+      "used_by": [
+        "sequence_wise0855_pm"
+      ]
+    },
+    "level2_2026W20_2A_0464_1D2_spx_l2b-v27-2026-267__cc3f41f3583f2ea1.fits": {
+      "bytes": 4000320,
+      "collection": "spherex_qr3",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W20_2A/l2b-v27-2026-267/2/level2_2026W20_2A_0464_1D2_spx_l2b-v27-2026-267.fits?center=210.8024290,54.3487500&size=0.10000",
+      "date_utc": "2026-05-17T10:54:42.815",
+      "detector": 2,
+      "obs_id": "2026W20_2A_0464_1",
+      "release": "SPHEREx Quick Release 3 Spectral Images, NASA/IPAC IRSA",
+      "sha256": "614a67e5f0d4695e70b05a74b113bd8235350b9b203e7660ce1b808c278ffa59",
+      "source_file": "level2_2026W20_2A_0464_1D2_spx_l2b-v27-2026-267.fits",
+      "used_by": [
+        "sequence_m101"
+      ]
+    },
+    "level2_2026W21_2A_0081_1D2_spx_l2b-v27-2026-268__01611a3585201642.fits": {
+      "bytes": 4000320,
+      "collection": "spherex_qr3",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W21_2A/l2b-v27-2026-268/2/level2_2026W21_2A_0081_1D2_spx_l2b-v27-2026-268.fits?center=210.8024290,54.3487500&size=0.10000",
+      "date_utc": "2026-05-22T00:06:14.504",
+      "detector": 2,
+      "obs_id": "2026W21_2A_0081_1",
+      "release": "SPHEREx Quick Release 3 Spectral Images, NASA/IPAC IRSA",
+      "sha256": "aeea59a3a7a35a6bfe6ff39106cbd792a5b0f922f26610ceb8bd45814b5d94e2",
+      "source_file": "level2_2026W21_2A_0081_1D2_spx_l2b-v27-2026-268.fits",
+      "used_by": [
+        "sequence_m101"
+      ]
+    },
+    "level2_2026W25_2A_0170_1D2_spx_l2b-v27-2026-273__2401df0c7178fc07.fits": {
+      "bytes": 4000320,
+      "collection": "spherex_qr3",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W25_2A/l2b-v27-2026-273/2/level2_2026W25_2A_0170_1D2_spx_l2b-v27-2026-273.fits?center=210.8024290,54.3487500&size=0.10000",
+      "date_utc": "2026-06-19T07:39:37.150",
+      "detector": 2,
+      "obs_id": "2026W25_2A_0170_1",
+      "release": "SPHEREx Quick Release 3 Spectral Images, NASA/IPAC IRSA",
+      "sha256": "a8242ff75bc07a6fda52a3b3297ef978c672ff2faf1c5e7d3f5eefdce7c1b112",
+      "source_file": "level2_2026W25_2A_0170_1D2_spx_l2b-v27-2026-273.fits",
+      "used_by": [
+        "sequence_m101"
+      ]
+    },
+    "level2_2026W26_1A_0178_1D2_spx_l2b-v27-2026-273__6a1fc0e82e131a4b.fits": {
+      "bytes": 4000320,
+      "collection": "spherex_qr3",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W26_1A/l2b-v27-2026-273/2/level2_2026W26_1A_0178_1D2_spx_l2b-v27-2026-273.fits?center=210.8024290,54.3487500&size=0.10000",
+      "date_utc": "2026-06-22T20:22:30.749",
+      "detector": 2,
+      "obs_id": "2026W26_1A_0178_1",
+      "release": "SPHEREx Quick Release 3 Spectral Images, NASA/IPAC IRSA",
+      "sha256": "b5d23c2dd6ffde97237a11076ef3f90850a19fc2978b64e5a4f1433a86b7e8da",
+      "source_file": "level2_2026W26_1A_0178_1D2_spx_l2b-v27-2026-273.fits",
+      "used_by": [
+        "sequence_m101"
+      ]
+    }
+  },
+  "updated_utc": "2026-11-14T16:58:29"
+}
