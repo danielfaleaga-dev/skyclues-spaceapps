@@ -1,6 +1,38 @@
 # SkyClues — estado del proyecto
 
-Última actualización: 14-11-2026, Codex: referencias Gaia/WISE sobre `3e009ef`. El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md). Las secciones anteriores conservadas más abajo son antecedentes; esta sección prevalece sobre sus pendientes.
+Última actualización: 14-11-2026, Claude Code: integración local de `feature/release-readiness` (Codex A) y `feature/multiband` (Claude Code A) en `main`. El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md). Las secciones anteriores conservadas más abajo son antecedentes; la primera sección prevalece sobre sus pendientes.
+
+## Integración local de los dos desarrollos (14-11-2026)
+
+Base común `2ec4881`. Rama temporal `integration/skyclues-complete`, fusiones explícitas (`--no-ff`) que conservan la genealogía, sin conflictos (las dos ramas no comparten archivos):
+
+1. `cb0354b` — Integrar `feature/release-readiness` (`bee8fa8`, Codex A): actualización bajo demanda de observaciones SIA2, buscador con autocompletado (índice local + SIMBAD), enlaces compartibles `ra/dec/fov/explorer/canal`, identificación del cubo publicado. Detalle y evidencia en [`RELEASE_READINESS.md`](RELEASE_READINESS.md).
+2. `d836b82` — Integrar `feature/multiband` (`47e7bd7`, Claude Code A): composición RGB de falso color en Spectrum Explorer (`multiband.py`, `multiband_view.py`, `multiband_page.py`). Tres canales auténticos del cubo DR1, cada uno con su propia normalización identificada; solo se colorean los píxeles con datos válidos en los tres (el resto con `MASK_COLOR`). Avisos de cobertura común, varias teselas, OVERFLOW/BLANKCH. Es solo visualización: sin fotometría, sin restas ni combinaciones físicas. Validación: `scripts/validate_multiband.py` → `results/multiband_validation.json`, captura `results/multiband_browser.jpg`.
+3. `a2a6881` — Defecto revelado por la integración (preexistente en `2ec4881`, comprobado con `git archive`): `KeyError: 'sx_pick_ra'` al volver a Spectrum Explorer con la misma región después de pasar por Time Explorer, porque Streamlit descarta el valor de un widget no dibujado. Se reconstruye la posición si falta. Prueba de regresión `test_returning_to_spectrum_explorer_with_the_same_region_keeps_working` (falla sin la corrección).
+
+### Regresión
+
+`.venv\Scripts\python -m pytest -q` → **274 passed, 0 failed, 0 skipped**, 1 aviso conocido de Astropy (NaN del verificador independiente de Spectrum). FITS de referencia: 6/6 SHA-256 coinciden con `data/reference/MANIFEST.json`; `data/reference` sin cambios.
+
+### Recorridos en navegador real (servidor de integración local)
+
+- **A Time Explorer**: ejemplo M101, 4 épocas, 36.4 d, 1.420 µm, 94.0 %, D2; reproducción y paso de épocas.
+- **B Buscador**: «Androm» sugiere M 31 (índice local); resuelve y abre en Time Explorer con centro, FOV 6′ y URL.
+- **C Spectrum Explorer**: apertura desde el buscador en canal 33 (1.592 µm, 99.7 %); avance de canal; canal 51 vacío con aviso BLANKCH.
+- **D Multibanda**: M31 RGB 88/56/10 con avisos (cobertura común 43 %, varias teselas, OVERFLOW 53 en canal 56). La cobertura del 43 % es real: el canal 10 solo tiene datos en 263 de 612 píxeles en DR1. Ida y vuelta canal único ↔ RGB conserva canal, posición y tripleta. Captura `results/integration_browser_m31_rgb.jpg`.
+- **E Referencias**: Gaia (500 fuentes, aviso de truncamiento), ficha de fuente, AllWISE W2; centro y FOV conservados.
+- **F Enlace compartido**: abierto en sesión independiente, restaura centro, FOV y canal (Spectrum) y región (Time).
+- **G Actualizar observaciones**: M101 verificado en IRSA (376 productos), mismos resultados.
+- **H Fallos externos** (instancia sin red mediante proxy inválido): error claro del cubo sin datos parciales; el ejemplo WISE 0855 se abre y reproduce desde `data/reference`; el buscador avisa y mantiene el índice local. Captura `results/integration_browser_offline.jpg`.
+
+### Limitaciones pendientes (no bloqueantes)
+
+- El enlace compartible no conserva el modo RGB ni la tripleta de canales; abre en canal único.
+- El espectro solo se extrae en modo de canal único.
+- Un servidor Streamlit arrancado antes de la integración debe reiniciarse (no recarga `skyclues/`; ver problema abierto 8).
+- Siguen vigentes los límites de servicios y científicos de las secciones siguientes y de `RELEASE_READINESS.md`.
+
+Sin push, despliegue, publicación ni envío a NASA. Ramas y worktrees originales conservados. La investigación de movimiento no se ha iniciado (requiere una orden aparte).
 
 ## Referencias astronómicas Gaia / WISE — integradas
 
@@ -189,6 +221,7 @@ Reglas nuevas: no presentar nunca `target_position` como detección; mostrar `re
 ## Commits locales de esta sesión (sin push)
 1. «Corrección de la auditoría independiente (SC-01 a SC-11)»: código, pruebas, informes reevaluados, nuevo ejemplo de WISE 0855, STATE y CONTEXT.
 2. «Datos de referencia de los ejemplos validados (data/reference)»: 6 FITS + `MANIFEST.json` (separado para poder descartarlo).
+3. Posteriores (14-11-2026): referencias Gaia/WISE, correcciones de auditoría y SIA2, y la integración `bee8fa8` + `47e7bd7` (fusiones `cb0354b`, `d836b82`, corrección `a2a6881` y documentación). Ninguno publicado.
 
 ## Siguiente tarea prioritaria
 - **Usuario:** decisiones pendientes 1 y 2.

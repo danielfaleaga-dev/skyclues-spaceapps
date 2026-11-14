@@ -42,7 +42,9 @@ Aplicación web de ciencia ciudadana para el desafío **Planet X and SPHEREx** d
 
 - **Time Explorer** (núcleo): búsqueda por RA/Dec o nombre, secuencia cronológica animada con pausa y navegación por fechas, comparación A/B y blink, campo de visión (FOV) seleccionable por el usuario (recomendación oficial del desafío; es la región consultada, no un zoom), URL compartible, metadatos de calidad.
 - **Spectrum Explorer** implementado: selector de canal, IMAGE/NHITS, selección por clic o coordenadas, extracción exploratoria de posición, CSV con procedencia y transferencia de regiones. Las pruebas y limitaciones concretas están en STATE.
-- Terminar y validar funcionalidades antes del refinamiento visual final. Sin combinación multibanda avanzada en esta etapa.
+- **Composición multibanda RGB** en Spectrum Explorer: tres canales auténticos del cubo DR1 en falso color, normalización por canal identificada y máscara común; solo visualización, sin combinación fotométrica ni restas.
+- **Buscador, enlaces y actualización**: autocompletado (índice local verificado + SIMBAD), enlaces `ra/dec/fov/explorer/canal`, «Actualizar observaciones» bajo demanda (SIA2, sin vigilancia) e identificación del cubo publicado. Detalle en `RELEASE_READINESS.md`.
+- Terminar y validar funcionalidades antes del refinamiento visual final.
 - **Referencias Gaia/WISE implementadas**: fragmento común en Time y Spectrum, mismo centro/FOV. Gaia DR3 desde ESA (máximo 500 fuentes, selección circular en J2016.0); AllWISE W1/W2 HiPS desde IRSA en Aladin Lite 3.8.1. Capas independientes, sin modificar imágenes ni FITS SPHEREx. Gaia de catálogo y posiciones calculadas se distinguen; estas últimas usan solo movimiento propio angular y no constituyen astrometría aparente de precisión. No hay asociaciones automáticas ni comparación fotométrica entre misiones. Límites y validación en STATE y README.
 
 ## Organización de agentes

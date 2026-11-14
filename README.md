@@ -18,6 +18,10 @@ El cubo DR1 combina distintas fechas: sus 102 canales no son una secuencia tempo
 
 Los espectros son **solo exploratorios**, sin incertidumbres ni corrección de apertura. SkyClues adapta la suma con fondo del [tutorial oficial de IRSA](https://caltech-ipac.github.io/irsa-tutorials/spherex-hipscube/): usa círculos sobre el cielo con subpíxeles; el tutorial usa círculos sobre la rejilla y Photutils. Sus valores pueden diferir. Para resultados científicos se remite a la [herramienta de espectrofotometría de IRSA](https://irsa.ipac.caltech.edu/applications/spherex/tool-spectrophotometry). Una posición propagada de WISE 0855 u otro objeto móvil es una predicción, nunca una detección en el cubo.
 
+En **Composición multibanda (RGB)** se eligen tres canales del cubo para los canales rojo, verde y azul. Es falso color de visualización: cada canal tiene su propia normalización y solo se colorean los píxeles con datos válidos en los tres. No es una medida fotométrica.
+
+Buscador con sugerencias, enlaces compartibles y actualización de observaciones: ver [`RELEASE_READINESS.md`](RELEASE_READINESS.md).
+
 ## Referencias Gaia y AllWISE
 
 En ambos exploradores, abra **Referencias astronómicas · Gaia / WISE** y active el visor. Conserva el centro ICRS y el FOV del explorador; no tiene navegación independiente. **Consultar Gaia DR3** recupera hasta 500 fuentes del archivo ESA (círculo del FOV en J2016.0, orden por magnitud G). Puede pulsar un marcador o elegir su identificador para ver parámetros y unidades. Gaia, posiciones calculadas y AllWISE tienen interruptores independientes dentro del visor; no reconstruyen la imagen SPHEREx. La consulta y la época se actualizan dentro de un fragmento Streamlit.
@@ -35,6 +39,7 @@ El visor usa [Aladin Lite 3.8.1, paquete oficial CDS](https://github.com/cds-ast
 .venv\Scripts\python -m pytest -q
 .venv\Scripts\python scripts\validate_spectrum.py
 .venv\Scripts\python scripts\validate_references.py
+.venv\Scripts\python scripts\validate_multiband.py
 ```
 
 Las pruebas `network` usan FITS locales o NASA/IPAC IRSA y requieren que el servicio correspondiente esté disponible. Las offline aíslan la caché y usan cubos sintéticos identificados como pruebas. `requirements-dev.txt` incorpora Photutils y astropy-healpix como verificadores independientes, sin añadirlos al runtime. La prueba del reproductor requiere Node.js. El script reproduce la extracción del tutorial (apertura 5 px, anillo 40–60 px), contrasta valores y metadatos, comprueba recursos y escribe `results/spectrum_validation.json`.
