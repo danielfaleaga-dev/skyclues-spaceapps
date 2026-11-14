@@ -13,7 +13,7 @@ import json
 import pandas as pd
 import streamlit as st
 
-from . import archive, config, reference_page
+from . import archive, config, multiband_page, reference_page
 from . import spectral_cube as sc
 from . import spectral_view as sv
 from .astrometry import Astrometry
@@ -26,6 +26,11 @@ DEFAULT_LAMBDA_UM = 1.6
 LAYERS = {"IMAGE · brillo superficial (MJy/sr)": "image", "NHITS · cobertura (píxeles de entrada)": "nhits"}
 QUANTITY_LABELS = {"Densidad de flujo en apertura (mJy) · exploratoria": "flux",
                    "Brillo superficial del píxel (MJy/sr)": "pixel"}
+#: widget keys of the single-channel mode kept while the multiband mode is shown: given back through
+#: the Session State API, or as the initial value of sliders created with an explicit default.
+#: (The channel needs neither: it is restored from the ``canal`` URL parameter.)
+SINGLE_STATE_KEYS = ("sx_layer", "sx_pick_ra", "sx_pick_dec", "sx_quantity")
+SINGLE_SLIDER_KEYS = ("sx_rap", "sx_ann")
 
 
 # ----------------------------------------------------------------------------- cached data
@@ -279,6 +284,21 @@ def render(shared: dict | None) -> None:
     st.button("Abrir esta región en Time Explorer", key="sx_to_time", on_click=to_time_explorer,
               args=(ra_c, dec_c, fov), help="Búsqueda de observaciones individuales de distintas fechas en la misma región.")
 
+    # ---------------------------------------------------------------- display mode
+    view_mode = st.radio("Modo de visualización", multiband_page.MODES, horizontal=True, key="sx_mode",
+                         help="«Composición multibanda» combina tres canales reales en falso color (R, G, B) con el "
+                              "mismo centro y campo. Puede volver a «Un canal» en cualquier momento.")
+    if view_mode == multiband_page.MODES[1]:
+        multiband_page.stash(SINGLE_STATE_KEYS + SINGLE_SLIDER_KEYS)
+        st.session_state.pop("sx_channel", None)       # given back from the ``canal`` URL parameter on return
+        target = (expected_ra, expected_dec) if epoch_info.get("propagated") else (ra_c, dec_c)
+        multiband_page.render_section(ra_c, dec_c, fov, channels, target, cached_map, _show_error)
+        st.caption("El espectro exploratorio se obtiene en el modo «Un canal»; al volver se conservan la región, el "
+                   "canal y la posición elegidos.")
+        return
+    multiband_page.stash(multiband_page.STATE_KEYS)
+    multiband_page.restore(SINGLE_STATE_KEYS)
+
     # ---------------------------------------------------------------- channel selector
     st.markdown("### Canal espectral")
     b1, mid, b2 = st.columns([1, 10, 1])
@@ -348,10 +368,10 @@ def render(shared: dict | None) -> None:
         st.number_input("Dec (°)", format="%.6f", min_value=-90.0, max_value=90.0, key="sx_pick_dec")
         mx = config.CUBE_APERTURE_MAX_PX
         pxs = tile0.pixel_scale_arcsec
-        r_ap = st.slider("Radio de apertura (píxeles del cubo)", 1.0, mx[0], config.CUBE_APERTURE_DEFAULT_PX[0], 0.5,
-                         key="sx_rap")
+        r_ap = st.slider("Radio de apertura (píxeles del cubo)", 1.0, mx[0],
+                         multiband_page.kept("sx_rap", config.CUBE_APERTURE_DEFAULT_PX[0]), 0.5, key="sx_rap")
         r_in, r_out = st.slider("Anillo de fondo: radios interior y exterior (píxeles)", 1.5, mx[2],
-                                config.CUBE_APERTURE_DEFAULT_PX[1:], 0.5, key="sx_ann")
+                                multiband_page.kept("sx_ann", config.CUBE_APERTURE_DEFAULT_PX[1:]), 0.5, key="sx_ann")
         st.session_state["sx_rin"], st.session_state["sx_rout"] = r_in, r_out
         st.caption(f"Apertura {r_ap * pxs:.0f}″ · anillo {r_in * pxs:.0f}″–{r_out * pxs:.0f}″ (1 píxel = {pxs:.2f}″).")
         go = st.button("Obtener el espectro en esta posición", type="primary", key="sx_extract")
