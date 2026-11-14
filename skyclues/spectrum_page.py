@@ -13,7 +13,7 @@ import json
 import pandas as pd
 import streamlit as st
 
-from . import archive, config
+from . import archive, config, reference_page
 from . import spectral_cube as sc
 from . import spectral_view as sv
 from .astrometry import Astrometry
@@ -238,6 +238,7 @@ def render(shared: dict | None) -> None:
         except Exception as err:  # noqa: BLE001
             _show_error(err, "No se pudo leer la cabecera de la tesela")
             return
+    reference_page.render(ra_c, dec_c, fov, key="spectrum_ref")
     try:
         channels = channel_list(ra_c, dec_c)
     except Exception as err:  # noqa: BLE001

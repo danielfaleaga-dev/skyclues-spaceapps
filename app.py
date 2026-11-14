@@ -13,7 +13,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from astropy.time import Time
 
-from skyclues import archive, config, player, render, spectrum_page
+from skyclues import archive, config, player, render, spectrum_page, reference_page
 from skyclues.astrometry import Astrometry
 from skyclues.quality import flag_census
 from skyclues.sequence import STRICT, find_sequence, load_sequence, report_urls, save_report
@@ -336,6 +336,8 @@ else:
     if report is None:
         st.info("Defina una región y un campo de visión y pulse «Buscar secuencia comparable», "
                 "o abra uno de los ejemplos validados de la barra lateral.")
+        if ra is not None and dec is not None:
+            reference_page.render(ra, dec, fov, key="time_ref")
         st.stop()
 
 retrieval = report.get("retrieval") or {}
@@ -406,6 +408,7 @@ elif centre_rule:
     st.caption(f"Centro del campo: {centre_rule}.")
 st.button("Ver esta región en Spectrum Explorer", key="to_spectrum", on_click=to_spectrum_explorer,
           help="La misma región en los 102 canales del cubo combinado DR1 (no es una secuencia temporal).")
+reference_page.render(float(seq.ra), float(seq.dec), float(seq.field_deg), key="time_ref")
 c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("Épocas", seq.n)
 c2.metric("Intervalo total", f"{m['span_days']:.1f} d")

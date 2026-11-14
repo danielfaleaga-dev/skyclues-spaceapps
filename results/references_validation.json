@@ -1,0 +1,194 @@
+{
+  "validated_utc": "2026-11-14T18:43:28.551363+00:00",
+  "fields": {
+    "m101": {
+      "truncated": false,
+      "limit": 500,
+      "query": "SELECT TOP 501 source_id,ra,dec,ref_epoch,pmra,pmdec,parallax,radial_velocity,phot_g_mean_mag,ruwe,ra_error,dec_error,pmra_error,pmdec_error,parallax_error FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',210.8024290000,54.3487500000,0.0500000000)) ORDER BY phot_g_mean_mag ASC, source_id ASC",
+      "endpoint": "https://gea.esac.esa.int/tap-server/tap/sync",
+      "table": "gaiadr3.gaia_source",
+      "ra": 210.802429,
+      "dec": 54.34875,
+      "fov": 0.1,
+      "catalogue_epoch": 2016.0,
+      "retrieved_utc": "2026-11-14T18:43:32.435133+00:00",
+      "response_bytes": 39701,
+      "sha256": "d8ec62f1329c7cbcdf507d8b72acea6f63f193a97e2b512a6117266f7f97b331",
+      "count": 283,
+      "max_separation_deg": 0.04992689638794633,
+      "sample": {
+        "source_id": "1609275562358762368",
+        "ra": 210.81085154104443,
+        "dec": 54.37031401176242,
+        "ref_epoch": 2016.0,
+        "pmra": 19.556382033967214,
+        "pmdec": 3.810269182461848,
+        "parallax": 1.7165707509622048,
+        "radial_velocity": -12.202431,
+        "phot_g_mean_mag": 12.802347,
+        "ruwe": 1.1270032,
+        "ra_error": 0.0100606745,
+        "dec_error": 0.011647236,
+        "pmra_error": 0.01210341,
+        "pmdec_error": 0.01377772,
+        "parallax_error": 0.013188075
+      }
+    },
+    "wise0855": {
+      "truncated": false,
+      "limit": 500,
+      "query": "SELECT TOP 501 source_id,ra,dec,ref_epoch,pmra,pmdec,parallax,radial_velocity,phot_g_mean_mag,ruwe,ra_error,dec_error,pmra_error,pmdec_error,parallax_error FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',133.7601000000,-7.2422470000,0.0500000000)) ORDER BY phot_g_mean_mag ASC, source_id ASC",
+      "endpoint": "https://gea.esac.esa.int/tap-server/tap/sync",
+      "table": "gaiadr3.gaia_source",
+      "ra": 133.7601,
+      "dec": -7.242247,
+      "fov": 0.1,
+      "catalogue_epoch": 2016.0,
+      "retrieved_utc": "2026-11-14T18:43:39.945176+00:00",
+      "response_bytes": 12775,
+      "sha256": "65539781937d85d38f0526ee3e062f7708713841b36169a02d6295da4ad36e48",
+      "count": 69,
+      "max_separation_deg": 0.04990474052997746,
+      "sample": {
+        "source_id": "5756955785394371328",
+        "ra": 133.79701301042874,
+        "dec": -7.257862301162162,
+        "ref_epoch": 2016.0,
+        "pmra": -2.0829915743543155,
+        "pmdec": -17.433272879188863,
+        "parallax": 1.5556890616725139,
+        "radial_velocity": -27.32165,
+        "phot_g_mean_mag": 13.29808,
+        "ruwe": 0.9963189,
+        "ra_error": 0.011315001,
+        "dec_error": 0.008693164,
+        "pmra_error": 0.014183351,
+        "pmdec_error": 0.010774455,
+        "parallax_error": 0.015348782
+      }
+    },
+    "barnard": {
+      "truncated": false,
+      "limit": 500,
+      "query": "SELECT TOP 501 source_id,ra,dec,ref_epoch,pmra,pmdec,parallax,radial_velocity,phot_g_mean_mag,ruwe,ra_error,dec_error,pmra_error,pmdec_error,parallax_error FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',269.4485000000,4.7394000000,0.0250000000)) ORDER BY phot_g_mean_mag ASC, source_id ASC",
+      "endpoint": "https://gea.esac.esa.int/tap-server/tap/sync",
+      "table": "gaiadr3.gaia_source",
+      "ra": 269.4485,
+      "dec": 4.7394,
+      "fov": 0.05,
+      "catalogue_epoch": 2016.0,
+      "retrieved_utc": "2026-11-14T18:43:47.447470+00:00",
+      "response_bytes": 30912,
+      "sha256": "b1e7d7d333ee7ff4e16eb745d57f3de424ceb6e1172ebbff2bf7a09447829425",
+      "count": 166,
+      "max_separation_deg": 0.024951557526502965,
+      "sample": {
+        "source_id": "4472832130942575872",
+        "ra": 269.44850252543836,
+        "dec": 4.739420051112412,
+        "ref_epoch": 2016.0,
+        "pmra": -801.5509783684709,
+        "pmdec": 10362.394206546573,
+        "parallax": 546.975939730948,
+        "radial_velocity": -110.46822,
+        "phot_g_mean_mag": 8.1939745,
+        "ruwe": 1.0848505,
+        "ra_error": 0.026238997,
+        "dec_error": 0.029043527,
+        "pmra_error": 0.031820867,
+        "pmdec_error": 0.036070455,
+        "parallax_error": 0.040116355
+      }
+    }
+  },
+  "wise": [
+    {
+      "field": "m101",
+      "band": "W1",
+      "url": "https://irsa.ipac.caltech.edu/data/hips/CDS/AllWISE/W1/Norder8/Dir180000/Npix182953.jpg",
+      "bytes": 26286,
+      "sha256": "0faf597d68da0ea1da056a081a479919cc5aaa8b6ba82105054b946adb742672",
+      "dimensions": [
+        512,
+        512
+      ],
+      "properties_sha256": "bc03d9037afc732d3e65aa26187b68080bdf9cb1fb318c4560604b2f723bbaf1",
+      "title": "AllWISE W1 (3.4um) from raw Atlas Images",
+      "hips_order": 8,
+      "frame": "equatorial"
+    },
+    {
+      "field": "m101",
+      "band": "W2",
+      "url": "https://irsa.ipac.caltech.edu/data/hips/CDS/AllWISE/W2/Norder8/Dir180000/Npix182953.jpg",
+      "bytes": 38751,
+      "sha256": "dad609fce8ea9ad389db23c5b8f0f8e0f9fb854abf4abdc9bf2e9c8a3902d66f",
+      "dimensions": [
+        512,
+        512
+      ],
+      "properties_sha256": "01625fda86ff98aa261f2c3cbb182255bf601aa677107d4fcc0df7a5564b1891",
+      "title": "AllWISE W2 (4.6um) from raw Atlas Images",
+      "hips_order": 8,
+      "frame": "equatorial"
+    },
+    {
+      "field": "wise0855",
+      "band": "W1",
+      "url": "https://irsa.ipac.caltech.edu/data/hips/CDS/AllWISE/W1/Norder8/Dir650000/Npix654490.jpg",
+      "bytes": 15573,
+      "sha256": "4590449a4e9d9424f19e3fd86babac8ba80429b61a93fbcf4187c7a82bdd4edc",
+      "dimensions": [
+        512,
+        512
+      ],
+      "properties_sha256": "bc03d9037afc732d3e65aa26187b68080bdf9cb1fb318c4560604b2f723bbaf1",
+      "title": "AllWISE W1 (3.4um) from raw Atlas Images",
+      "hips_order": 8,
+      "frame": "equatorial"
+    },
+    {
+      "field": "wise0855",
+      "band": "W2",
+      "url": "https://irsa.ipac.caltech.edu/data/hips/CDS/AllWISE/W2/Norder8/Dir650000/Npix654490.jpg",
+      "bytes": 40278,
+      "sha256": "40c8b3359226bd24601e24307100f20450f71336455a0da6332bf97882d8c89d",
+      "dimensions": [
+        512,
+        512
+      ],
+      "properties_sha256": "01625fda86ff98aa261f2c3cbb182255bf601aa677107d4fcc0df7a5564b1891",
+      "title": "AllWISE W2 (4.6um) from raw Atlas Images",
+      "hips_order": 8,
+      "frame": "equatorial"
+    }
+  ],
+  "high_pm": {
+    "source": {
+      "source_id": "4472832130942575872",
+      "ra": 269.44850252543836,
+      "dec": 4.739420051112412,
+      "ref_epoch": 2016.0,
+      "pmra": -801.5509783684709,
+      "pmdec": 10362.394206546573,
+      "parallax": 546.975939730948,
+      "radial_velocity": -110.46822,
+      "phot_g_mean_mag": 8.1939745,
+      "ruwe": 1.0848505,
+      "ra_error": 0.026238997,
+      "dec_error": 0.029043527,
+      "pmra_error": 0.031820867,
+      "pmdec_error": 0.036070455,
+      "parallax_error": 0.040116355
+    },
+    "epoch": 2026.0,
+    "calculated": [
+      269.4462682627585,
+      4.768204473433689
+    ],
+    "motion_arcsec": 103.93347842652966,
+    "angular_oracle_error_arcsec": 1.6114812161979054e-06,
+    "difference_from_3d_arcsec": 0.0642764631230284,
+    "limitation": "Approximate angular motion; excludes perspective acceleration, observer parallax and covariance."
+  }
+}

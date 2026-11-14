@@ -18,12 +18,23 @@ El cubo DR1 combina distintas fechas: sus 102 canales no son una secuencia tempo
 
 Los espectros son **solo exploratorios**, sin incertidumbres ni corrección de apertura. SkyClues adapta la suma con fondo del [tutorial oficial de IRSA](https://caltech-ipac.github.io/irsa-tutorials/spherex-hipscube/): usa círculos sobre el cielo con subpíxeles; el tutorial usa círculos sobre la rejilla y Photutils. Sus valores pueden diferir. Para resultados científicos se remite a la [herramienta de espectrofotometría de IRSA](https://irsa.ipac.caltech.edu/applications/spherex/tool-spectrophotometry). Una posición propagada de WISE 0855 u otro objeto móvil es una predicción, nunca una detección en el cubo.
 
+## Referencias Gaia y AllWISE
+
+En ambos exploradores, abra **Referencias astronómicas · Gaia / WISE** y active el visor. Conserva el centro ICRS y el FOV del explorador; no tiene navegación independiente. **Consultar Gaia DR3** recupera hasta 500 fuentes del archivo ESA (círculo del FOV en J2016.0, orden por magnitud G). Puede pulsar un marcador o elegir su identificador para ver parámetros y unidades. Gaia, posiciones calculadas y AllWISE tienen interruptores independientes dentro del visor; no reconstruyen la imagen SPHEREx. La consulta y la época se actualizan dentro de un fragmento Streamlit.
+
+Los círculos Gaia representan **J2016.0**. Las cruces opcionales corresponden a una posición aproximada para el año juliano TCB elegido (2000–2050), calculada solo con RA/Dec, época y movimiento propio; sin paralaje, velocidad radial, aceleración perspectiva ni incertidumbre propagada. Las fuentes sin movimiento propio no se propagan. La selección no incorpora fuentes que entren en el campo desde fuera después de 2016 y puede truncarse en regiones densas. Ningún marcador constituye una detección o asociación SPHEREx.
+
+AllWISE [W1, ≈3.4 µm](https://irsa.ipac.caltech.edu/data/hips/CDS/AllWISE/W1/properties) y [W2, ≈4.6 µm](https://irsa.ipac.caltech.edu/data/hips/CDS/AllWISE/W2/properties) son imágenes HiPS auténticas de NASA/IPAC IRSA, distribuidas por CDS, de la era WISE 2010–2011. El suplemento AllWISE describe la combinación de fases criogénica y poscriogénica; las propiedades de estos HiPS incluyen texto temporal genérico de All-Sky y no permiten asignar una época local fiable. Los JPEG son contexto visual, no datos para fotometría. Resolución, bandas y épocas difieren de SPHEREx; no inferir variabilidad por apariencia ni restar imágenes entre misiones. La ausencia en Gaia no descarta una fuente infrarroja (en particular, no se identifica WISE 0855 por proximidad).
+
+El visor usa [Aladin Lite 3.8.1, paquete oficial CDS](https://github.com/cds-astro/aladin-lite/releases/tag/v3.8.1), fijado en jsDelivr, y requiere WebGL2 e Internet en el navegador. La ruta histórica `/AladinLite/api/v3/latest/aladin.js` devolvió 404 durante esta validación. Gaia se consulta en el servidor y se almacena en memoria hasta 12 h, con un máximo de 32 campos; una caída no se interpreta como un catálogo vacío y WISE sigue disponible. Si Aladin falla, se conserva la tabla Gaia. Los servicios externos pueden fallar independientemente; el mensaje de tesela central recibida no garantiza la carga de todas las teselas del mosaico.
+
 ## Pruebas
 
 ```bash
 .venv\Scripts\python -m pytest -m "not network" -q
 .venv\Scripts\python -m pytest -q
 .venv\Scripts\python scripts\validate_spectrum.py
+.venv\Scripts\python scripts\validate_references.py
 ```
 
 Las pruebas `network` usan FITS locales o NASA/IPAC IRSA y requieren que el servicio correspondiente esté disponible. Las offline aíslan la caché y usan cubos sintéticos identificados como pruebas. `requirements-dev.txt` incorpora Photutils y astropy-healpix como verificadores independientes, sin añadirlos al runtime. La prueba del reproductor requiere Node.js. El script reproduce la extracción del tutorial (apertura 5 px, anillo 40–60 px), contrasta valores y metadatos, comprueba recursos y escribe `results/spectrum_validation.json`.

@@ -1,6 +1,39 @@
 # SkyClues — estado del proyecto
 
-Última actualización: 14-11-2026, Codex: validación e integración de Spectrum Explorer sobre `e359426`. El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md). Las secciones de Claude A/B más abajo son antecedentes; esta sección prevalece sobre sus pendientes.
+Última actualización: 14-11-2026, Codex: referencias Gaia/WISE sobre `3e009ef`. El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md). Las secciones anteriores conservadas más abajo son antecedentes; esta sección prevalece sobre sus pendientes.
+
+## Referencias astronómicas Gaia / WISE — integradas
+
+Base comprobada antes de editar: `3e009ef`, árbol limpio y **173 pruebas satisfactorias**. Se mantienen los informes aceptados de Spectrum y todos los FITS originales. Sin push, despliegue, publicación ni gastos. El hash de esta entrega está en `git log -1 --oneline` (el documento forma parte del commit).
+
+### Implementación
+
+- Panel común `reference_page.py`, con `st.fragment` y `st.iframe`, en Time Explorer y Spectrum Explorer. Centro ICRS y FOV tomados del explorador; Aladin queda fijado al campo, sin otro sistema de navegación. Time también permite referencias antes de buscar una secuencia; Spectrum las conserva si falla la lectura de canales del cubo.
+- Gaia oficial: `https://gea.esac.esa.int/tap-server/tap/sync`, tabla `gaiadr3.gaia_source`. Consulta cónica en J2016.0, TOP 501 para detectar truncamiento, máximo 500 fuentes por magnitud G, respuesta limitada a 2 MiB, timeout de conexión/lectura 8/25 s, caché en memoria 12 h / 32 campos. Reintento explícito, sin ciclos ocultos. Un fallo nunca se convierte en catálogo vacío. IDs de 64 bits conservados como texto; parámetros, unidades, consulta, fecha y SHA-256 disponibles.
+- Aladin Lite **3.8.1** del paquete oficial CDS vía jsDelivr. La ruta histórica `aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js` y el enlace antiguo de API devolvieron 404; documentación operativa en `https://cds-astro.github.io/aladin-lite/`. Requiere WebGL2 y acceso del navegador a CDN/IRSA. Si falla Aladin, sigue disponible la tabla Gaia.
+- AllWISE auténtico: `https://irsa.ipac.caltech.edu/data/hips/CDS/AllWISE/W1` y `/W2`, orden 8, marco equatorial, teselas JPEG 512×512. Se comprueban propiedades y decodificación de una tesela central antes de indicar recepción. W1 ≈3.4 µm / W2 ≈4.6 µm; no se sustituyen ni alteran las imágenes SPHEREx. Las otras teselas se cargan progresivamente; el mensaje no certifica cobertura completa.
+- Interruptores Gaia, posiciones calculadas y AllWISE, más selector W1/W2, ejecutados dentro del iframe: no reconstruyen SPHEREx. Selección por clic sobre el marcador o por ID, con ficha de coordenadas, movimiento propio, errores, paralaje, RV, G y RUWE. La consulta y la época usan un fragmento aislado.
+
+### Integridad científica y límites
+
+Gaia de catálogo se dibuja en **J2016.0** (círculos cian), separado de cruces calculadas para el año juliano TCB elegido (2000–2050). La aproximación angular usa `normalize(p + Δt·v)`, con RA/Dec, ref_epoch, pmra (= μα cos δ) y pmdec. No usa distancia/paralaje ni RV, no incluye aceleración perspectiva, paralaje del observador, binarias ni propagación de incertidumbres. No es una posición aparente de precisión ni una detección SPHEREx. Una fuente sin movimiento propio permanece solo en el catálogo. La selección está definida en 2016: no garantiza incluir fuentes que entren después ni ser completa si se trunca.
+
+AllWISE combina fases de la era WISE **2010–2011**, según su suplemento. Las propiedades de estos HiPS mezclan descripción temporal genérica de All-Sky y límites temporales insuficientes para asignar una época local fiable: se informa «época local no verificada». No se usa esa metadata como fecha exacta de WISE 0855. JPEG para contexto visual, sin fotometría entre misiones, sin restas y sin inferir variabilidad por apariencia. No hay asociaciones automáticas; ausencia de Gaia no descarta emisión infrarroja.
+
+### Validación y resultados
+
+Informe reproducible: `results/references_validation.json`, generado por `scripts/validate_references.py` (requiere dependencias de desarrollo). Conserva consultas, conteos, muestras reales, hashes, URLs y medidas; no modifica `results/spectrum_validation.json`.
+
+- **M101**, RA 210.802429°, Dec +54.348750°, FOV 6′: **283 fuentes Gaia**; **WISE 0855**, centro temporal RA 133.760100°, Dec −7.242247°, FOV 6′: **69 fuentes**. Todas las posiciones devueltas están dentro del cono, comprobadas con SkyCoord. No se identifica por ello ninguna de esas fuentes con WISE 0855.
+- Campo de **Barnard**, FOV 3′: 166 fuentes. ID real `4472832130942575872`, movimiento calculado J2016→J2026 = **103.933478″**. Diferencia con el oráculo angular independiente de Astropy = **0.00000161″**; diferencia respecto al modelo espacial con distancia y RV = **0.064276″**, evidencia del límite de la aproximación. Se prueban además cruce RA=0 y proximidad polar.
+- Cuatro teselas reales W1/W2 para M101/WISE 0855: HTTP 200, JPEG no uniforme de 512×512; índices verificados con astropy-healpix. **120,888 B** totales de teselas; **83,388 B** de las tres respuestas Gaia, aparte de propiedades y recursos del visor. Sin descargas masivas ni FITS nuevos.
+- **28 pruebas nuevas**: 26 del motor/JavaScript y 2 de integración Streamlit. Incluyen IDs, nulos, truncamiento, límite de tamaño, coordenadas inválidas antes de red, HTTP 404/429/500/503, timeout, error WebGL, reintento WISE, controles independientes sin recrear Aladin, transferencia de región y conservación del visor científico ante fallo Gaia.
+- **Regresión completa: 201 passed, 1 warning, 78.68 s**. El aviso conocido de Astropy corresponde al descarte de NaN del verificador independiente de Spectrum. Las 173 pruebas previas siguen pasando. Después se precisó el texto de época WISE y se cubrió el aviso de fallo tardío de Aladin tras ocultar/mostrar una banda; las 28 pruebas nuevas se repitieron satisfactoriamente.
+- **Navegador real**: M101 y WISE 0855 en Time y Spectrum, Gaia y W1/W2 visibles, ocultación independiente, selección de fuente, centro/FOV conservados ida y vuelta. Barnard muestra marcadores J2016/J2026 separados y la ficha al pulsar; arrastrar no cambia la región. Fallo WISE HTTP 404 simulado localmente: mensaje visible, Gaia sigue utilizable. Se corrigió un estiramiento vertical al abrir una ficha larga; campo comprobado 460×460 y FOV 6′×6′ después de seleccionar. Captura: `results/references_browser.jpg`.
+
+No quedan fallos bloqueantes conocidos de esta integración. Persisten los límites científicos y dependencias de servicios descritos; el refinamiento visual, astrometría aparente completa y asociación entre catálogos no forman parte de esta actividad.
+
+## Validación anterior de Spectrum Explorer (base conservada)
 
 ## Objetivo inmediato
 Completar funcionalidades y validación antes del refinamiento visual. Esta actividad no autoriza push, publicación, despliegue ni gastos.
