@@ -212,32 +212,69 @@ def test_timeouts_retry_after_cap_and_deadline(monkeypatch):
     assert len(calls) == 2 and sleeps == [config.HTTP_BACKOFF_S]       # next wait would pass the deadline
 
 
-def test_sia2_capabilities_502_is_retried_and_400_is_permanent(monkeypatch):
+def _fake_sia2(monkeypatch, capabilities_ok: bool, query_errors=()):
+    """SIA2Service stand-in. ``capabilities_ok`` False -> the capabilities route raises
+    HTTP 502 (as observed on 14-11-2026); ``query_errors``: codes raised by successive
+    searches before one succeeds. Records every service built and every search."""
     import pyvo
 
-    sleeps = []
-    monkeypatch.setattr(archive.time, "sleep", sleeps.append)
-    state = {"n": 0}
+    log = {"built": [], "searches": []}
+    errors = list(query_errors)
 
     class FakeSvc:
+        def __init__(self, route):
+            self.route = route
+
         def search(self, **k):
+            log["searches"].append((self.route, k))
+            if errors:
+                code = errors.pop(0)
+                raise pyvo.dal.DALServiceError(f"HTTP {code}", code=code, url=config.SIA_URL)
             return type("R", (), {"to_table": lambda self: []})()
 
-    def ctor(url, session=None):
-        state["n"] += 1
-        if state["n"] == 1:
-            raise pyvo.dal.DALServiceError("Bad Gateway", code=502, url=url)
-        return FakeSvc()
+    def ctor(url, session=None, check_baseurl=True):
+        assert url == config.SIA_URL
+        log["built"].append(check_baseurl)
+        if check_baseurl and not capabilities_ok:
+            raise pyvo.dal.DALServiceError("502 Server Error: Proxy Error", code=502,
+                                           url=url + "/capabilities")
+        return FakeSvc("capabilities" if check_baseurl else "direct")
 
     monkeypatch.setattr(archive.pyvo.dal, "SIA2Service", ctor)
-    assert archive._query_images_live(10.0, 20.0, 1 / 3600, ("spherex_dr1",)) == []
-    assert state["n"] == 2 and sleeps == [config.HTTP_BACKOFF_S]
+    return log
 
-    def bad(url, session=None):
-        raise pyvo.dal.DALServiceError("Bad Request", code=400, url=url)
 
-    monkeypatch.setattr(archive.pyvo.dal, "SIA2Service", bad)
+def test_capabilities_502_but_direct_query_works(monkeypatch):
+    sleeps = []
+    monkeypatch.setattr(archive.time, "sleep", sleeps.append)
+    ok = _fake_sia2(monkeypatch, capabilities_ok=True)
+    archive._query_images_live(10.0, 20.0, 1 / 3600, config.WIDE_COLLECTIONS)
+    assert archive.last_sia2_route == "capabilities" and ok["built"] == [True]
+
+    log = _fake_sia2(monkeypatch, capabilities_ok=False)
+    assert archive._query_images_live(10.0, 20.0, 1 / 3600, config.WIDE_COLLECTIONS) == []
+    assert log["built"] == [True, False]                       # one capabilities attempt, then direct
+    assert archive.last_sia2_route.startswith("directo") and sleeps == []
+    # identical scientific query on both routes: same collections, position and radius
+    assert [k for _, k in log["searches"]] == [k for _, k in ok["searches"]]
+    assert [k["collection"] for _, k in log["searches"]] == list(config.WIDE_COLLECTIONS)
+
+
+def test_direct_query_failures_keep_their_classification(monkeypatch):
+    sleeps = []
+    monkeypatch.setattr(archive.time, "sleep", sleeps.append)
+    log = _fake_sia2(monkeypatch, capabilities_ok=False, query_errors=[502])
+    archive._query_images_live(10.0, 20.0, 1 / 3600, ("spherex_dr1",))   # transient: retried, then OK
+    assert len(log["searches"]) == 2 and sleeps == [config.HTTP_BACKOFF_S]
+
     sleeps.clear()
+    _fake_sia2(monkeypatch, capabilities_ok=False, query_errors=[502] * 10)
+    with pytest.raises(archive.ArchiveTransientError):                    # SIA really unavailable
+        archive._query_images_live(10.0, 20.0, 1 / 3600, ("spherex_dr1",))
+    assert len(sleeps) == config.HTTP_RETRIES - 1
+
+    sleeps.clear()
+    _fake_sia2(monkeypatch, capabilities_ok=False, query_errors=[400])
     with pytest.raises(archive.ArchivePermanentError):
         archive._query_images_live(10.0, 20.0, 1 / 3600, ("spherex_dr1",))
     assert sleeps == []

@@ -344,9 +344,30 @@ def _with_retries(what: str, fn, sleep=None):
                                 f"{type(last).__name__}: {str(last)[:200]}") from last
 
 
+def sia2_service():
+    """(service, route) for config.SIA_URL.
+
+    Normal route: one request to ``/SIA/capabilities`` to find the query
+    endpoint. If that request fails (it alone can answer 502 while queries
+    work), the documented query endpoint ``https://irsa.ipac.caltech.edu/SIA``
+    is used directly (``check_baseurl=False``) instead of blocking the search.
+    Collections and query parameters are identical on both routes; failures
+    of the query itself are retried and classified by ``_with_retries``.
+    """
+    try:
+        return pyvo.dal.SIA2Service(config.SIA_URL, session=_timeout_session()), "capabilities"
+    except Exception:  # noqa: BLE001 - any capabilities failure: use the known query endpoint
+        return (pyvo.dal.SIA2Service(config.SIA_URL, session=_timeout_session(), check_baseurl=False),
+                "directo (capabilities no disponible)")
+
+
+#: Route used by the last live SIA2 query ("capabilities" or "directo …"), for diagnostics.
+last_sia2_route: str | None = None
+
+
 def _query_images_live(ra, dec, radius_deg, collections) -> list[ObservationRecord]:
-    # The service constructor already contacts IRSA (/SIA/capabilities), so it is retried too.
-    svc = _with_retries("SIA2 capabilities", lambda: pyvo.dal.SIA2Service(config.SIA_URL, session=_timeout_session()))
+    global last_sia2_route
+    svc, last_sia2_route = sia2_service()
     records: list[ObservationRecord] = []
     for coll in collections:
         tab = _with_retries(f"SIA2 {coll}", lambda: svc.search(
