@@ -8,7 +8,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
@@ -319,10 +318,9 @@ with tab_play:
 with tab_cov:
     cols = st.columns(2)
     with cols[0]:
-        st.pyplot(render.sequence_coverage_figure(seq), clear_figure=True)
+        st.image(render.figure_png(render.sequence_coverage_figure(seq)))
     with cols[1]:
-        st.pyplot(render.sequence_spread_figure(seq), clear_figure=True)
-    plt.close("all")
+        st.image(render.figure_png(render.sequence_spread_figure(seq)))
     st.markdown(f"Región válida común a las {seq.n} épocas: **{m['coverage_common_valid']:.1%}** del campo "
                 f"({m['n_common_px']} píxeles). Dispersión máxima de λ en esa región: "
                 f"**{m['lambda_spread_common_max_bw']:.2f}** anchos de banda.")

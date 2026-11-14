@@ -117,6 +117,22 @@ def test_both_geometries_fixed_canvas_and_labelled(m101):
         player.render_frame_png(seq, 0, norm, geometry="bilinear")
 
 
+def test_concurrent_rendering_is_deterministic_and_leaves_no_pyplot_state(m101):
+    from concurrent.futures import ThreadPoolExecutor
+
+    import matplotlib.pyplot as plt
+
+    seq = m101
+    norm = player.sequence_norm(seq)
+    serial = [player.render_frame_png(seq, i, norm) for i in range(seq.n)]
+    with ThreadPoolExecutor(4) as pool:            # several app sessions rendering at once
+        par = list(pool.map(lambda k: player.render_frame_png(seq, k % seq.n, norm), range(4 * seq.n)))
+        pngs = list(pool.map(lambda _: render.figure_png(render.sequence_coverage_figure(seq)), range(4)))
+    assert all(p == serial[k % seq.n] for k, p in enumerate(par))
+    assert len(set(pngs)) == 1 and _png_size(pngs[0])[0] > 0
+    assert plt.get_fignums() == []                 # nothing registered in pyplot's global state
+
+
 def test_load_sequence_reports_progress_from_local_files():
     rep = _report("sequence_wise0855_mwir")
     seen = []

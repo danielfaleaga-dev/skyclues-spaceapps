@@ -6,9 +6,19 @@ Rules enforced here:
 * both epochs share one intensity normalisation (same vmin/vmax/stretch), so
   apparent brightness changes are not produced by independent stretching;
 * the displayed quantity is stated (IMAGE or IMAGE - ZODI, MJy/sr).
+
+Thread safety: figures are plain ``Figure`` objects (never registered in
+pyplot), and every layout/drawing step runs under ``RENDER_LOCK`` because
+matplotlib's text/mathtext machinery is not thread-safe (concurrent app
+sessions failed with ParseException on WCSAxes tick labels). Use
+``figure_png`` to rasterise a figure.
 """
 
 from __future__ import annotations
+
+import functools
+import io
+import threading
 
 import matplotlib
 
@@ -17,9 +27,29 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 from astropy.visualization import AsinhStretch, ImageNormalize  # noqa: E402
 from matplotlib.colors import ListedColormap  # noqa: E402
+from matplotlib.figure import Figure  # noqa: E402
 
 from .compare import PairEvaluation, place_on_a  # noqa: E402
 from .fitsdata import SpectralImage  # noqa: E402
+
+RENDER_LOCK = threading.RLock()
+
+
+def serialized(fn):
+    """Run a figure-building function under RENDER_LOCK."""
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        with RENDER_LOCK:
+            return fn(*args, **kwargs)
+    return wrapper
+
+
+def figure_png(fig: Figure, dpi: float | None = None) -> bytes:
+    """Rasterise a figure to PNG bytes under RENDER_LOCK."""
+    buf = io.BytesIO()
+    with RENDER_LOCK:
+        fig.savefig(buf, format="png", dpi=dpi or fig.dpi, facecolor="white")
+    return buf.getvalue()
 
 MASK_COLOR = "#e0457b"            # no valid data in this frame
 OUTSIDE_COMMON_COLOR = "#b9cde8"  # valid here, but not in every frame of the sequence
@@ -149,9 +179,10 @@ def _mark_target(ax, ra, dec, field_deg):
     ax.scatter([ra], [dec], s=60, marker="+", color=ACCENT, lw=1.2, transform=ax.get_transform("icrs"))
 
 
+@serialized
 def frame_figure(data: np.ndarray, wcs, norm, title: str, ra: float, dec: float, field_deg: float,
                  subtitle: str = ""):
-    fig = plt.figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
+    fig = Figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
     ax = fig.add_subplot(1, 1, 1, projection=wcs)
     ax.imshow(to_rgba(data, norm), origin="lower", interpolation="nearest")
     _style_axes(ax)
@@ -182,8 +213,9 @@ def coverage_codes(ev: PairEvaluation) -> np.ndarray:
     return codes
 
 
+@serialized
 def coverage_figure(ev: PairEvaluation, wcs, ra, dec, field_deg):
-    fig = plt.figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
+    fig = Figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
     ax = fig.add_subplot(1, 1, 1, projection=wcs)
     ax.imshow(coverage_codes(ev), origin="lower", cmap=ListedColormap(COVERAGE_COLORS), vmin=-0.5, vmax=4.5,
               interpolation="nearest")
@@ -199,11 +231,12 @@ def coverage_figure(ev: PairEvaluation, wcs, ra, dec, field_deg):
     return fig
 
 
+@serialized
 def sequence_coverage_figure(seq):
     """Number of epochs with a valid pixel, on the reference grid (field only)."""
     n = seq.n
     count = np.where(seq.field_mask, seq.valid_stack.sum(axis=0), np.nan).astype(float)
-    fig = plt.figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
+    fig = Figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
     ax = fig.add_subplot(1, 1, 1, projection=seq.wcs)
     colors = [MASK_COLOR] + [plt.get_cmap("Blues")(0.3 + 0.6 * k / max(n - 1, 1)) for k in range(1, n)] + ["#2e7d32"]
     cm = ListedColormap(colors).with_extremes(bad="#ffffff")
@@ -217,8 +250,9 @@ def sequence_coverage_figure(seq):
     return fig
 
 
+@serialized
 def sequence_spread_figure(seq, limit=0.5):
-    fig = plt.figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
+    fig = Figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
     ax = fig.add_subplot(1, 1, 1, projection=seq.wcs)
     cm = plt.get_cmap("viridis").with_extremes(bad="#ffffff")
     im = ax.imshow(seq.lambda_spread_bw, origin="lower", cmap=cm, vmin=0, vmax=limit, interpolation="nearest")
@@ -231,8 +265,9 @@ def sequence_spread_figure(seq, limit=0.5):
     return fig
 
 
+@serialized
 def dlambda_figure(ev: PairEvaluation, wcs, ra, dec, field_deg, limit=0.5):
-    fig = plt.figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
+    fig = Figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
     ax = fig.add_subplot(1, 1, 1, projection=wcs)
     cm = plt.get_cmap("RdBu_r").with_extremes(bad="#ffffff")
     im = ax.imshow(ev.dlambda_bw, origin="lower", cmap=cm, vmin=-limit, vmax=limit, interpolation="nearest")

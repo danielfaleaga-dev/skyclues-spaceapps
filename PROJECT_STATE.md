@@ -16,9 +16,11 @@ Primera versión pública (pendiente de autorización para desplegar): decidir s
 | Parejas (C1–C9) y secuencias de N épocas (S1–S9 globales); regla de selección sin cambios | pruebas originales en verde |
 | **Geometría exacta (nueva, modo por defecto del reproductor):** cada píxel nativo de cada época se dibuja como un cuadrilátero en su posición WCS real (`TemporalSequence.native_corners`), con su valor original y sin remuestreo. La rejilla común por vecino más próximo se mantiene para las métricas y como vista opcional, con la etiqueta «REMUESTREADO» en la leyenda y en cada fotograma | pruebas reales: posición dibujada = posición WCS (< 0.01″); valores idénticos bit a bit al FITS; máscara = píxeles nativos inválidos |
 | **HALO (nuevo):** se añade SATELLITE_HALO (bit 29, siempre enmascarado). Modo exploratorio opcional: los píxeles enmascarados **solo** por HALO se muestran en escala cobre (el brillo conserva el orden), con su leyenda. Las métricas y criterios usan siempre la máscara estricta | pruebas: solo cambian los píxeles HALO; todos tienen el bit 28; los criterios, métricas y máscaras no cambian |
-| **Búsqueda con progreso (nuevo):** `find_sequence(progress=…)` informa de 5 etapas y de cada recorte (descargados / ya en caché); `load_sequence(progress=…)` descarga en paralelo. La app muestra una barra de progreso y mensajes claros cuando IRSA falla, sin datos parciales | prueba unitaria de etapas; probado en el navegador con una búsqueda real |
+| **Búsqueda con progreso (nuevo):** `find_sequence(progress=…)` informa de 5 etapas y de cada recorte (descargados / ya en caché); `load_sequence(progress=…)` descarga en paralelo. La app muestra una barra de progreso y mensajes claros cuando IRSA falla, sin datos parciales | prueba unitaria de etapas; en el navegador, búsqueda real de M101 a 12′ en D2: 8 recortes descargados con la barra de progreso, 143.8 s, 2 épocas, 96.0 % |
 | **Accesos rápidos a ejemplos validados (nuevo):** botones para M101 (4 épocas) y WISE 0855 (D6, 3 épocas) | AppTest y navegador |
 | **Campo de visión (FOV) seleccionable (nuevo; recomendación oficial del desafío):** valores predefinidos de 3′, 6′ (por defecto), 12′ y 18′, o un valor personalizado entre 3′ y 30′, con su equivalencia en grados y píxeles. Se aplica de verdad a la búsqueda: los candidatos deben contener el campo completo, λ se muestrea en todo el campo, el recorte IRSA tiene ese tamaño y la cobertura se calcula sobre ese campo. La URL lo guarda (`fov=`) y valores no válidos se acotan. Se distingue del zoom (tamaño en pantalla fijo) y se avisa de que los campos mayores tardan más | AppTest: búsqueda de 18′ → `field_deg = 0.3` y recortes `size=0.30000`; búsquedas reales de 18′ y 30′ (ver tabla) |
+| **Varias sesiones simultáneas (defecto encontrado y corregido):** el texto matemático de matplotlib (etiquetas de los ejes WCS) fallaba con `ParseException` al dibujar desde varios hilos, como hace Streamlit con cada visitante. Ahora las figuras son `Figure` independientes de pyplot y todo el dibujo se hace bajo `render.RENDER_LOCK`. La app muestra PNG generados bajo ese bloqueo | prueba: 4 hilos generan 16 fotogramas idénticos byte a byte a los secuenciales (4 de 4 ejecuciones) y pyplot no queda con figuras abiertas |
+| **Instalación limpia (simula el despliegue):** clon nuevo del commit, entorno nuevo con **Python 3.14.3** y solo `requirements-dev.txt`; `bundle_reference.py` → 7 FITS, 28.0 MB, SHA-256 correcto; sin caché, las pruebas sin red y las 3 pruebas de la app con los ejemplos pasan **con 0 descargas** (servido desde `data/reference/`) | ejecutado |
 | Reproductor: reproducción, pausa, velocidad, repetición, paso, deslizador, blink y teclado | **navegador real, tras los cambios**: siguiente/anterior, reproducción a 1 fps, pausa y blink 1↔2 |
 
 ## Medidas de esta sesión (datos reales)
@@ -45,10 +47,10 @@ Las parejas `pair_m101` y `pair_wise0855` y la prueba nula siguen vigentes. Con 
 
 ## Pruebas
 ```
-.venv\Scripts\python -m pytest -q                 # 57 passed, 14-11-2026 (38 anteriores + 19 nuevas)
+.venv\Scripts\python -m pytest -q                 # 59 passed, 14-11-2026 (38 anteriores + 21 nuevas)
 .venv\Scripts\python -m pytest -m "not network"   # 23 unitarias (incluye la máquina de estados del reproductor con Node)
 ```
-Nuevas: `tests/test_robustness_offline.py` (10) y `tests/test_robustness_live.py` (6). `tests/test_app.py` pasa de 3 a 6 pruebas: ejemplos validados, opciones de visualización y FOV. Los selectores de las 3 pruebas existentes ahora usan claves de widget; sus aserciones no cambian. Las pruebas del motor (19) y de secuencias siguen sin cambios.
+Nuevas: `tests/test_robustness_offline.py` (10) y `tests/test_robustness_live.py` (7, incluida la de dibujo concurrente). `tests/test_app.py` pasa de 3 a 7 pruebas: ejemplos validados, opciones de visualización, FOV y un fallo simulado de IRSA (503), que muestra un mensaje claro sin datos parciales. Los selectores de las 3 pruebas existentes ahora usan claves de widget; sus aserciones no cambian. Las pruebas del motor (19) y de secuencias siguen sin cambios.
 
 ## Despliegue en Streamlit Community Cloud (preparado; **no desplegado**)
 - `app.py` en la raíz; `requirements.txt` solo con dependencias de ejecución; `.streamlit/config.toml` con tema claro, sin estadísticas de uso y con la barra de herramientas mínima. No hacen falta `packages.txt` ni secretos.
@@ -57,7 +59,7 @@ Nuevas: `tests/test_robustness_offline.py` (10) y `tests/test_robustness_live.py
 - El disco no es persistente: la caché se pierde al reiniciar y la primera visita vuelve a descargar los FITS (unos 30–60 s por ejemplo si IRSA responde).
 
 ## Decisiones pendientes (usuario)
-1. **¿Versionar los FITS de los ejemplos validados?** `scripts/bundle_reference.py` los copia a `data/reference/` (unos 27 MB y 7 archivos idénticos a IRSA, con SHA-256 verificado). Ventaja: los ejemplos se abren al instante en la nube aunque IRSA esté saturado. Coste: unos 27 MB más en el historial de git. El código ya los usa si existen; no se han añadido al repositorio.
+1. **¿Versionar los FITS de los ejemplos validados?** `scripts/bundle_reference.py` los copia a `data/reference/` (28 MB en 7 archivos idénticos a IRSA, con SHA-256 verificado). Ventaja: los ejemplos se abren al instante en la nube aunque IRSA esté saturado. Coste: unos 28 MB más en el historial de git. El código ya los usa si existen; no se han añadido al repositorio.
 2. Autorización para hacer push y desplegar.
 
 ## API para Codex (`skyclues.sequence`, `skyclues.player`)
@@ -74,7 +76,7 @@ seq.placement_error_px(i)    # desplazamiento del vecino más próximo en cada p
 html = player.build_player(seq, subtract_zodi=True, restrict_to_common=False,
                            geometry="exact" | "nearest", show_halo=False)
 ```
-Reglas: una única `sequence_norm`; los NaN se dibujan con `MASK_COLOR`; la geometría «nearest» debe mostrarse siempre como remuestreada; HALO solo es visible en modo exploratorio y con su color; las opciones de visualización no modifican nunca la secuencia ni sus métricas. Limitar el FOV con `targets.clamp_fov_deg` (3′–30′).
+Reglas: una única `sequence_norm`; los NaN se dibujan con `MASK_COLOR`; la geometría «nearest» debe mostrarse siempre como remuestreada; HALO solo es visible en modo exploratorio y con su color; las opciones de visualización no modifican nunca la secuencia ni sus métricas. Limitar el FOV con `targets.clamp_fov_deg` (3′–30′). Las figuras nuevas deben ser `Figure` (no pyplot), construirse con `@render.serialized` y mostrarse con `st.image(render.figure_png(fig))`, no con `st.pyplot`.
 
 ## Problemas abiertos
 1. No hay vista con el norte arriba: los ejes son los del detector de la época 1.

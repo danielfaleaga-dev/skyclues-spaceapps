@@ -29,10 +29,10 @@ import json
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 from astropy.time import Time  # noqa: E402
 from matplotlib.cm import ScalarMappable  # noqa: E402
+from matplotlib.figure import Figure  # noqa: E402
 
 from . import render  # noqa: E402
 from .quality import CAUTION  # noqa: E402
@@ -75,13 +75,18 @@ def native_frame_rgba(seq: TemporalSequence, i: int, norm, subtract_zodi: bool =
                               seq.native_common(i) if restrict_to_common else None)
 
 
+@render.serialized
 def render_frame_png(seq: TemporalSequence, i: int, norm, subtract_zodi: bool = True,
                      restrict_to_common: bool = False, geometry: str = "exact",
                      show_halo: bool = False) -> bytes:
-    """PNG of frame i with a fixed layout (identical axes for every frame)."""
+    """PNG of frame i with a fixed layout (identical axes for every frame).
+
+    Runs under ``render.RENDER_LOCK``: matplotlib text rendering is not
+    thread-safe and the app serves several sessions in parallel threads.
+    """
     if geometry not in GEOMETRIES:
         raise ValueError(f"geometry must be one of {GEOMETRIES}")
-    fig = plt.figure(figsize=FIG_SIZE_IN, dpi=DPI, facecolor="white")
+    fig = Figure(figsize=FIG_SIZE_IN, dpi=DPI, facecolor="white")   # not registered in pyplot
     ax = fig.add_axes(AX_RECT, projection=seq.wcs)
     render._style_axes(ax)
     if geometry == "exact":
@@ -106,7 +111,6 @@ def render_frame_png(seq: TemporalSequence, i: int, norm, subtract_zodi: bool = 
     cb.ax.tick_params(labelsize=7, colors=render.INK)
     buf = io.BytesIO()
     fig.savefig(buf, format="png", dpi=DPI, facecolor="white")  # no bbox_inches: fixed canvas
-    plt.close(fig)
     return buf.getvalue()
 
 

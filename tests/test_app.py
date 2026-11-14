@@ -63,6 +63,22 @@ def test_display_options_render_without_changing_the_verdict():
         assert {m.label: m.value for m in at.metric} == metrics
 
 
+def test_irsa_failure_shows_a_clear_message_and_no_partial_data(monkeypatch):
+    from skyclues import archive
+
+    def busy(*a, **k):
+        raise RuntimeError("SIA2 query failed for spherex_dr1: HTTP 503 Server busy, retry later")
+
+    monkeypatch.setattr(archive, "query_images", busy)
+    at = AppTest.from_file(APP, default_timeout=300)
+    at.run()
+    at.radio(key="mode").set_value("Nueva búsqueda").run()
+    at.button(key="search").click().run()
+    assert not at.exception
+    assert any("IRSA no respondió" in e.value for e in at.error)
+    assert not any(m.label == "Épocas" for m in at.metric)
+
+
 def test_field_of_view_is_applied_to_the_search():
     at = AppTest.from_file(APP, default_timeout=900)
     at.run()
