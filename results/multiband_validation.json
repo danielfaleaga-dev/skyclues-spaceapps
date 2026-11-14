@@ -1,0 +1,381 @@
+{
+ "producto": "SPHEREx DR1 All-Sky spectral cube",
+ "doi": "10.26131/IRSA679",
+ "fecha_utc": "2026-11-14T19:34:10Z",
+ "casos": {
+  "m101_3arcmin": {
+   "frio": {
+    "peticiones_http": 7,
+    "MiB_red": 0.482,
+    "MiB_cache": 0.0,
+    "s_lectura_y_composicion": 3.27,
+    "s_render": 0.31,
+    "MiB_pico_python": 1.9,
+    "png_KiB": 26.9,
+    "paneles_KiB": 30.7,
+    "filas_tabla": 233
+   },
+   "caliente": {
+    "peticiones_http": 0,
+    "MiB_red": 0.0,
+    "MiB_cache": 0.404,
+    "s_lectura_y_composicion": 0.32,
+    "s_render": 0.21,
+    "MiB_pico_python": 1.3,
+    "png_KiB": 26.9,
+    "paneles_KiB": 30.7,
+    "filas_tabla": 233
+   },
+   "canales": {
+    "R": {
+     "canal": 88,
+     "lambda_um": 4.5,
+     "ancho_um": 0.03500000014901161
+    },
+    "G": {
+     "canal": 47,
+     "lambda_um": 2.188999891281128,
+     "ancho_um": 0.054999999701976776
+    },
+    "B": {
+     "canal": 21,
+     "lambda_um": 1.1950000524520874,
+     "ancho_um": 0.028999999165534973
+    }
+   },
+   "teselas": [
+    2858
+   ],
+   "alineacion_verificada": true,
+   "cobertura": {
+    "n_campo": 153,
+    "con_datos": {
+     "R": 153,
+     "G": 153,
+     "B": 153
+    },
+    "tres_canales": 153,
+    "parcial": 0,
+    "ninguno": 0,
+    "fraccion_tres_canales": 1.0
+   },
+   "escala": {
+    "mode": "independiente",
+    "percentiles": [
+     1.0,
+     99.5
+    ],
+    "asinh_a": 0.1,
+    "vmin": {
+     "R": 0.25403242945671084,
+     "G": 0.7772464776039123,
+     "B": 0.78042475938797
+    },
+    "vmax": {
+     "R": 2.3142683124542307,
+     "G": 6.8112032890320116,
+     "B": 7.162734584808378
+    },
+    "n_pixels": 153,
+    "degenerate": [],
+    "description": "límites propios de cada canal (percentiles 1–99.5, asinh)",
+    "note": "solo afecta a la visualización; los valores del cubo no se modifican"
+   },
+   "avisos": [
+    "Escala independiente: cada canal usa todo su contraste, de modo que los colores NO reflejan los cocientes de brillo entre canales (un canal mucho más débil puede verse tan intenso como los demás). Para comparar intensidades use la escala común o el espectro."
+   ],
+   "comprobaciones_independientes": {
+    "valores_identicos_a_lectura_directa": 1380,
+    "pixeles_campo": 153,
+    "duplicados_entre_teselas": 0,
+    "faltan_respecto_a_healpix": 0,
+    "sobran_respecto_a_healpix": 0
+   },
+   "reproducible": true
+  },
+  "m101_30arcmin": {
+   "frio": {
+    "peticiones_http": 3,
+    "MiB_red": 2.954,
+    "MiB_cache": 0.0,
+    "s_lectura_y_composicion": 6.58,
+    "s_render": 0.56,
+    "MiB_pico_python": 35.5,
+    "png_KiB": 195.9,
+    "paneles_KiB": 130.9,
+    "filas_tabla": 18964
+   },
+   "caliente": {
+    "peticiones_http": 0,
+    "MiB_red": 0.0,
+    "MiB_cache": 2.953,
+    "s_lectura_y_composicion": 0.74,
+    "s_render": 0.58,
+    "MiB_pico_python": 35.5,
+    "png_KiB": 195.9,
+    "paneles_KiB": 130.9,
+    "filas_tabla": 18964
+   },
+   "canales": {
+    "R": {
+     "canal": 88,
+     "lambda_um": 4.5,
+     "ancho_um": 0.03500000014901161
+    },
+    "G": {
+     "canal": 47,
+     "lambda_um": 2.188999891281128,
+     "ancho_um": 0.054999999701976776
+    },
+    "B": {
+     "canal": 21,
+     "lambda_um": 1.1950000524520874,
+     "ancho_um": 0.028999999165534973
+    }
+   },
+   "teselas": [
+    2858
+   ],
+   "alineacion_verificada": true,
+   "cobertura": {
+    "n_campo": 15318,
+    "con_datos": {
+     "R": 15317,
+     "G": 15317,
+     "B": 15318
+    },
+    "tres_canales": 15316,
+    "parcial": 2,
+    "ninguno": 0,
+    "fraccion_tres_canales": 0.9998694346520434
+   },
+   "escala": {
+    "mode": "independiente",
+    "percentiles": [
+     1.0,
+     99.5
+    ],
+    "asinh_a": 0.1,
+    "vmin": {
+     "R": -0.00695829801261425,
+     "G": 0.009487814782187343,
+     "B": 0.017835092917084693
+    },
+    "vmax": {
+     "R": 0.5416825294494619,
+     "G": 1.5472361773252379,
+     "B": 1.6676648944616224
+    },
+    "n_pixels": 15316,
+    "degenerate": [],
+    "description": "límites propios de cada canal (percentiles 1–99.5, asinh)",
+    "note": "solo afecta a la visualización; los valores del cubo no se modifican"
+   },
+   "avisos": [
+    "Escala independiente: cada canal usa todo su contraste, de modo que los colores NO reflejan los cocientes de brillo entre canales (un canal mucho más débil puede verse tan intenso como los demás). Para comparar intensidades use la escala común o el espectro.",
+    "Cobertura distinta entre canales: 2 píxeles del campo tienen datos en uno o dos canales pero no en los tres; en la composición se muestran como sin datos (rosa), nunca con un color parcial."
+   ],
+   "comprobaciones_independientes": {
+    "valores_identicos_a_lectura_directa": 69048,
+    "pixeles_campo": 15318,
+    "duplicados_entre_teselas": 0,
+    "faltan_respecto_a_healpix": 0,
+    "sobran_respecto_a_healpix": 0
+   },
+   "reproducible": true
+  },
+  "m101_30arcmin_comun": {
+   "frio": {
+    "peticiones_http": 0,
+    "MiB_red": 0.0,
+    "MiB_cache": 2.953,
+    "s_lectura_y_composicion": 0.6,
+    "s_render": 0.59,
+    "MiB_pico_python": 35.5,
+    "png_KiB": 193.6,
+    "paneles_KiB": 126.8,
+    "filas_tabla": 18964
+   },
+   "caliente": {
+    "peticiones_http": 0,
+    "MiB_red": 0.0,
+    "MiB_cache": 2.953,
+    "s_lectura_y_composicion": 0.65,
+    "s_render": 0.59,
+    "MiB_pico_python": 35.5,
+    "png_KiB": 193.6,
+    "paneles_KiB": 126.8,
+    "filas_tabla": 18964
+   },
+   "canales": {
+    "R": {
+     "canal": 88,
+     "lambda_um": 4.5,
+     "ancho_um": 0.03500000014901161
+    },
+    "G": {
+     "canal": 47,
+     "lambda_um": 2.188999891281128,
+     "ancho_um": 0.054999999701976776
+    },
+    "B": {
+     "canal": 21,
+     "lambda_um": 1.1950000524520874,
+     "ancho_um": 0.028999999165534973
+    }
+   },
+   "teselas": [
+    2858
+   ],
+   "alineacion_verificada": true,
+   "cobertura": {
+    "n_campo": 15318,
+    "con_datos": {
+     "R": 15317,
+     "G": 15317,
+     "B": 15318
+    },
+    "tres_canales": 15316,
+    "parcial": 2,
+    "ninguno": 0,
+    "fraccion_tres_canales": 0.9998694346520434
+   },
+   "escala": {
+    "mode": "comun",
+    "percentiles": [
+     1.0,
+     99.5
+    ],
+    "asinh_a": 0.1,
+    "vmin": {
+     "R": 0.0008659192320192243,
+     "G": 0.0008659192320192243,
+     "B": 0.0008659192320192243
+    },
+    "vmax": {
+     "R": 1.422249561548233,
+     "G": 1.422249561548233,
+     "B": 1.422249561548233
+    },
+    "n_pixels": 15316,
+    "degenerate": [],
+    "description": "mismos límites en MJy/sr para los tres canales (percentiles 1–99.5 del conjunto, asinh)",
+    "note": "solo afecta a la visualización; los valores del cubo no se modifican"
+   },
+   "avisos": [
+    "Cobertura distinta entre canales: 2 píxeles del campo tienen datos en uno o dos canales pero no en los tres; en la composición se muestran como sin datos (rosa), nunca con un color parcial."
+   ],
+   "comprobaciones_independientes": {
+    "valores_identicos_a_lectura_directa": 69048,
+    "pixeles_campo": 15318,
+    "duplicados_entre_teselas": 0,
+    "faltan_respecto_a_healpix": 0,
+    "sobran_respecto_a_healpix": 0
+   },
+   "reproducible": true
+  },
+  "esquina_4_teselas_6arcmin": {
+   "frio": {
+    "peticiones_http": 24,
+    "MiB_red": 1.536,
+    "MiB_cache": 0.0,
+    "s_lectura_y_composicion": 7.23,
+    "s_render": 0.3,
+    "MiB_pico_python": 2.5,
+    "png_KiB": 50.4,
+    "paneles_KiB": 59.0,
+    "filas_tabla": 855
+   },
+   "caliente": {
+    "peticiones_http": 0,
+    "MiB_red": 0.0,
+    "MiB_cache": 1.301,
+    "s_lectura_y_composicion": 0.76,
+    "s_render": 0.31,
+    "MiB_pico_python": 2.5,
+    "png_KiB": 50.4,
+    "paneles_KiB": 59.0,
+    "filas_tabla": 855
+   },
+   "canales": {
+    "R": {
+     "canal": 88,
+     "lambda_um": 4.5,
+     "ancho_um": 0.03500000014901161
+    },
+    "G": {
+     "canal": 47,
+     "lambda_um": 2.188999891281128,
+     "ancho_um": 0.054999999701976776
+    },
+    "B": {
+     "canal": 21,
+     "lambda_um": 1.1950000524520874,
+     "ancho_um": 0.028999999165534973
+    }
+   },
+   "teselas": [
+    2856,
+    2857,
+    2858,
+    2859
+   ],
+   "alineacion_verificada": true,
+   "cobertura": {
+    "n_campo": 613,
+    "con_datos": {
+     "R": 613,
+     "G": 613,
+     "B": 613
+    },
+    "tres_canales": 613,
+    "parcial": 0,
+    "ninguno": 0,
+    "fraccion_tres_canales": 1.0
+   },
+   "escala": {
+    "mode": "independiente",
+    "percentiles": [
+     1.0,
+     99.5
+    ],
+    "asinh_a": 0.1,
+    "vmin": {
+     "R": -0.006192589569836855,
+     "G": 0.005785931330174208,
+     "B": 0.017282803431153296
+    },
+    "vmax": {
+     "R": 0.15658255070447716,
+     "G": 0.33945822775363854,
+     "B": 0.47619213759899026
+    },
+    "n_pixels": 613,
+    "degenerate": [],
+    "description": "límites propios de cada canal (percentiles 1–99.5, asinh)",
+    "note": "solo afecta a la visualización; los valores del cubo no se modifican"
+   },
+   "avisos": [
+    "Escala independiente: cada canal usa todo su contraste, de modo que los colores NO reflejan los cocientes de brillo entre canales (un canal mucho más débil puede verse tan intenso como los demás). Para comparar intensidades use la escala común o el espectro.",
+    "El campo abarca varias teselas HEALPix: se dibujan los píxeles nativos de cada una (misma rejilla, mismo ángulo sólido); no hay remuestreo ni costura interpolada."
+   ],
+   "comprobaciones_independientes": {
+    "valores_identicos_a_lectura_directa": 3570,
+    "pixeles_campo": 613,
+    "duplicados_entre_teselas": 0,
+    "faltan_respecto_a_healpix": 0,
+    "sobran_respecto_a_healpix": 0
+   },
+   "reproducible": true
+  }
+ },
+ "canales_vacios": {
+  "rechazados": {
+   "51": true,
+   "52": true
+  },
+  "BLANKCH": "D3:17,D4:01",
+  "canal_51_pixeles_con_datos": 0,
+  "canal_51_pixeles_campo": 153
+ }
+}
