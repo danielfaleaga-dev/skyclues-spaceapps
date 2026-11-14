@@ -1,0 +1,1254 @@
+{
+ "outcome": "INSUFFICIENT_EVIDENCE",
+ "outcome_label": "Evidencia insuficiente",
+ "reasons": [
+  "Otra fuente comparable dentro del radio de búsqueda: posible confusión.",
+  "Núcleo saturado y menos de tres medidas individuales por temporada: no se puede estimar empíricamente el sesgo de un ajuste con las alas de la PSF."
+ ],
+ "method": "skyclues-motion 1.0 (2026-11-14)",
+ "source": {
+  "label": "NAME Barnard's star",
+  "selected_ra": 269.4461907367249,
+  "selected_dec": 4.767384313539078,
+  "search_radius_arcsec": 20.0
+ },
+ "data_rule": "Imágenes individuales SPHEREx L2 originales (IMAGE − ZODI, VARIANCE, FLAGS, EPSF, WCS). Sin cubo, sin remuestreo, sin capturas.",
+ "thresholds": {
+  "significance": 5.0,
+  "min_season_detection": 10.0,
+  "min_refs": 3,
+  "min_snr_reference": 8.0,
+  "season_gap_days": 10.0
+ },
+ "gaia": {
+  "endpoint": "https://gea.esac.esa.int/tap-server/tap/sync",
+  "table": "gaiadr3.gaia_source",
+  "query": "SELECT TOP 501 source_id,ra,dec,ref_epoch,pmra,pmdec,parallax,radial_velocity,phot_g_mean_mag,ruwe,ra_error,dec_error,pmra_error,pmdec_error,parallax_error FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',269.4463642730,4.7689192520,0.1000000000)) ORDER BY phot_g_mean_mag ASC, source_id ASC",
+  "retrieved_utc": "2026-11-14T21:50:04.735032+00:00",
+  "sha256": "d192687b2f258b5097cc8a6368f223eb63ddae637818199a8c4791bb8234d475",
+  "truncated": true,
+  "catalogue_epoch": 2016.0
+ },
+ "detector": 1,
+ "images": [
+  {
+   "index": 0,
+   "obs_id": "2025W35_2A_0611_1",
+   "date_utc": "2025-08-31T14:58:32.025",
+   "mjd": 60918.623981768,
+   "lambda_um": 0.9252972080999959,
+   "n_refs": 33,
+   "psf_model": "EPSF oficial zona (15,9), 520 estrellas, λc 0.925 µm · epsf_1_20260507.fits",
+   "registration_mode": "33 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    0.06841438055308374,
+    -0.1707849991214754
+   ],
+   "registration_offset_arcsec": [
+    0.03156406608882249,
+    -0.16110024991182462
+   ],
+   "registration_err_arcsec": [
+    0.027380418514424267,
+    0.026994178581500907
+   ],
+   "file": "level2_2025W35_2A_0611_1D1_spx_l2b-v27-2026-231__13ab627fc0f9593e.fits",
+   "sha256": "aa4cfc3cc8168bc4ff1e974e7a8bd563d20a58170b1eb210ac542c79798e4b4d",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W35_2A/l2b-v27-2026-231/1/level2_2025W35_2A_0611_1D1_spx_l2b-v27-2026-231.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "usable": true,
+   "snr": 162.95256049795967,
+   "warnings": [],
+   "saturated_core": true
+  },
+  {
+   "index": 1,
+   "obs_id": "2025W35_2A_0611_2",
+   "date_utc": "2025-08-31T15:00:42.490",
+   "mjd": 60918.62549178,
+   "lambda_um": 0.9471293896952303,
+   "n_refs": 30,
+   "psf_model": "EPSF oficial zona (15,8), 486 estrellas, λc 0.944 µm · epsf_1_20260507.fits",
+   "registration_mode": "30 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    0.1213848286440698,
+    -0.08538311429438285
+   ],
+   "registration_offset_arcsec": [
+    0.0843216638566127,
+    -0.06490048873387579
+   ],
+   "registration_err_arcsec": [
+    0.028249853836233872,
+    0.028311733345363344
+   ],
+   "file": "level2_2025W35_2A_0611_2D1_spx_l2b-v27-2026-231__5a6420a2bfd94e4c.fits",
+   "sha256": "2ce7f5bb72c2e15ea7f879c6556a86ab2e3ad4b8fb86b06a8803c000a2d8b0e5",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W35_2A/l2b-v27-2026-231/1/level2_2025W35_2A_0611_2D1_spx_l2b-v27-2026-231.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "usable": true,
+   "snr": 168.59072559885334,
+   "warnings": [],
+   "saturated_core": true
+  },
+  {
+   "index": 2,
+   "obs_id": "2025W35_2A_0611_3",
+   "date_utc": "2025-08-31T15:02:51.421",
+   "mjd": 60918.626984036,
+   "lambda_um": 0.9697627161888378,
+   "n_refs": 32,
+   "psf_model": "EPSF oficial zona (15,7), 486 estrellas, λc 0.963 µm · epsf_1_20260507.fits",
+   "registration_mode": "32 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    0.038793723363203525,
+    -0.00951077108120666
+   ],
+   "registration_offset_arcsec": [
+    0.0020275507873266964,
+    0.01276000214242756
+   ],
+   "registration_err_arcsec": [
+    0.027380418514424267,
+    0.027412717937214354
+   ],
+   "file": "level2_2025W35_2A_0611_3D1_spx_l2b-v27-2026-231__157fd87b5e83831e.fits",
+   "sha256": "35aa7910a3fe2c05ea515bc66b1ff8e896b898dd41b2963ac1c5b4a12d9480cb",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W35_2A/l2b-v27-2026-231/1/level2_2025W35_2A_0611_3D1_spx_l2b-v27-2026-231.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "usable": true,
+   "snr": 172.8054476203071,
+   "warnings": [],
+   "saturated_core": true
+  },
+  {
+   "index": 3,
+   "obs_id": "2025W35_2A_0611_4",
+   "date_utc": "2025-08-31T15:05:00.353",
+   "mjd": 60918.628476305,
+   "lambda_um": 0.992914314996,
+   "n_refs": 28,
+   "psf_model": "EPSF oficial zona (15,5), 503 estrellas, λc 1.002 µm · epsf_1_20260507.fits",
+   "registration_mode": "28 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    0.08179360332093133,
+    -0.024149012928617857
+   ],
+   "registration_offset_arcsec": [
+    0.05078121724868881,
+    -0.01655355427850887
+   ],
+   "registration_err_arcsec": [
+    0.029724738070950923,
+    0.029305428160379603
+   ],
+   "file": "level2_2025W35_2A_0611_4D1_spx_l2b-v27-2026-231__dcefa391369382c3.fits",
+   "sha256": "201f98bc7fd523cdc444d356993e3ae7670879b42d3b6c031fffcbded9f5065a",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W35_2A/l2b-v27-2026-231/1/level2_2025W35_2A_0611_4D1_spx_l2b-v27-2026-231.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "usable": true,
+   "snr": 205.99894690382163,
+   "warnings": [],
+   "saturated_core": true
+  },
+  {
+   "index": 4,
+   "obs_id": "2026W11_1A_0539_1",
+   "date_utc": "2026-03-11T13:34:41.095",
+   "mjd": 61110.565753411,
+   "lambda_um": 0.9040833226571902,
+   "n_refs": 29,
+   "psf_model": "EPSF oficial zona (12,10), 515 estrellas, λc 0.905 µm · epsf_1_20260507.fits",
+   "registration_mode": "29 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    -0.04485207253766309,
+    0.058462781210832246
+   ],
+   "registration_offset_arcsec": [
+    -0.08375216035679826,
+    0.07416320640228605
+   ],
+   "registration_err_arcsec": [
+    0.02920774666657502,
+    0.028795729658602793
+   ],
+   "file": "level2_2026W11_1A_0539_1D1_spx_l2b-v27-2026-232__63f4c601194d08f9.fits",
+   "sha256": "36127bbd49941a253b17b8563c6c38765557f204799d236c93147c47d4a8c85d",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2026W11_1A/l2b-v27-2026-232/1/level2_2026W11_1A_0539_1D1_spx_l2b-v27-2026-232.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "usable": true,
+   "snr": 153.93194410413136,
+   "warnings": [],
+   "saturated_core": false
+  },
+  {
+   "index": 5,
+   "obs_id": "2026W11_1A_0539_2",
+   "date_utc": "2026-03-11T13:36:50.027",
+   "mjd": 61110.56724568,
+   "lambda_um": 0.9259332018224696,
+   "n_refs": 29,
+   "psf_model": "EPSF oficial zona (12,9), 487 estrellas, λc 0.923 µm · epsf_1_20260507.fits",
+   "registration_mode": "29 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    -0.06746039294123282,
+    0.027001593018095092
+   ],
+   "registration_offset_arcsec": [
+    -0.09442933524055402,
+    0.04523361141498632
+   ],
+   "registration_err_arcsec": [
+    0.02920774666657502,
+    0.028795729658602793
+   ],
+   "file": "level2_2026W11_1A_0539_2D1_spx_l2b-v27-2026-232__ab1c655bd329e6b7.fits",
+   "sha256": "bb9e96752e3521ccd535ba7fac5f18a6ad3d6198033927d2a55b9c146243dcf1",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2026W11_1A/l2b-v27-2026-232/1/level2_2026W11_1A_0539_2D1_spx_l2b-v27-2026-232.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "usable": true,
+   "snr": 204.38403636506396,
+   "warnings": [],
+   "saturated_core": true
+  },
+  {
+   "index": 6,
+   "obs_id": "2026W11_1A_0539_3",
+   "date_utc": "2026-03-11T13:38:58.958",
+   "mjd": 61110.568737937,
+   "lambda_um": 0.9478335402088068,
+   "n_refs": 30,
+   "psf_model": "EPSF oficial zona (12,8), 473 estrellas, λc 0.942 µm · epsf_1_20260507.fits",
+   "registration_mode": "30 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    -0.12319056793392592,
+    0.04716313631900593
+   ],
+   "registration_offset_arcsec": [
+    -0.15840663360001966,
+    0.06491841454253965
+   ],
+   "registration_err_arcsec": [
+    0.02871682520453001,
+    0.028311733345363344
+   ],
+   "file": "level2_2026W11_1A_0539_3D1_spx_l2b-v27-2026-232__b2ee7a51a00b7def.fits",
+   "sha256": "d2b443898bb131ed8ce792ab249ed59724dc55c6d5350ad0d9389d7fdf502e04",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2026W11_1A/l2b-v27-2026-232/1/level2_2026W11_1A_0539_3D1_spx_l2b-v27-2026-232.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "usable": true,
+   "snr": 182.02505365577227,
+   "warnings": [],
+   "saturated_core": true
+  },
+  {
+   "index": 7,
+   "obs_id": "2026W11_1A_0570_1",
+   "date_utc": "2026-03-11T16:50:47.567",
+   "mjd": 61110.70193943,
+   "lambda_um": 0.8834201256154497,
+   "n_refs": 28,
+   "psf_model": "EPSF oficial zona (12,11), 531 estrellas, λc 0.887 µm · epsf_1_20260507.fits",
+   "registration_mode": "28 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    -0.03071263839477779,
+    0.04535671604983854
+   ],
+   "registration_offset_arcsec": [
+    -0.05047711643006621,
+    0.06705835612675544
+   ],
+   "registration_err_arcsec": [
+    0.029724738070950923,
+    0.029305428160379603
+   ],
+   "file": "level2_2026W11_1A_0570_1D1_spx_l2b-v27-2026-232__0d37dbdb9daa1441.fits",
+   "sha256": "57ba47d881cf77ac25f3a041f17876df8a65dfbebdf440f3668b70e8f1393bdf",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2026W11_1A/l2b-v27-2026-232/1/level2_2026W11_1A_0570_1D1_spx_l2b-v27-2026-232.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "usable": true,
+   "snr": 145.8882092263387,
+   "warnings": [],
+   "saturated_core": false
+  },
+  {
+   "index": 8,
+   "obs_id": "2026W35_1A_0079_4",
+   "date_utc": "2026-08-24T08:52:13.498",
+   "mjd": 61276.369600668,
+   "lambda_um": 0.9142817085727001,
+   "n_refs": 28,
+   "psf_model": "EPSF oficial zona (14,10), 535 estrellas, λc 0.906 µm · epsf_1_20260507.fits",
+   "registration_mode": "28 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    0.06360747056589096,
+    -0.05244628748179247
+   ],
+   "registration_offset_arcsec": [
+    0.025671343805452093,
+    -0.035262577540883314
+   ],
+   "registration_err_arcsec": [
+    0.029724738070950923,
+    0.029305428160379603
+   ],
+   "file": "level2_2026W35_1A_0079_4D1_spx_l2b-v27-2026-243__d394d4c4a52489f9.fits",
+   "sha256": "97aa75b3ac0be053e96111fa1dfb555a57a75c5bbb71656d0dbffb4fabba2c2a",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W35_1A/l2b-v27-2026-243/1/level2_2026W35_1A_0079_4D1_spx_l2b-v27-2026-243.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_qr3",
+   "usable": true,
+   "snr": 173.74369767219656,
+   "warnings": [],
+   "saturated_core": true
+  },
+  {
+   "index": 9,
+   "obs_id": "2026W35_2A_0412_1",
+   "date_utc": "2026-08-29T15:50:04.034",
+   "mjd": 61281.659768909,
+   "lambda_um": 0.9359389112014946,
+   "n_refs": 31,
+   "psf_model": "EPSF oficial zona (14,8), 466 estrellas, λc 0.943 µm · epsf_1_20260507.fits",
+   "registration_mode": "31 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    0.11960774305354928,
+    0.047458644983474796
+   ],
+   "registration_offset_arcsec": [
+    0.09933797848570924,
+    0.07195933677884334
+   ],
+   "registration_err_arcsec": [
+    0.028249853836233872,
+    0.02785134927557299
+   ],
+   "file": "level2_2026W35_2A_0412_1D1_spx_l2b-v27-2026-246__a4af8ab152df8a87.fits",
+   "sha256": "65f3146f244efc92e7dc9f25758cff6c6a771295d34995ca1a30af092f8a879c",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W35_2A/l2b-v27-2026-246/1/level2_2026W35_2A_0412_1D1_spx_l2b-v27-2026-246.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_qr3",
+   "usable": true,
+   "snr": 190.23299032229136,
+   "warnings": [],
+   "saturated_core": true
+  },
+  {
+   "index": 10,
+   "obs_id": "2026W35_2A_0412_2",
+   "date_utc": "2026-08-29T15:52:12.966",
+   "mjd": 61281.661261178,
+   "lambda_um": 0.958161319283878,
+   "n_refs": 29,
+   "psf_model": "EPSF oficial zona (14,7), 530 estrellas, λc 0.962 µm · epsf_1_20260507.fits",
+   "registration_mode": "29 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    0.08084897142464051,
+    -0.07085307229595163
+   ],
+   "registration_offset_arcsec": [
+    0.045688944526366564,
+    -0.05596861191418463
+   ],
+   "registration_err_arcsec": [
+    0.02920774666657502,
+    0.028795729658602793
+   ],
+   "file": "level2_2026W35_2A_0412_2D1_spx_l2b-v27-2026-246__540b3182de1244da.fits",
+   "sha256": "a61d4151625ad80a90691d3d9f37dd57bd14b1784463c86a6c559a6dd86cebe5",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W35_2A/l2b-v27-2026-246/1/level2_2026W35_2A_0412_2D1_spx_l2b-v27-2026-246.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_qr3",
+   "usable": true,
+   "snr": 174.42485665940893,
+   "warnings": [],
+   "saturated_core": true
+  },
+  {
+   "index": 11,
+   "obs_id": "2026W35_2A_0412_3",
+   "date_utc": "2026-08-29T15:54:21.896",
+   "mjd": 61281.662753423,
+   "lambda_um": 0.9812567280403058,
+   "n_refs": 29,
+   "psf_model": "EPSF oficial zona (14,6), 497 estrellas, λc 0.981 µm · epsf_1_20260507.fits",
+   "registration_mode": "29 estrellas Gaia",
+   "wcs_offset_vs_gaia_arcsec": [
+    0.08327452902645507,
+    -0.02607433204123316
+   ],
+   "registration_offset_arcsec": [
+    0.04767248082845952,
+    -0.0023074450285611387
+   ],
+   "registration_err_arcsec": [
+    0.02871682520453001,
+    0.028795729658602793
+   ],
+   "file": "level2_2026W35_2A_0412_3D1_spx_l2b-v27-2026-246__194c3194b19a0364.fits",
+   "sha256": "f106fc7c12c0e0121125c8e01b3b02ac34c67672efb20dd106cbc6436d7c8ef3",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W35_2A/l2b-v27-2026-246/1/level2_2026W35_2A_0412_3D1_spx_l2b-v27-2026-246.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_qr3",
+   "usable": true,
+   "snr": 182.58559546163082,
+   "warnings": [],
+   "saturated_core": true
+  }
+ ],
+ "lambda_range_um": [
+  0.8834201256154497,
+  0.992914314996
+ ],
+ "registration": {
+  "method": "Gaia DR3 (movimiento propio aplicado; punto cero libre por estrella)",
+  "stars": 40,
+  "chi2_red": [
+   0.9070749875212478,
+   0.6228798574280368
+  ],
+  "rms_arcsec": [
+   0.15728852944453992,
+   0.15506974995326703
+  ],
+  "wcs_scatter_arcsec": [
+   0.0793963356226647,
+   0.08614631610073424
+  ]
+ },
+ "warnings": [],
+ "seasons": [
+  {
+   "dxi": 6.752984377420309,
+   "deta": 8.97240174064673,
+   "xi": 6.752984377420309,
+   "eta": 8.97240174064673,
+   "cov": [
+    [
+     0.38418566854151015,
+     7.131831842109723e-05
+    ],
+    [
+     7.131831842109721e-05,
+     0.5772800709046818
+    ]
+   ],
+   "err_xi": 0.6198271279490033,
+   "err_eta": 0.7597894911781038,
+   "err_fit": [
+    0.20175791217256026,
+    0.2475387108049422
+   ],
+   "err_registration": [
+    0.01455771669949215,
+    0.014440681892091757
+   ],
+   "significance": 356.75433926376735,
+   "chi2_red_local": 899.632866833074,
+   "internal_chi2_red": 9.389118663449578,
+   "n_single_fits": 4,
+   "mjd": 60918.62652196319,
+   "n_images": 4,
+   "images": [
+    {
+     "k": 0,
+     "snr": 162.95256049795967,
+     "saturated_core": true,
+     "x": 59.03329718146565,
+     "y": 57.014327484827774
+    },
+    {
+     "k": 1,
+     "snr": 168.59072559885334,
+     "saturated_core": true,
+     "x": 58.70817502855641,
+     "y": 57.82455701868536
+    },
+    {
+     "k": 2,
+     "snr": 172.8054476203071,
+     "saturated_core": true,
+     "x": 58.90447438407464,
+     "y": 57.56323472352846
+    },
+    {
+     "k": 3,
+     "snr": 205.99894690382163,
+     "saturated_core": true,
+     "x": 58.862176675747016,
+     "y": 57.26578371517219
+    }
+   ],
+   "confusion": true,
+   "saturated_core": true,
+   "date_utc": "2025-08-31",
+   "obs_ids": [
+    "2025W35_2A_0611_1",
+    "2025W35_2A_0611_2",
+    "2025W35_2A_0611_3",
+    "2025W35_2A_0611_4"
+   ],
+   "usable": true
+  },
+  {
+   "dxi": 10.190435566104801,
+   "deta": 13.152137222282173,
+   "xi": 10.190435566104801,
+   "eta": 13.152137222282173,
+   "cov": [
+    [
+     0.022815840369660847,
+     0.010927651551107363
+    ],
+    [
+     0.010927651551107363,
+     0.051409395355336944
+    ]
+   ],
+   "err_xi": 0.1510491323035682,
+   "err_eta": 0.2267364005962363,
+   "err_fit": [
+    0.15029338057228714,
+    0.22624772951588298
+   ],
+   "err_registration": [
+    0.015091061122880358,
+    0.01487818013887447
+   ],
+   "significance": 346.24322013031235,
+   "chi2_red_local": 488.0547709879859,
+   "internal_chi2_red": null,
+   "n_single_fits": 1,
+   "mjd": 61110.59127567387,
+   "n_images": 4,
+   "images": [
+    {
+     "k": 4,
+     "snr": 153.93194410413136,
+     "saturated_core": false,
+     "x": 56.927631095197036,
+     "y": 59.15818988353322
+    },
+    {
+     "k": 5,
+     "snr": 204.38403636506396,
+     "saturated_core": true,
+     "x": 56.11636556670351,
+     "y": 59.1323665199129
+    },
+    {
+     "k": 6,
+     "snr": 182.02505365577227,
+     "saturated_core": true,
+     "x": 56.291584508700915,
+     "y": 59.031836147421906
+    },
+    {
+     "k": 7,
+     "snr": 145.8882092263387,
+     "saturated_core": false,
+     "x": 56.76999207690508,
+     "y": 59.108981902790134
+    }
+   ],
+   "confusion": true,
+   "saturated_core": true,
+   "date_utc": "2026-03-11",
+   "obs_ids": [
+    "2026W11_1A_0539_1",
+    "2026W11_1A_0539_2",
+    "2026W11_1A_0539_3",
+    "2026W11_1A_0570_1"
+   ],
+   "usable": true
+  },
+  {
+   "dxi": -7.19588679598196,
+   "deta": 14.84487595560836,
+   "xi": -7.19588679598196,
+   "eta": 14.84487595560836,
+   "cov": [
+    [
+     0.18459808736770156,
+     0.07723583511492438
+    ],
+    [
+     0.07723583511492438,
+     0.2479819235023524
+    ]
+   ],
+   "err_xi": 0.4296487953755969,
+   "err_eta": 0.49797783434843,
+   "err_fit": [
+    0.4294043432491071,
+    0.49777102681073376
+   ],
+   "err_registration": [
+    0.014491285881679571,
+    0.014350204533043252
+   ],
+   "significance": 360.7450531587402,
+   "chi2_red_local": 1746.7802893186793,
+   "internal_chi2_red": null,
+   "n_single_fits": 1,
+   "mjd": 61280.433762891196,
+   "n_images": 4,
+   "images": [
+    {
+     "k": 8,
+     "snr": 173.74369767219656,
+     "saturated_core": true,
+     "x": 56.966162617442905,
+     "y": 55.97373675103353
+    },
+    {
+     "k": 9,
+     "snr": 190.23299032229136,
+     "saturated_core": true,
+     "x": 56.971171101754585,
+     "y": 56.25175745923685
+    },
+    {
+     "k": 10,
+     "snr": 174.42485665940893,
+     "saturated_core": true,
+     "x": 56.26484185538075,
+     "y": 55.993388802308004
+    },
+    {
+     "k": 11,
+     "snr": 182.58559546163082,
+     "saturated_core": true,
+     "x": 56.60910474183597,
+     "y": 56.722503438074426
+    }
+   ],
+   "confusion": true,
+   "saturated_core": true,
+   "date_utc": "2026-08-24",
+   "obs_ids": [
+    "2026W35_1A_0079_4",
+    "2026W35_2A_0412_1",
+    "2026W35_2A_0412_2",
+    "2026W35_2A_0412_3"
+   ],
+   "usable": true
+  }
+ ],
+ "control": {
+  "n": 40,
+  "stars": [
+   {
+    "gaia_source_id": "4472831340657080448",
+    "g": 17.344086,
+    "dxi": 0.05927934553111669,
+    "deta": 0.06010922469281772,
+    "err_dxi": 0.29392332728732234,
+    "err_deta": 0.304564663762867,
+    "significance": 0.2800193767386497,
+    "delta_t_days": 361.5851650821496,
+    "significance_calibrated": 0.2800193767386497
+   },
+   {
+    "gaia_source_id": "4472831825992700288",
+    "g": 15.024134,
+    "dxi": -0.118142585454775,
+    "deta": -0.1571898561416797,
+    "err_dxi": 0.14590509079728467,
+    "err_deta": 0.1286994138943794,
+    "significance": 1.4797330240217925,
+    "delta_t_days": 361.7201417366741,
+    "significance_calibrated": 1.4797330240217925
+   },
+   {
+    "gaia_source_id": "4472831894712172544",
+    "g": 15.567743,
+    "dxi": -0.08526982284245768,
+    "deta": 0.02901238286108586,
+    "err_dxi": 0.11848138290291912,
+    "err_deta": 0.09546906357785853,
+    "significance": 0.762562201368764,
+    "delta_t_days": 361.726151967232,
+    "significance_calibrated": 0.762562201368764
+   },
+   {
+    "gaia_source_id": "4472831929071913856",
+    "g": 13.897241,
+    "dxi": -0.002284476961864429,
+    "deta": -0.16459229623460114,
+    "err_dxi": 0.0812131666407734,
+    "err_deta": 0.06813669877336538,
+    "significance": 2.415623304601959,
+    "delta_t_days": 361.6971904901002,
+    "significance_calibrated": 2.415623304601959
+   },
+   {
+    "gaia_source_id": "4472832066510880000",
+    "g": 15.830342,
+    "dxi": -0.09035791344188013,
+    "deta": -0.1863200196602195,
+    "err_dxi": 0.3781953968865582,
+    "err_deta": 0.36498449723784576,
+    "significance": 0.6053044873504171,
+    "delta_t_days": 361.554957339431,
+    "significance_calibrated": 0.6053044873504171
+   },
+   {
+    "gaia_source_id": "4472832135230352256",
+    "g": 16.229185,
+    "dxi": 0.01178990622183454,
+    "deta": 0.0600591581060259,
+    "err_dxi": 0.21920271074674705,
+    "err_deta": 0.2076095962221928,
+    "significance": 0.2924888549500992,
+    "delta_t_days": 361.6263002074338,
+    "significance_calibrated": 0.2924888549500992
+   },
+   {
+    "gaia_source_id": "4472832165289152896",
+    "g": 13.585307,
+    "dxi": 0.02540631803592451,
+    "deta": -0.052417794925629604,
+    "err_dxi": 0.05132110524704641,
+    "err_deta": 0.04983465129031764,
+    "significance": 1.158786033340016,
+    "delta_t_days": 361.7827251185954,
+    "significance_calibrated": 1.158786033340016
+   },
+   {
+    "gaia_source_id": "4472832165289153024",
+    "g": 11.451174,
+    "dxi": 0.045756575416540796,
+    "deta": 0.013411384155739501,
+    "err_dxi": 0.06430864070838194,
+    "err_deta": 0.05961995605025328,
+    "significance": 0.7490425920093265,
+    "delta_t_days": 361.74454860627156,
+    "significance_calibrated": 0.7490425920093265
+   },
+   {
+    "gaia_source_id": "4472832203949832448",
+    "g": 15.680504,
+    "dxi": 0.15937632002014246,
+    "deta": -0.19712320099171604,
+    "err_dxi": 0.22052341628425487,
+    "err_deta": 0.2244141461465781,
+    "significance": 1.1195183974777407,
+    "delta_t_days": 361.2794946931026,
+    "significance_calibrated": 1.1195183974777407
+   },
+   {
+    "gaia_source_id": "4472832272669313024",
+    "g": 15.56469,
+    "dxi": -0.07140062438188961,
+    "deta": -0.12904945127384698,
+    "err_dxi": 0.13696216585311635,
+    "err_deta": 0.11236553612086252,
+    "significance": 1.2278786974175782,
+    "delta_t_days": 361.71552698248706,
+    "significance_calibrated": 1.2278786974175782
+   },
+   {
+    "gaia_source_id": "4472832341386001664",
+    "g": 17.636381,
+    "dxi": -0.01108500817284401,
+    "deta": -0.2407411701551736,
+    "err_dxi": 0.2970529189247382,
+    "err_deta": 0.2386706565432073,
+    "significance": 1.0094345363954038,
+    "delta_t_days": 361.98578602279304,
+    "significance_calibrated": 1.0094345363954038
+   },
+   {
+    "gaia_source_id": "4472832375748531584",
+    "g": 13.945418,
+    "dxi": -0.043137493730890666,
+    "deta": -0.0018930015519163339,
+    "err_dxi": 0.15529877684207508,
+    "err_deta": 0.12916994664712042,
+    "significance": 0.2781858948873052,
+    "delta_t_days": 361.74751224657666,
+    "significance_calibrated": 0.2781858948873052
+   },
+   {
+    "gaia_source_id": "4472832410108266368",
+    "g": 15.306466,
+    "dxi": 0.003118873063709976,
+    "deta": -0.06407737011588344,
+    "err_dxi": 0.09395189119688269,
+    "err_deta": 0.0746592302046437,
+    "significance": 0.8591698117071183,
+    "delta_t_days": 361.71454097682,
+    "significance_calibrated": 0.8591698117071183
+   },
+   {
+    "gaia_source_id": "4472832508888391168",
+    "g": 13.028434,
+    "dxi": -0.06464133934253785,
+    "deta": 0.04796497333792214,
+    "err_dxi": 0.06545621302820585,
+    "err_deta": 0.06362171229946872,
+    "significance": 1.2311266576304785,
+    "delta_t_days": 361.6866526265658,
+    "significance_calibrated": 1.2311266576304785
+   },
+   {
+    "gaia_source_id": "4472832513187484544",
+    "g": 14.487946,
+    "dxi": -0.03743710060012456,
+    "deta": -0.010102905178097199,
+    "err_dxi": 0.1083218830044163,
+    "err_deta": 0.099948853766951,
+    "significance": 0.35922102983112686,
+    "delta_t_days": 361.7459628253855,
+    "significance_calibrated": 0.35922102983112686
+   },
+   {
+    "gaia_source_id": "4472832581906946944",
+    "g": 15.2107725,
+    "dxi": 0.027322145270269958,
+    "deta": -0.18936125718817365,
+    "err_dxi": 0.17692871419709477,
+    "err_deta": 0.17266005852352226,
+    "significance": 1.102370930630517,
+    "delta_t_days": 361.7580979088234,
+    "significance_calibrated": 1.102370930630517
+   },
+   {
+    "gaia_source_id": "4472832680687096576",
+    "g": 16.205532,
+    "dxi": -0.06301021780943133,
+    "deta": -0.1295542178457919,
+    "err_dxi": 0.25719968290361683,
+    "err_deta": 0.23840785202340384,
+    "significance": 0.6075671898265134,
+    "delta_t_days": 361.8026176310377,
+    "significance_calibrated": 0.6075671898265134
+   },
+   {
+    "gaia_source_id": "4472832788065380224",
+    "g": 14.175624,
+    "dxi": -0.041864359732610976,
+    "deta": -0.10634813615118577,
+    "err_dxi": 0.11353330845623819,
+    "err_deta": 0.0942292661517694,
+    "significance": 1.1774424290026129,
+    "delta_t_days": 361.7186369435731,
+    "significance_calibrated": 1.1774424290026129
+   },
+   {
+    "gaia_source_id": "4472832822422325632",
+    "g": 15.559026,
+    "dxi": -0.06032694336516972,
+    "deta": -0.13230376285738957,
+    "err_dxi": 0.15706125836680943,
+    "err_deta": 0.14511071665007008,
+    "significance": 0.9864076425390097,
+    "delta_t_days": 361.72818807338626,
+    "significance_calibrated": 0.9864076425390097
+   },
+   {
+    "gaia_source_id": "4472832959864074752",
+    "g": 14.785453,
+    "dxi": -0.09568294912089212,
+    "deta": -0.056763508854117316,
+    "err_dxi": 0.14196123439536376,
+    "err_deta": 0.14344821103055783,
+    "significance": 0.784746315413643,
+    "delta_t_days": 361.7356946228392,
+    "significance_calibrated": 0.784746315413643
+   },
+   {
+    "gaia_source_id": "4472834226875454592",
+    "g": 15.387098,
+    "dxi": 0.004767234784110674,
+    "deta": -0.12390637831244486,
+    "err_dxi": 0.09538761361473337,
+    "err_deta": 0.08845370064933888,
+    "significance": 1.401612209885759,
+    "delta_t_days": 361.7212036114797,
+    "significance_calibrated": 1.401612209885759
+   },
+   {
+    "gaia_source_id": "4472834261235193856",
+    "g": 16.69535,
+    "dxi": 0.1832321417448188,
+    "deta": -0.20290559279015122,
+    "err_dxi": 0.2030450697501113,
+    "err_deta": 0.17292961384453778,
+    "significance": 1.4389480471355574,
+    "delta_t_days": 361.7446727776696,
+    "significance_calibrated": 1.4389480471355574
+   },
+   {
+    "gaia_source_id": "4472834402972715136",
+    "g": 14.164164,
+    "dxi": -0.03294462034140726,
+    "deta": -0.14632300864693104,
+    "err_dxi": 0.12050365902527471,
+    "err_deta": 0.11001563807290196,
+    "significance": 1.3641260455259385,
+    "delta_t_days": 361.6782693408095,
+    "significance_calibrated": 1.3641260455259385
+   },
+   {
+    "gaia_source_id": "4472834467393681024",
+    "g": 15.972957,
+    "dxi": -0.0630051259322589,
+    "deta": -0.20274552915188213,
+    "err_dxi": 0.2591716105071855,
+    "err_deta": 0.23641372018378634,
+    "significance": 0.8904756088268111,
+    "delta_t_days": 361.7341054678909,
+    "significance_calibrated": 0.8904756088268111
+   },
+   {
+    "gaia_source_id": "4472834677850637184",
+    "g": 14.411834,
+    "dxi": 0.05863345425001741,
+    "deta": -0.05165747543313568,
+    "err_dxi": 0.15585017803073176,
+    "err_deta": 0.13241733012922546,
+    "significance": 0.5384398300252902,
+    "delta_t_days": 361.6880287921231,
+    "significance_calibrated": 0.5384398300252902
+   },
+   {
+    "gaia_source_id": "4472835330686037760",
+    "g": 16.069403,
+    "dxi": -0.032079759278243525,
+    "deta": -0.08086950635129385,
+    "err_dxi": 0.17064805587138893,
+    "err_deta": 0.17766925505096007,
+    "significance": 0.4914233422489486,
+    "delta_t_days": 361.7130438967579,
+    "significance_calibrated": 0.4914233422489486
+   },
+   {
+    "gaia_source_id": "4472835399405517696",
+    "g": 16.859377,
+    "dxi": 0.4577538773521403,
+    "deta": 0.09835649241206368,
+    "err_dxi": 0.3212060890527519,
+    "err_deta": 0.28944379703509104,
+    "significance": 1.4725754797770918,
+    "delta_t_days": 361.4179238005963,
+    "significance_calibrated": 1.4725754797770918
+   },
+   {
+    "gaia_source_id": "4472835777362783616",
+    "g": 15.210423,
+    "dxi": -0.00779557331998762,
+    "deta": -0.05985645267004874,
+    "err_dxi": 0.23638413712274575,
+    "err_deta": 0.21212961944851472,
+    "significance": 0.28464670379496193,
+    "delta_t_days": 361.6881859107234,
+    "significance_calibrated": 0.28464670379496193
+   },
+   {
+    "gaia_source_id": "4472836327118455552",
+    "g": 13.4505,
+    "dxi": -0.05632625291105557,
+    "deta": -0.07798661871354537,
+    "err_dxi": 0.06765569099505431,
+    "err_deta": 0.06436511522992511,
+    "significance": 1.4816870524523942,
+    "delta_t_days": 361.7873367734719,
+    "significance_calibrated": 1.4816870524523942
+   },
+   {
+    "gaia_source_id": "4472836601996372992",
+    "g": 13.441708,
+    "dxi": 0.056442935498020784,
+    "deta": -0.008561223273057188,
+    "err_dxi": 0.13760088213787253,
+    "err_deta": 0.11543624227451459,
+    "significance": 0.41357516726775645,
+    "delta_t_days": 361.75310978425114,
+    "significance_calibrated": 0.41357516726775645
+   },
+   {
+    "gaia_source_id": "4472837010014436608",
+    "g": 16.798973,
+    "dxi": -0.18021294402812682,
+    "deta": 0.8089592405374177,
+    "err_dxi": 1.2225501698571657,
+    "err_deta": 1.622396092844945,
+    "significance": 0.5030540589563713,
+    "delta_t_days": 362.8865349565749,
+    "significance_calibrated": 0.5030540589563713
+   },
+   {
+    "gaia_source_id": "4472837083032703744",
+    "g": 15.472873,
+    "dxi": 0.05889303743831705,
+    "deta": 0.058808097894897826,
+    "err_dxi": 0.13597884735881988,
+    "err_deta": 0.1199527688449349,
+    "significance": 0.654719781996576,
+    "delta_t_days": 361.8143609576655,
+    "significance_calibrated": 0.654719781996576
+   },
+   {
+    "gaia_source_id": "4472837495349546240",
+    "g": 13.467515,
+    "dxi": -0.0674763946916443,
+    "deta": 0.03438183875862139,
+    "err_dxi": 0.051146945449905605,
+    "err_deta": 0.04550247079407444,
+    "significance": 1.5292013421355046,
+    "delta_t_days": 361.7524319635122,
+    "significance_calibrated": 1.5292013421355046
+   },
+   {
+    "gaia_source_id": "4472837632788148224",
+    "g": 15.433734,
+    "dxi": -0.008682665571779928,
+    "deta": 0.058636057442025685,
+    "err_dxi": 0.17776920037813498,
+    "err_deta": 0.1603329279215417,
+    "significance": 0.36913490276186706,
+    "delta_t_days": 361.68385238357587,
+    "significance_calibrated": 0.36913490276186706
+   },
+   {
+    "gaia_source_id": "4472837838946944000",
+    "g": 15.046462,
+    "dxi": -0.0663445504225636,
+    "deta": -0.08928018132149951,
+    "err_dxi": 0.21118092705642388,
+    "err_deta": 0.20488322203732282,
+    "significance": 0.5408093867342924,
+    "delta_t_days": 361.65858928798843,
+    "significance_calibrated": 0.5408093867342924
+   },
+   {
+    "gaia_source_id": "4472837942025804800",
+    "g": 11.821142,
+    "dxi": -0.0878870507215714,
+    "deta": -0.0657732837529856,
+    "err_dxi": 0.07220624506582803,
+    "err_deta": 0.06224621360420815,
+    "significance": 1.6284168818430251,
+    "delta_t_days": 361.73217901118915,
+    "significance_calibrated": 1.6284168818430251
+   },
+   {
+    "gaia_source_id": "4472838113826722688",
+    "g": 16.77147,
+    "dxi": -0.2876368877354235,
+    "deta": 0.10400838280399233,
+    "err_dxi": 0.19121367945462195,
+    "err_deta": 0.17975615263617004,
+    "significance": 1.5814748363628532,
+    "delta_t_days": 361.73136525486916,
+    "significance_calibrated": 1.5814748363628532
+   },
+   {
+    "gaia_source_id": "4472838728001567360",
+    "g": 16.426283,
+    "dxi": -0.19549381994609555,
+    "deta": 0.04815394054577493,
+    "err_dxi": 0.23209765314943615,
+    "err_deta": 0.20005272357199322,
+    "significance": 0.860108083769516,
+    "delta_t_days": 361.91493150505994,
+    "significance_calibrated": 0.860108083769516
+   },
+   {
+    "gaia_source_id": "4472838801019621760",
+    "g": 15.978101,
+    "dxi": 0.04619100606070041,
+    "deta": -0.1585200923994627,
+    "err_dxi": 0.22784376746685675,
+    "err_deta": 0.19866855602493225,
+    "significance": 0.8156412668713182,
+    "delta_t_days": 361.7555528104349,
+    "significance_calibrated": 0.8156412668713182
+   },
+   {
+    "gaia_source_id": "4472838904098844288",
+    "g": 15.405831,
+    "dxi": 0.1148828767127176,
+    "deta": 0.024073308636646945,
+    "err_dxi": 0.1279438472069397,
+    "err_deta": 0.11435820293931011,
+    "significance": 0.9225866778409867,
+    "delta_t_days": 361.4647479162886,
+    "significance_calibrated": 0.9225866778409867
+   }
+  ],
+  "calibration_factor": 1.0,
+  "max_significance_calibrated": 2.415623304601959,
+  "n_above_threshold": 0,
+  "median_offset_arcsec": 0.11277246637303007,
+  "rule": "Cada estrella de referencia se registra sin sí misma (leave-one-out) y se mide con el mismo ajuste conjunto por temporada que el objetivo. Debe seguir su trayectoria Gaia (desplazamiento residual nulo). El factor de calibración ≥ 1 lleva la mediana de sus χ² (2 g.l.) a 1.386."
+ },
+ "displacement": {
+  "dxi": -13.948871173402269,
+  "deta": 5.872474214961631,
+  "err_dxi": 0.754177536067743,
+  "err_deta": 0.9084393179552689,
+  "cov": [
+   [
+    0.5687837559092117,
+    0.07730715343334547
+   ],
+   [
+    0.07730715343334547,
+    0.8252619944070342
+   ]
+  ],
+  "significance": 20.399772603786225,
+  "delta_t_days": 361.80724092800665,
+  "first": "2025-08-31",
+  "last": "2026-08-24",
+  "err_dxi_calibrated": 0.754177536067743,
+  "err_deta_calibrated": 0.9084393179552689,
+  "significance_calibrated": 20.399772603786225,
+  "total_arcsec": 15.134627858575248,
+  "total_err_arcsec": 0.7793575262244042,
+  "rate_arcsec_yr": 15.278640668345746
+ },
+ "catalogue_comparison": {
+  "source": "SIMBAD (simbad.harvard.edu, 2026-11-14); refs: 2020yCat.1350....0G",
+  "name": "NAME Barnard's star",
+  "predicted_dxi": -0.7858290338866734,
+  "predicted_deta": 10.31187912124463,
+  "predicted_total_arcsec": 10.341778293971505,
+  "difference_sigma": 18.12473875668007,
+  "consistent_3sigma": false,
+  "note": "Predicción calculada con la astrometría del catálogo (incluye paralaje si existe). Solo se compara al final; no interviene en la búsqueda, el ajuste ni la decisión."
+ },
+ "created_utc": "2026-11-14T21:55:10.298685+00:00",
+ "object": "Barnard's star",
+ "astrometry": {
+  "name": "NAME Barnard's star",
+  "ra_deg": 269.4520769586187,
+  "dec_deg": 4.693364966576667,
+  "epoch_jyear": 2000.0,
+  "pmra_masyr": -801.551,
+  "pmdec_masyr": 10362.394,
+  "parallax_mas": 546.9759,
+  "rv_kms": -110.11,
+  "source": "SIMBAD (simbad.harvard.edu, 2026-11-14); refs: 2020yCat.1350....0G"
+ },
+ "astrometry_warnings": [],
+ "selection": {
+  "candidates": 57,
+  "seasons_available": 4,
+  "season_dates": [
+   [
+    "2025-08-27",
+    "2025-09-05",
+    18
+   ],
+   [
+    "2025-09-30",
+    "2025-10-01",
+    5
+   ],
+   [
+    "2026-03-11",
+    "2026-03-11",
+    17
+   ],
+   [
+    "2026-08-23",
+    "2026-09-02",
+    17
+   ]
+  ],
+  "field_deg": 0.2,
+  "detector": 1,
+  "rule": "Mismo detector D1; temporadas separadas > 10 d; primera, intermedia(s) y última (máx. 3); hasta 4 imágenes por temporada, las más alejadas del borde del detector."
+ },
+ "cutout_centre": {
+  "ra": 269.4463642729742,
+  "dec": 4.768919252034399
+ },
+ "control_mode": false,
+ "files": [
+  {
+   "file": "level2_2025W35_2A_0611_1D1_spx_l2b-v27-2026-231__13ab627fc0f9593e.fits",
+   "sha256": "aa4cfc3cc8168bc4ff1e974e7a8bd563d20a58170b1eb210ac542c79798e4b4d",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W35_2A/l2b-v27-2026-231/1/level2_2025W35_2A_0611_1D1_spx_l2b-v27-2026-231.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "obs_id": "2025W35_2A_0611_1"
+  },
+  {
+   "file": "level2_2025W35_2A_0611_2D1_spx_l2b-v27-2026-231__5a6420a2bfd94e4c.fits",
+   "sha256": "2ce7f5bb72c2e15ea7f879c6556a86ab2e3ad4b8fb86b06a8803c000a2d8b0e5",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W35_2A/l2b-v27-2026-231/1/level2_2025W35_2A_0611_2D1_spx_l2b-v27-2026-231.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "obs_id": "2025W35_2A_0611_2"
+  },
+  {
+   "file": "level2_2025W35_2A_0611_3D1_spx_l2b-v27-2026-231__157fd87b5e83831e.fits",
+   "sha256": "35aa7910a3fe2c05ea515bc66b1ff8e896b898dd41b2963ac1c5b4a12d9480cb",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W35_2A/l2b-v27-2026-231/1/level2_2025W35_2A_0611_3D1_spx_l2b-v27-2026-231.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "obs_id": "2025W35_2A_0611_3"
+  },
+  {
+   "file": "level2_2025W35_2A_0611_4D1_spx_l2b-v27-2026-231__dcefa391369382c3.fits",
+   "sha256": "201f98bc7fd523cdc444d356993e3ae7670879b42d3b6c031fffcbded9f5065a",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W35_2A/l2b-v27-2026-231/1/level2_2025W35_2A_0611_4D1_spx_l2b-v27-2026-231.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "obs_id": "2025W35_2A_0611_4"
+  },
+  {
+   "file": "level2_2026W11_1A_0539_1D1_spx_l2b-v27-2026-232__63f4c601194d08f9.fits",
+   "sha256": "36127bbd49941a253b17b8563c6c38765557f204799d236c93147c47d4a8c85d",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2026W11_1A/l2b-v27-2026-232/1/level2_2026W11_1A_0539_1D1_spx_l2b-v27-2026-232.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "obs_id": "2026W11_1A_0539_1"
+  },
+  {
+   "file": "level2_2026W11_1A_0539_2D1_spx_l2b-v27-2026-232__ab1c655bd329e6b7.fits",
+   "sha256": "bb9e96752e3521ccd535ba7fac5f18a6ad3d6198033927d2a55b9c146243dcf1",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2026W11_1A/l2b-v27-2026-232/1/level2_2026W11_1A_0539_2D1_spx_l2b-v27-2026-232.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "obs_id": "2026W11_1A_0539_2"
+  },
+  {
+   "file": "level2_2026W11_1A_0539_3D1_spx_l2b-v27-2026-232__b2ee7a51a00b7def.fits",
+   "sha256": "d2b443898bb131ed8ce792ab249ed59724dc55c6d5350ad0d9389d7fdf502e04",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2026W11_1A/l2b-v27-2026-232/1/level2_2026W11_1A_0539_3D1_spx_l2b-v27-2026-232.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "obs_id": "2026W11_1A_0539_3"
+  },
+  {
+   "file": "level2_2026W11_1A_0570_1D1_spx_l2b-v27-2026-232__0d37dbdb9daa1441.fits",
+   "sha256": "57ba47d881cf77ac25f3a041f17876df8a65dfbebdf440f3668b70e8f1393bdf",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2026W11_1A/l2b-v27-2026-232/1/level2_2026W11_1A_0570_1D1_spx_l2b-v27-2026-232.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_dr1",
+   "obs_id": "2026W11_1A_0570_1"
+  },
+  {
+   "file": "level2_2026W35_1A_0079_4D1_spx_l2b-v27-2026-243__d394d4c4a52489f9.fits",
+   "sha256": "97aa75b3ac0be053e96111fa1dfb555a57a75c5bbb71656d0dbffb4fabba2c2a",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W35_1A/l2b-v27-2026-243/1/level2_2026W35_1A_0079_4D1_spx_l2b-v27-2026-243.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_qr3",
+   "obs_id": "2026W35_1A_0079_4"
+  },
+  {
+   "file": "level2_2026W35_2A_0412_1D1_spx_l2b-v27-2026-246__a4af8ab152df8a87.fits",
+   "sha256": "65f3146f244efc92e7dc9f25758cff6c6a771295d34995ca1a30af092f8a879c",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W35_2A/l2b-v27-2026-246/1/level2_2026W35_2A_0412_1D1_spx_l2b-v27-2026-246.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_qr3",
+   "obs_id": "2026W35_2A_0412_1"
+  },
+  {
+   "file": "level2_2026W35_2A_0412_2D1_spx_l2b-v27-2026-246__540b3182de1244da.fits",
+   "sha256": "a61d4151625ad80a90691d3d9f37dd57bd14b1784463c86a6c559a6dd86cebe5",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W35_2A/l2b-v27-2026-246/1/level2_2026W35_2A_0412_2D1_spx_l2b-v27-2026-246.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_qr3",
+   "obs_id": "2026W35_2A_0412_2"
+  },
+  {
+   "file": "level2_2026W35_2A_0412_3D1_spx_l2b-v27-2026-246__194c3194b19a0364.fits",
+   "sha256": "f106fc7c12c0e0121125c8e01b3b02ac34c67672efb20dd106cbc6436d7c8ef3",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W35_2A/l2b-v27-2026-246/1/level2_2026W35_2A_0412_3D1_spx_l2b-v27-2026-246.fits?center=269.4463643,4.7689193&size=0.20000",
+   "collection": "spherex_qr3",
+   "obs_id": "2026W35_2A_0412_3"
+  }
+ ]
+}

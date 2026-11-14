@@ -797,7 +797,7 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
     warns = [f"Excluidas por astrometría fina no válida (FINAST ≠ 0): {', '.join(bad)}."] if bad else []
     if len(seasons([i["mjd"] for i in infos])) < 2:
         return Investigation(INSUFFICIENT_DATA, ["Las imágenes válidas no abarcan dos temporadas (separación > "
-                                                 f"{SEASON_GAP_DAYS:g} días)."] + warns, {**base, "images": infos})
+                                                 f"{SEASON_GAP_DAYS:g} días)."], {**base, "images": infos, "warnings": warns})
     refs = _gaia_references(gaia, ra0, dec0, (ra0, dec0))
     meas = [measure_image(f.image, i, (ra0, dec0), ra0, dec0, refs, search_radius_arcsec)
             for f, i in zip(frames, infos)]
@@ -829,6 +829,13 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
     unregistered = [rows[k]["obs_id"] for k in range(len(rows)) if k not in {e.k for e in ents}]
     if unregistered:
         warns.append(f"Sin registro posible (ni estrellas ni error empírico del WCS): {', '.join(unregistered)}.")
+    if not ents:
+        why = ("Gaia DR3 no disponible: sin estrellas estacionarias no se pueden registrar las imágenes ni controlar "
+               "falsos positivos." if not gaia else
+               f"Ninguna imagen tiene estrellas Gaia estacionarias medibles ({len(refs)} candidatas aisladas con "
+               f"G ≤ {REF_MAX_G:g} y movimiento propio): no se puede registrar ni estimar el error del WCS. Un campo "
+               "mayor suele contener más estrellas de referencia.")
+        return Investigation(INSUFFICIENT_EVIDENCE, [why], result)
     groups = seasons([e.mjd for e in ents])
     xs, ys = _tangent(ra0, dec0, ra0, dec0)
     fits_ = []
@@ -850,11 +857,11 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
     if not good:
         reason = ("La fuente no se detecta con significación ≥ "
                   f"{MIN_SEASON_SNR:g}σ en ninguna temporada (ajuste conjunto de sus exposiciones).")
-        return Investigation(INSUFFICIENT_DATA if not fits_ else INSUFFICIENT_EVIDENCE, [reason] + warns, result)
+        return Investigation(INSUFFICIENT_DATA if not fits_ else INSUFFICIENT_EVIDENCE, [reason], result)
     if len(good) < 2:
         weak = [f"{s['date_utc']} ({s['significance']:.1f}σ)" for s in fits_ if s not in good]
         return Investigation(INSUFFICIENT_EVIDENCE, [f"Solo una temporada con detección ≥ {MIN_SEASON_SNR:g}σ; "
-                                                     f"débil o ausente en: {', '.join(weak) or '—'}."] + warns, result)
+                                                     f"débil o ausente en: {', '.join(weak) or '—'}."], result)
     a, b = good[0], good[-1]
     disp = _season_disp(a, b)
     control = _control(frames, meas, reg, refs, ra0, dec0, (a["mjd"], b["mjd"]))
@@ -897,7 +904,7 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
                            f"{disp['delta_t_days']:.0f} d: {sig:.1f}σ, por debajo de {SIGNIFICANCE:g}σ.")
         elif sig <= worst:
             reasons.append(f"{sig:.1f}σ no supera el máximo alcanzado por una estrella de control ({worst:.1f}σ).")
-    return Investigation(outcome, reasons + warns, result)
+    return Investigation(outcome, reasons, result)
 
 
 def _f(v):

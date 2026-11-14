@@ -14,7 +14,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from astropy.time import Time
 
-from skyclues import archive, config, player, render, spectrum_page, reference_page, release_ui
+from skyclues import archive, config, motion_page, player, render, spectrum_page, reference_page, release_ui
 from skyclues.astrometry import Astrometry
 from skyclues.quality import flag_census
 from skyclues.sequence import STRICT, find_sequence, load_sequence, report_urls, save_report
@@ -158,7 +158,7 @@ def to_spectrum_explorer():
 
 
 # ---------------------------------------------------------------- explorer
-release_ui.search()
+release_ui.locate()
 if qp.get("explorer", "temporal") not in ("temporal", "espectral"):
     st.error("Explorador de URL desconocido"); st.stop()
 if "canal" in qp and (not str(qp["canal"]).isdigit() or not 1 <= int(qp["canal"]) <= 102):
@@ -442,9 +442,9 @@ c4.metric("Cobertura común válida", f"{m['coverage_common_valid']:.1%}")
 det = seq.frames[0].detector
 c5.metric("Detector", f"D{det}", f"{config.BANDS_UM[det][0]}–{config.BANDS_UM[det][1]} µm", delta_color="off")
 
-tab_play, tab_cov, tab_q, tab_meta, tab_opt, tab_obs = st.tabs(
-    ["Reproductor temporal", "Cobertura y espectro", "Calidad por época", "Metadatos y procedencia",
-     "Opciones evaluadas", "Observaciones disponibles"])
+tab_play, tab_move, tab_cov, tab_q, tab_meta, tab_opt, tab_obs = st.tabs(
+    ["Reproductor temporal", "Buscar algo que se mueve", "Cobertura y espectro", "Calidad por época",
+     "Metadatos y procedencia", "Opciones evaluadas", "Observaciones disponibles"])
 
 with tab_play:
     with st.spinner("Preparando fotogramas…"):
@@ -459,6 +459,9 @@ with tab_play:
                f"con la misma escala de intensidad. {geo_txt} El tamaño en pantalla es fijo: un campo de visión mayor "
                "muestra más cielo, no es un zoom. Una diferencia visual no es por sí sola una detección de movimiento "
                "o variabilidad.")
+
+with tab_move:
+    motion_page.render(seq, report_json)
 
 with tab_cov:
     cols = st.columns(2)

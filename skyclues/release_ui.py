@@ -42,6 +42,8 @@ def search():
         if selected['extended']:st.info('Centro catalogado de un objeto extenso; el campo de 3–30 minutos de arco puede mostrar solo una parte.')
         for w in selected['warnings']:st.caption(w)
         st.caption('Si hay movimiento propio, cada explorador reutiliza su cálculo de época. No es una detección observada.')
+        if st.button('Ver en Atlas',key='open_object_atlas',on_click=_object_to_atlas,args=(a.to_dict(),)):
+            st.rerun(scope='app')
         for mode,label in [('temporal','Abrir objeto en Time Explorer'),('espectral','Abrir objeto en Spectrum Explorer')]:
             if st.button(label,key='open_object_'+mode):
                 try:fov=float(st.query_params.get('fov',config.DEFAULT_FIELD_DEG))
@@ -75,3 +77,78 @@ def refresh_saved(ra,dec,fov,astrometry=None):
     if astrometry:
         st.session_state.update(how='Nombre (SIMBAD)',obj_name=astrometry['name'],resolved={'astrometry':astrometry,'warnings':[]})
     st.session_state['release_force_refresh']=True
+
+
+LOCATE_MODES = ["Por nombre", "Coordenadas", "Atlas"]
+
+
+def _object_to_atlas(astro_dict):
+    from . import atlas
+    from .astrometry import Astrometry
+    atlas.show_object(Astrometry.from_dict(astro_dict))
+    navigation.request_locate(st.session_state, "Atlas")
+
+
+def locate():
+    """Three ways to locate a region; all of them write the same common region."""
+    navigation.apply_pending(st.session_state)
+    if st.session_state.get("locate_mode") not in LOCATE_MODES:
+        st.session_state["locate_mode"] = LOCATE_MODES[0]
+    mode = st.radio("Localizar una región del cielo", LOCATE_MODES, key="locate_mode", horizontal=True,
+                    help="Por nombre (SIMBAD e índice local), por coordenadas RA/Dec o explorando el Atlas. "
+                         "Los tres métodos comparten la misma región con Time Explorer y Spectrum Explorer.")
+    if mode == "Por nombre":
+        search()
+    elif mode == "Coordenadas":
+        coordinates()
+    else:
+        from . import atlas
+        atlas.render()
+
+
+def _coords_from_inputs():
+    s = st.session_state
+    return float(s["loc_ra"]), float(s["loc_dec"]), float(s["loc_fov"]) / 60
+
+
+def _coords_to_atlas():
+    from . import atlas
+    try:
+        ra, dec, fov = _coords_from_inputs()
+        navigation.set_region(st.session_state, st.query_params, ra, dec, fov, source="Coordenadas")
+    except ValueError as err:
+        st.session_state["loc_error"] = str(err)
+        return
+    atlas.show_region(ra, dec, fov)
+    navigation.request_locate(st.session_state, "Atlas")
+
+
+def _coords_open(explorer):
+    try:
+        ra, dec, fov = _coords_from_inputs()
+        navigation.set_region(st.session_state, st.query_params, ra, dec, fov, source="Coordenadas")
+    except ValueError as err:
+        st.session_state["loc_error"] = str(err)
+        return
+    navigation.open_region(explorer)
+
+
+def coordinates():
+    r = navigation.current_region(st.session_state, st.query_params)
+    s = st.session_state
+    s.setdefault("loc_ra", float(r["ra"]))
+    s.setdefault("loc_dec", float(r["dec"]))
+    s.setdefault("loc_fov", round(float(r["fov"]) * 60, 1))
+    c1, c2, c3 = st.columns(3)
+    c1.number_input("RA (grados, ICRS)", min_value=0.0, max_value=359.999999, format="%.6f", key="loc_ra")
+    c2.number_input("Dec (grados, ICRS)", min_value=-90.0, max_value=90.0, format="%.6f", key="loc_dec")
+    c3.number_input("Diámetro (minutos de arco)", min_value=config.FOV_MIN_DEG * 60, max_value=config.FOV_MAX_DEG * 60,
+                    step=0.5, format="%.1f", key="loc_fov")
+    err = s.pop("loc_error", None)
+    if err:
+        st.error(f"Coordenadas no válidas: {err}")
+    st.caption("Coordenadas fijas para todas las fechas. Para un objeto con movimiento propio use «Por nombre».")
+    b1, b2, b3 = st.columns(3)
+    b1.button("Ver en Atlas", key="loc_atlas", on_click=_coords_to_atlas)
+    b2.button("Abrir en Time Explorer", key="loc_time", on_click=_coords_open, args=("temporal",))
+    b3.button("Abrir en Spectrum Explorer", key="loc_spectrum", on_click=_coords_open, args=("espectral",))
