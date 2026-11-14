@@ -15,13 +15,11 @@ from __future__ import annotations
 import io
 import itertools
 import json
-import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import lru_cache
 
 import numpy as np
-import requests
 from astropy.io import fits
 from astropy.time import Time
 
@@ -70,16 +68,9 @@ def wave_table_from_url(access_url: str) -> dict:
 
 def _wave_table_live(access_url: str) -> dict:
     """Read the WCS-WAVE table of a full Level-2 file from its last bytes."""
-    r = None
-    for attempt in range(config.HTTP_RETRIES):
-        r = requests.get(access_url, headers={**config.HTTP_HEADERS, "Range": "bytes=-11520"},
-                         timeout=config.HTTP_TIMEOUT_S)
-        if r.status_code != 503:
-            break
-        time.sleep(min(30, 3 * 2 ** attempt))
-    if r.status_code != 206:
-        raise RuntimeError(f"Range request not honoured (HTTP {r.status_code})")
-    blob = r.content
+    # Same retry policy as every archive request: transient errors only, bounded.
+    # Only 206 (partial content) is accepted; any other non-transient status is permanent.
+    blob = archive.http_get(access_url, headers={"Range": "bytes=-11520"}, ok_status=(206,)).content
     # The tail is 4 FITS blocks and files are block-aligned, so HDU headers
     # can only start at multiples of 2880 bytes inside it.
     start = blob.rfind(b"XTENSION= 'BINTABLE'")

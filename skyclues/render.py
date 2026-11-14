@@ -170,13 +170,27 @@ def _style_axes(ax):
         c.set_ticklabel(color=INK, size=8)
 
 
-def _mark_target(ax, ra, dec, field_deg):
+CATALOGUE_COLOR = "#6b7480"
+
+
+def _mark_target(ax, ra, dec, field_deg, expected=None, catalogue=None):
+    """Field circle (centre ra, dec) and target markers.
+
+    ``expected``: calculated target position for this image's date ("+");
+    defaults to the field centre. ``catalogue``: catalogue position at its own
+    epoch ("x", grey), drawn only when given (moving targets). Markers are
+    calculations, never detections.
+    """
     from astropy import units as u
     from astropy.visualization.wcsaxes import SphericalCircle
 
+    tr = ax.get_transform("icrs")
     ax.add_patch(SphericalCircle((ra * u.deg, dec * u.deg), field_deg / 2 * u.deg, edgecolor=ACCENT,
-                                 facecolor="none", lw=1.0, ls="--", transform=ax.get_transform("icrs")))
-    ax.scatter([ra], [dec], s=60, marker="+", color=ACCENT, lw=1.2, transform=ax.get_transform("icrs"))
+                                 facecolor="none", lw=1.0, ls="--", transform=tr))
+    if catalogue is not None:
+        ax.scatter([catalogue[0]], [catalogue[1]], s=36, marker="x", color=CATALOGUE_COLOR, lw=1.0, transform=tr)
+    ex = expected if expected is not None else (ra, dec)
+    ax.scatter([ex[0]], [ex[1]], s=60, marker="+", color=ACCENT, lw=1.2, transform=tr)
 
 
 @serialized
@@ -231,6 +245,15 @@ def coverage_figure(ev: PairEvaluation, wcs, ra, dec, field_deg):
     return fig
 
 
+def _mark_sequence_target(ax, seq, i):
+    """Field circle plus the target position calculated for frame i's date; for a
+    moving target also its catalogue position (if it falls inside the axes)."""
+    a = seq.astrometry
+    cat = (a.ra_deg, a.dec_deg) if (a is not None and a.has_proper_motion) else None
+    _mark_target(ax, seq.ra, seq.dec, seq.field_deg, expected=seq.target_position(i), catalogue=cat)
+    fix_extent(ax, seq.shape)
+
+
 @serialized
 def sequence_coverage_figure(seq):
     """Number of epochs with a valid pixel, on the reference grid (field only)."""
@@ -242,7 +265,7 @@ def sequence_coverage_figure(seq):
     cm = ListedColormap(colors).with_extremes(bad="#ffffff")
     im = ax.imshow(count, origin="lower", cmap=cm, vmin=-0.5, vmax=n + 0.5, interpolation="nearest")
     _style_axes(ax)
-    _mark_target(ax, seq.ra, seq.dec, seq.field_deg)
+    _mark_sequence_target(ax, seq, 0)
     ax.set_title(f"Épocas con dato válido (verde = las {n})", color=INK, fontsize=10, loc="left")
     cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, ticks=range(0, n + 1))
     cb.ax.tick_params(labelsize=7, colors=INK)
@@ -257,7 +280,7 @@ def sequence_spread_figure(seq, limit=0.5):
     cm = plt.get_cmap("viridis").with_extremes(bad="#ffffff")
     im = ax.imshow(seq.lambda_spread_bw, origin="lower", cmap=cm, vmin=0, vmax=limit, interpolation="nearest")
     _style_axes(ax)
-    _mark_target(ax, seq.ra, seq.dec, seq.field_deg)
+    _mark_sequence_target(ax, seq, 0)
     ax.set_title("Dispersión de λ entre épocas / ancho de banda", color=INK, fontsize=10, loc="left")
     cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     cb.ax.tick_params(labelsize=7, colors=INK)

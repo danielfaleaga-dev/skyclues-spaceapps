@@ -2,6 +2,12 @@
 
 Usage:
     python scripts/find_sequence.py --ra 210.802429 --dec 54.34875 --field 0.1 --name sequence_m101
+    python scripts/find_sequence.py --object "WISE J085510.83-071442.5" --detectors 6 --name sequence_wise0855_pm
+
+``--object`` takes the astrometry from SIMBAD (proper motion, parallax): the
+field is centred on the position calculated for the observation dates and
+every frame gets its own calculated target position. ``--ra/--dec`` are used
+unchanged for every date.
 
 Writes results/<name>.json (frames, criteria S1-S9, options considered,
 rejection reasons, SHA-256 of every cached FITS).
@@ -15,21 +21,32 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from skyclues import config  # noqa: E402
 from skyclues.sequence import find_sequence, save_report  # noqa: E402
+from skyclues.targets import resolve_name  # noqa: E402
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--ra", type=float, required=True)
-    ap.add_argument("--dec", type=float, required=True)
+    ap.add_argument("--ra", type=float)
+    ap.add_argument("--dec", type=float)
+    ap.add_argument("--object", help="object name resolved with SIMBAD (astrometry per epoch)")
     ap.add_argument("--field", type=float, default=config.DEFAULT_FIELD_DEG)
     ap.add_argument("--name", required=True)
     ap.add_argument("--detectors", type=int, nargs="*")
     ap.add_argument("--max-frames", type=int, default=config.MAX_SEQUENCE_FRAMES)
     ap.add_argument("--max-candidates", type=int, default=config.MAX_SEQUENCE_CANDIDATES)
     args = ap.parse_args()
+    astro = None
+    if args.object:
+        astro, warns = resolve_name(args.object)
+        print(f"{astro.name}: {astro.source}")
+        for w in warns:
+            print(f"  AVISO: {w}")
+        args.ra, args.dec = astro.ra_deg, astro.dec_deg
+    elif args.ra is None or args.dec is None:
+        ap.error("indique --object o bien --ra y --dec")
 
     seq, report = find_sequence(args.ra, args.dec, args.field, detectors=args.detectors,
-                                max_frames=args.max_frames, max_candidates=args.max_candidates)
+                                max_frames=args.max_frames, max_candidates=args.max_candidates, astrometry=astro)
     path = save_report(report, args.name)
     print(f"Informe: {path}")
     if seq is None:

@@ -1,36 +1,107 @@
-"""Preset fields. Coordinates are catalogue positions (ICRS, epoch J2000).
+"""Preset fields, name resolution and input validation.
 
-They are NOT propagated for proper motion: for high-proper-motion objects
-(Barnard's Star, WISE 0855, eps Ind B) the object is displaced from these
-positions at SPHEREx epochs. A propagated position is not a detection.
+Every target carries its catalogue astrometry (``astrometry.Astrometry``):
+position at the catalogue epoch plus proper motion, parallax and radial
+velocity when known. Searches and markers use the position *propagated to
+each observation date*, never the catalogue position at every date. A
+propagated position is a calculation, not a SPHEREx detection.
 """
+
+from __future__ import annotations
+
+import math
+
+from .astrometry import Astrometry, query_simbad
+
+#: SIMBAD basic data (ICRS, epoch J2000.0), queried 2026-11-14.
+WISE0855 = Astrometry(
+    name="WISEA J085510.74-071442.5", ra_deg=133.81890825, dec_deg=-7.247048, epoch_jyear=2000.0,
+    pmra_masyr=-8123.7, pmdec_masyr=673.2, parallax_mas=439.0, rv_kms=None,
+    source="SIMBAD 2026-11-14; astrometría 2021ApJS..253....7K (Kirkpatrick et al. 2021)")
+M101 = Astrometry(
+    name="M 101", ra_deg=210.80242916666668, dec_deg=54.34875, epoch_jyear=2000.0,
+    source="SIMBAD 2026-11-14 (galaxia: sin movimiento propio medible)")
+
+#: Coordinates printed in the NASA Space Apps 2026 challenge text for WISE 0855
+#: (08h55m10.831s -07d14m42.53s). They are not J2000.0 positions: the SIMBAD
+#: track passes within 0.34 arcsec of them at epoch 2010.40 (WISE era).
+CHALLENGE_WISE0855 = {"ra_deg": 133.7951292, "dec_deg": -7.2451472, "epoch_jyear_estimated": 2010.40}
 
 PRESETS = {
     "M101 (galaxia, campo de control estático)": {
-        "ra": 210.802429, "dec": 54.348750, "source": "SIMBAD (M101)", "high_pm": False,
+        "ra": M101.ra_deg, "dec": M101.dec_deg, "astrometry": M101, "high_pm": False,
     },
-    "WISE 0855−0714 (coordenadas del enunciado NASA)": {
-        # 08h55m10.831s -07d14m42.53s as given in the Space Apps challenge text.
-        "ra": 133.7951292, "dec": -7.2451472, "source": "NASA Space Apps 2026 challenge", "high_pm": True,
+    "WISE 0855−0714 (enana marrón, 8.2″/año)": {
+        "ra": WISE0855.ra_deg, "dec": WISE0855.dec_deg, "astrometry": WISE0855, "high_pm": True,
     },
 }
 
 
-def resolve_name(name: str):
-    """Resolve an object name with CDS Sesame (network). Returns (ra, dec)."""
-    from astropy.coordinates import SkyCoord
+def resolve_name(name: str) -> tuple[Astrometry, list[str]]:
+    """Astrometry for an object name (network) and the warnings that apply.
 
-    c = SkyCoord.from_name(name)
-    return float(c.ra.deg), float(c.dec.deg)
+    SIMBAD (TAP) first: position, proper motion, parallax and radial
+    velocity. If SIMBAD is unavailable, CDS Sesame gives only a position:
+    the result then has no proper motion and a warning says so.
+    """
+    name = (name or "").strip()
+    if not name:
+        raise ValueError("Escribe el nombre de un objeto.")
+    try:
+        a = query_simbad(name)
+        return a, a.warnings()
+    except LookupError:
+        raise
+    except RuntimeError as err:
+        from astropy.coordinates import SkyCoord
+
+        c = SkyCoord.from_name(name)
+        a = Astrometry(name=name, ra_deg=float(c.ra.deg), dec_deg=float(c.dec.deg), epoch_jyear=2000.0,
+                       source="CDS Sesame (solo posición; SIMBAD no disponible)")
+        return a, [f"SIMBAD no disponible ({str(err)[:80]}): sin movimiento propio. "
+                   "Si el objeto se mueve, la posición para las fechas SPHEREx será incorrecta."]
+
+
+# ----------------------------------------------------------------------------- validation
+def validate_coordinates(ra, dec) -> tuple[float, float]:
+    """(ra, dec) in degrees as finite floats inside RA [0, 360) and Dec [-90, 90].
+
+    Raises ValueError with a message for the user. Values are never clamped
+    or wrapped silently: an out-of-range value is an input error.
+    """
+    try:
+        r, d = float(ra), float(dec)
+    except (TypeError, ValueError):
+        raise ValueError(f"Coordenadas no numéricas: RA={ra!r}, Dec={dec!r}.") from None
+    if not (math.isfinite(r) and math.isfinite(d)):
+        raise ValueError(f"Coordenadas no finitas: RA={r}, Dec={d}.")
+    if not 0.0 <= r < 360.0:
+        raise ValueError(f"RA fuera de rango: {r}° (debe estar en [0°, 360°)).")
+    if not -90.0 <= d <= 90.0:
+        raise ValueError(f"Dec fuera de rango: {d}° (debe estar en [−90°, +90°]).")
+    return r, d
+
+
+def validate_fov_deg(value) -> float:
+    """Field-of-view diameter in degrees inside [FOV_MIN_DEG, FOV_MAX_DEG]; ValueError otherwise."""
+    from . import config
+
+    try:
+        v = float(value)
+    except (TypeError, ValueError):
+        raise ValueError(f"Campo de visión no numérico: {value!r}.") from None
+    if not math.isfinite(v) or not config.FOV_MIN_DEG <= v <= config.FOV_MAX_DEG:
+        raise ValueError(f"Campo de visión {v}° fuera de [{config.FOV_MIN_DEG}°, {config.FOV_MAX_DEG}°] "
+                         f"({config.FOV_MIN_DEG * 60:g}′–{config.FOV_MAX_DEG * 60:g}′).")
+    return round(v, 4)
 
 
 def clamp_fov_deg(value, default: float | None = None) -> float:
     """Field-of-view diameter in degrees, limited to [FOV_MIN_DEG, FOV_MAX_DEG].
 
-    Invalid input (text, NaN, None) returns the default field.
+    For widgets that enforce their own limits. Invalid input (text, NaN,
+    None) returns the default field. Query parameters use validate_fov_deg.
     """
-    import math
-
     from . import config
 
     default = config.DEFAULT_FIELD_DEG if default is None else default

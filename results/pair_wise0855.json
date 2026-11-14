@@ -2,7 +2,26 @@
   "target": {
     "ra_deg": 133.7951292,
     "dec_deg": -7.2451472,
-    "field_deg": 0.1
+    "field_deg": 0.1,
+    "astrometry": {
+      "name": "WISEA J085510.74-071442.5",
+      "ra_deg": 133.81890825,
+      "dec_deg": -7.247048,
+      "epoch_jyear": 2000.0,
+      "pmra_masyr": -8123.7,
+      "pmdec_masyr": 673.2,
+      "parallax_mas": 439.0,
+      "rv_kms": null,
+      "source": "SIMBAD 2026-11-14; astrometría 2021ApJS..253....7K (Kirkpatrick et al. 2021)"
+    },
+    "astrometry_warnings": [
+      "Sin velocidad radial: se desprecia la aceleración de perspectiva (efecto mínimo en pocas décadas)."
+    ],
+    "centre": {
+      "rule": "coordenadas del enunciado NASA, que corresponden a la época ≈2010.4 (no J2000.0); NO propagadas: en 2026 el objetivo está a ≈2′ del centro del campo",
+      "epoch_jyear": 2010.4,
+      "propagated": false
+    }
   },
   "collections": [
     "spherex_dr1",
@@ -4272,69 +4291,88 @@
         "criterion": "Mismo detector (misma banda instrumental)",
         "value": "D5 / D5",
         "threshold": "igual",
-        "status": "pass"
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "C2",
         "criterion": "Fechas de observación diferentes",
         "value": "Δt = 373.18 d",
         "threshold": "≥ 1.0 d",
-        "status": "pass"
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "C3",
         "criterion": "Mismo canal efectivo en el objetivo (LVF)",
-        "value": "|Δλ| = 0.0 nm = 0.00 × ancho de banda",
-        "threshold": "≤ 0.25 (aviso ≤ 0.5)",
-        "status": "pass"
+        "value": "|Δλ| = 0.3 nm = 0.01 × ancho de banda",
+        "threshold": "≤ 0.25 (aviso ≤ 0.5; rechazo por encima)",
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "C4",
         "criterion": "Desajuste espectral máximo en la zona común",
         "value": "máx |Δλ| = 0.01 × ancho de banda; 100% de la zona común ≤ 0.25",
-        "threshold": "≤ 0.5",
-        "status": "pass"
+        "threshold": "≤ 0.25 (aviso ≤ 0.5; rechazo por encima)",
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "C5",
         "criterion": "Cobertura común válida del campo",
         "value": "92.6% (2504 px; solapamiento geométrico 100.0%)",
         "threshold": "≥ 60% (aviso ≥ 30%)",
-        "status": "pass"
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "C6",
         "criterion": "Control de calidad oficial L2 (L2DQAFLG)",
         "value": "Pass / Pass",
         "threshold": "Pass / Pass",
-        "status": "pass"
+        "status": "pass",
+        "basis": "garantía del archivo"
       },
       {
         "id": "C7",
-        "criterion": "Astrometría fina válida (FINAST = 0)",
+        "criterion": "Astrometría fina válida (FINAST)",
         "value": "0 / 0",
-        "threshold": "0 / 0",
-        "status": "pass"
+        "threshold": "0 / 0 (1 = solución parcial: aviso; ≥ 2 = no utilizable: rechazo)",
+        "status": "pass",
+        "basis": "garantía del archivo"
       },
       {
         "id": "C8",
         "criterion": "Mismo procesamiento (colección y versión de software)",
         "value": "spherex_dr1 v7.0.5 / spherex_dr1 v7.0.5",
         "threshold": "iguales (si difieren: aviso de calibración)",
-        "status": "pass"
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "C9",
         "criterion": "Saturación en el campo (OVERFLOW/NONLINEAR)",
         "value": "0.00% / 0.00%",
         "threshold": "≤ 0.1%",
-        "status": "pass"
+        "status": "pass",
+        "basis": "efectiva"
       }
     ],
     "metrics": {
       "target_radec_deg": [
         133.7951292,
         -7.2451472
+      ],
+      "target_expected_radec_deg": [
+        [
+          133.7611395125694,
+          -7.2422705366217865
+        ],
+        [
+          133.75881766820095,
+          -7.2420728578851135
+        ]
       ],
       "mask_classes": [
         "unusable",
@@ -4348,14 +4386,14 @@
       "valid_fraction_a": 0.963387573964497,
       "valid_fraction_b_on_a": 0.959689349112426,
       "lambda_target_um": [
-        4.370188586382351,
-        4.370221790053761
+        4.369117642024167,
+        4.368838995935732
       ],
       "bandwidth_target_um": [
-        0.0379785985476597,
-        0.03798034108146847
+        0.037985736887056275,
+        0.03798670496258803
       ],
-      "dlambda_target_bw": 0.000874273213847522,
+      "dlambda_target_bw": 0.007335545161687369,
       "dlambda_common_median_bw": 0.007635716596508595,
       "dlambda_common_max_bw": 0.0076531169685879405,
       "fraction_common_within_pass_bw": 1.0,
@@ -4487,5 +4525,85 @@
       }
     }
   },
-  "generated_utc": "2026-11-14T14:47:12"
+  "generated_utc": "2026-11-14T14:47:12",
+  "previous_evaluation": {
+    "criteria": [
+      {
+        "id": "C1",
+        "criterion": "Mismo detector (misma banda instrumental)",
+        "value": "D5 / D5",
+        "threshold": "igual",
+        "status": "pass"
+      },
+      {
+        "id": "C2",
+        "criterion": "Fechas de observación diferentes",
+        "value": "Δt = 373.18 d",
+        "threshold": "≥ 1.0 d",
+        "status": "pass"
+      },
+      {
+        "id": "C3",
+        "criterion": "Mismo canal efectivo en el objetivo (LVF)",
+        "value": "|Δλ| = 0.0 nm = 0.00 × ancho de banda",
+        "threshold": "≤ 0.25 (aviso ≤ 0.5)",
+        "status": "pass"
+      },
+      {
+        "id": "C4",
+        "criterion": "Desajuste espectral máximo en la zona común",
+        "value": "máx |Δλ| = 0.01 × ancho de banda; 100% de la zona común ≤ 0.25",
+        "threshold": "≤ 0.5",
+        "status": "pass"
+      },
+      {
+        "id": "C5",
+        "criterion": "Cobertura común válida del campo",
+        "value": "92.6% (2504 px; solapamiento geométrico 100.0%)",
+        "threshold": "≥ 60% (aviso ≥ 30%)",
+        "status": "pass"
+      },
+      {
+        "id": "C6",
+        "criterion": "Control de calidad oficial L2 (L2DQAFLG)",
+        "value": "Pass / Pass",
+        "threshold": "Pass / Pass",
+        "status": "pass"
+      },
+      {
+        "id": "C7",
+        "criterion": "Astrometría fina válida (FINAST = 0)",
+        "value": "0 / 0",
+        "threshold": "0 / 0",
+        "status": "pass"
+      },
+      {
+        "id": "C8",
+        "criterion": "Mismo procesamiento (colección y versión de software)",
+        "value": "spherex_dr1 v7.0.5 / spherex_dr1 v7.0.5",
+        "threshold": "iguales (si difieren: aviso de calibración)",
+        "status": "pass"
+      },
+      {
+        "id": "C9",
+        "criterion": "Saturación en el campo (OVERFLOW/NONLINEAR)",
+        "value": "0.00% / 0.00%",
+        "threshold": "≤ 0.1%",
+        "status": "pass"
+      }
+    ],
+    "admissible": true,
+    "lambda_target_um": [
+      4.370188586382351,
+      4.370221790053761
+    ]
+  },
+  "reevaluation": {
+    "date_utc": "2026-11-14T16:55:58",
+    "reason": "auditoría independiente: astrometría por época (SC-01), rechazo espectral (SC-02), FLAGS oficiales y bits sin definir (SC-06), FINAST (SC-11)",
+    "fits": "los mismos recortes (SHA-256 comprobado); centro del campo sin cambios",
+    "changes": [
+      "λ en el objetivo (µm): 4.3702→4.3691, 4.3702→4.3688"
+    ]
+  }
 }

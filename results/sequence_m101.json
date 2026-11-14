@@ -3,7 +3,25 @@
   "target": {
     "ra_deg": 210.802429,
     "dec_deg": 54.34875,
-    "field_deg": 0.1
+    "field_deg": 0.1,
+    "astrometry": {
+      "name": "M 101",
+      "ra_deg": 210.80242916666668,
+      "dec_deg": 54.34875,
+      "epoch_jyear": 2000.0,
+      "pmra_masyr": null,
+      "pmdec_masyr": null,
+      "parallax_mas": null,
+      "rv_kms": null,
+      "source": "SIMBAD 2026-11-14 (galaxia: sin movimiento propio medible)"
+    },
+    "astrometry_warnings": [
+      "Sin movimiento propio en el catálogo: se usa la posición de catálogo para todas las fechas (correcto para objetos lejanos; incorrecto si el objeto se mueve)."
+    ],
+    "centre": {
+      "rule": "posición de catálogo (sin movimiento propio)",
+      "propagated": false
+    }
   },
   "collections": [
     "spherex_dr1",
@@ -418,7 +436,18 @@
     "target": {
       "ra_deg": 210.802429,
       "dec_deg": 54.34875,
-      "field_deg": 0.1
+      "field_deg": 0.1,
+      "astrometry": {
+        "name": "M 101",
+        "ra_deg": 210.80242916666668,
+        "dec_deg": 54.34875,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": null,
+        "pmdec_masyr": null,
+        "parallax_mas": null,
+        "rv_kms": null,
+        "source": "SIMBAD 2026-11-14 (galaxia: sin movimiento propio medible)"
+      }
     },
     "n_frames": 4,
     "reference_index": 0,
@@ -442,11 +471,16 @@
         "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W20_2A/l2b-v27-2026-267/2/level2_2026W20_2A_0464_1D2_spx_l2b-v27-2026-267.fits?center=210.8024290,54.3487500&size=0.10000",
         "local_file": "level2_2026W20_2A_0464_1D2_spx_l2b-v27-2026-267__cc3f41f3583f2ea1.fits",
         "sha256": "614a67e5f0d4695e70b05a74b113bd8235350b9b203e7660ce1b808c278ffa59",
+        "expected_target_radec_deg": [
+          210.80242916666668,
+          54.34875
+        ],
         "quality": {
           "L2DQAFLG": "Pass",
           "FINAST": 0,
           "valid_fraction_in_field": 0.9877687175685693,
           "saturation_fraction_in_field": 0.0,
+          "halo_only_fraction_in_field": 0.007783543365455893,
           "zodi_median_mjysr": 0.12494852393865585,
           "psf_fwhm_arcsec": 7.46070125580342
         }
@@ -466,11 +500,16 @@
         "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W21_2A/l2b-v27-2026-268/2/level2_2026W21_2A_0081_1D2_spx_l2b-v27-2026-268.fits?center=210.8024290,54.3487500&size=0.10000",
         "local_file": "level2_2026W21_2A_0081_1D2_spx_l2b-v27-2026-268__01611a3585201642.fits",
         "sha256": "aeea59a3a7a35a6bfe6ff39106cbd792a5b0f922f26610ceb8bd45814b5d94e2",
+        "expected_target_radec_deg": [
+          210.80242916666668,
+          54.34875
+        ],
         "quality": {
           "L2DQAFLG": "Pass",
           "FINAST": 0,
           "valid_fraction_in_field": 0.969236471460341,
           "saturation_fraction_in_field": 0.0,
+          "halo_only_fraction_in_field": 0.013713862120088955,
           "zodi_median_mjysr": 0.12529250979423523,
           "psf_fwhm_arcsec": 7.46070125580342
         }
@@ -490,11 +529,16 @@
         "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W25_2A/l2b-v27-2026-273/2/level2_2026W25_2A_0170_1D2_spx_l2b-v27-2026-273.fits?center=210.8024290,54.3487500&size=0.10000",
         "local_file": "level2_2026W25_2A_0170_1D2_spx_l2b-v27-2026-273__2401df0c7178fc07.fits",
         "sha256": "a8242ff75bc07a6fda52a3b3297ef978c672ff2faf1c5e7d3f5eefdce7c1b112",
+        "expected_target_radec_deg": [
+          210.80242916666668,
+          54.34875
+        ],
         "quality": {
           "L2DQAFLG": "Pass",
           "FINAST": 0,
           "valid_fraction_in_field": 0.9896219421793921,
           "saturation_fraction_in_field": 0.0,
+          "halo_only_fraction_in_field": 0.005936920222634508,
           "zodi_median_mjysr": 0.13124926388263702,
           "psf_fwhm_arcsec": 7.46070125580342
         }
@@ -514,11 +558,16 @@
         "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W26_1A/l2b-v27-2026-273/2/level2_2026W26_1A_0178_1D2_spx_l2b-v27-2026-273.fits?center=210.8024290,54.3487500&size=0.10000",
         "local_file": "level2_2026W26_1A_0178_1D2_spx_l2b-v27-2026-273__6a1fc0e82e131a4b.fits",
         "sha256": "b5d23c2dd6ffde97237a11076ef3f90850a19fc2978b64e5a4f1433a86b7e8da",
+        "expected_target_radec_deg": [
+          210.80242916666668,
+          54.34875
+        ],
         "quality": {
           "L2DQAFLG": "Pass",
           "FINAST": 0,
           "valid_fraction_in_field": 0.9925871015567087,
           "saturation_fraction_in_field": 0.0,
+          "halo_only_fraction_in_field": 0.004447739065974796,
           "zodi_median_mjysr": 0.13241977244615555,
           "psf_fwhm_arcsec": 7.46070125580342
         }
@@ -530,63 +579,72 @@
         "criterion": "Mismo detector en todas las épocas",
         "value": "D2",
         "threshold": "uno solo",
-        "status": "pass"
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "S2",
         "criterion": "Fechas distintas (separación mínima entre épocas consecutivas)",
         "value": "mín 3.53 d · total 36.4 d",
         "threshold": "≥ 1.0 d",
-        "status": "pass"
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "S3",
         "criterion": "Mismo canal efectivo en el objetivo (dispersión de λ entre todas las épocas)",
         "value": "5.5 nm = 0.16 × ancho de banda",
-        "threshold": "≤ 0.25 (aviso ≤ 0.5)",
-        "status": "pass"
+        "threshold": "≤ 0.25 (aviso ≤ 0.5; rechazo por encima)",
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "S4",
         "criterion": "Dispersión espectral máxima en la región común",
         "value": "máx 0.24 × ancho de banda; 100% de la región ≤ 0.25",
-        "threshold": "≤ 0.25 en toda la región (aviso hasta 0.5)",
-        "status": "pass"
+        "threshold": "≤ 0.25 en toda la región (aviso ≤ 0.5; rechazo por encima)",
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "S5",
         "criterion": "Cobertura válida común a TODAS las épocas",
         "value": "94.0% (2537 px; solapamiento geométrico 99.9%)",
         "threshold": "≥ 60% (aviso ≥ 30%)",
-        "status": "pass"
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "S6",
         "criterion": "Control de calidad oficial L2 en todas",
         "value": "Pass / Pass / Pass / Pass",
         "threshold": "todas Pass",
-        "status": "pass"
+        "status": "pass",
+        "basis": "garantía del archivo"
       },
       {
         "id": "S7",
-        "criterion": "Astrometría fina válida en todas (FINAST = 0)",
+        "criterion": "Astrometría fina válida en todas (FINAST)",
         "value": "0 / 0 / 0 / 0",
-        "threshold": "todas 0",
-        "status": "pass"
+        "threshold": "todas 0 (1 = solución parcial: aviso; ≥ 2 = no utilizable: rechazo)",
+        "status": "pass",
+        "basis": "garantía del archivo"
       },
       {
         "id": "S8",
         "criterion": "Mismo procesamiento (colección y versión de software)",
         "value": "spherex_qr3 · v7.0.5",
         "threshold": "una colección y una versión",
-        "status": "pass"
+        "status": "pass",
+        "basis": "efectiva"
       },
       {
         "id": "S9",
         "criterion": "Saturación en el campo (OVERFLOW/NONLINEAR), peor época",
         "value": "0.00%",
         "threshold": "≤ 0.1%",
-        "status": "pass"
+        "status": "pass",
+        "basis": "efectiva"
       }
     ],
     "metrics": {
@@ -4695,5 +4753,87 @@
     }
   ],
   "elapsed_s": 1.2,
-  "generated_utc": "2026-11-14T15:06:16"
+  "generated_utc": "2026-11-14T15:06:16",
+  "previous_evaluation": {
+    "criteria": [
+      {
+        "id": "S1",
+        "criterion": "Mismo detector en todas las épocas",
+        "value": "D2",
+        "threshold": "uno solo",
+        "status": "pass"
+      },
+      {
+        "id": "S2",
+        "criterion": "Fechas distintas (separación mínima entre épocas consecutivas)",
+        "value": "mín 3.53 d · total 36.4 d",
+        "threshold": "≥ 1.0 d",
+        "status": "pass"
+      },
+      {
+        "id": "S3",
+        "criterion": "Mismo canal efectivo en el objetivo (dispersión de λ entre todas las épocas)",
+        "value": "5.5 nm = 0.16 × ancho de banda",
+        "threshold": "≤ 0.25 (aviso ≤ 0.5)",
+        "status": "pass"
+      },
+      {
+        "id": "S4",
+        "criterion": "Dispersión espectral máxima en la región común",
+        "value": "máx 0.24 × ancho de banda; 100% de la región ≤ 0.25",
+        "threshold": "≤ 0.25 en toda la región (aviso hasta 0.5)",
+        "status": "pass"
+      },
+      {
+        "id": "S5",
+        "criterion": "Cobertura válida común a TODAS las épocas",
+        "value": "94.0% (2537 px; solapamiento geométrico 99.9%)",
+        "threshold": "≥ 60% (aviso ≥ 30%)",
+        "status": "pass"
+      },
+      {
+        "id": "S6",
+        "criterion": "Control de calidad oficial L2 en todas",
+        "value": "Pass / Pass / Pass / Pass",
+        "threshold": "todas Pass",
+        "status": "pass"
+      },
+      {
+        "id": "S7",
+        "criterion": "Astrometría fina válida en todas (FINAST = 0)",
+        "value": "0 / 0 / 0 / 0",
+        "threshold": "todas 0",
+        "status": "pass"
+      },
+      {
+        "id": "S8",
+        "criterion": "Mismo procesamiento (colección y versión de software)",
+        "value": "spherex_qr3 · v7.0.5",
+        "threshold": "una colección y una versión",
+        "status": "pass"
+      },
+      {
+        "id": "S9",
+        "criterion": "Saturación en el campo (OVERFLOW/NONLINEAR), peor época",
+        "value": "0.00%",
+        "threshold": "≤ 0.1%",
+        "status": "pass"
+      }
+    ],
+    "admissible": true,
+    "lambda_target_um": [
+      1.4201994425388356,
+      1.415133808448378,
+      1.415087430156776,
+      1.420580919587076
+    ]
+  },
+  "reevaluation": {
+    "date_utc": "2026-11-14T16:55:57",
+    "reason": "auditoría independiente: astrometría por época (SC-01), rechazo espectral (SC-02), FLAGS oficiales y bits sin definir (SC-06), FINAST (SC-11)",
+    "fits": "los mismos recortes (SHA-256 comprobado); centro del campo sin cambios",
+    "changes": [
+      "ningún cambio de estado"
+    ]
+  }
 }

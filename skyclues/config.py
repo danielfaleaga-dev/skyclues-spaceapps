@@ -23,7 +23,10 @@ FOV_SLOW_DEG = 0.2            # warn about longer processing above this
 # Validated example sequences offered as quick access in the app (results/<name>.json).
 VALIDATED_EXAMPLES = {
     "sequence_m101": "M101 · 4 épocas · 1.42 µm",
-    "sequence_wise0855_mwir": "WISE 0855 · 3 épocas · 4.82 µm",
+    # Centred on the position propagated with SIMBAD proper motion (audit SC-01).
+    # sequence_wise0855_mwir (centred on the challenge coordinates, epoch ~2010.4,
+    # ~130 arcsec from the 2026 position) stays among the saved results.
+    "sequence_wise0855_pm": "WISE 0855 · 2 épocas · 4.86 µm · Δt 1 año",
 }
 
 # NASA/IPAC IRSA, IVOA Simple Image Access v2 (verified 2026-11-14).
@@ -33,8 +36,15 @@ WIDE_COLLECTIONS = ("spherex_dr1", "spherex_qr3")
 DEEP_COLLECTIONS = ("spherex_dr1_deep", "spherex_qr3_deep")
 
 HTTP_HEADERS = {"User-Agent": "SkyClues/0.1 (NASA Space Apps 2026 prototype; astropy/pyvo)"}
-HTTP_TIMEOUT_S = 180
-HTTP_RETRIES = 6
+# (connect, read) timeouts per request. A 4 MB cutout takes a few seconds; IRSA
+# can take ~1 min to start answering a cutout under load.
+HTTP_TIMEOUT_S = (15, 90)
+# Attempts per request. Only transient failures are retried (timeouts,
+# connection errors, HTTP 408/425/429 and 5xx); other 4xx fail at once.
+HTTP_RETRIES = 4
+HTTP_BACKOFF_S = 4.0          # 4, 8, 16 s between attempts (never after the last one)
+HTTP_BACKOFF_MAX_S = 30.0     # cap, also for a server Retry-After
+HTTP_DEADLINE_S = 240.0       # total time budget per URL, attempts and waits included
 
 # SPHEREx Level-2 geometry.
 DETECTOR_NPIX = 2040

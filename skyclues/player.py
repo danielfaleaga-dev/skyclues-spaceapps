@@ -34,7 +34,7 @@ from astropy.time import Time  # noqa: E402
 from matplotlib.cm import ScalarMappable  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
 
-from . import render  # noqa: E402
+from . import config, render  # noqa: E402
 from .quality import CAUTION  # noqa: E402
 from .sequence import TemporalSequence  # noqa: E402
 
@@ -44,13 +44,42 @@ AX_RECT = [0.15, 0.11, 0.66, 0.85]
 CB_RECT = [0.86, 0.11, 0.03, 0.85]
 GEOMETRIES = ("exact", "nearest")
 GEOMETRY_LABEL = {
-    "exact": "geometría exacta: cada píxel nativo en su posición real (WCS), sin remuestreo",
+    "exact": ("geometría WCS: cada píxel nativo se dibuja donde lo sitúa su WCS (TAN-SIP), con su valor original "
+              "(sin remuestreo de valores)"),
     "nearest": "REMUESTREADO por vecino más próximo (error de posición hasta ½ px por eje, ≈0.7 px)",
 }
 FRAME_STAMP = {
-    "exact": "Píxeles nativos en su posición WCS · sin remuestreo",
+    "exact": "Píxeles nativos en su posición WCS · sin remuestreo de valores",
     "nearest": "REMUESTREADO · vecino más próximo en la rejilla de la época 1",
 }
+
+
+def screen_scale_arcsec(seq: TemporalSequence) -> float:
+    """Sky size of one screen pixel of the player image (arcsec).
+
+    The axes have a fixed size in pixels; with equal aspect the field's
+    longer side sets the scale. Positions on screen are therefore rounded to
+    about half this value, independently of the WCS precision.
+    """
+    from astropy.wcs.utils import proj_plane_pixel_scales
+
+    ny, nx = seq.shape
+    ax_w, ax_h = FIG_SIZE_IN[0] * AX_RECT[2] * DPI, FIG_SIZE_IN[1] * AX_RECT[3] * DPI
+    native_px_per_screen_px = max(nx / ax_w, ny / ax_h)
+    pix_arcsec = float(np.mean(proj_plane_pixel_scales(seq.wcs.celestial))) * 3600
+    return native_px_per_screen_px * pix_arcsec
+
+
+def precision_note(seq: TemporalSequence) -> str:
+    """What limits the positional precision of the display (four separate things)."""
+    psf = [f.quality.get("psf_fwhm_arcsec") for f in seq.frames]
+    psf = [float(p) for p in psf if p is not None and np.isfinite(float(p))]
+    s = screen_scale_arcsec(seq)
+    return (f"Precisión de posición: (1) WCS: cálculo exacto de cada esquina de píxel (TAN-SIP); "
+            f"(2) pantalla: 1 píxel de pantalla ≈ {s:.1f}″, así que lo dibujado se redondea ±{s / 2:.1f}″; "
+            f"(3) instrumento: píxel SPHEREx ≈ {config.NOMINAL_PIXEL_SCALE_ARCSEC}″"
+            + (f", PSF ≈ {min(psf):.1f}–{max(psf):.1f}″ FWHM" if psf else "")
+            + "; (4) remuestreo: ninguno en geometría WCS; hasta ≈0.7 px nativos en la rejilla común.")
 
 
 def sequence_norm(seq: TemporalSequence, subtract_zodi: bool = True):
@@ -101,9 +130,9 @@ def render_frame_png(seq: TemporalSequence, i: int, norm, subtract_zodi: bool = 
             data = f.on_reference(seq.native_data(i, subtract_zodi, CAUTION))
             rgba = render.native_rgba(data, norm, caution, seq.common_mask if restrict_to_common else None)
         ax.imshow(rgba, origin="lower", interpolation="nearest")
-    render._mark_target(ax, seq.ra, seq.dec, seq.field_deg)
-    render.fix_extent(ax, seq.shape)
-    fig.text(0.01, 0.01, FRAME_STAMP[geometry] + (" · HALO visible (exploratorio)" if show_halo else ""),
+    render._mark_sequence_target(ax, seq, i)
+    fig.text(0.01, 0.01, FRAME_STAMP[geometry] + f" · pantalla ≈{screen_scale_arcsec(seq):.1f}″/px"
+             + (" · HALO visible (exploratorio)" if show_halo else ""),
              fontsize=6.5, color=render.INK if geometry == "exact" else "#8a1a36")
     cax = fig.add_axes(CB_RECT)
     cb = fig.colorbar(ScalarMappable(norm=norm, cmap=render._cmap()), cax=cax)
@@ -193,7 +222,19 @@ function createPlayer(n, opts) {
   };
   return api;
 }
-if (typeof module !== 'undefined') { module.exports = { createPlayer }; }
+// Global keyboard shortcut for a keydown, or null to leave the key alone.
+// A key pressed while a form control has the focus keeps its native meaning
+// (slider and select move with the arrows, space toggles a checkbox or presses
+// a button), so a shortcut never acts twice or on the wrong control.
+function shortcutAction(code, tag, type, editable, modifiers) {
+  if (modifiers) return null;
+  const t = String(tag || '').toUpperCase();
+  if (editable || t === 'INPUT' || t === 'SELECT' || t === 'TEXTAREA' || t === 'BUTTON' || t === 'OPTION') {
+    return null;
+  }
+  return {Space: 'toggle', ArrowRight: 'next', ArrowLeft: 'prev'}[code] || null;
+}
+if (typeof module !== 'undefined') { module.exports = { createPlayer, shortcutAction }; }
 """
 
 _CSS = """
@@ -264,7 +305,8 @@ _BODY = """
       <tbody id="rows"></tbody></table>
     </div>
     <div class="legend">%(legend)s</div>
-    <div class="kbd">Teclado: espacio = reproducir/pausa · ← → = paso.</div>
+    <div class="kbd">Teclado (con el foco fuera de los controles): espacio = reproducir/pausa · ← → = paso.
+      Con un control seleccionado, las teclas actúan solo sobre ese control.</div>
   </div>
 </div>
 """
@@ -313,11 +355,12 @@ _GLUE_JS = r"""
   const blinkSet = () => { P.setBlink($('blink').checked, +$('ba').value, +$('bb').value, $('bfps').value); schedule(); draw(); };
   ['blink','ba','bb','bfps'].forEach(id => $(id).onchange = blinkSet);
   document.addEventListener('keydown', e => {
-    if (e.code === 'Space') { e.preventDefault(); P.toggle(); }
-    else if (e.code === 'ArrowRight') P.next();
-    else if (e.code === 'ArrowLeft') P.prev();
-    else return;
-    schedule(); draw();
+    const el = e.target || {};
+    const act = shortcutAction(e.code, el.tagName, el.type, !!el.isContentEditable,
+                               e.ctrlKey || e.altKey || e.metaKey);
+    if (!act) return;
+    e.preventDefault();
+    P[act](); schedule(); draw();
   });
   window.skycluesPlayer = P;
   schedule(); draw();
@@ -326,7 +369,7 @@ _GLUE_JS = r"""
 
 
 def legend_html(subtract_zodi: bool = True, restrict_to_common: bool = False, geometry: str = "exact",
-                show_halo: bool = False) -> str:
+                show_halo: bool = False, moving: bool = False, precision: str = "") -> str:
     legend = (f'Magnitud: {"IMAGE − ZODI" if subtract_zodi else "IMAGE"} (MJy/sr), misma escala en todas las épocas.'
               f'<span class="sw" style="background:{render.MASK_COLOR}"></span>sin datos válidos en esa época')
     if restrict_to_common:
@@ -335,8 +378,17 @@ def legend_html(subtract_zodi: bool = True, restrict_to_common: bool = False, ge
     if show_halo:
         legend += (f'<span class="sw" style="background:{render.CAUTION_SWATCH}"></span>'
                    'HALO (modo exploratorio: precaución recomendada; excluido de las métricas)')
-    legend += (' · Cruz y círculo azules: objetivo y campo. Fotogramas = observaciones reales, sin interpolación '
+    if moving:
+        legend += (' · Círculo azul: campo de comparación. <b>+ azul: posición CALCULADA del objetivo para la fecha de '
+                   'cada época</b> (movimiento propio y paralaje del catálogo; es un cálculo, no una detección de '
+                   'SPHEREx). × gris: posición de catálogo en su época (si cae dentro del campo).')
+    else:
+        legend += (' · Círculo azul: campo de comparación; + azul: posición del objetivo (sin movimiento propio '
+                   'conocido: la misma en todas las fechas; no es una detección).')
+    legend += (' Fotogramas = observaciones reales, sin interpolación '
                f'temporal. Ejes: rejilla de la época 1; {GEOMETRY_LABEL[geometry]}.')
+    if precision:
+        legend += ' ' + precision
     return legend
 
 
@@ -344,7 +396,8 @@ def player_html(seq: TemporalSequence, pngs: list[bytes], subtract_zodi: bool = 
                 restrict_to_common: bool = False, geometry: str = "exact", show_halo: bool = False) -> str:
     frames = ["data:image/png;base64," + base64.b64encode(p).decode() for p in pngs]
     css = _CSS % {"mask": render.MASK_COLOR, "outside": render.OUTSIDE_COMMON_COLOR}
-    body = _BODY % {"legend": legend_html(subtract_zodi, restrict_to_common, geometry, show_halo)}
+    body = _BODY % {"legend": legend_html(subtract_zodi, restrict_to_common, geometry, show_halo,
+                                          seq.target_moves, precision_note(seq))}
     glue = _GLUE_JS % {"frames": json.dumps(frames), "meta": json.dumps(frame_metadata(seq))}
     return (f"<!doctype html><html><head><meta charset='utf-8'><style>{css}</style></head>"
             f"<body>{body}<script>{PLAYER_CORE_JS}</script><script>{glue}</script></body></html>")

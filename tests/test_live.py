@@ -58,7 +58,9 @@ def test_fits_structure_units_and_wcs(pair, report):
     for img in imgs:
         assert img.meta["BUNIT"].replace(" ", "") == "MJy/sr"
         assert img.image.shape == img.flags.shape == img.variance.shape == img.zodi.shape
-        assert img.flag_defs.source == "header" and not img.flag_defs.unknown_names()
+        # real headers define bits 0-28; bit 29 (SATELLITE_HALO) is added from the documentation
+        assert img.flag_defs.source.startswith("cabecera") and not img.flag_defs.unknown_names()
+        assert img.flag_defs.bits[29] == "SATELLITE_HALO"
         # WCS round trip pixel -> sky -> pixel
         ny, nx = img.shape
         px = np.array([[0, 0], [nx - 1, ny - 1], [nx / 2, ny / 3]], float)

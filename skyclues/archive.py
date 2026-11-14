@@ -18,12 +18,14 @@ as the cache; ``fetch`` uses them before contacting IRSA.
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import os
 import re
 import threading
 import time
 import uuid
+import warnings
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -34,6 +36,192 @@ import requests
 
 from . import config
 from .geometry import FootprintMap
+
+
+# ----------------------------------------------------------------------------- errors
+class ArchiveError(RuntimeError):
+    """Base class of archive access errors."""
+
+
+class ArchiveTransientError(ArchiveError):
+    """Timeout, connection error, HTTP 408/425/429 or 5xx after every allowed attempt:
+    retrying later may succeed."""
+
+
+class ArchivePermanentError(ArchiveError):
+    """HTTP 4xx (other than 408/425/429) or an invalid request: retrying will not help."""
+
+
+class CorruptFitsError(ArchiveError):
+    """A FITS file (received or stored) is truncated or lacks required extensions."""
+
+
+TRANSIENT_STATUS = frozenset({408, 425, 429})
+#: Extensions every SPHEREx Level-2 cutout must contain (IRSA keeps them all).
+REQUIRED_EXTENSIONS = ("IMAGE", "FLAGS", "VARIANCE", "ZODI", "WCS-WAVE")
+
+
+def is_transient_status(code: int) -> bool:
+    return code in TRANSIENT_STATUS or 500 <= code <= 599
+
+
+def _retry_after_s(resp) -> float | None:
+    try:
+        v = float(resp.headers.get("Retry-After", ""))
+    except (TypeError, ValueError, AttributeError):
+        return None
+    return v if v >= 0 else None
+
+
+def http_get(url: str, headers: dict | None = None, ok_status=(200,), validate=None, sleep=None,
+             retries: int | None = None, deadline_s: float | None = None):
+    """GET with bounded retries for transient failures only.
+
+    * retried: timeouts, connection errors, HTTP 408/425/429 and 5xx, and a
+      response rejected by ``validate`` (e.g. a FITS truncated in transit);
+    * not retried: any other status (400, 404, ...) -> ArchivePermanentError;
+    * exponential back-off ``HTTP_BACKOFF_S * 2**k`` capped at
+      ``HTTP_BACKOFF_MAX_S`` (a server ``Retry-After`` is honoured up to the
+      cap), never after the last attempt, and never past ``deadline_s``.
+
+    Raises ArchiveTransientError (or CorruptFitsError) once attempts or the
+    time budget are exhausted.
+    """
+    retries = config.HTTP_RETRIES if retries is None else retries
+    deadline = time.monotonic() + (config.HTTP_DEADLINE_S if deadline_s is None else deadline_s)
+    hdrs = {**config.HTTP_HEADERS, **(headers or {})}
+    last: Exception | None = None
+    for attempt in range(retries):
+        wait = None
+        try:
+            r = requests.get(url, headers=hdrs, timeout=config.HTTP_TIMEOUT_S)
+        except (requests.Timeout, requests.ConnectionError) as err:
+            last = ArchiveTransientError(f"{type(err).__name__} ({url.split('?')[0].rsplit('/', 1)[-1]}): "
+                                         f"{str(err)[:160]}")
+        except requests.RequestException as err:      # malformed URL, too many redirects...
+            raise ArchivePermanentError(f"{type(err).__name__}: {str(err)[:200]}") from err
+        else:
+            if r.status_code in ok_status:
+                if validate is None:
+                    return r
+                try:
+                    validate(r.content)
+                    return r
+                except CorruptFitsError as err:
+                    last = err                        # partial transfer: one more attempt may succeed
+            elif is_transient_status(r.status_code):
+                last = ArchiveTransientError(f"HTTP {r.status_code} de IRSA: {r.text[:100]!r}")
+                wait = _retry_after_s(r)
+            else:
+                raise ArchivePermanentError(f"HTTP {r.status_code} de IRSA (no se reintenta): {r.text[:120]!r}")
+        if attempt == retries - 1:
+            break
+        delay = min(config.HTTP_BACKOFF_MAX_S, wait if wait is not None else config.HTTP_BACKOFF_S * 2 ** attempt)
+        if time.monotonic() + delay > deadline:
+            break
+        (sleep or time.sleep)(delay)
+    if isinstance(last, CorruptFitsError):
+        raise last
+    raise ArchiveTransientError(f"Sin respuesta válida tras {attempt + 1} intentos: {last}")
+
+
+def _timeout_session(timeout=None):
+    """requests.Session with SkyClues headers and a default timeout (for pyvo)."""
+    s = requests.Session()
+    s.headers.update(config.HTTP_HEADERS)
+    req = s.request
+
+    def request(*a, **k):
+        k.setdefault("timeout", timeout or config.HTTP_TIMEOUT_S)
+        return req(*a, **k)
+
+    s.request = request
+    return s
+
+
+def classify_exception(err: Exception) -> type:
+    """ArchiveTransientError or ArchivePermanentError for an exception raised by
+    pyvo/requests (HTTP status when known; network errors are transient)."""
+    if isinstance(err, ArchiveError):
+        return type(err)
+    chain = [err, getattr(err, "cause", None), err.__cause__, err.__context__]
+    for e in chain:
+        if isinstance(e, (requests.Timeout, requests.ConnectionError)):
+            return ArchiveTransientError
+    for e in chain:
+        code = getattr(e, "code", None)
+        resp = getattr(e, "response", None)
+        if not isinstance(code, int) and resp is not None:
+            code = getattr(resp, "status_code", None)
+        if isinstance(code, int) and 100 <= code <= 599:
+            return ArchiveTransientError if is_transient_status(code) else ArchivePermanentError
+    return ArchiveTransientError        # unknown service failure: bounded retries
+
+
+# ----------------------------------------------------------------------------- FITS integrity
+def validate_fits_bytes(data: bytes, required=REQUIRED_EXTENSIONS) -> None:
+    """Raise CorruptFitsError unless ``data`` is a complete SPHEREx Level-2 FITS.
+
+    Checks: FITS signature, length a multiple of the 2880-byte block, every
+    HDU readable without truncation warnings, every required extension
+    present with its data.
+    """
+    from astropy.io import fits
+    from astropy.utils.exceptions import AstropyUserWarning
+
+    if data[:6] != b"SIMPLE":
+        raise CorruptFitsError("no es un FITS (falta la cabecera SIMPLE)")
+    if len(data) % 2880:
+        raise CorruptFitsError(f"longitud {len(data)} B no múltiplo de 2880: archivo truncado")
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", AstropyUserWarning)
+            with fits.open(io.BytesIO(data), memmap=False, lazy_load_hdus=False) as hdul:
+                names = [h.name for h in hdul]
+                missing = [n for n in required if n not in names]
+                if missing:
+                    raise CorruptFitsError(f"faltan extensiones {missing} (presentes: {names})")
+                for h in hdul:
+                    if h.name in required:
+                        _ = h.data
+                info = hdul.fileinfo(len(hdul) - 1)
+                expected = int(info["datLoc"]) + int(info["datSpan"])
+                if expected != len(data):
+                    raise CorruptFitsError(f"tamaño {len(data)} B distinto del declarado por las cabeceras "
+                                           f"({expected} B)")
+    except CorruptFitsError:
+        raise
+    except Exception as err:
+        raise CorruptFitsError(f"FITS ilegible: {type(err).__name__}: {str(err)[:160]}") from err
+
+
+_validated: dict[tuple, bool] = {}
+_validated_guard = threading.Lock()
+
+
+def validate_fits_file(path: Path) -> None:
+    """validate_fits_bytes for a file on disk (memoised by path, size and mtime)."""
+    st = path.stat()
+    key = (str(path), st.st_size, st.st_mtime_ns)
+    with _validated_guard:
+        if _validated.get(key):
+            return
+    validate_fits_bytes(path.read_bytes())
+    with _validated_guard:
+        _validated[key] = True
+
+
+def quarantine(path: Path) -> Path:
+    """Move a corrupt CACHE file aside (``*.corrupt-<time>``); it is never deleted silently."""
+    if config.REFERENCE_DIR.resolve() in path.resolve().parents:
+        raise CorruptFitsError(f"Archivo de referencia dañado {path.name}: no se modifica; restáurelo del "
+                               "repositorio o de IRSA")
+    dest = path.with_name(f"{path.name}.corrupt-{time.strftime('%Y%m%dT%H%M%S')}-{uuid.uuid4().hex[:6]}")
+    try:
+        os.replace(path, dest)
+    except FileNotFoundError:     # another thread already moved it
+        pass
+    return dest
 
 _FILE_RE = re.compile(
     r"level2_(?P<obsid>[0-9A-Z_]+)D(?P<det>[1-6])_spx_l2b-v(?P<ver>\d+)-(?P<pdate>\d{4}-\d{3})\.fits"
@@ -133,21 +321,36 @@ def query_images(ra: float, dec: float, radius_deg: float = 1.0 / 3600,
     return records
 
 
+def _with_retries(what: str, fn, sleep=None):
+    """Call ``fn()`` retrying only transient failures (see http_get); permanent
+    errors raise ArchivePermanentError at once."""
+    deadline = time.monotonic() + config.HTTP_DEADLINE_S
+    last = None
+    for attempt in range(config.HTTP_RETRIES):
+        try:
+            return fn()
+        except Exception as err:  # pyvo wraps HTTP and network errors in DALServiceError
+            kind = classify_exception(err)
+            if kind is ArchivePermanentError:
+                raise ArchivePermanentError(f"{what}: {type(err).__name__}: {str(err)[:200]}") from err
+            last = err
+        if attempt == config.HTTP_RETRIES - 1:
+            break
+        delay = min(config.HTTP_BACKOFF_MAX_S, config.HTTP_BACKOFF_S * 2 ** attempt)
+        if time.monotonic() + delay > deadline:
+            break
+        (sleep or time.sleep)(delay)
+    raise ArchiveTransientError(f"{what}: sin respuesta tras {attempt + 1} intentos: "
+                                f"{type(last).__name__}: {str(last)[:200]}") from last
+
+
 def _query_images_live(ra, dec, radius_deg, collections) -> list[ObservationRecord]:
-    svc = pyvo.dal.SIA2Service(config.SIA_URL)
+    # The service constructor already contacts IRSA (/SIA/capabilities), so it is retried too.
+    svc = _with_retries("SIA2 capabilities", lambda: pyvo.dal.SIA2Service(config.SIA_URL, session=_timeout_session()))
     records: list[ObservationRecord] = []
     for coll in collections:
-        last_err = None
-        for attempt in range(config.HTTP_RETRIES):
-            try:
-                res = svc.search(pos=(ra * u.deg, dec * u.deg, radius_deg * u.deg), collection=coll)
-                tab = res.to_table()
-                break
-            except Exception as err:  # network / service errors
-                last_err = err
-                time.sleep(2 * (attempt + 1))
-        else:
-            raise RuntimeError(f"SIA2 query failed for {coll}: {last_err}")
+        tab = _with_retries(f"SIA2 {coll}", lambda: svc.search(
+            pos=(ra * u.deg, dec * u.deg, radius_deg * u.deg), collection=coll).to_table())
         for row in tab:
             if str(row["dataproduct_subtype"]).strip() not in ("science", ""):
                 continue
@@ -196,8 +399,15 @@ def _lock_for(url: str) -> threading.Lock:
         return _url_locks.setdefault(url, threading.Lock())
 
 
+def is_reference(path: Path) -> bool:
+    return config.REFERENCE_DIR.resolve() in Path(path).resolve().parents
+
+
 def local_copy(url: str) -> Path | None:
-    """Existing local file for ``url`` (reference store first, then cache), or None."""
+    """Existing local file for ``url`` (reference store first, then cache), or None.
+
+    Presence only; ``fetch`` also verifies the file's integrity.
+    """
     path = _cache_path(url)
     ref = config.REFERENCE_DIR / path.name
     if ref.exists():
@@ -205,26 +415,50 @@ def local_copy(url: str) -> Path | None:
     return path if path.exists() else None
 
 
+def _valid_local(url: str) -> Path | None:
+    """Local copy that passes the FITS integrity check. A corrupt cache file is
+    quarantined (and None returned so that it is downloaded again); a corrupt
+    reference file raises CorruptFitsError and is left untouched."""
+    hit = local_copy(url)
+    if hit is None:
+        return None
+    try:
+        validate_fits_file(hit)
+        return hit
+    except CorruptFitsError as err:
+        if is_reference(hit):
+            raise CorruptFitsError(f"Archivo de referencia dañado {hit.name} ({err}); no se modifica") from err
+        quarantine(hit)
+        return None
+
+
 def fetch(url: str, refresh: bool = False) -> Path:
-    """Return a local copy of ``url``, downloading it to the cache only if needed."""
-    if not refresh and (hit := local_copy(url)) is not None:
+    """Return a verified local copy of ``url``, downloading it to the cache only if needed.
+
+    Every file (downloaded or cached) must pass ``validate_fits_bytes`` before
+    it is used; nothing incomplete is ever written to the cache. Reference
+    files are never overwritten. Raises ArchiveTransientError,
+    ArchivePermanentError or CorruptFitsError.
+    """
+    if not refresh and (hit := _valid_local(url)) is not None:
         return hit
     path = _cache_path(url)
     with _lock_for(url):
-        if path.exists() and not refresh:      # another thread finished it meanwhile
-            return path
-        last = None
-        for attempt in range(config.HTTP_RETRIES):
-            try:
-                r = requests.get(url, headers=config.HTTP_HEADERS, timeout=config.HTTP_TIMEOUT_S)
-                if r.status_code == 200 and r.content[:6] == b"SIMPLE":
-                    return atomic_write(path, r.content)
-                last = f"HTTP {r.status_code}: {r.text[:80]!r}"
-            except requests.RequestException as err:
-                last = repr(err)
-            # IRSA answers 503 "Server busy, retry later" under load: back off.
-            time.sleep(min(60, 5 * 2 ** attempt))
-    raise RuntimeError(f"Download failed after {config.HTTP_RETRIES} attempts: {url} ({last})")
+        if not refresh and (hit := _valid_local(url)) is not None:   # another thread finished it meanwhile
+            return hit
+        r = http_get(url, validate=validate_fits_bytes)
+        return atomic_write(path, r.content)
+
+
+def redownload(url: str, path: Path) -> Path:
+    """Replace a CACHE copy that failed a check (e.g. SHA-256 against a report):
+    the old file is quarantined, never deleted. Reference files are refused."""
+    if is_reference(path):
+        raise CorruptFitsError(f"El archivo de referencia {path.name} no coincide con el informe; no se modifica")
+    with _lock_for(url):
+        if path.exists():
+            quarantine(path)
+    return fetch(url)
 
 
 def fetch_cutout(rec: ObservationRecord, ra: float, dec: float, size_deg: float) -> Path:
@@ -242,7 +476,11 @@ def fetch_many(urls: list[str], workers: int = config.DOWNLOAD_WORKERS,
     out: dict[str, Path | Exception] = {}
     todo = []
     for u in unique:
-        hit = local_copy(u)
+        try:
+            hit = _valid_local(u)
+        except CorruptFitsError as err:      # damaged reference file: reported, never replaced
+            out[u] = err
+            continue
         if hit is not None:
             out[u] = hit
         else:

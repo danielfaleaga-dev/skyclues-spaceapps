@@ -121,13 +121,7 @@ def test_fov_limits_and_invalid_input():
 
 
 # ------------------------------------------------------------------ cache robustness
-@pytest.fixture
-def tmp_store(tmp_path, monkeypatch):
-    monkeypatch.setattr(config, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(config, "REFERENCE_DIR", tmp_path / "reference")
-    return tmp_path
-
-
+# (tmp_store and l2_bytes fixtures: tests/conftest.py)
 def test_atomic_write_concurrent_writers_leave_complete_file(tmp_path):
     target = tmp_path / "x.json"
     payloads = [(f"{k}" * 200_000).encode() for k in range(8)]
@@ -148,13 +142,14 @@ class _Resp:
         self.text = ""
 
 
-def test_fetch_downloads_each_url_once_under_concurrency(tmp_store, monkeypatch):
+def test_fetch_downloads_each_url_once_under_concurrency(tmp_store, monkeypatch, l2_bytes):
     calls = []
+    blob = l2_bytes()
 
     def fake_get(url, **kw):
         calls.append(url)
         time.sleep(0.2)
-        return _Resp(b"SIMPLE  = T" + b" " * 100)
+        return _Resp(blob)
 
     monkeypatch.setattr(archive.requests, "get", fake_get)
     url = "https://example.invalid/level2_TEST_D1_spx_l2b-v1-2026-001.fits?center=1,2&size=0.1"
@@ -165,19 +160,19 @@ def test_fetch_downloads_each_url_once_under_concurrency(tmp_store, monkeypatch)
     for t in threads:
         t.join()
     assert len(calls) == 1 and len(set(results)) == 1
-    assert results[0].read_bytes().startswith(b"SIMPLE")
+    assert results[0].read_bytes() == blob
 
 
-def test_fetch_many_uses_local_copies_and_reports_progress(tmp_store, monkeypatch):
+def test_fetch_many_uses_local_copies_and_reports_progress(tmp_store, monkeypatch, l2_bytes):
     def no_network(*a, **k):
         raise AssertionError("network must not be used")
 
     monkeypatch.setattr(archive.requests, "get", no_network)
     ua = "https://example.invalid/level2_A_D1_spx_l2b-v1-2026-001.fits?center=1,2&size=0.1"
     ub = "https://example.invalid/level2_B_D1_spx_l2b-v1-2026-001.fits?center=1,2&size=0.1"
-    archive.atomic_write(archive._cache_path(ua), b"SIMPLE cache")
+    archive.atomic_write(archive._cache_path(ua), l2_bytes(tag="cache"))
     ref = config.REFERENCE_DIR / archive._cache_path(ub).name
-    archive.atomic_write(ref, b"SIMPLE reference")
+    archive.atomic_write(ref, l2_bytes(tag="reference"))
     seen = []
     got = archive.fetch_many([ua, ub, ua], progress=lambda d, t, n: seen.append((d, t, n)))
     assert list(got) == [ua, ub]

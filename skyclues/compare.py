@@ -92,9 +92,40 @@ def _status(ok_pass: bool, ok_warn: bool = False) -> str:
     return "pass" if ok_pass else ("warn" if ok_warn else "fail")
 
 
+def spectral_status(value_bw: float) -> str:
+    """lambda mismatch in bandwidth units: <= SPECTRAL_PASS_BW pass, <= SPECTRAL_WARN_BW
+    warn, above it fail (not comparable). NaN (cannot be evaluated) fails."""
+    if value_bw is None or not np.isfinite(value_bw):
+        return "fail"
+    return _status(value_bw <= config.SPECTRAL_PASS_BW, value_bw <= config.SPECTRAL_WARN_BW)
+
+
+def finast_status(values) -> str:
+    """FINAST (fine-astrometry status, Explanatory Supplement): 0 good -> pass;
+    1 partial solution (offsets of a couple of pixels in the image corners) -> warn;
+    >= 2 poor, "should not be used", or missing/unreadable -> fail."""
+    try:
+        v = [int(x) for x in values]
+    except (TypeError, ValueError):
+        return "fail"
+    if any(x >= 2 or x < 0 for x in v):
+        return "fail"
+    return "warn" if any(x == 1 for x in v) else "pass"
+
+
+#: What a criterion's result rests on (shown to the user).
+BASIS_EFFECTIVE = "efectiva"
+#: IRSA only publishes images with L2DQA = PASS and FINAST = 0 (Explanatory
+#: Supplement §3.2.12): these checks re-read the header but cannot discriminate
+#: among archive products; they only protect against non-standard files.
+BASIS_ARCHIVE = "garantía del archivo"
+
+
 def evaluate_pair(a: SpectralImage, b: SpectralImage, ra: float, dec: float,
                   field_deg: float, collections: tuple[str, str] | None = None,
-                  mask_classes=("unusable", "artifact")) -> PairEvaluation:
+                  mask_classes=("unusable", "artifact"), astrometry=None) -> PairEvaluation:
+    """``ra, dec`` is the field centre; with ``astrometry`` the target
+    wavelength of each image is read at the position calculated for its date."""
     iy, ix, in_b, ra_a, dec_a = map_onto(a, b)
     sep = separation_deg(ra_a, dec_a, ra, dec)
     field_mask = sep <= field_deg / 2
@@ -111,8 +142,10 @@ def evaluate_pair(a: SpectralImage, b: SpectralImage, ra: float, dec: float,
     lam_b_on_a = place_on_a(b.wavelength_um, (iy, ix), in_b)
     dl = (a.wavelength_um - lam_b_on_a) / a.bandwidth_um
     dl_common = np.abs(dl[common])
-    lam_a_t, bw_a_t = lambda_at(a, ra, dec)
-    lam_b_t, bw_b_t = lambda_at(b, ra, dec)
+    pos_a = astrometry.position_at(a.meta["MJD-AVG"]) if astrometry is not None else (ra, dec)
+    pos_b = astrometry.position_at(b.meta["MJD-AVG"]) if astrometry is not None else (ra, dec)
+    lam_a_t, bw_a_t = lambda_at(a, *pos_a)
+    lam_b_t, bw_b_t = lambda_at(b, *pos_b)
     dl_target = abs(lam_a_t - lam_b_t) / bw_a_t if np.isfinite(bw_a_t) else float("nan")
 
     mjd_a, mjd_b = a.meta["MJD-AVG"], b.meta["MJD-AVG"]
@@ -133,14 +166,14 @@ def evaluate_pair(a: SpectralImage, b: SpectralImage, ra: float, dec: float,
          "status": _status(dt >= config.MIN_TIME_SEPARATION_DAYS)},
         {"id": "C3", "criterion": "Mismo canal efectivo en el objetivo (LVF)",
          "value": f"|Δλ| = {abs(lam_a_t - lam_b_t) * 1000:.1f} nm = {dl_target:.2f} × ancho de banda",
-         "threshold": f"≤ {config.SPECTRAL_PASS_BW} (aviso ≤ {config.SPECTRAL_WARN_BW})",
-         "status": _status(dl_target <= config.SPECTRAL_PASS_BW, dl_target <= config.SPECTRAL_WARN_BW)},
+         "threshold": f"≤ {config.SPECTRAL_PASS_BW} (aviso ≤ {config.SPECTRAL_WARN_BW}; rechazo por encima)",
+         "status": spectral_status(dl_target)},
         {"id": "C4", "criterion": "Desajuste espectral máximo en la zona común",
-         "value": (f"máx |Δλ| = {np.max(dl_common) if dl_common.size else float('nan'):.2f} × ancho de banda; "
-                   f"{np.mean(dl_common <= config.SPECTRAL_PASS_BW) if dl_common.size else 0:.0%} de la zona común "
-                   f"≤ {config.SPECTRAL_PASS_BW}"),
-         "threshold": f"≤ {config.SPECTRAL_WARN_BW}",
-         "status": _status(bool(dl_common.size) and np.max(dl_common) <= config.SPECTRAL_WARN_BW, True)},
+         "value": (f"máx |Δλ| = {np.max(dl_common):.2f} × ancho de banda; "
+                   f"{np.mean(dl_common <= config.SPECTRAL_PASS_BW):.0%} de la zona común "
+                   f"≤ {config.SPECTRAL_PASS_BW}") if dl_common.size else "sin zona común",
+         "threshold": f"≤ {config.SPECTRAL_PASS_BW} (aviso ≤ {config.SPECTRAL_WARN_BW}; rechazo por encima)",
+         "status": spectral_status(float(np.max(dl_common)) if dl_common.size else float("nan"))},
         {"id": "C5", "criterion": "Cobertura común válida del campo",
          "value": f"{coverage:.1%} ({n_common} px; solapamiento geométrico {geom_overlap:.1%})",
          "threshold": f"≥ {config.COVERAGE_PASS:.0%} (aviso ≥ {config.COVERAGE_WARN:.0%})",
@@ -148,10 +181,12 @@ def evaluate_pair(a: SpectralImage, b: SpectralImage, ra: float, dec: float,
                            coverage >= config.COVERAGE_WARN and n_common >= config.MIN_COMMON_VALID_PIXELS)},
         {"id": "C6", "criterion": "Control de calidad oficial L2 (L2DQAFLG)",
          "value": f"{a.meta['L2DQAFLG']} / {b.meta['L2DQAFLG']}", "threshold": "Pass / Pass",
-         "status": _status(str(a.meta["L2DQAFLG"]).strip() == "Pass" and str(b.meta["L2DQAFLG"]).strip() == "Pass")},
-        {"id": "C7", "criterion": "Astrometría fina válida (FINAST = 0)",
-         "value": f"{a.meta['FINAST']} / {b.meta['FINAST']}", "threshold": "0 / 0",
-         "status": _status(a.meta["FINAST"] == 0 and b.meta["FINAST"] == 0, True)},
+         "status": _status(str(a.meta["L2DQAFLG"]).strip() == "Pass" and str(b.meta["L2DQAFLG"]).strip() == "Pass"),
+         "basis": BASIS_ARCHIVE},
+        {"id": "C7", "criterion": "Astrometría fina válida (FINAST)",
+         "value": f"{a.meta.get('FINAST')} / {b.meta.get('FINAST')}",
+         "threshold": "0 / 0 (1 = solución parcial: aviso; ≥ 2 = no utilizable: rechazo)",
+         "status": finast_status([a.meta.get("FINAST"), b.meta.get("FINAST")]), "basis": BASIS_ARCHIVE},
         {"id": "C8", "criterion": "Mismo procesamiento (colección y versión de software)",
          "value": f"{(collections or ('?', '?'))[0]} v{a.meta['VERSION']} / {(collections or ('?', '?'))[1]} v{b.meta['VERSION']}",
          "threshold": "iguales (si difieren: aviso de calibración)",
@@ -161,11 +196,14 @@ def evaluate_pair(a: SpectralImage, b: SpectralImage, ra: float, dec: float,
          "value": f"{sat_a:.2%} / {sat_b:.2%}", "threshold": f"≤ {config.SATURATION_WARN_FRACTION:.1%}",
          "status": _status(max(sat_a, sat_b) <= config.SATURATION_WARN_FRACTION, True)},
     ]
+    for c in criteria:
+        c.setdefault("basis", BASIS_EFFECTIVE)
 
     za = float(np.nanmedian(a.zodi[field_mask]))
     zb = float(np.nanmedian(place_on_a(b.zodi, (iy, ix), in_b)[field_mask]))
     metrics = {
         "target_radec_deg": [float(ra), float(dec)],
+        "target_expected_radec_deg": [list(map(float, pos_a)), list(map(float, pos_b))],
         "mask_classes": list(mask_classes),
         "field_deg": field_deg,
         "n_field_px": n_field,

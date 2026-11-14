@@ -38,7 +38,9 @@ import numpy as np
 from astropy.time import Time
 
 from . import archive, config, fitsdata
-from .compare import lambda_at, map_onto, place_on_a
+from .astrometry import Astrometry
+from .compare import (BASIS_ARCHIVE, BASIS_EFFECTIVE, finast_status, lambda_at, map_onto, place_on_a,
+                      spectral_status)
 from .fitsdata import SpectralImage
 from .geometry import separation_deg
 from .pairing import build_candidates, estimate_wavelengths
@@ -62,6 +64,9 @@ class Frame:
     lambda_target_um: float = float("nan")
     bandwidth_target_um: float = float("nan")
     quality: dict = field(default_factory=dict)
+    #: expected (calculated) target position at this frame's date: (ra, dec) in
+    #: degrees. A calculation from catalogue astrometry, not a detection.
+    expected_radec: tuple = None
 
     @property
     def obs_id(self) -> str:
@@ -99,6 +104,7 @@ class Frame:
             "exptime_s": self.image.meta.get("XPOSURE"), "software_version": self.image.meta.get("VERSION"),
             "file_name": self.record.get("file_name"), "access_url": self.record.get("access_url"),
             "cutout_url": self.cutout_url, "local_file": self.path.name, "sha256": self.sha256,
+            "expected_target_radec_deg": list(self.expected_radec) if self.expected_radec else None,
             "quality": self.quality,
         }
 
@@ -118,7 +124,16 @@ class TemporalSequence:
     metrics: dict
     notes: list[str]
     reference_index: int = 0
+    astrometry: Astrometry | None = None   # catalogue astrometry of the target, if known
     _cache: dict = field(default_factory=dict, repr=False, compare=False)
+
+    def target_position(self, i: int) -> tuple[float, float]:
+        """Calculated target position at the date of frame i (field centre if unknown)."""
+        return self.frames[i].expected_radec or (self.ra, self.dec)
+
+    @property
+    def target_moves(self) -> bool:
+        return self.astrometry is not None and self.astrometry.has_proper_motion
 
     # -- convenience ------------------------------------------------------
     @property
@@ -226,8 +241,11 @@ class TemporalSequence:
         return np.hypot(bx - np.rint(bx), by - np.rint(by))
 
     def summary(self) -> dict:
+        target = {"ra_deg": self.ra, "dec_deg": self.dec, "field_deg": self.field_deg}
+        if self.astrometry is not None:
+            target["astrometry"] = self.astrometry.to_dict()
         return {
-            "target": {"ra_deg": self.ra, "dec_deg": self.dec, "field_deg": self.field_deg},
+            "target": target,
             "n_frames": self.n, "reference_index": self.reference_index,
             "mask_classes": list(self.mask_classes),
             "frames": [f.summary() for f in self.frames],
@@ -242,9 +260,12 @@ def _status(ok_pass: bool, ok_warn: bool = False) -> str:
 
 
 def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: float,
-                      mask_classes=STRICT) -> TemporalSequence:
+                      mask_classes=STRICT, astrometry: Astrometry | None = None) -> TemporalSequence:
     """Align N frames on the earliest one and evaluate global criteria S1-S9.
 
+    ``ra, dec`` is the field centre. With ``astrometry`` the target position
+    is propagated to every frame's date (``frame.expected_radec``) and the
+    target wavelength is read there; without it the field centre is used.
     Frames are shallow-copied (the SpectralImage is shared and read-only), so
     one Frame can take part in several candidate sequences safely.
     """
@@ -259,7 +280,8 @@ def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: flo
     for f in frames:
         iy, ix, inside, _, _ = map_onto(ref, f.image)
         f.index_on_ref, f.inside_ref = (iy, ix), inside
-        f.lambda_target_um, f.bandwidth_target_um = lambda_at(f.image, ra, dec)
+        f.expected_radec = astrometry.position_at(f.mjd) if astrometry is not None else None
+        f.lambda_target_um, f.bandwidth_target_um = lambda_at(f.image, *(f.expected_radec or (ra, dec)))
 
     valid_stack = np.stack([f.valid_on_reference(mask_classes) for f in frames])
     common = field_mask & valid_stack.all(axis=0)
@@ -312,14 +334,15 @@ def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: flo
          "status": _status(len(gaps) > 0 and gaps.min() >= config.MIN_TIME_SEPARATION_DAYS)},
         {"id": "S3", "criterion": "Mismo canal efectivo en el objetivo (dispersión de λ entre todas las épocas)",
          "value": f"{(np.nanmax(lam_t) - np.nanmin(lam_t)) * 1000:.1f} nm = {spread_target:.2f} × ancho de banda",
-         "threshold": f"≤ {config.SPECTRAL_PASS_BW} (aviso ≤ {config.SPECTRAL_WARN_BW})",
-         "status": _status(spread_target <= config.SPECTRAL_PASS_BW, spread_target <= config.SPECTRAL_WARN_BW)},
+         "threshold": f"≤ {config.SPECTRAL_PASS_BW} (aviso ≤ {config.SPECTRAL_WARN_BW}; rechazo por encima)",
+         "status": spectral_status(spread_target)},
         {"id": "S4", "criterion": "Dispersión espectral máxima en la región común",
          "value": (f"máx {max_sp:.2f} × ancho de banda; "
                    f"{np.mean(sp_common <= config.SPECTRAL_PASS_BW) if sp_common.size else 0:.0%} "
-                   f"de la región ≤ {config.SPECTRAL_PASS_BW}"),
-         "threshold": f"≤ {config.SPECTRAL_PASS_BW} en toda la región (aviso hasta {config.SPECTRAL_WARN_BW})",
-         "status": _status(bool(sp_common.size) and max_sp <= config.SPECTRAL_PASS_BW, True)},
+                   f"de la región ≤ {config.SPECTRAL_PASS_BW}") if sp_common.size else "sin región común",
+         "threshold": (f"≤ {config.SPECTRAL_PASS_BW} en toda la región (aviso ≤ {config.SPECTRAL_WARN_BW}; "
+                       "rechazo por encima)"),
+         "status": spectral_status(max_sp)},
         {"id": "S5", "criterion": "Cobertura válida común a TODAS las épocas",
          "value": f"{coverage:.1%} ({n_common} px; solapamiento geométrico {geom:.1%})",
          "threshold": f"≥ {config.COVERAGE_PASS:.0%} (aviso ≥ {config.COVERAGE_WARN:.0%})",
@@ -327,10 +350,11 @@ def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: flo
                            coverage >= config.COVERAGE_WARN and n_common >= config.MIN_COMMON_VALID_PIXELS)},
         {"id": "S6", "criterion": "Control de calidad oficial L2 en todas",
          "value": " / ".join(dqa), "threshold": "todas Pass",
-         "status": _status(all(d == "Pass" for d in dqa))},
-        {"id": "S7", "criterion": "Astrometría fina válida en todas (FINAST = 0)",
-         "value": " / ".join(str(v) for v in fin), "threshold": "todas 0",
-         "status": _status(all(v == 0 for v in fin), True)},
+         "status": _status(all(d == "Pass" for d in dqa)), "basis": BASIS_ARCHIVE},
+        {"id": "S7", "criterion": "Astrometría fina válida en todas (FINAST)",
+         "value": " / ".join(str(v) for v in fin),
+         "threshold": "todas 0 (1 = solución parcial: aviso; ≥ 2 = no utilizable: rechazo)",
+         "status": finast_status(fin), "basis": BASIS_ARCHIVE},
         {"id": "S8", "criterion": "Mismo procesamiento (colección y versión de software)",
          "value": f"{', '.join(sorted(colls))} · v{', '.join(sorted(str(v) for v in vers))}",
          "threshold": "una colección y una versión",
@@ -339,6 +363,8 @@ def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: flo
          "value": f"{max(sat_frac):.2%}", "threshold": f"≤ {config.SATURATION_WARN_FRACTION:.1%}",
          "status": _status(max(sat_frac) <= config.SATURATION_WARN_FRACTION, True)},
     ]
+    for c in criteria:
+        c.setdefault("basis", BASIS_EFFECTIVE)
 
     # Pairwise lambda mismatch at the target (all pairs, not only consecutive).
     pair_dl = [[abs(a - b) / bw_t for b in lam_t] for a in lam_t]
@@ -369,6 +395,21 @@ def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: flo
         "mask_classes": list(mask_classes),
     }
     notes = []
+    if astrometry is not None and astrometry.has_proper_motion:
+        pos = [f.expected_radec for f in frames]
+        off = [float(separation_deg(p[0], p[1], ra, dec)) * 3600 for p in pos]
+        moved = float(separation_deg(pos[0][0], pos[0][1], pos[-1][0], pos[-1][1])) * 3600
+        metrics["target_expected_radec_deg"] = [list(p) for p in pos]
+        metrics["target_offset_from_centre_arcsec"] = off
+        metrics["target_motion_in_sequence_arcsec"] = moved
+        notes.append(f"Objetivo con movimiento propio ({astrometry.total_pm_arcsec_yr:.2f}″/año): posición calculada "
+                     f"para cada fecha desde {astrometry.name} (época {astrometry.epoch_jyear:.1f}); se desplaza "
+                     f"{moved:.1f}″ durante la secuencia y queda a {min(off):.0f}–{max(off):.0f}″ del centro del campo. "
+                     "Es un cálculo, no una detección.")
+        if max(off) > field_deg * 3600 / 2:
+            notes.append("La posición calculada del objetivo queda FUERA del campo de comparación en alguna época.")
+    if astrometry is not None:
+        notes += astrometry.warnings() if astrometry.has_proper_motion else []
     if max(zodi_med) - min(zodi_med) > 0.05 * max(abs(z) for z in zodi_med):
         notes.append(f"El fondo zodiacal modelado varía entre épocas ({min(zodi_med):.3f}–{max(zodi_med):.3f} MJy/sr): "
                      "la secuencia muestra IMAGE − ZODI por defecto.")
@@ -376,7 +417,8 @@ def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: flo
         notes.append("Detectores 1–2: posible contaminación por airglow de He I (HE_AIRGLOW_CONT).")
     return TemporalSequence(ra=ra, dec=dec, field_deg=field_deg, frames=frames, mask_classes=tuple(mask_classes),
                             field_mask=field_mask, valid_stack=valid_stack, common_mask=common,
-                            lambda_spread_bw=spread, criteria=criteria, metrics=metrics, notes=notes)
+                            lambda_spread_bw=spread, criteria=criteria, metrics=metrics, notes=notes,
+                            astrometry=astrometry)
 
 
 # --------------------------------------------------------------------------- metadata-stage proposals
@@ -441,15 +483,16 @@ def _frame_from(cand, ra, dec, field_deg, path: Path) -> Frame:
                  path=path, sha256=archive.sha256(path))
 
 
-def pruning_path(frames: list[Frame], ra, dec, field_deg, mask_classes=STRICT) -> list[TemporalSequence]:
+def pruning_path(frames: list[Frame], ra, dec, field_deg, mask_classes=STRICT,
+                 astrometry: Astrometry | None = None) -> list[TemporalSequence]:
     """Evaluate the full set, then greedily drop the frame that costs most common
     coverage, down to two frames. Every state is a candidate option."""
-    states = [evaluate_sequence(frames, ra, dec, field_deg, mask_classes)]
+    states = [evaluate_sequence(frames, ra, dec, field_deg, mask_classes, astrometry)]
     current = list(states[0].frames)
     while len(current) > 2:
         best = None
         for i in range(len(current)):
-            trial = evaluate_sequence(current[:i] + current[i + 1:], ra, dec, field_deg, mask_classes)
+            trial = evaluate_sequence(current[:i] + current[i + 1:], ra, dec, field_deg, mask_classes, astrometry)
             if best is None or trial.metrics["coverage_common_valid"] > best.metrics["coverage_common_valid"]:
                 best = trial
         states.append(best)
@@ -498,21 +541,48 @@ def find_sequence(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD
                   collections=config.WIDE_COLLECTIONS, detectors=None,
                   max_frames: int = config.MAX_SEQUENCE_FRAMES,
                   max_candidates: int = config.MAX_SEQUENCE_CANDIDATES,
-                  mask_classes=STRICT, log=print, progress=None):
+                  mask_classes=STRICT, log=print, progress=None, astrometry: Astrometry | None = None):
     """Search IRSA and return (best TemporalSequence | None, JSON-able report).
 
     ``progress(stage, fraction, message)``, if given, is called at every stage
     (``STAGES``) and after each FITS cutout, with ``fraction`` in [0, 1].
+
+    With ``astrometry`` of a moving target, ``ra, dec`` are ignored: the
+    field is centred on the position calculated for the median date of the
+    archive observations (rounded to 0.1 yr so that repeated searches reuse
+    the same cutouts) and every frame gets its own calculated position.
+    Invalid coordinates or field sizes raise ValueError before any query.
     """
+    from .targets import validate_coordinates, validate_fov_deg
+
     def step(stage, frac, msg):
         if progress:
             progress(stage, min(1.0, max(0.0, frac)), msg)
+
+    moving = astrometry is not None and astrometry.has_proper_motion
+    if astrometry is not None:
+        validate_coordinates(astrometry.ra_deg, astrometry.dec_deg)
+        ra, dec = astrometry.position_at(round(Time.now().jyear, 1))   # provisional query position
+    ra, dec = validate_coordinates(ra, dec)
+    field_deg = validate_fov_deg(field_deg)
 
     t0 = time.time()
     step("catalog", 0.02, "Consultando el catálogo SPHEREx de IRSA (SIA2)…")
     records = archive.query_images(ra, dec, collections=collections)
     if detectors:
         records = [r for r in records if r.detector in set(detectors)]
+    centre = {"rule": "coordenadas introducidas (sin astrometría: se usan para todas las fechas)"}
+    if astrometry is not None:
+        centre = {"rule": "posición de catálogo (sin movimiento propio)"}
+    if moving and records:
+        t_c = round(float(Time(float(np.median([r.mjd_mid for r in records])), format="mjd").jyear), 1)
+        ra1, dec1 = astrometry.position_at(t_c)
+        log(f"Movimiento propio: centro en la posición calculada para {t_c:.1f} "
+            f"({float(separation_deg(ra, dec, ra1, dec1)) * 3600:.1f}″ de la consulta provisional; "
+            f"{astrometry.offset_arcsec(t_c, astrometry.ra_deg, astrometry.dec_deg):.0f}″ de la posición de catálogo)")
+        ra, dec = ra1, dec1
+        centre = {"rule": "posición calculada (movimiento propio + paralaje) en la época mediana de las "
+                          "observaciones del archivo, redondeada a 0.1 años", "epoch_jyear": t_c}
     log(f"SIA2: {len(records)} imágenes contienen el objetivo ({', '.join(collections)})")
     cands = build_candidates(records, ra, dec, field_deg)
     log(f"Con el campo completo dentro del detector: {len(cands)}")
@@ -537,19 +607,27 @@ def find_sequence(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD
     log(f"Recortes FITS: {len(set(urls))} en {time.time() - t1:.0f} s")
     step("evaluate", 0.86, "Alineando épocas y evaluando los criterios S1–S9…")
 
-    options, origins, failures = [], [], []
+    failures = []
+    for u in sorted(set(urls)):
+        res = got.get(u)
+        if isinstance(res, Exception) or res is None:
+            failures.append({"file": u.split("?")[0].rsplit("/", 1)[-1], "cutout_url": u,
+                             "kind": "transitorio" if isinstance(res, archive.ArchiveTransientError) else "permanente",
+                             "error": str(res)[:200]})
+    if failures:
+        log(f"AVISO: {len(failures)} de {len(set(urls))} recortes no se pudieron obtener; "
+            "la selección se hace sin ellos")
+    options, origins = [], []
     for k, p in enumerate(chosen_props):
         frames = []
         for m in p["members"]:
-            u = archive.cutout_url(m.rec.access_url, ra, dec, field_deg)
-            res = got.get(u)
+            res = got.get(archive.cutout_url(m.rec.access_url, ra, dec, field_deg))
             if isinstance(res, Exception) or res is None:
-                failures.append({"file": m.rec.file_name, "error": str(res)[:200]})
                 continue
             frames.append(_frame_from(m, ra, dec, field_deg, res))
         if len(frames) < 2:
             continue
-        for s in pruning_path(frames, ra, dec, field_deg, mask_classes):
+        for s in pruning_path(frames, ra, dec, field_deg, mask_classes, astrometry):
             options.append(s)
             origins.append(f"propuesta {k + 1} ({p['n']} épocas)")
             log(f"  D{s.frames[0].detector} {s.n} épocas · cobertura común {s.metrics['coverage_common_valid']:.1%} · "
@@ -574,9 +652,16 @@ def find_sequence(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD
                                         "coverage": o.metrics["coverage_common_valid"],
                                         "obs_ids": [f.obs_id for f in o.frames],
                                         "reasons": why or ["peor puntuación"]})
+    target = {"ra_deg": ra, "dec_deg": dec, "field_deg": field_deg, "centre": centre}
+    if astrometry is not None:
+        target["astrometry"] = astrometry.to_dict()
+        target["astrometry_warnings"] = astrometry.warnings()
+    n_req = len(set(urls))
     report = {
         "kind": "sequence",
-        "target": {"ra_deg": ra, "dec_deg": dec, "field_deg": field_deg},
+        "target": target,
+        "retrieval": {"n_requested": n_req, "n_failed": len(failures), "complete": not failures,
+                      "n_transient": sum(f["kind"] == "transitorio" for f in failures)},
         "collections": list(collections),
         "n_records": len(records), "n_candidates": len(cands), "n_proposals": len(proposals),
         "proposals": [{"n": p["n"], "detector": p["detector"], "spread_field_bw_est": p["spread_field_bw_est"],
@@ -650,13 +735,21 @@ def load_sequence(report: dict | str | Path, mask_classes=STRICT, verify: bool =
     frames = []
     for url, digest, rec in items:
         path = got[url]
+        name = url.split("?")[0].rsplit("/", 1)[-1]
         if isinstance(path, Exception):
-            raise RuntimeError(f"No se pudo obtener {url.split('?')[0].rsplit('/', 1)[-1]}: {path}") from path
+            cls = type(path) if isinstance(path, archive.ArchiveError) else RuntimeError
+            raise cls(f"No se pudo obtener {name}: {path}") from path
         actual = archive.sha256(path)
+        if verify and digest and actual != digest and not archive.is_reference(path):
+            # A cache copy that differs from the report: set it aside and download it once more.
+            path = archive.redownload(url, path)
+            actual = archive.sha256(path)
         if verify and digest and actual != digest:
-            raise ValueError(f"SHA-256 mismatch for {path.name}: the cached FITS differs from the report")
+            raise ValueError(f"SHA-256 de {path.name} distinto del informe: el FITS local no es el analizado "
+                             f"({'archivo de referencia, no se modifica' if archive.is_reference(path) else 'también tras volver a descargarlo'})")
         frames.append(Frame(image=fitsdata.load(path), record=rec, cutout_url=url, path=path, sha256=actual))
-    return evaluate_sequence(frames, t["ra_deg"], t["dec_deg"], t["field_deg"], mask_classes)
+    return evaluate_sequence(frames, t["ra_deg"], t["dec_deg"], t["field_deg"], mask_classes,
+                             Astrometry.from_dict(t.get("astrometry")))
 
 
 __all__ = ["Frame", "TemporalSequence", "evaluate_sequence", "find_sequence", "load_sequence",

@@ -23,7 +23,7 @@ Para buscar una secuencia reproducible de N épocas comparables:
 - Punto de entrada: `app.py` en la raíz. Dependencias de ejecución: `requirements.txt` (solo runtime; las de desarrollo están en `requirements-dev.txt`). Configuración: `.streamlit/config.toml`.
 - Versión de Python: se elige en *Advanced settings* al desplegar. Se recomienda 3.11, la versión de desarrollo. También se ha probado una instalación limpia con 3.14.
 - La app escribe en `data/cache/` (FITS de IRSA, sin modificar) y en `results/search_*.json`. En Community Cloud ese disco no es persistente: tras un reinicio, los recortes se vuelven a descargar.
-- Opcional: `python scripts/bundle_reference.py` copia a `data/reference/` los FITS de los ejemplos validados (~28 MB, SHA-256 verificado), para que se abran sin depender de IRSA. Versionarlos es una decisión del repositorio.
+- `data/reference/` contiene los FITS de los ejemplos validados (6 archivos, 24 MB, idénticos a los recortes de IRSA; procedencia y SHA-256 en `data/reference/MANIFEST.json`), para que se abran sin depender de IRSA. `python scripts/bundle_reference.py` los regenera desde la caché o IRSA y nunca sobrescribe un archivo existente.
 
 Datos: NASA/IPAC Infrared Science Archive, SPHEREx DR1 (doi:10.26131/IRSA678) y QR3.
 

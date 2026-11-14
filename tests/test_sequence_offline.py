@@ -115,3 +115,29 @@ console.log(JSON.stringify(out));
     assert out["seekClamp"] == [0, 2]
     assert out["blinkStart"] == 1 and out["blink"] == [3, 1, 3, 1] and out["blinkMs"] == 250
     assert out["stepLeavesBlink"] and out["singleFrameNoPlay"]
+
+
+@pytest.mark.skipif(NODE is None, reason="Node.js not installed")
+def test_keyboard_shortcuts_respect_the_focused_control(tmp_path):
+    """SC-07: arrows on the slider or the speed select, and space on the Repeat
+    checkbox or a button, keep their native meaning only (no double step)."""
+    core = tmp_path / "core.js"
+    core.write_text(PLAYER_CORE_JS, encoding="utf-8")
+    script = tmp_path / "keys.js"
+    script.write_text("""
+const { shortcutAction: f } = require(%s);
+console.log(JSON.stringify({
+  body: [f('Space', 'BODY'), f('ArrowRight', 'BODY'), f('ArrowLeft', 'DIV'), f('KeyA', 'BODY')],
+  slider: [f('ArrowRight', 'INPUT', 'range'), f('ArrowLeft', 'INPUT', 'range'), f('Space', 'INPUT', 'range')],
+  select: [f('ArrowDown', 'SELECT'), f('ArrowRight', 'SELECT')],
+  checkbox: f('Space', 'INPUT', 'checkbox'), button: f('Space', 'BUTTON'),
+  editable: f('Space', 'DIV', undefined, true), modifier: f('ArrowRight', 'BODY', undefined, false, true),
+}));
+""" % json.dumps(str(core)), encoding="utf-8")
+    res = subprocess.run([NODE, str(script)], capture_output=True, text=True, timeout=30)
+    assert res.returncode == 0, res.stderr
+    out = json.loads(res.stdout)
+    assert out["body"] == ["toggle", "next", "prev", None]
+    assert out["slider"] == [None, None, None] and out["select"] == [None, None]
+    assert out["checkbox"] is None and out["button"] is None
+    assert out["editable"] is None and out["modifier"] is None

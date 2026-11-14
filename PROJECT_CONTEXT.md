@@ -8,7 +8,7 @@ Aplicación web de ciencia ciudadana para el desafío **Planet X and SPHEREx** d
 
 - Desafío: https://www.spaceappschallenge.org/2026/challenges/planet-x-and-spherex/
 - Lo central del desafío es buscar por coordenadas, recuperar las imágenes de esa región y ver una secuencia temporal tipo vídeo para detectar objetos que cambian.
-- Objetos de prueba citados por NASA: Barnard's Star, Epsilon Indi B, WISE 0855−0714 (RA 08h55m10.831s, Dec −07°14′42.53″), RW Aurigae y R Draconis. No se garantiza que ninguno muestre un cambio detectable.
+- Objetos de prueba citados por NASA: Barnard's Star, Epsilon Indi B, WISE 0855−0714 (RA 08h55m10.831s, Dec −07°14′42.53″), RW Aurigae y R Draconis. No se garantiza que ninguno muestre un cambio detectable. Las coordenadas del enunciado para WISE 0855 corresponden a la época ≈2010.4 (era WISE), no a J2000.0: con la astrometría de SIMBAD, en 2026 el objeto está a ≈2′ de ellas.
 - El enunciado sugiere además datos actualizados, espectros, sumas y restas de imágenes, campo configurable, Gaia/WISE, URL con coordenadas, metadatos de calidad y Aladin. Son ideas de diseño, no requisitos.
 
 ## Decisiones aprobadas
@@ -29,7 +29,7 @@ Aplicación web de ciencia ciudadana para el desafío **Planet X and SPHEREx** d
 4. **LVF:** en SPHEREx la longitud de onda depende de la posición en el detector. Dos fechas solo se comparan si coinciden detector, canal efectivo (Δλ pequeño respecto al ancho de banda), cobertura común, FLAGS y calidad. Una diferencia espectral, geométrica o instrumental no es variabilidad.
 5. El fondo zodiacal (extensión ZODI) cambia con la fecha y **no está restado** en IMAGE.
 6. Hay artefactos que parecen moverse porque están fijos en el detector y el apuntado cambia. Nunca se declara un asteroide, un movimiento o un descubrimiento sin pruebas suficientes. Decir «la evidencia es insuficiente» es un resultado válido.
-7. Las posiciones de catálogo dependen de la época (Barnard ≈ 10.4″/año). Una posición propagada no es una detección.
+7. Las posiciones de catálogo dependen de la época (Barnard ≈ 10.4″/año). La posición del objetivo se calcula para la fecha de cada observación (Astropy: movimiento propio, paralaje y velocidad radial de SIMBAD cuando existen) y la búsqueda se centra en ella. Una posición propagada no es una detección, y se avisa cuando faltan parámetros.
 8. El cubo HiPS global de DR1 es un **producto combinado**: sirve para explorar el espectro, nunca como secuencia temporal.
 9. Los detectores automáticos de movimiento y variabilidad de SkyCluesLab fueron experimentales y de baja sensibilidad. No se reconstruyen en el núcleo.
 10. Las métricas de comparabilidad usan siempre la máscara estricta. Cualquier vista exploratoria (por ejemplo, píxeles HALO visibles) identifica los píxeles afectados y no modifica las métricas. Un producto remuestreado se etiqueta como tal.
