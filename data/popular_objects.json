@@ -1,0 +1,231 @@
+{
+  "verified_utc": "2026-11-14T19:25:13.875383+00:00",
+  "endpoint": "https://simbad.harvard.edu/simbad/sim-tap",
+  "objects": [
+    {
+      "id": "* eps Ind",
+      "aliases": [
+        "Epsilon Indi",
+        "eps Ind"
+      ],
+      "type": "PM*",
+      "astrometry": {
+        "name": "* eps Ind",
+        "ra_deg": 330.8402234423433,
+        "dec_deg": -56.785978554364995,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": 3966.661,
+        "pmdec_masyr": -2536.192,
+        "parallax_mas": 274.8431,
+        "rv_kms": -40.035,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2020yCat.1350....0G"
+      },
+      "extended": false
+    },
+    {
+      "id": "* eps Ind B",
+      "aliases": [
+        "Epsilon Indi B",
+        "eps Ind B"
+      ],
+      "type": "BD*",
+      "astrometry": {
+        "name": "* eps Ind B",
+        "ra_deg": 331.04414658852124,
+        "dec_deg": -56.782844195116105,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": 3981.977,
+        "pmdec_masyr": -2466.832,
+        "parallax_mas": 270.658,
+        "rv_kms": null,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2020yCat.1350....0G"
+      },
+      "extended": false
+    },
+    {
+      "id": "NAME Barnard's star",
+      "aliases": [
+        "Barnard",
+        "Estrella de Barnard",
+        "Barnard’s star"
+      ],
+      "type": "BY*",
+      "astrometry": {
+        "name": "NAME Barnard's star",
+        "ra_deg": 269.4520769586187,
+        "dec_deg": 4.693364966576667,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": -801.551,
+        "pmdec_masyr": 10362.394,
+        "parallax_mas": 546.9759,
+        "rv_kms": -110.11,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2020yCat.1350....0G"
+      },
+      "extended": false
+    },
+    {
+      "id": "HD 209458",
+      "aliases": [
+        "HD209458"
+      ],
+      "type": "*",
+      "astrometry": {
+        "name": "HD 209458",
+        "ra_deg": 330.79488644388,
+        "dec_deg": 18.88431927594,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": 29.766,
+        "pmdec_masyr": -17.976,
+        "parallax_mas": 20.7694,
+        "rv_kms": -14.743,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2020yCat.1350....0G"
+      },
+      "extended": false
+    },
+    {
+      "id": "M 101",
+      "aliases": [
+        "M101",
+        "NGC 5457"
+      ],
+      "type": "GiP",
+      "astrometry": {
+        "name": "M 101",
+        "ra_deg": 210.80242916666668,
+        "dec_deg": 54.34875,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": null,
+        "pmdec_masyr": null,
+        "parallax_mas": null,
+        "rv_kms": 243.0330935727467,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2006AJ....131.1163S"
+      },
+      "extended": true
+    },
+    {
+      "id": "M  31",
+      "aliases": [
+        "M31",
+        "Andrómeda",
+        "Andromeda",
+        "NGC 224"
+      ],
+      "type": "AGN",
+      "astrometry": {
+        "name": "M  31",
+        "ra_deg": 10.684708333333333,
+        "dec_deg": 41.268750000000004,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": null,
+        "pmdec_masyr": null,
+        "parallax_mas": null,
+        "rv_kms": -300,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2006AJ....131.1163S"
+      },
+      "extended": true
+    },
+    {
+      "id": "M  42",
+      "aliases": [
+        "M42",
+        "Nebulosa de Orión",
+        "Orion Nebula",
+        "NGC 1976"
+      ],
+      "type": "HII",
+      "astrometry": {
+        "name": "M  42",
+        "ra_deg": 83.8201,
+        "dec_deg": -5.3876,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": 1.67,
+        "pmdec_masyr": -0.3,
+        "parallax_mas": null,
+        "rv_kms": 27.8,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2022A&A...661A..38P"
+      },
+      "extended": true
+    },
+    {
+      "id": "Cl Melotte   22",
+      "aliases": [
+        "M45",
+        "Pléyades",
+        "Pleiades"
+      ],
+      "type": "OpC",
+      "astrometry": {
+        "name": "Cl Melotte   22",
+        "ra_deg": 56.600833333333334,
+        "dec_deg": 24.11388888888889,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": 19.997,
+        "pmdec_masyr": -45.548,
+        "parallax_mas": 7.364,
+        "rv_kms": 5.88,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2021A&A...647A..19T"
+      },
+      "extended": true
+    },
+    {
+      "id": "V* R Dra",
+      "aliases": [
+        "R Draconis",
+        "R Dra"
+      ],
+      "type": "Mi*",
+      "astrometry": {
+        "name": "V* R Dra",
+        "ra_deg": 248.16761083295,
+        "dec_deg": 66.75497941722,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": -20.643,
+        "pmdec_masyr": 6.149,
+        "parallax_mas": 1.2509,
+        "rv_kms": -132.8,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2020yCat.1350....0G"
+      },
+      "extended": false
+    },
+    {
+      "id": "V* RW Aur",
+      "aliases": [
+        "RW Aurigae",
+        "RW Aur"
+      ],
+      "type": "TT*",
+      "astrometry": {
+        "name": "V* RW Aur",
+        "ra_deg": 76.95652603458333,
+        "dec_deg": 30.401438173888888,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": 7.23,
+        "pmdec_masyr": -20.33,
+        "parallax_mas": 15.42,
+        "rv_kms": 15,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2007A&A...474..653V"
+      },
+      "extended": false
+    },
+    {
+      "id": "WISEA J085510.74-071442.5",
+      "aliases": [
+        "WISE 0855",
+        "WISE 0855-0714"
+      ],
+      "type": "BD*",
+      "astrometry": {
+        "name": "WISEA J085510.74-071442.5",
+        "ra_deg": 133.81890825,
+        "dec_deg": -7.247048000000001,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": -8123.7,
+        "pmdec_masyr": 673.2,
+        "parallax_mas": 439,
+        "rv_kms": null,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2021ApJS..253....7K"
+      },
+      "extended": false
+    }
+  ]
+}

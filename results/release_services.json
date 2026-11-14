@@ -1,0 +1,589 @@
+{
+  "checked_utc": "2026-11-14T19:25:13.875383+00:00",
+  "collections": [
+    {
+      "collection": "spherex_dr1",
+      "status": 200,
+      "count": 2,
+      "sample": [
+        {
+          "s_ra": "209.44420308349856",
+          "s_dec": "53.95675528701896",
+          "facility_name": "SPHEREx",
+          "instrument_name": "SPHEREx",
+          "dataproduct_subtype": "science",
+          "calib_level": "2",
+          "dataproduct_type": "image",
+          "energy_bandpassname": "SPHEREx-D3",
+          "energy_emband": "Infrared",
+          "obs_id": "2025W19_2B_0101_1",
+          "s_resolution": "3.075",
+          "em_min": "1.6301e-06",
+          "em_max": "2.4346e-06",
+          "em_res_power": "40.6",
+          "proposal_title": "SPHEREx LVF Survey Data",
+          "access_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W19_2B/l2b-v27-2026-198/3/level2_2025W19_2B_0101_1D3_spx_l2b-v27-2026-198.fits",
+          "access_format": "image/fits",
+          "access_estsize": "65587",
+          "t_exptime": "113.5826",
+          "s_region": "POLYGON ICRS 209.83959155679264 56.44114245103572 213.49129034404666 53.663939984308065 209.07883518007839 51.42938816773157 205.3145708610052 54.09537087695609 209.83959155679264 56.44114245103572",
+          "obs_collection": "spherex_dr1",
+          "obs_intent": "science",
+          "algorithm_name": "exposure",
+          "facility_keywords": "",
+          "instrument_keywords": "",
+          "environment_photometric": "--",
+          "proposal_id": "",
+          "proposal_pi": "",
+          "proposal_project": "SPHEREx",
+          "target_name": "SPS_099364_S12",
+          "target_type": "field",
+          "target_standard": "False",
+          "target_moving": "False",
+          "target_keywords": "",
+          "obs_release_date": "2026-09-28 07:20:04",
+          "s_xel1": "2040",
+          "s_xel2": "2040",
+          "s_pixel_scale": "6.15",
+          "position_timedependent": "False",
+          "t_min": "60804.148555",
+          "t_max": "60804.149887",
+          "t_resolution": "--",
+          "t_xel": "--",
+          "obs_publisher_did": "ivo://irsa.ipac/spherex_dr1?2025W19_2B_0101_1/D3",
+          "s_fov": "3.485",
+          "em_xel": "--",
+          "pol_states": "",
+          "pol_xel": "--",
+          "cloud_access": "{\"aws\": {\"bucket_name\": \"nasa-irsa-spherex\", \"key\":\"dr1/level2/2025W19_2B/l2b-v27-2026-198/3/level2_2025W19_2B_0101_1D3_spx_l2b-v27-2026-198.fits\", \"region\": \"us-east-1\"}}",
+          "o_ucd": "",
+          "upload_row_id": "1"
+        },
+        {
+          "s_ra": "209.4201164323643",
+          "s_dec": "53.94309537806052",
+          "facility_name": "SPHEREx",
+          "instrument_name": "SPHEREx",
+          "dataproduct_subtype": "science",
+          "calib_level": "2",
+          "dataproduct_type": "image",
+          "energy_bandpassname": "SPHEREx-D6",
+          "energy_emband": "Infrared",
+          "obs_id": "2025W19_2B_0101_1",
+          "s_resolution": "3.075",
+          "em_min": "4.4115e-06",
+          "em_max": "5.0096e-06",
+          "em_res_power": "127.8",
+          "proposal_title": "SPHEREx LVF Survey Data",
+          "access_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W19_2B/l2b-v27-2026-198/6/level2_2025W19_2B_0101_1D6_spx_l2b-v27-2026-198.fits",
+          "access_format": "image/fits",
+          "access_estsize": "65319",
+          "t_exptime": "113.5826",
+          "s_region": "POLYGON ICRS 209.82210296192252 56.429766630363375 213.46850423271445 53.64612867766621 209.04868273993165 51.413008205067285 205.28718869829657 54.085723260892514 209.82210296192252 56.429766630363375",
+          "obs_collection": "spherex_dr1",
+          "obs_intent": "science",
+          "algorithm_name": "exposure",
+          "facility_keywords": "",
+          "instrument_keywords": "",
+          "environment_photometric": "--",
+          "proposal_id": "",
+          "proposal_pi": "",
+          "proposal_project": "SPHEREx",
+          "target_name": "SPS_099364_S12",
+          "target_type": "field",
+          "target_standard": "False",
+          "target_moving": "False",
+          "target_keywords": "",
+          "obs_release_date": "2026-09-28 07:20:04",
+          "s_xel1": "2040",
+          "s_xel2": "2040",
+          "s_pixel_scale": "6.15",
+          "position_timedependent": "False",
+          "t_min": "60804.148555",
+          "t_max": "60804.149887",
+          "t_resolution": "--",
+          "t_xel": "--",
+          "obs_publisher_did": "ivo://irsa.ipac/spherex_dr1?2025W19_2B_0101_1/D6",
+          "s_fov": "3.485",
+          "em_xel": "--",
+          "pol_states": "",
+          "pol_xel": "--",
+          "cloud_access": "{\"aws\": {\"bucket_name\": \"nasa-irsa-spherex\", \"key\":\"dr1/level2/2025W19_2B/l2b-v27-2026-198/6/level2_2025W19_2B_0101_1D6_spx_l2b-v27-2026-198.fits\", \"region\": \"us-east-1\"}}",
+          "o_ucd": "",
+          "upload_row_id": "1"
+        }
+      ]
+    },
+    {
+      "collection": "spherex_qr3",
+      "status": 200,
+      "count": 2,
+      "sample": [
+        {
+          "s_ra": "212.02320046332804",
+          "s_dec": "52.65292357860982",
+          "facility_name": "SPHEREx",
+          "instrument_name": "SPHEREx",
+          "dataproduct_subtype": "science",
+          "calib_level": "2",
+          "dataproduct_type": "image",
+          "energy_bandpassname": "SPHEREx-D2",
+          "energy_emband": "Infrared",
+          "obs_id": "2026W20_2A_0464_3",
+          "s_resolution": "3.075",
+          "em_min": "1.1033e-06",
+          "em_max": "1.6499e-06",
+          "em_res_power": "41.4",
+          "proposal_title": "SPHEREx LVF Survey Data",
+          "access_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W20_2A/l2b-v27-2026-267/2/level2_2026W20_2A_0464_3D2_spx_l2b-v27-2026-267.fits",
+          "access_format": "image/fits",
+          "access_estsize": "68205",
+          "t_exptime": "113.5826",
+          "s_region": "POLYGON ICRS 211.77679526016047 55.09481853596594 216.05574347529168 52.71955715491393 212.22812866294313 50.17901108233837 207.9665411380201 52.43554167998142 211.77679526016047 55.09481853596594",
+          "obs_collection": "spherex_qr3",
+          "obs_intent": "science",
+          "algorithm_name": "exposure",
+          "facility_keywords": "",
+          "instrument_keywords": "",
+          "environment_photometric": "--",
+          "proposal_id": "",
+          "proposal_pi": "",
+          "proposal_project": "SPHEREx",
+          "target_name": "SPS_099396_S34",
+          "target_type": "field",
+          "target_standard": "False",
+          "target_moving": "False",
+          "target_keywords": "",
+          "obs_release_date": "2026-10-10 15:57:41",
+          "s_xel1": "2040",
+          "s_xel2": "2040",
+          "s_pixel_scale": "6.15",
+          "position_timedependent": "False",
+          "t_min": "61177.456981",
+          "t_max": "61177.458313",
+          "t_resolution": "--",
+          "t_xel": "--",
+          "obs_publisher_did": "ivo://irsa.ipac/spherex_qr3?2026W20_2A_0464_3/D2",
+          "s_fov": "3.485",
+          "em_xel": "--",
+          "pol_states": "",
+          "pol_xel": "--",
+          "cloud_access": "{\"aws\": {\"bucket_name\": \"nasa-irsa-spherex\", \"key\":\"qr3/level2/2026W20_2A/l2b-v27-2026-267/2/level2_2026W20_2A_0464_3D2_spx_l2b-v27-2026-267.fits\", \"region\": \"us-east-1\"}}",
+          "o_ucd": "",
+          "upload_row_id": "1"
+        },
+        {
+          "s_ra": "211.9997037017476",
+          "s_dec": "52.64255327656063",
+          "facility_name": "SPHEREx",
+          "instrument_name": "SPHEREx",
+          "dataproduct_subtype": "science",
+          "calib_level": "2",
+          "dataproduct_type": "image",
+          "energy_bandpassname": "SPHEREx-D5",
+          "energy_emband": "Infrared",
+          "obs_id": "2026W20_2A_0464_3",
+          "s_resolution": "3.075",
+          "em_min": "3.8113e-06",
+          "em_max": "4.43e-06",
+          "em_res_power": "111.6",
+          "proposal_title": "SPHEREx LVF Survey Data",
+          "access_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W20_2A/l2b-v27-2026-267/5/level2_2026W20_2A_0464_3D5_spx_l2b-v27-2026-267.fits",
+          "access_format": "image/fits",
+          "access_estsize": "68694",
+          "t_exptime": "113.5826",
+          "s_region": "POLYGON ICRS 211.77212279043565 55.087358864353625 216.03557910201937 52.698125636199656 212.18773783077674 50.16588744097246 207.9383251367866 52.43573527185256 211.77212279043565 55.087358864353625",
+          "obs_collection": "spherex_qr3",
+          "obs_intent": "science",
+          "algorithm_name": "exposure",
+          "facility_keywords": "",
+          "instrument_keywords": "",
+          "environment_photometric": "--",
+          "proposal_id": "",
+          "proposal_pi": "",
+          "proposal_project": "SPHEREx",
+          "target_name": "SPS_099396_S34",
+          "target_type": "field",
+          "target_standard": "False",
+          "target_moving": "False",
+          "target_keywords": "",
+          "obs_release_date": "2026-10-10 15:57:41",
+          "s_xel1": "2040",
+          "s_xel2": "2040",
+          "s_pixel_scale": "6.15",
+          "position_timedependent": "False",
+          "t_min": "61177.456981",
+          "t_max": "61177.458313",
+          "t_resolution": "--",
+          "t_xel": "--",
+          "obs_publisher_did": "ivo://irsa.ipac/spherex_qr3?2026W20_2A_0464_3/D5",
+          "s_fov": "3.485",
+          "em_xel": "--",
+          "pol_states": "",
+          "pol_xel": "--",
+          "cloud_access": "{\"aws\": {\"bucket_name\": \"nasa-irsa-spherex\", \"key\":\"qr3/level2/2026W20_2A/l2b-v27-2026-267/5/level2_2026W20_2A_0464_3D5_spx_l2b-v27-2026-267.fits\", \"region\": \"us-east-1\"}}",
+          "o_ucd": "",
+          "upload_row_id": "1"
+        }
+      ]
+    },
+    {
+      "collection": "spherex_dr1_deep",
+      "error": "502 Server Error: Proxy Error for url: https://irsa.ipac.caltech.edu/SIA?POS=CIRCLE+210.802429+54.34875+0.000278&COLLECTION=spherex_dr1_deep&MAXREC=2"
+    },
+    {
+      "collection": "spherex_qr3_deep",
+      "status": 200,
+      "count": 0,
+      "sample": []
+    }
+  ],
+  "simbad": [
+    {
+      "endpoint": "https://simbad.cds.unistra.fr/simbad/sim-tap",
+      "error": "404 Client Error: Not Found for url: https://simbad.cds.unistra.fr/simbad/sim-tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+main_id%2Cotype%2Cra%2Cdec%2Cpmra%2Cpmdec%2Cplx_value%2Crvz_ra"
+    },
+    {
+      "endpoint": "https://simbad.harvard.edu/simbad/sim-tap",
+      "response": {
+        "metadata": [
+          {
+            "name": "main_id",
+            "description": "Main identifier for an object",
+            "datatype": "CHAR",
+            "arraysize": "*",
+            "ucd": "meta.id;meta.main",
+            "utype": "mango:MangoObject.identifier"
+          },
+          {
+            "name": "otype",
+            "description": "Object type",
+            "datatype": "CHAR",
+            "arraysize": "*",
+            "ucd": "src.class",
+            "utype": "mango:Label.text[CT.vocabulary=https://www.ivoa.net/rdf/uat#classification]"
+          },
+          {
+            "name": "ra",
+            "description": "Right ascension",
+            "datatype": "DOUBLE",
+            "unit": "deg",
+            "ucd": "pos.eq.ra;meta.main",
+            "utype": "mango:EpochPosition.longitude[CS.spaceSys=ICRS CT.epoch=J2000]"
+          },
+          {
+            "name": "dec",
+            "description": "Declination",
+            "datatype": "DOUBLE",
+            "unit": "deg",
+            "ucd": "pos.eq.dec;meta.main",
+            "utype": "mango:EpochPosition.latitude[CS.spaceSys=ICRS CT.epoch=J2000]"
+          },
+          {
+            "name": "pmra",
+            "description": "Proper motion in RA",
+            "datatype": "DOUBLE",
+            "unit": "mas.yr-1",
+            "ucd": "pos.pm;pos.eq.ra",
+            "utype": "mango:EpochPosition.pmLongitude[CS.spaceSys=ICRS CT.epoch=J2000]"
+          },
+          {
+            "name": "pmdec",
+            "description": "Proper motion in DEC",
+            "datatype": "DOUBLE",
+            "unit": "mas.yr-1",
+            "ucd": "pos.pm;pos.eq.dec",
+            "utype": "mango:EpochPosition.pmLatitude[CS.spaceSys=ICRS CT.epoch=J2000]"
+          },
+          {
+            "name": "plx_value",
+            "description": "Parallax",
+            "datatype": "DOUBLE",
+            "unit": "mas",
+            "ucd": "pos.parallax.trig",
+            "utype": "mango:EpochPosition.parallax[CS.spaceSys=ICRS CT.epoch=J2000]"
+          },
+          {
+            "name": "rvz_radvel",
+            "description": "Radial Velocity",
+            "datatype": "DOUBLE",
+            "unit": "km.s-1",
+            "ucd": "spect.dopplerVeloc.opt",
+            "utype": "mango:EpochPosition.radialVelocity[CS.spaceSys=ICRS CT.epoch=J2000]"
+          },
+          {
+            "name": "coo_bibcode",
+            "description": "Coordinate reference",
+            "datatype": "CHAR",
+            "arraysize": "19",
+            "ucd": "meta.bib.bibcode;pos.eq"
+          },
+          {
+            "name": "id",
+            "description": "Identifier",
+            "datatype": "CHAR",
+            "arraysize": "*",
+            "ucd": "meta.id"
+          }
+        ],
+        "data": [
+          [
+            "* eps Ind",
+            "PM*",
+            330.8402234423433,
+            -56.785978554364995,
+            3966.661,
+            -2536.192,
+            274.8431,
+            -40.035,
+            "2020yCat.1350....0G",
+            "* eps Ind"
+          ],
+          [
+            "* eps Ind B",
+            "BD*",
+            331.04414658852124,
+            -56.782844195116105,
+            3981.977,
+            -2466.832,
+            270.658,
+            null,
+            "2020yCat.1350....0G",
+            "* eps Ind B"
+          ],
+          [
+            "NAME Barnard's star",
+            "BY*",
+            269.4520769586187,
+            4.693364966576667,
+            -801.551,
+            10362.394,
+            546.9759,
+            -110.11,
+            "2020yCat.1350....0G",
+            "GJ 699"
+          ],
+          [
+            "HD 209458",
+            "*",
+            330.79488644388,
+            18.88431927594,
+            29.766,
+            -17.976,
+            20.7694,
+            -14.743,
+            "2020yCat.1350....0G",
+            "HD 209458"
+          ],
+          [
+            "M 101",
+            "GiP",
+            210.80242916666668,
+            54.34875,
+            null,
+            null,
+            null,
+            243.0330935727467,
+            "2006AJ....131.1163S",
+            "M 101"
+          ],
+          [
+            "M  31",
+            "AGN",
+            10.684708333333333,
+            41.268750000000004,
+            null,
+            null,
+            null,
+            -300,
+            "2006AJ....131.1163S",
+            "M  31"
+          ],
+          [
+            "M  42",
+            "HII",
+            83.8201,
+            -5.3876,
+            1.67,
+            -0.3,
+            null,
+            27.8,
+            "2022A&A...661A..38P",
+            "M  42"
+          ],
+          [
+            "Cl Melotte   22",
+            "OpC",
+            56.600833333333334,
+            24.11388888888889,
+            19.997,
+            -45.548,
+            7.364,
+            5.88,
+            "2021A&A...647A..19T",
+            "M  45"
+          ],
+          [
+            "V* R Dra",
+            "Mi*",
+            248.16761083295,
+            66.75497941722,
+            -20.643,
+            6.149,
+            1.2509,
+            -132.8,
+            "2020yCat.1350....0G",
+            "V* R Dra"
+          ],
+          [
+            "V* RW Aur",
+            "TT*",
+            76.95652603458333,
+            30.401438173888888,
+            7.23,
+            -20.33,
+            15.42,
+            15,
+            "2007A&A...474..653V",
+            "V* RW Aur"
+          ],
+          [
+            "WISEA J085510.74-071442.5",
+            "BD*",
+            133.81890825,
+            -7.247048000000001,
+            -8123.7,
+            673.2,
+            439,
+            null,
+            "2021ApJS..253....7K",
+            "WISE J085510.83-071442.5"
+          ]
+        ]
+      }
+    }
+  ],
+  "deep_samples": [
+    {
+      "collection": "spherex_dr1_deep",
+      "error": "HTTPSConnectionPool(host='irsa.ipac.caltech.edu', port=443): Read timed out. (read timeout=20)"
+    },
+    {
+      "collection": "spherex_qr3_deep",
+      "error": "HTTPSConnectionPool(host='irsa.ipac.caltech.edu', port=443): Read timed out. (read timeout=20)"
+    }
+  ],
+  "prefix_check": {
+    "query": "HD20945",
+    "suggestions": [
+      {
+        "id": "HD 209450",
+        "type": "PM*",
+        "aliases": [
+          "HD 209450"
+        ],
+        "source": "https://simbad.harvard.edu/simbad/sim-tap"
+      },
+      {
+        "id": "HD 209451",
+        "type": "*",
+        "aliases": [
+          "HD 209451"
+        ],
+        "source": "https://simbad.harvard.edu/simbad/sim-tap"
+      },
+      {
+        "id": "HD 209452",
+        "type": "*",
+        "aliases": [
+          "HD 209452"
+        ],
+        "source": "https://simbad.harvard.edu/simbad/sim-tap"
+      },
+      {
+        "id": "HD 209453",
+        "type": "PM*",
+        "aliases": [
+          "HD 209453"
+        ],
+        "source": "https://simbad.harvard.edu/simbad/sim-tap"
+      },
+      {
+        "id": "HD 209454",
+        "type": "**",
+        "aliases": [
+          "HD 209454"
+        ],
+        "source": "https://simbad.harvard.edu/simbad/sim-tap"
+      },
+      {
+        "id": "HD 209455",
+        "type": "PM*",
+        "aliases": [
+          "HD 209455"
+        ],
+        "source": "https://simbad.harvard.edu/simbad/sim-tap"
+      },
+      {
+        "id": "HD 209455B",
+        "type": "PM*",
+        "aliases": [
+          "HD 209455B"
+        ],
+        "source": "https://simbad.harvard.edu/simbad/sim-tap"
+      },
+      {
+        "id": "HD 209456",
+        "type": "*",
+        "aliases": [
+          "HD 209456"
+        ],
+        "source": "https://simbad.harvard.edu/simbad/sim-tap"
+      }
+    ],
+    "source_or_status": "https://simbad.harvard.edu/simbad/sim-tap"
+  },
+  "retry_product": {
+    "url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W23_2A/l2b_retry-v27-2026-271/2/level2_2026W23_2A_0336_3D2_spx_l2b_retry-v27-2026-271.fits",
+    "sha256": "0d2281e841e88aa490ed085ed14eadf5bfa32eb2848e4951401cda4c11117672",
+    "bytes": 3965760,
+    "version": "7.0.5",
+    "shape": [
+      29,
+      29
+    ]
+  },
+  "alias_verification": {
+    "metadata": [
+      {
+        "name": "main_id",
+        "description": "Main identifier for an object",
+        "datatype": "CHAR",
+        "arraysize": "*",
+        "ucd": "meta.id;meta.main",
+        "utype": "mango:MangoObject.identifier"
+      },
+      {
+        "name": "id",
+        "description": "Identifier",
+        "datatype": "CHAR",
+        "arraysize": "*",
+        "ucd": "meta.id"
+      }
+    ],
+    "data": [
+      [
+        "M  42",
+        "NGC  1976"
+      ],
+      [
+        "M  31",
+        "NGC   224"
+      ],
+      [
+        "M 101",
+        "NGC  5457"
+      ]
+    ]
+  }
+}

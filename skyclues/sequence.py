@@ -102,6 +102,8 @@ class Frame:
             "collection": self.collection, "detector": self.detector,
             "lambda_target_um": self.lambda_target_um, "bandwidth_target_um": self.bandwidth_target_um,
             "exptime_s": self.image.meta.get("XPOSURE"), "software_version": self.image.meta.get("VERSION"),
+            "publisher_did": self.record.get("publisher_did"), "product_level": self.record.get("product_level"),
+            "processing_date": self.record.get("processing_date"), "l2b_version": self.record.get("l2b_version"),
             "file_name": self.record.get("file_name"), "access_url": self.record.get("access_url"),
             "cutout_url": self.cutout_url, "local_file": self.path.name, "sha256": self.sha256,
             "expected_target_radec_deg": list(self.expected_radec) if self.expected_radec else None,
@@ -358,7 +360,7 @@ def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: flo
         {"id": "S8", "criterion": "Mismo procesamiento (colección y versión de software)",
          "value": f"{', '.join(sorted(colls))} · v{', '.join(sorted(str(v) for v in vers))}",
          "threshold": "una colección y una versión",
-         "status": _status(len(colls) == 1 and len(vers) == 1, True)},
+         "status": _status(len(colls) == 1 and len(vers) == 1 and None not in vers and "" not in vers)},
         {"id": "S9", "criterion": "Saturación en el campo (OVERFLOW/NONLINEAR), peor época",
          "value": f"{max(sat_frac):.2%}", "threshold": f"≤ {config.SATURATION_WARN_FRACTION:.1%}",
          "status": _status(max(sat_frac) <= config.SATURATION_WARN_FRACTION, True)},
@@ -423,6 +425,8 @@ def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: flo
 
 # --------------------------------------------------------------------------- metadata-stage proposals
 def _compatible(a, b) -> bool:
+    if (a.rec.collection, getattr(a.rec, "l2b_version", None)) != (b.rec.collection, getattr(b.rec, "l2b_version", None)):
+        return False  # cross-release/calibration compatibility has not been established
     bw = 0.5 * (a.bw_um + b.bw_um)
     if abs(a.lam_um - b.lam_um) / bw > config.SPECTRAL_PASS_BW:
         return False
@@ -541,7 +545,7 @@ def find_sequence(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD
                   collections=config.WIDE_COLLECTIONS, detectors=None,
                   max_frames: int = config.MAX_SEQUENCE_FRAMES,
                   max_candidates: int = config.MAX_SEQUENCE_CANDIDATES,
-                  mask_classes=STRICT, log=print, progress=None, astrometry: Astrometry | None = None):
+                  mask_classes=STRICT, log=print, progress=None, astrometry: Astrometry | None = None, refresh: bool = False):
     """Search IRSA and return (best TemporalSequence | None, JSON-able report).
 
     ``progress(stage, fraction, message)``, if given, is called at every stage
@@ -568,7 +572,8 @@ def find_sequence(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD
 
     t0 = time.time()
     step("catalog", 0.02, "Consultando el catálogo SPHEREx de IRSA (SIA2)…")
-    records = archive.query_images(ra, dec, collections=collections)
+    records = archive.query_images(ra, dec, collections=collections, **({"max_age_s": 0} if refresh else {}))
+    discovery = getattr(records, "provenance", {"origin": "unknown", "queried_utc": None})
     if detectors:
         records = [r for r in records if r.detector in set(detectors)]
     centre = {"rule": "coordenadas introducidas (sin astrometría: se usan para todas las fechas)"}
@@ -662,6 +667,7 @@ def find_sequence(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD
         "target": target,
         "retrieval": {"n_requested": n_req, "n_failed": len(failures), "complete": not failures,
                       "n_transient": sum(f["kind"] == "transitorio" for f in failures)},
+        "discovery": discovery,
         "collections": list(collections),
         "n_records": len(records), "n_candidates": len(cands), "n_proposals": len(proposals),
         "proposals": [{"n": p["n"], "detector": p["detector"], "spread_field_bw_est": p["spread_field_bw_est"],
@@ -691,7 +697,11 @@ def find_sequence(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD
 def save_report(report: dict, name: str) -> Path:
     config.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     path = config.RESULTS_DIR / f"{name}.json"
-    path.write_text(json.dumps(report, indent=2, ensure_ascii=False, default=_jsonable), encoding="utf-8")
+    if path.exists():
+        import uuid
+        path = path.with_name(f"{path.stem}_{uuid.uuid4().hex[:12]}.json")
+    with path.open("x", encoding="utf-8") as stream:
+        stream.write(json.dumps(report, indent=2, ensure_ascii=False, default=_jsonable))
     return path
 
 

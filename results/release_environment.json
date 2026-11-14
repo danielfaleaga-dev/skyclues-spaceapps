@@ -1,0 +1,26 @@
+{
+  "checked_utc": "2026-11-14T19:39:17.785887+00:00",
+  "python": "3.11.9",
+  "pip_check": "No broken requirements found.",
+  "reference_bytes": 23996160,
+  "secret_pattern_files": [],
+  "runtime_dependencies": "# Runtime dependencies only (Streamlit Community Cloud installs this file).\n# Tested with Python 3.11 (Windows 11) and in a clean environment on Python 3.14, 2026-11-14.\n# Development and tests: requirements-dev.txt\nstreamlit==1.67.0\nastropy==8.0.2\npyvo==1.10.0\nnumpy==2.4.6\npandas==3.1.1\nmatplotlib==3.11.2\nrequests==2.34.2\n",
+  "install": "fresh venv in release worktree; no global site packages",
+  "network_workers": 3,
+  "tests": {
+    "baseline": 201,
+    "full_suite": 239,
+    "full_seconds": 87.28,
+    "warnings": 1,
+    "final_targeted": 55,
+    "targeted_seconds": 6.89
+  },
+  "server_memory_sample": {
+    "working_set_bytes": 247664640,
+    "peak_working_set_bytes": 271769600,
+    "sessions": 2,
+    "scope": "local desktop sample, not a load guarantee"
+  },
+  "public_deployment_tested": false,
+  "protected_spectral_modules_changed": false
+}

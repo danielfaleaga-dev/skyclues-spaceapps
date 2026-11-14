@@ -6,6 +6,7 @@ Run:  streamlit run app.py
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -13,7 +14,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from astropy.time import Time
 
-from skyclues import archive, config, player, render, spectrum_page, reference_page
+from skyclues import archive, config, player, render, spectrum_page, reference_page, release_ui
 from skyclues.astrometry import Astrometry
 from skyclues.quality import flag_census
 from skyclues.sequence import STRICT, find_sequence, load_sequence, report_urls, save_report
@@ -21,6 +22,7 @@ from skyclues.targets import (PRESETS, clamp_fov_deg, fov_pixels, resolve_name, 
                               validate_fov_deg)
 
 st.set_page_config(page_title="SkyClues", layout="wide")
+release_ui.releases.configure_cube_release(os.environ.get("SKYCLUES_CUBE_RELEASE",release_ui.releases.ACTIVE_CUBE))
 
 st.markdown(
     """
@@ -156,6 +158,11 @@ def to_spectrum_explorer():
 
 
 # ---------------------------------------------------------------- explorer
+release_ui.search()
+if qp.get("explorer", "temporal") not in ("temporal", "espectral"):
+    st.error("Explorador de URL desconocido"); st.stop()
+if "canal" in qp and (not str(qp["canal"]).isdigit() or not 1 <= int(qp["canal"]) <= 102):
+    st.error("Canal de URL fuera de 1–102"); st.stop()
 if "explorer" not in st.session_state:
     st.session_state["explorer"] = EXPLORERS[1] if qp.get("explorer") == "espectral" else EXPLORERS[0]
 with st.sidebar:
@@ -167,6 +174,12 @@ with st.sidebar:
     st.markdown("---")
 if explorer == EXPLORERS[1]:
     spectrum_page.render(st.session_state.get("shared_region"))
+    if all(k in qp for k in ("ra","dec","fov")):
+        try:
+            release_ui.share(float(qp['ra']),float(qp['dec']),float(qp['fov']),'espectral',int(qp.get('canal',63)))
+        except ValueError:
+            pass
+    st.caption(f"Cubo publicado: {config.CUBE_RELEASE_ID} · DOI {config.CUBE_DOI}. Actualizar observaciones SIA2 no modifica este cubo.")
     st.stop()
 if st.query_params.get("explorer"):
     del st.query_params["explorer"]
@@ -185,6 +198,7 @@ with st.sidebar:
     st.markdown("### Región del cielo")
     mode = st.radio("Origen", MODES, key="mode")
     run_search = False
+    refresh_search = False
     fov = config.DEFAULT_FIELD_DEG
     astro = None
     if mode == MODES[0]:
@@ -264,6 +278,9 @@ with st.sidebar:
             st.caption("Elija al menos un detector.")
         run_search = st.button("Buscar secuencia comparable", type="primary", key="search",
                                disabled=not dets or ra is None)
+        refresh_search = st.button("Actualizar observaciones", key="refresh_observations", disabled=not dets or ra is None)
+        refresh_search = st.session_state.pop('release_force_refresh',False) or refresh_search
+        run_search = run_search or refresh_search
         st.caption("Una búsqueda nueva suele tardar de 1 a 2 minutos: los recortes FITS se descargan de IRSA.")
 
     st.markdown("---")
@@ -307,7 +324,8 @@ if mode == MODES[1] and run_search:
     bar = box.progress(0.0, text="Iniciando la búsqueda…")
     try:
         _, rep = find_sequence(ra, dec, fov, detectors=dets, max_frames=max_frames, log=lambda m: None,
-                               progress=lambda stage, frac, msg: bar.progress(frac, text=msg), astrometry=astro)
+                               progress=lambda stage, frac, msg: bar.progress(frac, text=msg), astrometry=astro,
+                               **({"refresh": True} if refresh_search else {}))
     except ValueError as err:
         box.update(label="Entrada no válida", state="error", expanded=True)
         st.error(f"Entrada no válida: {err} No se ha realizado ninguna consulta.")
@@ -337,9 +355,11 @@ else:
         st.info("Defina una región y un campo de visión y pulse «Buscar secuencia comparable», "
                 "o abra uno de los ejemplos validados de la barra lateral.")
         if ra is not None and dec is not None:
+            release_ui.share(ra, dec, fov)
             reference_page.render(ra, dec, fov, key="time_ref")
         st.stop()
 
+release_ui.discovery(report)
 retrieval = report.get("retrieval") or {}
 n_failed = retrieval.get("n_failed", len(report.get("retrieval_failures") or []))
 if n_failed:
@@ -408,6 +428,10 @@ elif centre_rule:
     st.caption(f"Centro del campo: {centre_rule}.")
 st.button("Ver esta región en Spectrum Explorer", key="to_spectrum", on_click=to_spectrum_explorer,
           help="La misma región en los 102 canales del cubo combinado DR1 (no es una secuencia temporal).")
+release_ui.share(float(seq.ra),float(seq.dec),float(seq.field_deg))
+if mode == MODES[0]:
+    st.button("Actualizar observaciones", key="refresh_saved", on_click=release_ui.refresh_saved,
+              args=(float(seq.ra),float(seq.dec),float(seq.field_deg),seq.astrometry.to_dict() if seq.astrometry else None))
 reference_page.render(float(seq.ra), float(seq.dec), float(seq.field_deg), key="time_ref")
 c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("Épocas", seq.n)
