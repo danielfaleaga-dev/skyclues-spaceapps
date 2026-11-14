@@ -21,7 +21,8 @@ from matplotlib.colors import ListedColormap  # noqa: E402
 from .compare import PairEvaluation, place_on_a  # noqa: E402
 from .fitsdata import SpectralImage  # noqa: E402
 
-MASK_COLOR = "#e0457b"
+MASK_COLOR = "#e0457b"            # no valid data in this frame
+OUTSIDE_COMMON_COLOR = "#b9cde8"  # valid here, but not in every frame of the sequence
 INK = "#14181f"
 GRID = "#9aa4b2"
 ACCENT = "#1f5fbf"
@@ -70,6 +71,17 @@ def to_rgba(data: np.ndarray, norm: ImageNormalize) -> np.ndarray:
     scaled[finite] = np.asarray(norm(data[finite]), float)
     rgba = plt.get_cmap("gray")(np.clip(scaled, 0.0, 1.0))
     rgba[~finite] = _c(MASK_COLOR)
+    return rgba
+
+
+def sequence_rgba(data: np.ndarray, norm: ImageNormalize, common: np.ndarray | None = None) -> np.ndarray:
+    """Like ``to_rgba``; if ``common`` is given, valid pixels outside the region
+    common to all frames are drawn in OUTSIDE_COMMON_COLOR (not grey sky)."""
+    from matplotlib.colors import to_rgba as _c
+
+    rgba = to_rgba(data, norm)
+    if common is not None:
+        rgba[np.isfinite(data) & ~common] = _c(OUTSIDE_COMMON_COLOR)
     return rgba
 
 
@@ -137,6 +149,38 @@ def coverage_figure(ev: PairEvaluation, wcs, ra, dec, field_deg):
     ax.legend(handles=[Patch(facecolor=c, edgecolor="#cfd5dd", label=l)
                        for c, l in zip(COVERAGE_COLORS[1:], COVERAGE_LABELS[1:])],
               loc="upper center", bbox_to_anchor=(0.5, -0.12), ncol=2, fontsize=7, frameon=False)
+    fig.tight_layout()
+    return fig
+
+
+def sequence_coverage_figure(seq):
+    """Number of epochs with a valid pixel, on the reference grid (field only)."""
+    n = seq.n
+    count = np.where(seq.field_mask, seq.valid_stack.sum(axis=0), np.nan).astype(float)
+    fig = plt.figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
+    ax = fig.add_subplot(1, 1, 1, projection=seq.wcs)
+    colors = [MASK_COLOR] + [plt.get_cmap("Blues")(0.3 + 0.6 * k / max(n - 1, 1)) for k in range(1, n)] + ["#2e7d32"]
+    cm = ListedColormap(colors).with_extremes(bad="#ffffff")
+    im = ax.imshow(count, origin="lower", cmap=cm, vmin=-0.5, vmax=n + 0.5, interpolation="nearest")
+    _style_axes(ax)
+    _mark_target(ax, seq.ra, seq.dec, seq.field_deg)
+    ax.set_title(f"Épocas con dato válido (verde = las {n})", color=INK, fontsize=10, loc="left")
+    cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, ticks=range(0, n + 1))
+    cb.ax.tick_params(labelsize=7, colors=INK)
+    fig.tight_layout()
+    return fig
+
+
+def sequence_spread_figure(seq, limit=0.5):
+    fig = plt.figure(figsize=(5.2, 5.4), dpi=130, facecolor="white")
+    ax = fig.add_subplot(1, 1, 1, projection=seq.wcs)
+    cm = plt.get_cmap("viridis").with_extremes(bad="#ffffff")
+    im = ax.imshow(seq.lambda_spread_bw, origin="lower", cmap=cm, vmin=0, vmax=limit, interpolation="nearest")
+    _style_axes(ax)
+    _mark_target(ax, seq.ra, seq.dec, seq.field_deg)
+    ax.set_title("Dispersión de λ entre épocas / ancho de banda", color=INK, fontsize=10, loc="left")
+    cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    cb.ax.tick_params(labelsize=7, colors=INK)
     fig.tight_layout()
     return fig
 

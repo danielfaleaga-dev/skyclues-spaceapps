@@ -15,6 +15,8 @@ from __future__ import annotations
 import io
 import itertools
 import json
+import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -53,11 +55,29 @@ def field_samples(ra: float, dec: float, field_deg: float, n_ring: int = 8):
     return ras, decs
 
 
-@lru_cache(maxsize=64)
+@lru_cache(maxsize=256)
 def wave_table_from_url(access_url: str) -> dict:
+    """WCS-WAVE table of a full Level-2 file (disk-cached per file URL)."""
+    cpath = archive._meta_cache_path("wave", access_url)
+    if cpath.exists():
+        d = json.loads(cpath.read_text(encoding="utf-8"))
+        return {**d, "X": np.array(d["X"]), "Y": np.array(d["Y"]), "VALUES": np.array(d["VALUES"])}
+    tab = _wave_table_live(access_url)
+    cpath.parent.mkdir(parents=True, exist_ok=True)
+    cpath.write_text(json.dumps({**tab, "X": tab["X"].tolist(), "Y": tab["Y"].tolist(),
+                                 "VALUES": tab["VALUES"].tolist()}), encoding="utf-8")
+    return tab
+
+
+def _wave_table_live(access_url: str) -> dict:
     """Read the WCS-WAVE table of a full Level-2 file from its last bytes."""
-    r = requests.get(access_url, headers={**config.HTTP_HEADERS, "Range": "bytes=-11520"},
-                     timeout=config.HTTP_TIMEOUT_S)
+    r = None
+    for attempt in range(config.HTTP_RETRIES):
+        r = requests.get(access_url, headers={**config.HTTP_HEADERS, "Range": "bytes=-11520"},
+                         timeout=config.HTTP_TIMEOUT_S)
+        if r.status_code != 503:
+            break
+        time.sleep(min(30, 3 * 2 ** attempt))
     if r.status_code != 206:
         raise RuntimeError(f"Range request not honoured (HTTP {r.status_code})")
     blob = r.content
@@ -102,9 +122,11 @@ def estimate_wavelengths(cands: list[Candidate]) -> dict:
     groups = {}
     for c in cands:
         groups.setdefault((c.rec.detector, c.rec.collection), []).append(c)
+    probes = {key: max(group, key=lambda c: c.margin_px) for key, group in groups.items()}
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        fetched = dict(zip(probes, pool.map(lambda p: wave_table_from_url(p.rec.access_url), probes.values())))
     for key, group in groups.items():
-        probe = max(group, key=lambda c: c.margin_px)
-        tab = wave_table_from_url(probe.rec.access_url)
+        probe, tab = probes[key], fetched[key]
         tables[key] = {"calibration": tab["calibration"], "probe": probe.rec.file_name}
         for c in group:
             lam, bw = bilinear_lookup(tab["X"], tab["Y"], tab["VALUES"], c.x, c.y)
@@ -165,7 +187,10 @@ def find_pair(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD_DEG
         f"|Δλ| estimado ≤ {config.SPECTRAL_PRESELECT_BW} BW): {len(pairs)}")
 
     evaluated, failures = [], []
-    for p in pairs[:max_download_pairs]:
+    top = pairs[:max_download_pairs]
+    archive.fetch_many([archive.cutout_url(c.rec.access_url, ra, dec, field_deg)
+                        for p in top for c in (p["a"], p["b"])])  # parallel prefetch into the cache
+    for p in top:
         try:
             pa = archive.fetch_cutout(p["a"].rec, ra, dec, field_deg)
             pb = archive.fetch_cutout(p["b"].rec, ra, dec, field_deg)

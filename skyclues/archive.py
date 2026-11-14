@@ -12,8 +12,10 @@ Downloaded files are stored byte-for-byte as served by IRSA in
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -69,9 +71,30 @@ def _detector_from(bandpass: str, url: str) -> int:
     raise ValueError(f"Cannot determine detector for {url}")
 
 
+def _meta_cache_path(kind: str, key: str) -> Path:
+    h = hashlib.sha1(key.encode()).hexdigest()[:20]
+    return config.CACHE_DIR / "meta" / f"{kind}_{h}.json"
+
+
 def query_images(ra: float, dec: float, radius_deg: float = 1.0 / 3600,
-                 collections=config.WIDE_COLLECTIONS) -> list[ObservationRecord]:
-    """SIA2 search for SPHEREx spectral images overlapping a sky circle."""
+                 collections=config.WIDE_COLLECTIONS,
+                 max_age_s: float = config.METADATA_CACHE_MAX_AGE_S) -> list[ObservationRecord]:
+    """SIA2 search for SPHEREx spectral images overlapping a sky circle.
+
+    Results are cached as JSON for ``max_age_s`` (archive metadata only; IRSA
+    ingests new data weekly). Pass ``max_age_s=0`` to force a fresh query.
+    """
+    key = f"{ra:.7f}|{dec:.7f}|{radius_deg:.7f}|{','.join(collections)}"
+    cpath = _meta_cache_path("sia", key)
+    if max_age_s > 0 and cpath.exists() and time.time() - cpath.stat().st_mtime < max_age_s:
+        return [ObservationRecord(**d) for d in json.loads(cpath.read_text(encoding="utf-8"))]
+    records = _query_images_live(ra, dec, radius_deg, collections)
+    cpath.parent.mkdir(parents=True, exist_ok=True)
+    cpath.write_text(json.dumps([asdict(r) for r in records]), encoding="utf-8")
+    return records
+
+
+def _query_images_live(ra, dec, radius_deg, collections) -> list[ObservationRecord]:
     svc = pyvo.dal.SIA2Service(config.SIA_URL)
     records: list[ObservationRecord] = []
     for coll in collections:
@@ -150,6 +173,23 @@ def fetch(url: str, refresh: bool = False) -> Path:
 
 def fetch_cutout(rec: ObservationRecord, ra: float, dec: float, size_deg: float) -> Path:
     return fetch(cutout_url(rec.access_url, ra, dec, size_deg))
+
+
+def fetch_many(urls: list[str], workers: int = config.DOWNLOAD_WORKERS) -> dict[str, Path | Exception]:
+    """Download several URLs concurrently (small pool: IRSA throttles with 503)."""
+    unique = list(dict.fromkeys(urls))
+    out: dict[str, Path | Exception] = {}
+
+    def one(u):
+        try:
+            return u, fetch(u)
+        except Exception as err:  # reported per URL
+            return u, err
+
+    with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
+        for u, res in pool.map(one, unique):
+            out[u] = res
+    return out
 
 
 def sha256(path: Path) -> str:

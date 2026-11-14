@@ -1,67 +1,81 @@
 # SkyClues — estado del proyecto
 
-Última actualización: 14-11-2026, Claude Code A (cierre de la misión 1). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md).
+Última actualización: 14-11-2026, Claude Code A (misión 2: secuencias de N épocas y reproductor). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md).
 
 ## Objetivo inmediato
-Hito 3 (visor temporal): pasar de una pareja A/B a una **secuencia de N épocas comparables** (mismo detector y mismo canal LVF) con animación, pausa y blink.
+Hito 4 (experiencia de usuario): pulir la interfaz (Codex), añadir contexto con Aladin Lite y ejecutar los demás objetos de NASA.
 
 ## Terminado y verificado
 | Componente | Verificación |
 |---|---|
 | Entorno: Python 3.11 en `.venv`, `requirements.txt` con versiones fijadas | instalado y en uso |
-| App Streamlit `app.py` (tema claro) | arranca en `localhost:8501`; revisada en el navegador; `tests/test_app.py` recorre la vista de referencia y una búsqueda nueva completa con AppTest |
-| Consulta SIA2 a IRSA en `spherex_dr1` y `spherex_qr3` (`skyclues/archive.py`) | prueba real: 376 imágenes de M101 |
-| Recortes IBE con caché y reintentos ante el 503 «Server busy» | prueba real; SHA-256 comprobado |
-| Lectura MEF: IMAGE, FLAGS, VARIANCE, ZODI, WCS celeste TAN-SIP y WCS espectral `W` (WAVE-TAB) (`fitsdata.py`) | prueba real: ida y vuelta WCS < 1e-3 px; λ dentro de la banda |
-| FLAGS leídos de las claves MSKN de cada archivo; política «estricta» o «básica» (`quality.py`) | pruebas unitarias y reales |
-| Estimación de λ sin descargar: polígono `s_region` → homografía → tabla WCS-WAVE leída con una petición *range* de 11 kB (`geometry.py`, `pairing.py`) | λ estimada = λ del FITS (< 0.1 ancho de banda); convención de esquinas confirmada |
-| Criterios C1–C9 de comparabilidad (`compare.py`, umbrales en `config.py`) | reevaluados desde los FITS en las pruebas |
-| Visualización sin fabricar datos: RGBA explícito, máscara rosa, escala compartida, B colocado sobre la rejilla de A por vecino más próximo (`render.py`) | prueba: los NaN coinciden exactamente con los píxeles inválidos y los válidos valen IMAGE − ZODI |
+| Consulta SIA2 a `spherex_dr1` y `spherex_qr3`, con caché JSON de 12 h (`archive.py`) | prueba real |
+| Recortes IBE con caché intacta, SHA-256, reintentos ante 503 y **3 descargas en paralelo** (`fetch_many`) | prueba real |
+| Lectura MEF con WCS celeste y espectral (`fitsdata.py`); FLAGS leídos de MSKN (`quality.py`) | pruebas reales |
+| Estimación de λ sin descargar (homografía `s_region` + tabla WCS-WAVE por petición *range*, en caché de disco) | λ estimada = λ del FITS |
+| Parejas, criterios C1–C9 (`pairing.py`, `compare.py`) | sin cambios; pruebas originales en verde |
+| **Secuencias de N épocas, criterios globales S1–S9 sobre todo el conjunto (`sequence.py`)** | pruebas reales: intersección de máscaras, Δλ entre todos los pares, orden cronológico, alineación WCS < 0.75 px, datos idénticos al FITS y sin interpolar |
+| **Regla de selección:** solo opciones admisibles con S5 = pass y cobertura ≥ (mejor − 15 puntos); entre ellas, menos avisos y después más épocas | pruebas unitarias: una secuencia de 3 épocas con cobertura del 62 % no supera a una pareja del 97 % |
+| **Reproductor temporal (`player.py`, pestaña de la app):** reproducción, pausa, velocidad de 0.5 a 4 fps, repetición, anterior/siguiente, deslizador, blink A↔B (1–4 Hz), teclado y tabla de épocas | máquina de estados probada con Node; fotogramas con lienzo idéntico; HTML con N fotogramas reales; **probado en el navegador real**: siguiente/anterior, reproducción a 4 fps con repetición, pausa, blink 1↔4 y deslizador |
+| Color de máscara (rosa) en el reproductor y región no común (azul claro, opcional) | prueba píxel a píxel |
+| App Streamlit (`app.py`) basada en `TemporalSequence`; una pareja se trata como secuencia de 2 épocas | AppTest: vista de referencia, todos los resultados guardados y una búsqueda nueva |
 
-**Defecto corregido:** antes los píxeles enmascarados se pintaban en blanco, como si fueran estrellas. Ahora la imagen RGBA se compone de forma explícita y una prueba lo comprueba.
+## Secuencias de referencia (datos reales; los informes están en `results/`)
+| Campo | Épocas | Fechas (UTC) | Intervalos (d) | λ en el objetivo | Cobertura común | Criterios |
+|---|---|---|---|---|---|---|
+| M101 (`sequence_m101`), QR3 D2 | 4 | 17-05, 22-05, 19-06 y 22-06-2026 | 4.5 · 28.3 · 3.5 (total 36.4) | 1.4151–1.4206 µm (dispersión 0.16 BW; máx. 0.24 en la región) | 94.0 % (2537 px) | 9/9 cumplen |
+| WISE 0855 (`sequence_wise0855_mwir`), DR1 D6, detectores limitados a D5–D6 | 3 | 26-04, 30-04 y 08-05-2026 | 4.7 · 8.2 (total 12.9) | 4.823–4.826 µm (0.07 BW; máx. 0.11) | 88.0 % | 9/9 cumplen |
+| WISE 0855 (`sequence_wise0855`), DR1 D3, todos los detectores | 3 | las mismas fechas | 4.7 · 8.2 | 2.156–2.159 µm (0.04 BW; máx. 0.07) | 86.8 % | 9/9 cumplen |
 
-## Pareja de referencia (datos reales, `results/pair_m101.json`)
-M101, RA 210.802429, Dec +54.34875, campo de 0.1°. Colección QR3, detector D2.
-- A: `level2_2026W21_2A_0081_4D2_spx_l2b-v27-2026-268.fits`, 22-05-2026 00:12 UTC
-- B: `level2_2026W25_2A_0311_1D2_spx_l2b-v27-2026-273.fits`, 19-06-2026 22:17 UTC
-- Δt = 28.9 d · λ = 1.5198 / 1.5197 µm · |Δλ| máximo en la zona común = 0.00 anchos de banda · cobertura común válida 97.9 % (2655 px) · L2DQA Pass/Pass · FINAST 0/0 · software 7.0.5 en ambas · sin saturación
-- Los 9 criterios pasan. Nota: posible airglow de He I (D1/D2).
-- Prueba nula (`results/pair_m101_null_test.json`): mediana de A − B = −0.0002 MJy/sr frente a una señal de 0.90; χ con mediana −0.005 y dispersión robusta 1.36 (inflada por el desfase subpíxel del vecino más próximo).
-- Alternativa evaluada en una iteración anterior: DR1 D2, 16-05-2025 frente a 07-12-2025 (Δt = 205 d). Es admisible pero C4 da aviso: los gradientes LVF son antiparalelos y Δλ alcanza 0.52 anchos de banda en el borde.
+- Notas sobre WISE 0855: es una enana Y que emite sobre todo por encima de 3.5 µm, por eso la versión D5–D6 es la relevante. Con 12.9 días, el movimiento propio publicado (≈8″/año, no verificado aquí) supone ≈0.3″, muy por debajo de un píxel de 6.2″: **no se espera ver movimiento** en esta secuencia. La pareja `pair_wise0855` (DR1 D5, Δt = 373 d) sigue siendo la mejor línea base y el reproductor también la abre.
+- **Razones de rechazo registradas:** las opciones de 4 épocas en WISE 0855 (D2 con cobertura del 81.7 % y D5 del 83.6 %) se descartaron porque S4 dio aviso: los gradientes LVF eran antiparalelos y la dispersión llegaba a 0.50 y 0.51 BW. En M101, 4 es el máximo de épocas espectralmente compatibles entre los recortes evaluados (91 propuestas).
+- Las parejas originales (`pair_m101`, `pair_wise0855`) y la prueba nula siguen vigentes.
 
-## Segunda pareja: WISE 0855−0714 (`results/pair_wise0855.json`)
-Campo de 0.1° centrado en las coordenadas del enunciado de NASA, **sin propagar** el movimiento propio. Colección DR1, detector D5.
-- A: `2025W19_1B_0181_3`, 06-05-2025 · B: `2026W20_1A_1166_1`, 14-05-2026
-- Δt = 373.2 d · λ = 4.3702 µm en ambas · |Δλ| máximo 0.01 anchos de banda · cobertura común válida 92.6 % · los 9 criterios pasan · el ZODI difiere (0.286 frente a 0.333 MJy/sr)
-- **Sin analizar todavía.** El movimiento propio de la literatura (unos 8″/año, no verificado en esta sesión) daría un desplazamiento de unos 1.3 px entre A y B. Es un caso interesante, pero no se ha medido nada ni se afirma una detección.
+## Rendimiento
+Búsqueda de secuencia en frío: 73 s en M101 y 70 s en WISE 0855, frente a ~110 s de la antigua búsqueda de parejas (el tiempo lo dominan los recortes de ~4 MB, que ahora se descargan de 3 en 3). En caliente, con metadatos y FITS en caché, tarda ~1 s.
 
 ## Pruebas
 ```
-.venv\Scripts\python -m pytest -q          # 21 passed (8 sin red + 11 con IRSA o caché + 2 de la app sin interfaz), 14-11-2026
-.venv\Scripts\python -m pytest -m "not network"
-.venv\Scripts\python scripts\find_pair.py --ra 210.802429 --dec 54.34875 --field 0.1 --name pair_m101   # ~110 s en frío
-.venv\Scripts\python scripts\null_test.py
+.venv\Scripts\python -m pytest -q          # 38 passed, 14-11-2026 (19 originales del motor sin cambios, 3 de la app, 16 nuevas)
+.venv\Scripts\python -m pytest -m "not network"   # unitarias, incluida la máquina de estados del reproductor con Node
+.venv\Scripts\python scripts\find_sequence.py --ra 210.802429 --dec 54.34875 --field 0.1 --name sequence_m101
+.venv\Scripts\python scripts\find_sequence.py --ra 133.7951292 --dec -7.2451472 --field 0.1 --detectors 5 6 --name sequence_wise0855_mwir
 .venv\Scripts\streamlit run app.py
 ```
+Las 2 pruebas de la app de la misión 1 (vista de pareja y búsqueda de pareja) se adaptaron a la vista de secuencias. Las 19 pruebas del motor siguen sin cambios.
+
+## API para Codex (`skyclues.sequence`, `skyclues.player`)
+```python
+from skyclues.sequence import find_sequence, load_sequence
+seq, report = find_sequence(ra, dec, field_deg=0.1, detectors=None, max_frames=8)   # o bien:
+seq = load_sequence("results/sequence_m101.json")      # también acepta informes de pareja (2 épocas)
+seq.n, seq.frames                                       # cronológico
+f = seq.frames[i]; f.date_utc, f.mjd, f.obs_id, f.collection, f.detector,
+f.lambda_target_um, f.bandwidth_target_um, f.quality, f.cutout_url, f.sha256, f.record
+f.image                                                 # SpectralImage original (IMAGE, FLAGS, VARIANCE, ZODI, WCS); no modificar
+seq.frame_data(i, subtract_zodi=True)                   # MJy/sr en la rejilla de referencia; NaN = sin dato válido
+seq.frame_status(i)                                     # 0 común · 1 válido solo aquí · 2 sin datos
+seq.wcs, seq.field_mask, seq.common_mask, seq.valid_stack, seq.lambda_spread_bw
+seq.criteria, seq.metrics, seq.notes, seq.admissible, seq.summary()
+from skyclues import player
+html = player.build_player(seq, subtract_zodi=True, restrict_to_common=False)  # componente listo
+norm = player.sequence_norm(seq); player.frame_rgba(seq, i, norm); player.render_frame_png(...)
+```
+Reglas: una única `sequence_norm` para todas las épocas; los NaN se dibujan siempre con `MASK_COLOR`; hay que indicar la magnitud mostrada (IMAGE − ZODI) y que la rejilla es la de la época 1. La lógica de reproducción está en `PLAYER_CORE_JS`, separada del DOM.
 
 ## Archivos importantes
-`app.py` (UI) · `skyclues/{config,archive,geometry,fitsdata,quality,compare,pairing,render,targets}.py` · `scripts/find_pair.py`, `scripts/null_test.py` · `tests/` · `results/*.json` (versionados) · `data/cache/` (FITS de IRSA intactos; ignorados por git; se regeneran con la URL del informe y se comprueban por SHA-256).
+`app.py` · `skyclues/{config,archive,geometry,fitsdata,quality,compare,pairing,sequence,player,render,targets}.py` · `scripts/{find_pair,find_sequence,null_test}.py` · `tests/` · `results/*.json` (versionados; `results/search_*` lo ignora git) · `data/cache/` (FITS intactos y `meta/` con SIA2 y WCS-WAVE; ignorado por git).
 
 ## Problemas abiertos
-1. La bandera **HALO** coincide con estrellas brillantes en algunas exposiciones y la máscara estricta las tapa. Falta confirmar su significado en la tabla 16 del suplemento (el PDF pesa más de 10 MB y no se pudo leer con la herramienta web; hay que descargarlo localmente).
-2. La alineación por vecino más próximo (≤ 0.5 px) no basta para un blink o una diferencia fina. Valorar un remuestreo conservativo claramente etiquetado.
-3. Los recortes siguen los ejes del detector y aún no hay vista con el norte arriba.
-4. Una búsqueda en frío tarda unos 110 s (SIA2 más 8 recortes de unos 4 MB, por la extensión EPSF) e IRSA devuelve 503 bajo carga.
-5. La λ por píxel viene de WCS-WAVE, con precisión de visualización (~1 nm). Para ciencia hacen falta CWAVE/CBAND, que no están implementados.
-6. Las pruebas automáticas validan M101; WISE 0855 solo tiene la pareja. RW Aur, R Dra, Barnard y ε Ind B no se han ejecutado, y la propagación del movimiento propio no está implementada.
-7. Streamlit no recarga los módulos de `skyclues/`: hay que reiniciar el servidor tras editarlos.
+1. La bandera **HALO** tapa estrellas brillantes con la máscara estricta. Falta confirmar su significado en la tabla 16 del suplemento (descargar el PDF en local).
+2. La alineación por vecino más próximo (≤ 0.5 px) hace que una estrella fija pueda «saltar» un píxel entre épocas. Una diferencia visual no es movimiento. Falta valorar un remuestreo subpíxel etiquetado.
+3. No hay vista con el norte arriba: la rejilla es la del detector de la época 1.
+4. La λ por píxel tiene precisión de visualización (WCS-WAVE); CWAVE/CBAND no están implementados.
+5. RW Aur, R Dra, Barnard y ε Ind B no se han ejecutado, y la propagación del movimiento propio no está implementada.
+6. Con 8 épocas o campos más grandes, el HTML del reproductor crece (~80 kB por fotograma).
+7. Streamlit no recarga `skyclues/`: hay que reiniciar el servidor tras editarlo.
 
-## Pendiente / siguiente tarea prioritaria
-1. **Claude A:** `select_sequence()`, que a partir de los candidatos ya calculados elija todas las épocas del mismo detector con |Δλ| en el campo ≤ 0.25 anchos de banda y cobertura común suficiente, y ejecutarla en M101 y en RW Aur, R Dra y WISE 0855.
-2. **Codex:** animación, pausa y navegación por fechas, blink A/B, URL compartible (ya existen `?ra=&dec=&fov=`) y pulido visual de `app.py`.
-3. **Claude B (posterior):** Spectrum Explorer con `spherex_dr1_cube` / HiPS (ver CONTEXT).
-
-## Información para Codex
-- API: `archive.query_images(ra, dec)` → `ObservationRecord`; `pairing.find_pair(ra, dec, field_deg)` → `(best, report)`; `fitsdata.load(path)` → `SpectralImage`; `compare.evaluate_pair(a, b, ra, dec, field)` → `PairEvaluation` (`criteria`, `metrics`, `common`, `b_index`…); `render.display_array`, `aligned_b`, `shared_norm`, `to_rgba`, `frame_figure`.
-- Reglas para la UI: misma `shared_norm` para todas las épocas; los NaN se dibujan siempre con `MASK_COLOR`; hay que indicar la magnitud mostrada (IMAGE − ZODI) y que B está sobre la rejilla de A.
-- `app.py` es un único script. Si se divide, conviene no tocar `skyclues/` en paralelo con Claude A.
+## Siguiente tarea prioritaria
+- **Codex:** refinamiento visual del reproductor y de la app, URL compartible con la secuencia elegida, accesibilidad y despliegue (con autorización).
+- **Claude A:** objetos variables (RW Aur, R Dra) con la misma API, propagación del movimiento propio para el marcador del objetivo (sin presentarla como detección) y la bandera HALO.
+- **Claude B:** Spectrum Explorer (ver CONTEXT).

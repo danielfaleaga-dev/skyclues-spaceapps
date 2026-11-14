@@ -58,3 +58,15 @@ SATURATION_WARN_FRACTION = 0.001
 
 DEFAULT_FIELD_DEG = 0.1
 MAX_PAIRS_TO_DOWNLOAD = 4
+
+# ---- Temporal sequences --------------------------------------------------
+# A sequence with more epochs is preferred only if its common valid coverage
+# is within this tolerance of the best admissible option (pair included), so
+# the number of dates never automatically outweighs comparable sky area.
+SEQUENCE_COVERAGE_TOLERANCE = 0.15
+MAX_SEQUENCE_FRAMES = 8
+MAX_SEQUENCE_CANDIDATES = 3
+
+# ---- Performance -----------------------------------------------------------
+METADATA_CACHE_MAX_AGE_S = 12 * 3600   # SIA2 results and WCS-WAVE tables
+DOWNLOAD_WORKERS = 3
