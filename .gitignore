@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Downloaded FITS cache (originals are re-fetchable from IRSA; never edited in place)
+data/cache/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

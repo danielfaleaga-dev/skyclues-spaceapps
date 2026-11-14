@@ -1,0 +1,17 @@
+{
+  "n_common_px": 2655,
+  "median_diff_mjysr": -0.0002075880765914917,
+  "median_signal_a_mjysr": 0.903775542974472,
+  "chi_median": -0.00516814791552297,
+  "chi_robust_std": 1.3553890480522788,
+  "frac_abs_chi_gt_5": 0.01694915254237288,
+  "target_full_detector_px_a": [
+    1678.0,
+    424.2
+  ],
+  "target_full_detector_px_b": [
+    1675.6,
+    423.9
+  ],
+  "note": "B placed on A grid by nearest neighbour (<= 0.5 px offset); PSF/sub-pixel offsets inflate chi on bright sources."
+}
