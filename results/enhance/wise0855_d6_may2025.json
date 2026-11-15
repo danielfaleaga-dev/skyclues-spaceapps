@@ -1,0 +1,953 @@
+{
+ "method": "infrared-snr 1.0 (2026-11-15)",
+ "selection": {
+  "method": "infrared-snr 1.0 (2026-11-15)",
+  "purpose": "deep",
+  "ok": true,
+  "reason": "",
+  "rejected": [],
+  "accepted": [
+   "2025W19_1B_0116_1",
+   "2025W19_1B_0138_1"
+  ],
+  "warnings": [
+   "Producto de BANDA ANCHA: combina longitudes de onda distintas del mismo detector. Sirve para detectar y situar fuentes; su brillo no es monocromático y no debe compararse entre fechas ni con un canal."
+  ],
+  "detector": 6,
+  "n": 2,
+  "collection": "spherex_dr1",
+  "version": "7.0.5",
+  "bunit": "MJy / sr",
+  "lambda_um": [
+   4.967382499008442,
+   4.859938082308185
+  ],
+  "bandwidth_um": 0.037559974273750525,
+  "lambda_range_um": [
+   4.859938082308185,
+   4.967382499008442
+  ],
+  "lambda_spread_centre_bw": 2.8606094327212306,
+  "mjd": [
+   60800.70069465,
+   60800.835104036
+  ],
+  "span_days": 0.13440938600251684,
+  "psf_area_px": [
+   4.909023241522252,
+   4.806610079295417
+  ],
+  "psf_fwhm_arcsec": 9.041940402463002,
+  "nonphysical_negative_pixels": [
+   6,
+   5
+  ],
+  "weighting": "frame",
+  "lambda_spread_field_bw": 2.867638842246809,
+  "kind": "broadband"
+ },
+ "exposures": [
+  {
+   "obs_id": "2025W19_1B_0116_1",
+   "mjd": 60800.70069465,
+   "date_utc": "2025-05-05T16:49:00.018",
+   "detector": 6,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W19_1B_0116_1D6_spx_l2b-v27-2026-197__2dd30c2df29731ff.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W19_1B/l2b-v27-2026-197/6/level2_2025W19_1B_0116_1D6_spx_l2b-v27-2026-197.fits?center=133.7601752,-7.2422453&size=0.20000",
+   "sha256": "ebadb195d6dc4a6a995308f4a8f9e0d5cf0d2c8b6f6e6765bb3024b70bc62460"
+  },
+  {
+   "obs_id": "2025W19_1B_0138_1",
+   "mjd": 60800.835104036,
+   "date_utc": "2025-05-05T20:02:32.989",
+   "detector": 6,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W19_1B_0138_1D6_spx_l2b-v27-2026-197__2c766a3a6c47dcbe.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W19_1B/l2b-v27-2026-197/6/level2_2025W19_1B_0138_1D6_spx_l2b-v27-2026-197.fits?center=133.7601752,-7.2422453&size=0.20000",
+   "sha256": "e22a315be5415dc83f1366cf59afd0cc16bc6f2bd22c5609dfbce290b1145076"
+  }
+ ],
+ "sky_constants_mjysr": [
+  -0.009055346250534058,
+  0.009055346250534058
+ ],
+ "weights_relative": [
+  0.8558931588669991,
+  1.0
+ ],
+ "reference_exposure": "2025W19_1B_0116_1",
+ "best_exposure": "2025W19_1B_0138_1",
+ "grid": {
+  "oversample": 1,
+  "pixel_arcsec": 6.15,
+  "shape": [
+   117,
+   117
+  ],
+  "note": "rejilla nativa de la exposición de referencia"
+ },
+ "metrics": {
+  "method": "infrared-snr 1.0 (2026-11-15)",
+  "kind": "broadband",
+  "n_exposures": 2,
+  "pixel_noise_mjysr": {
+   "single_median": 0.06563468975206146,
+   "single": [
+    0.06818675145890907,
+    0.06308262804521386
+   ],
+   "reference": 0.06818675145890907,
+   "best_single": 0.06308262804521386,
+   "combined": 0.04651901542207572,
+   "ratio": 1.4109217307491497,
+   "ratio_vs_best": 1.35606111764949,
+   "ideal_ratio": 1.4142135623730951
+  },
+  "noise_calibration": {
+   "null_scale": 0.9986883056794393,
+   "null_pixels": 10055,
+   "scale": 1.0,
+   "single_scale": 0.9986883056794393,
+   "single_pairs": [
+    0.9986883056794393
+   ],
+   "single": 1.0,
+   "null_scale_all_pixels": 1.0045941357614712,
+   "note": "Dispersión robusta de la imagen nula (mitad A − mitad B)/2 dividida por su error formal, en los píxeles sin fuente brillante: 1 = las varianzas oficiales describen el ruido real. «single_scale» es la misma prueba con diferencias de dos exposiciones individuales. Los errores publicados de la combinación y de cada exposición se multiplican por su factor cuando es mayor que 1; nunca se reducen."
+  },
+  "contributions": {
+   "median": 2.0,
+   "min": 1,
+   "max": 2,
+   "field_fraction_valid": 0.998983270172844,
+   "field_fraction_all": 0.9345595711248729
+  },
+  "detections": {
+   "threshold": 5.0,
+   "combined": 20,
+   "single": [
+    14,
+    13
+   ],
+   "single_median": 13.5,
+   "reference": 14,
+   "new_in_combined": 5,
+   "single_exposure_only": 0,
+   "null_image": 1,
+   "null_image_elsewhere": 0,
+   "null_image_at_sources": 1,
+   "null_image_single_exposure": 0,
+   "null_image_spurious": 0,
+   "negative_image": 2
+  },
+  "gain": {
+   "n_sources": 18,
+   "median": 1.4149194160244125,
+   "p16": 1.4093663391975053,
+   "p84": 1.424679084938497,
+   "ideal_median": 1.416085808281419,
+   "vs_best_exposure_median": 1.376362518981487,
+   "vs_best_exposure_n": 17,
+   "sqrt_n": 1.4142135623730951
+  },
+  "photometry": {
+   "n_sources": 2,
+   "flux_ratio_median": 1.000741647705917,
+   "flux_ratio_scatter": null,
+   "single_scatter_chi2_median": 1.070592270178846
+  },
+  "resolution": {
+   "n_sources": 0,
+   "area_combined_px": null,
+   "area_single_px": null,
+   "area_ratio": null,
+   "width_ratio": null
+  },
+  "astrometry": {
+   "n_sources": 0,
+   "median_shift_arcsec": null,
+   "rms_shift_arcsec": null,
+   "note": "Centroide en la combinación menos la media de los centroides de las exposiciones individuales en la misma rejilla."
+  },
+  "registration": {
+   "checked": true,
+   "frames": [
+    {
+     "obs_id": "2025W19_1B_0116_1",
+     "reference": true,
+     "n_sources": null,
+     "shift_arcsec": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "obs_id": "2025W19_1B_0138_1",
+     "n_sources": 7,
+     "shift_arcsec": [
+      0.22778885658633755,
+      -0.4695412039604485
+     ],
+     "shift_px": 0.08485822049827355,
+     "scatter_arcsec": 0.7805062779694588,
+     "error_arcsec": 0.2950036440331199
+    }
+   ],
+   "n_verified": 1,
+   "max_shift_arcsec": 0.5218780560643823,
+   "rms_shift_arcsec": 0.5218780560643823,
+   "note": "Desplazamiento mediano de fuentes compactas comunes (ajuste ePSF, máscara estricta) respecto a la exposición de referencia. No se aplica ninguna corrección.",
+   "placement_rms_arcsec": 0.6620408250473316,
+   "placement_max_arcsec": 1.4254186077639233,
+   "placement_note": "Desplazamiento medio ponderado entre el centro de cada píxel de la combinación y los centros de los píxeles nativos copiados en él (vecino más próximo). Es el error de registro propio del producto: una posición medida en la imagen combinada lo hereda si no se corrige."
+  }
+ },
+ "sources": [
+  {
+   "x": 23,
+   "y": 104,
+   "significance": 127.61510629395409,
+   "ra": 133.6808378942603,
+   "dec": -7.298644754736577,
+   "significance_single": [
+    92.58375002958681,
+    91.80312760237004
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 2,
+   "dominance": 0.540288973117794,
+   "single_exposure_only": false,
+   "flux_mjy": 69.0997217926289,
+   "flux_err_mjy": 0.4280053142561417,
+   "snr": 161.44594352227097,
+   "snr_single": [
+    111.00770600475327,
+    117.29899739041247
+   ],
+   "snr_single_median": 114.15335169758288,
+   "snr_single_best": 117.29899739041247,
+   "snr_reference": 111.00770600475327,
+   "snr_best_exposure": 117.29899739041247,
+   "gain": 1.4142899978090566,
+   "gain_vs_best": 1.376362518981487,
+   "gain_ideal": 1.414750402356811,
+   "flux_ratio_to_single_mean": 1.000082932937585,
+   "single_scatter_chi2": 0.22183342692384556,
+   "single_exposure_fraction": 0.5275354057585682,
+   "catalogue_arcsec": 2.7036779032974865
+  },
+  {
+   "x": 31,
+   "y": 76,
+   "significance": 46.67948870029536,
+   "ra": 133.7077918541651,
+   "dec": -7.257208132528507,
+   "significance_single": [
+    32.80157356866557,
+    35.04971644819951
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 2,
+   "dominance": 0.550519245559254,
+   "single_exposure_only": false,
+   "flux_mjy": 11.02507996522123,
+   "flux_err_mjy": 0.2098533414618666,
+   "snr": 52.537071310940505,
+   "snr_single": [
+    35.69902959686068,
+    38.57059050918828
+   ],
+   "snr_single_median": 37.13481005302448,
+   "snr_single_best": 38.57059050918828,
+   "snr_reference": 35.69902959686068,
+   "snr_best_exposure": 38.57059050918828,
+   "gain": 1.414766124720263,
+   "gain_vs_best": 1.3621018142935908,
+   "gain_ideal": 1.4152702252430434,
+   "flux_ratio_to_single_mean": 1.001400362474249,
+   "single_scatter_chi2": 1.9193511134338461,
+   "single_exposure_fraction": 0.5386062915688278,
+   "catalogue_arcsec": 2.7797281265187292
+  },
+  {
+   "x": 36,
+   "y": 54,
+   "significance": 27.728225214756268,
+   "ra": 133.72686911878552,
+   "dec": -7.223965574653448,
+   "significance_single": [
+    18.76907529455561,
+    21.36607294506626
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 2,
+   "dominance": 0.5500954815509574,
+   "single_exposure_only": false,
+   "flux_mjy": 4.98957105147284,
+   "flux_err_mjy": 0.17004790568448114,
+   "snr": 29.34214938660192,
+   "snr_single": [
+    20.22362439895958,
+    21.300582182237978
+   ],
+   "snr_single_median": 20.76210329059878,
+   "snr_single_best": 21.300582182237978,
+   "snr_reference": 20.22362439895958,
+   "snr_best_exposure": 21.300582182237978,
+   "gain": 1.413255149341649,
+   "gain_vs_best": 1.3775280476169147,
+   "gain_ideal": 1.4146891238424741,
+   "flux_ratio_to_single_mean": 1.0012453794356122,
+   "single_scatter_chi2": 0.32208985706497895,
+   "single_exposure_fraction": 0.5259182277996384,
+   "catalogue_arcsec": 3.0607018633514786
+  },
+  {
+   "x": 59,
+   "y": 74,
+   "significance": 19.467091256251965,
+   "ra": 133.7544328973246,
+   "dec": -7.268908763158313,
+   "significance_single": [
+    14.187130196623896,
+    13.867827979620213
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 2,
+   "dominance": 0.5499943762180696,
+   "single_exposure_only": false,
+   "flux_mjy": 2.5323605113994274,
+   "flux_err_mjy": 0.15252115799599292,
+   "snr": 16.603339134534757,
+   "snr_single": [
+    11.226907718848334,
+    12.238262669406561
+   ],
+   "snr_single_median": 11.732585194127449,
+   "snr_single_best": 12.238262669406561,
+   "snr_reference": 11.226907718848334,
+   "snr_best_exposure": 12.238262669406561,
+   "gain": 1.4151475450478965,
+   "gain_vs_best": 1.3566745201539183,
+   "gain_ideal": 1.415526497409122,
+   "flux_ratio_to_single_mean": 1.0017387887426372,
+   "single_scatter_chi2": 0.2766800670961679,
+   "single_exposure_fraction": 0.5430203442637782,
+   "catalogue_arcsec": 1.3217081572310236
+  },
+  {
+   "x": 81,
+   "y": 60,
+   "significance": 18.622180212107075,
+   "ra": 133.79724508781587,
+   "dec": -7.2578180893403115,
+   "significance_single": [
+    13.202213835576284,
+    13.682819439953576
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 2,
+   "dominance": 0.5359703176418771,
+   "single_exposure_only": false,
+   "flux_mjy": 2.6573077839031614,
+   "flux_err_mjy": 0.15141965559713358,
+   "snr": 17.549292219850123,
+   "snr_single": [
+    12.28833790458629,
+    12.551412233878683
+   ],
+   "snr_single_median": 12.419875069232486,
+   "snr_single_best": 12.551412233878683,
+   "snr_reference": 12.28833790458629,
+   "snr_best_exposure": 12.551412233878683,
+   "gain": 1.4130007042763773,
+   "gain_vs_best": 1.3981926410225933,
+   "gain_ideal": 1.4142928737194045,
+   "flux_ratio_to_single_mean": 0.9996009177809494,
+   "single_scatter_chi2": 0.05843713584708502,
+   "single_exposure_fraction": 0.5105896727243372,
+   "catalogue_arcsec": 0.994756067715621
+  },
+  {
+   "x": 30,
+   "y": 51,
+   "significance": 13.53210756633263,
+   "ra": 133.71857886810815,
+   "dec": -7.215862839660696,
+   "significance_single": [
+    7.494230166393852,
+    11.568144952314697
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 2,
+   "dominance": 0.5733710413145995,
+   "single_exposure_only": false,
+   "flux_mjy": 1.8876470588538683,
+   "flux_err_mjy": 0.1546940697555475,
+   "snr": 12.202452633360727,
+   "snr_single": [
+    7.699601976629132,
+    9.467241333095277
+   ],
+   "snr_single_median": 8.583421654862205,
+   "snr_single_best": 9.467241333095277,
+   "snr_reference": 7.699601976629132,
+   "snr_best_exposure": 9.467241333095277,
+   "gain": 1.4216303385781437,
+   "gain_vs_best": 1.2889132329080686,
+   "gain_ideal": 1.4216908630387168,
+   "flux_ratio_to_single_mean": 1.0131141645147044,
+   "single_scatter_chi2": 2.0891988091037224,
+   "single_exposure_fraction": 0.601887960847214,
+   "catalogue_arcsec": 2.919195564942346
+  },
+  {
+   "x": 21,
+   "y": 25,
+   "significance": 11.089880308816463,
+   "ra": 133.71682357917692,
+   "dec": -7.168615477340351,
+   "significance_single": [
+    7.657924619511689,
+    8.181565420057021
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 2,
+   "dominance": 0.6560793563146642,
+   "single_exposure_only": false,
+   "flux_mjy": 1.2771108262318036,
+   "flux_err_mjy": 0.1418279455119316,
+   "snr": 9.004648707432372,
+   "snr_single": [
+    4.31985239521742,
+    8.194506893266588
+   ],
+   "snr_single_median": 6.2571796442420045,
+   "snr_single_best": 8.194506893266588,
+   "snr_reference": 4.31985239521742,
+   "snr_best_exposure": 8.194506893266588,
+   "gain": 1.4390906477679044,
+   "gain_vs_best": 1.0988640103325162,
+   "gain_ideal": 1.480447563820927,
+   "flux_ratio_to_single_mean": 1.0144273923491902,
+   "single_scatter_chi2": 6.827617123654878,
+   "single_exposure_fraction": 0.7825324265926006,
+   "catalogue_arcsec": 1.717781816743749
+  },
+  {
+   "x": 82,
+   "y": 79,
+   "significance": 10.186943655396304,
+   "ra": 133.78944888993036,
+   "dec": -7.2893731842275615,
+   "significance_single": [
+    8.521607756373212,
+    6.178029608908886
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 2,
+   "dominance": 0.5012720827192595,
+   "single_exposure_only": false,
+   "flux_mjy": 1.2864371693700478,
+   "flux_err_mjy": 0.14186872884516297,
+   "snr": 9.067799365243337,
+   "snr_single": [
+    6.588735417494128,
+    6.279442855737017
+   ],
+   "snr_single_median": 6.434089136615572,
+   "snr_single_best": 6.588735417494128,
+   "snr_reference": 6.588735417494128,
+   "snr_best_exposure": 6.279442855737017,
+   "gain": 1.409336919757555,
+   "gain_vs_best": 1.444045208080654,
+   "gain_ideal": 1.4146220012807136,
+   "flux_ratio_to_single_mean": 0.9981444921567741,
+   "single_scatter_chi2": 0.1274497358571517,
+   "single_exposure_fraction": 0.5240215809136627,
+   "catalogue_arcsec": 1.8933059350006767
+  },
+  {
+   "x": 85,
+   "y": 79,
+   "significance": 9.403603802926623,
+   "ra": 133.79433996594216,
+   "dec": -7.290978251435077,
+   "significance_single": [
+    6.24824897426154,
+    7.239670146144477
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 2,
+   "dominance": 0.5226534650288869,
+   "single_exposure_only": false,
+   "flux_mjy": 1.1227428362543928,
+   "flux_err_mjy": 0.13952813442414044,
+   "snr": 8.046712879005867,
+   "snr_single": [
+    5.93192827738373,
+    5.486887873509953
+   ],
+   "snr_single_median": 5.7094080754468415,
+   "snr_single_best": 5.93192827738373,
+   "snr_reference": 5.93192827738373,
+   "snr_best_exposure": 5.486887873509953,
+   "gain": 1.4093777800908194,
+   "gain_vs_best": 1.4665349583421319,
+   "gain_ideal": 1.4152872473932028,
+   "flux_ratio_to_single_mean": 0.9982496435187052,
+   "single_scatter_chi2": 0.2686779487570343,
+   "single_exposure_fraction": 0.538915191257466,
+   "catalogue_arcsec": 1.7006886974767363
+  },
+  {
+   "x": 56,
+   "y": 77,
+   "significance": 8.473229554187055,
+   "ra": 133.7480527526999,
+   "dec": -7.272202529236547,
+   "significance_single": [
+    5.263906364849887,
+    6.60573546272622
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 2,
+   "dominance": 0.5752657624315902,
+   "single_exposure_only": false,
+   "flux_mjy": 0.7973241386370323,
+   "flux_err_mjy": 0.13905451495002483,
+   "snr": 5.7338960832993076,
+   "snr_single": [
+    3.3751314361433917,
+    4.683283678626421
+   ],
+   "snr_single_median": 4.029207557384907,
+   "snr_single_best": 4.683283678626421,
+   "snr_reference": 3.3751314361433917,
+   "snr_best_exposure": 4.683283678626421,
+   "gain": 1.423082827487994,
+   "gain_vs_best": 1.2243324292883802,
+   "gain_ideal": 1.4327262307626316,
+   "flux_ratio_to_single_mean": 1.0015399811647494,
+   "single_scatter_chi2": 0.5434332386480523,
+   "single_exposure_fraction": 0.6581656701749072,
+   "catalogue_arcsec": 2.6572870790187277
+  },
+  {
+   "x": 94,
+   "y": 16,
+   "significance": 8.460979043209178,
+   "ra": 133.84025661965245,
+   "dec": -7.192940918482155,
+   "significance_single": [
+    4.986564535992872,
+    7.324902929945869
+   ],
+   "detected_in_single": 1,
+   "n_contributions": 2,
+   "dominance": 0.6405610263544954,
+   "single_exposure_only": false,
+   "flux_mjy": 1.1766356933086057,
+   "flux_err_mjy": 0.14441555355414892,
+   "snr": 8.147569041913647,
+   "snr_single": [
+    4.431498890721875,
+    6.973402738769472
+   ],
+   "snr_single_median": 5.702450814745674,
+   "snr_single_best": 6.973402738769472,
+   "snr_reference": 4.431498890721875,
+   "snr_best_exposure": 6.973402738769472,
+   "gain": 1.4287837469540758,
+   "gain_vs_best": 1.1683778131178708,
+   "gain_ideal": 1.4489131707544174,
+   "flux_ratio_to_single_mean": 1.0053303639802615,
+   "single_scatter_chi2": 2.5373762166088754,
+   "single_exposure_fraction": 0.712330728640985,
+   "catalogue_arcsec": 3.613243232826038
+  },
+  {
+   "x": 104,
+   "y": 68,
+   "significance": 7.72757618970532,
+   "ra": 133.83077169581313,
+   "dec": -7.283186460587191,
+   "significance_single": [
+    4.641518535270457,
+    null
+   ],
+   "detected_in_single": 0,
+   "n_contributions": 2,
+   "dominance": 0.5571525271805908,
+   "single_exposure_only": false,
+   "flux_mjy": 0.7680761202800365,
+   "flux_err_mjy": 0.14448993103721836,
+   "snr": 5.31577608741603,
+   "snr_single": [
+    2.7083079363410762,
+    null
+   ],
+   "snr_single_median": 2.7083079363410762,
+   "snr_single_best": 2.7083079363410762,
+   "snr_reference": 2.7083079363410762,
+   "snr_best_exposure": null,
+   "gain": 1.9627664993655198,
+   "gain_vs_best": null,
+   "gain_ideal": 1.0,
+   "flux_ratio_to_single_mean": 1.4632583354940925,
+   "single_scatter_chi2": 0.0,
+   "single_exposure_fraction": 1.0,
+   "catalogue_arcsec": 2.2338402288687966
+  },
+  {
+   "x": 84,
+   "y": 31,
+   "significance": 7.440308059489328,
+   "ra": 133.81652049907999,
+   "dec": -7.212078992321182,
+   "significance_single": [
+    6.316108409209874,
+    4.55761749244502
+   ],
+   "detected_in_single": 1,
+   "n_contributions": 2,
+   "dominance": 0.5572033709322098,
+   "single_exposure_only": false,
+   "flux_mjy": 1.0387375465743205,
+   "flux_err_mjy": 0.14100152040749062,
+   "snr": 7.3668535174117045,
+   "snr_single": [
+    6.276177064450945,
+    4.160592187768868
+   ],
+   "snr_single_median": 5.2183846261099065,
+   "snr_single_best": 6.276177064450945,
+   "snr_reference": 6.276177064450945,
+   "snr_best_exposure": 4.160592187768868,
+   "gain": 1.4117114864534994,
+   "gain_vs_best": 1.7706261957296527,
+   "gain_ideal": 1.4429756062689687,
+   "flux_ratio_to_single_mean": 1.0166978537879363,
+   "single_scatter_chi2": 4.005827060534502,
+   "single_exposure_fraction": 0.6947046793505923,
+   "catalogue_arcsec": 4.1226000375517655
+  },
+  {
+   "x": 51,
+   "y": 37,
+   "significance": 6.782429099177758,
+   "ra": 133.75975869390322,
+   "dec": -7.204230100043246,
+   "significance_single": [
+    null,
+    3.7555816821212926
+   ],
+   "detected_in_single": 0,
+   "n_contributions": 2,
+   "dominance": 0.5907412170666952,
+   "single_exposure_only": false,
+   "flux_mjy": 0.8663396039451458,
+   "flux_err_mjy": 0.14767911213072832,
+   "snr": 5.866365198473333,
+   "snr_single": [
+    null,
+    3.6301189493136876
+   ],
+   "snr_single_median": 3.6301189493136876,
+   "snr_single_best": 3.6301189493136876,
+   "snr_reference": null,
+   "snr_best_exposure": 3.6301189493136876,
+   "gain": 1.6160256124892083,
+   "gain_vs_best": 1.6160256124892083,
+   "gain_ideal": 1.0,
+   "flux_ratio_to_single_mean": 1.2161540209596502,
+   "single_scatter_chi2": 0.0,
+   "single_exposure_fraction": 1.0,
+   "catalogue_arcsec": 1.475916913527365
+  },
+  {
+   "x": 92,
+   "y": 91,
+   "significance": 6.462431018371982,
+   "ra": 133.79979986930812,
+   "dec": -7.314316746664834,
+   "significance_single": [
+    5.264615388482271,
+    4.0669711643314015
+   ],
+   "detected_in_single": 1,
+   "n_contributions": 2,
+   "dominance": 0.5124872838021589,
+   "single_exposure_only": false,
+   "flux_mjy": 0.8112967318883814,
+   "flux_err_mjy": 0.13760675584023183,
+   "snr": 5.895762362353318,
+   "snr_single": [
+    4.439717107003106,
+    3.94766324735666
+   ],
+   "snr_single_median": 4.193690177179883,
+   "snr_single_best": 4.439717107003106,
+   "snr_reference": 4.439717107003106,
+   "snr_best_exposure": 3.94766324735666,
+   "gain": 1.40586502895119,
+   "gain_vs_best": 1.4934815846567202,
+   "gain_ideal": 1.416645119153716,
+   "flux_ratio_to_single_mean": 0.9962738367365662,
+   "single_scatter_chi2": 0.17949770248151775,
+   "single_exposure_fraction": 0.5584647586317004,
+   "catalogue_arcsec": 2.5094292852452638
+  },
+  {
+   "x": 85,
+   "y": 16,
+   "significance": 5.919090035206379,
+   "ra": 133.82558974187637,
+   "dec": -7.188126904609764,
+   "significance_single": [
+    5.6054528259508185,
+    3.0930377769029347
+   ],
+   "detected_in_single": 1,
+   "n_contributions": 2,
+   "dominance": 0.7305514568331029,
+   "single_exposure_only": false,
+   "flux_mjy": 0.9094936049345916,
+   "flux_err_mjy": 0.13959602126028636,
+   "snr": 6.515182859250539,
+   "snr_single": [
+    6.104227948097223,
+    3.098931184645955
+   ],
+   "snr_single_median": 4.601579566371589,
+   "snr_single_best": 6.104227948097223,
+   "snr_reference": 6.104227948097223,
+   "snr_best_exposure": 3.098931184645955,
+   "gain": 1.415857916890885,
+   "gain_vs_best": 2.102396752638727,
+   "gain_ideal": 1.4877064682747863,
+   "flux_ratio_to_single_mean": 1.035524240086845,
+   "single_scatter_chi2": 6.995056178403242,
+   "single_exposure_fraction": 0.7950841789741152,
+   "catalogue_arcsec": 2.855595168727264
+  },
+  {
+   "x": 48,
+   "y": 108,
+   "significance": 5.4186616476264415,
+   "ra": 133.71961653114596,
+   "dec": -7.3185369719160365,
+   "significance_single": [
+    3.0349229390895625,
+    null
+   ],
+   "detected_in_single": 0,
+   "n_contributions": 2,
+   "dominance": 0.64253604803563,
+   "single_exposure_only": false,
+   "flux_mjy": 0.5470949864321105,
+   "flux_err_mjy": 0.1440260971758467,
+   "snr": 3.79858232056474,
+   "snr_single": [
+    2.0915470817184345,
+    null
+   ],
+   "snr_single_median": 2.0915470817184345,
+   "snr_single_best": 2.0915470817184345,
+   "snr_reference": 2.0915470817184345,
+   "snr_best_exposure": null,
+   "gain": 1.8161591263074937,
+   "gain_vs_best": null,
+   "gain_ideal": 1.0,
+   "flux_ratio_to_single_mean": 1.3261202518923185,
+   "single_scatter_chi2": 6.259448004440313e-32,
+   "single_exposure_fraction": 1.0,
+   "catalogue_arcsec": 2.528257069631019
+  },
+  {
+   "x": 86,
+   "y": 107,
+   "significance": 5.416359041981307,
+   "ra": 133.7820783112072,
+   "dec": -7.337230335166831,
+   "significance_single": [
+    3.981284568554162,
+    3.685935953914974
+   ],
+   "detected_in_single": 0,
+   "n_contributions": 2,
+   "dominance": 0.5707470068871174,
+   "single_exposure_only": false,
+   "flux_mjy": 0.6373325128882171,
+   "flux_err_mjy": 0.13441214168285834,
+   "snr": 4.741629029258274,
+   "snr_single": [
+    3.2199100439888095,
+    3.4816947635969924
+   ],
+   "snr_single_median": 3.350802403792901,
+   "snr_single_best": 3.4816947635969924,
+   "snr_reference": 3.2199100439888095,
+   "snr_best_exposure": 3.4816947635969924,
+   "gain": 1.4150727073285618,
+   "gain_vs_best": 1.3618738434036715,
+   "gain_ideal": 1.4152921374505842,
+   "flux_ratio_to_single_mean": 1.0006423124381836,
+   "single_scatter_chi2": 0.007301098232625014,
+   "single_exposure_fraction": 0.539003473635466,
+   "catalogue_arcsec": 3.189715750637097
+  },
+  {
+   "x": 92,
+   "y": 52,
+   "significance": 5.410153760563414,
+   "ra": 133.8191444788544,
+   "dec": -7.2506421156095495,
+   "significance_single": [
+    5.044025444364215,
+    2.6743938304457755
+   ],
+   "detected_in_single": 1,
+   "n_contributions": 2,
+   "dominance": 0.6108636813373285,
+   "single_exposure_only": false,
+   "flux_mjy": 0.6191891974791246,
+   "flux_err_mjy": 0.135315961998244,
+   "snr": 4.575876994372325,
+   "snr_single": [
+    4.647169144837409,
+    1.9327748319071298
+   ],
+   "snr_single_median": 3.2899719883722693,
+   "snr_single_best": 4.647169144837409,
+   "snr_reference": 4.647169144837409,
+   "snr_best_exposure": 1.9327748319071298,
+   "gain": 1.3908559132250435,
+   "gain_vs_best": 2.367516856506851,
+   "gain_ideal": 1.5298217165747894,
+   "flux_ratio_to_single_mean": 1.0005438183853987,
+   "single_scatter_chi2": 4.415875127847468,
+   "single_exposure_fraction": 0.8525324450638085,
+   "catalogue_arcsec": 2.5490506448756363
+  },
+  {
+   "x": 18,
+   "y": 33,
+   "significance": 5.060869237255277,
+   "ra": 133.7079606435363,
+   "dec": -7.180071642412917,
+   "significance_single": [
+    3.5229206421957575,
+    3.8645888058619144
+   ],
+   "detected_in_single": 0,
+   "n_contributions": 2,
+   "dominance": 0.5678221567832151,
+   "single_exposure_only": false,
+   "flux_mjy": 0.6539727866401749,
+   "flux_err_mjy": 0.13876734328853962,
+   "snr": 4.712728305826004,
+   "snr_single": [
+    2.898850492482174,
+    3.7429517635389784
+   ],
+   "snr_single_median": 3.3209011280105765,
+   "snr_single_best": 3.7429517635389784,
+   "snr_reference": 2.898850492482174,
+   "snr_best_exposure": 3.7429517635389784,
+   "gain": 1.4191112966525496,
+   "gain_vs_best": 1.2590940529167005,
+   "gain_ideal": 1.4255887641946445,
+   "flux_ratio_to_single_mean": 0.9987515054080993,
+   "single_scatter_chi2": 0.142217483358417,
+   "single_exposure_fraction": 0.625069116202138,
+   "catalogue_arcsec": 1.930377198507675
+  }
+ ],
+ "verdict": {
+  "accepted": false,
+  "reasons": [
+   "La imagen combinada invertida contiene 2 detecciones: hay estructura negativa que el ruido no explica."
+  ]
+ },
+ "case": {
+  "label": "wise0855_d6_may2025",
+  "title": "WISE 0855−0714 · D6 · mayo de 2025 (solo dos exposiciones)",
+  "mjd": 60800.75,
+  "role": "Caso límite · dos exposiciones",
+  "ra": 133.7601752,
+  "dec": -7.2422453,
+  "fov": 0.2,
+  "detector": 6,
+  "collection": "spherex_dr1",
+  "catalogue": "allwise"
+ },
+ "selection_rule": {
+  "rule": "enhance.nearby_exposures: D6, spherex_dr1, campo completo en el detector, |Δt| ≤ 7 d alrededor de MJD 60800.75, máx. 12",
+  "sia2": {
+   "origin": "cache",
+   "queried_utc": "2026-11-15T15:40:43.006513+00:00",
+   "endpoint": "https://irsa.ipac.caltech.edu/SIA",
+   "collections": [
+    "spherex_dr1",
+    "spherex_qr3"
+   ],
+   "forced": false,
+   "raw_count": 258,
+   "selected_count": 258,
+   "replacements": []
+  },
+  "candidates": 2,
+  "failures": []
+ },
+ "repeatability": null,
+ "catalogue_crossmatch": {
+  "catalogue": "allwise",
+  "n_catalogue": 637,
+  "radius_arcsec": 6.15,
+  "all": {
+   "n": 20,
+   "matched": 20
+  },
+  "new_in_combined": {
+   "n": 5,
+   "matched": 5
+  },
+  "seen_in_single": {
+   "n": 15,
+   "matched": 15
+  },
+  "chance_fraction": 0.22499999999999998,
+  "note": "Coincidencia = fuente del catálogo a menos de un píxel nativo. «chance_fraction»: la misma prueba con las detecciones desplazadas 40″ en cuatro direcciones (coincidencias casuales)."
+ },
+ "astrometry_vs_catalogue": {
+  "n_sources": 10,
+  "combined_median_offset_arcsec": 0.8539641732278449,
+  "single_median_offset_arcsec": 0.6992639543492742,
+  "combined_formal_error_arcsec": 0.7781381602198834,
+  "single_formal_error_arcsec": 0.5734597737354411,
+  "single_fits_tried": 20,
+  "single_fits_measured": 19,
+  "note": "Fuentes con S/N combinada entre 6 y 40 y contrapartida de catálogo a menos de un píxel. Separación entre la posición ajustada (ePSF) y la del catálogo. En las exposiciones individuales solo cuentan los ajustes que convergen con S/N ≥ 5: las que no se pueden medir no entran en su mediana, lo que la favorece."
+ },
+ "target": {
+  "selected_radec_deg": [
+   133.76020235140194,
+   -7.2422441274445735
+  ],
+  "detected_in_combination": false,
+  "snr": 1.9737670426053513,
+  "snr_single": [
+   0.5467175220755022,
+   2.1385878898582513
+  ],
+  "reason": "Sin detección ≥ 5σ en la posición del objeto en la imagen combinada."
+ }
+}

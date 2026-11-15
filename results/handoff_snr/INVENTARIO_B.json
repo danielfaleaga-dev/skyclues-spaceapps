@@ -1,0 +1,409 @@
+{
+    "origen":  "C:\\Users\\danie\\Documents\\SkyClues",
+    "rama_origen":  "redesign/unified-region",
+    "head_origen":  "d01917e39d857a1d18990745b6ecd0d4c775f4f0",
+    "generado":  "2026-11-15 13:17:02",
+    "nota":  "Inventario de todo el trabajo sin confirmar de Claude B (git status -uall, sin archivos ignorados). Excluidos a propósito: .venv, __pycache__, .pytest_cache, data/cache (FITS descargables de IRSA, 2,5 GB) y data/recovery (salvo el registro de la validación final, copiado en evidencia_B). No hay .env, claves ni secretos en el origen.",
+    "archivos":  [
+                     {
+                         "estado_en_B":  "modificado sin confirmar",
+                         "ruta":  "DESIGN_SYSTEM.md",
+                         "bytes":  11670,
+                         "sha256":  "31dec89211ba4a5aae3121cd97c2561f9921b0cc6cfc0059bb34cdf40cd2a8e4",
+                         "blob_git":  "ee7b7adf23f00056829ef039dbfc675f4432bd77",
+                         "modificado_local":  "2026-11-15 11:17:40"
+                     },
+                     {
+                         "estado_en_B":  "modificado sin confirmar",
+                         "ruta":  "PROJECT_CONTEXT.md",
+                         "bytes":  13222,
+                         "sha256":  "6d73b41146481a31458a2b43583c41b7580f92d149dbb13c542b971596a39089",
+                         "blob_git":  "256035e43850ca6cb9c4b5d45a5ab39db02132fb",
+                         "modificado_local":  "2026-11-15 11:17:40"
+                     },
+                     {
+                         "estado_en_B":  "modificado sin confirmar",
+                         "ruta":  "README.md",
+                         "bytes":  10915,
+                         "sha256":  "0008dd21e89d46cbb90c9975d15545f9bf332f7f3525091ec2543a618f8270fb",
+                         "blob_git":  "7fe0689eb442b3d976756ae4411c5d1987a0bdc6",
+                         "modificado_local":  "2026-11-15 11:17:40"
+                     },
+                     {
+                         "estado_en_B":  "modificado sin confirmar",
+                         "ruta":  "skyclues/time_page.py",
+                         "bytes":  33916,
+                         "sha256":  "209fc2688fbe051720a3fbde6a1bbc3f1f43635b9b29e59b3925d4c561157b24",
+                         "blob_git":  "0b3eba26fa3a61625ed4d647e48abe031d1e90cd",
+                         "modificado_local":  "2026-11-15 11:08:09"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/RESULTS.md",
+                         "bytes":  3044,
+                         "sha256":  "ac11e1958c892fa744c8aab5f692c9e3b7132b38b529a2c901dbbee72b9bf39b",
+                         "blob_git":  "8cf27e0790622dce1f144a9a6ccf8e0b763fe666",
+                         "modificado_local":  "2026-11-15 11:21:59"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/atlas_aug_d1_comoving.json",
+                         "bytes":  10337,
+                         "sha256":  "5ccef3021db2000ec39c486714f67919bba0f720517325d9e1780c25031207a6",
+                         "blob_git":  "04c2cf665aad335553020e49a8a2984db8789b3e",
+                         "modificado_local":  "2026-11-15 11:20:32"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/atlas_aug_d1_comoving_target.png",
+                         "bytes":  100801,
+                         "sha256":  "6b9bb5c92468947d8cdff5602339a6f4a0574c85d4a26b565caaeb911c9cd19f",
+                         "blob_git":  "8ec9637aa61b0d946bab201c8d0dc094229ef78f",
+                         "modificado_local":  "2026-11-15 11:20:32"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/browser_check.json",
+                         "bytes":  593,
+                         "sha256":  "ee097d8848f3dd613da0eb3a87983615e2988eb8d56ee0ded88e0cabd30e19f7",
+                         "blob_git":  "1e3e94cc28e64d03c400b0817c6d0c4a365b636a",
+                         "modificado_local":  "2026-11-15 11:17:51"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/browser_m101_narrow.png",
+                         "bytes":  72293,
+                         "sha256":  "13ad456bc9b659891464b5c854b9de546efe3d42c50a6797acbd48a7838d10ff",
+                         "blob_git":  "05ea343fcc816061d7afac795b30c62df3f68c6e",
+                         "modificado_local":  "2026-11-15 11:17:38"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/browser_m101_scientific.png",
+                         "bytes":  148521,
+                         "sha256":  "99d43581df6a56331b16aa917acedb10f46ef8e60e02c56378ca570133bd2bf6",
+                         "blob_git":  "89c3647d14dce5c839bd6d29b72864b5f1bbf579",
+                         "modificado_local":  "2026-11-15 11:17:31"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/browser_m101_simple.png",
+                         "bytes":  126120,
+                         "sha256":  "363203ea076a686aff0de2ace48f86073f506db349563bf4c96240b5c4ec5618",
+                         "blob_git":  "3857c0922562b9c36dd9c1af0552f6276ca4eb94",
+                         "modificado_local":  "2026-11-15 11:17:35"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/catalogue_m101_d2_dec2025.json",
+                         "bytes":  9166,
+                         "sha256":  "83131d9d282dc3dc3653b27c31aba5cac096dbb689441030b9bf0febd2eb9bb9",
+                         "blob_git":  "976126b390699b5ae04da98f3e85700ece878b8b",
+                         "modificado_local":  "2026-11-15 11:08:29"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/catalogue_m101_sequence.json",
+                         "bytes":  3132,
+                         "sha256":  "38ac3d8802ed8c566e232246fb978dbb218788ec954e7edb8d6828162df671a1",
+                         "blob_git":  "ab53768f290c4cb682c37adfd38888530c059452",
+                         "modificado_local":  "2026-11-15 11:06:05"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/catalogue_wise0855_d6_apr2026.json",
+                         "bytes":  53646,
+                         "sha256":  "72d0e2e4b1776c153d8e140b20ccb3777569ba7d2c60672be7064d8006916458",
+                         "blob_git":  "69fbf564678daee1267e60d596b8fc399a38f846",
+                         "modificado_local":  "2026-11-15 11:10:17"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/catalogue_wise0855_d6_dec2025.json",
+                         "bytes":  53646,
+                         "sha256":  "b28bd584c85bdc030bcf9b376c061919904a1c31727d72afb306926123c7a066",
+                         "blob_git":  "ddcbd90eef97d73906104c8d3f773f4817b7e401",
+                         "modificado_local":  "2026-11-15 11:09:52"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/catalogue_wise0855_d6_may2025.json",
+                         "bytes":  53646,
+                         "sha256":  "025cf28984f9e4ac9d4c5b081eb1c3733ab4fc662bc6e6515c13d059eff97f8b",
+                         "blob_git":  "9fe96cfd4f7b34b5d5821e91eba608cb01e7bb07",
+                         "modificado_local":  "2026-11-15 11:10:50"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/catalogue_wise0855_d6_nov2025.json",
+                         "bytes":  53646,
+                         "sha256":  "ca9079da7ba19bedfd472fb27dea3cb3c9e92e7f6ccf78c593d3b9d00149c752",
+                         "blob_git":  "3fda63ab48d55319a58fe80f99a846d8fd08fe3e",
+                         "modificado_local":  "2026-11-15 11:05:00"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/enhance_validation_summary.json",
+                         "bytes":  13975,
+                         "sha256":  "96d7b705a3ef010ea76a52e85ee8611de08dcf409481d500aaf7b7477df1b563",
+                         "blob_git":  "86feb58c845d9dac18b8b346f0f2a1859ee4172c",
+                         "modificado_local":  "2026-11-15 11:21:59"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/juno_d1_comoving.json",
+                         "bytes":  11005,
+                         "sha256":  "38fbe8ba8f356c42a905e531ec44c1cca4b4a2ea8fcf32056b0917906daef4e5",
+                         "blob_git":  "5913a2fefd629cd5efc048992e9669947d8fbfb6",
+                         "modificado_local":  "2026-11-15 11:21:56"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/juno_d1_comoving_target.png",
+                         "bytes":  96200,
+                         "sha256":  "466a40314eea4b6199db8a2a445f8fcac7529f2c97d1f189b6eb6a2680add081",
+                         "blob_git":  "cfee75806a70d8ce6e0e7d6bd1c3a2034d67bd43",
+                         "modificado_local":  "2026-11-15 11:21:56"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/m101_d2_dec2025.json",
+                         "bytes":  133527,
+                         "sha256":  "98be6f987288454094fd624849fa1ac8ad1142757451ab2c6b9573668058171b",
+                         "blob_git":  "73cc7c459181bbc4998bb6335a1a6d303cb56721",
+                         "modificado_local":  "2026-11-15 11:18:50"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/m101_d2_dec2025_comparison.png",
+                         "bytes":  88212,
+                         "sha256":  "c4cd5403b740254f87943a050f564c56f4b57e4b1f4e8df6ae7f0cf0400e0db0",
+                         "blob_git":  "87f96ad44536bb2bc9c1dc0ba44679b02af4a868",
+                         "modificado_local":  "2026-11-15 11:18:50"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/m101_d2_dec2025_null.png",
+                         "bytes":  104315,
+                         "sha256":  "97543b1131f234b9098924ae142c812e005601d246b666b1cd9d3c57dda6348a",
+                         "blob_git":  "780a5793df0c525057d8196eaef74bc6d715e968",
+                         "modificado_local":  "2026-11-15 11:18:50"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/m101_sequence.json",
+                         "bytes":  17610,
+                         "sha256":  "d66401800c7f52e4b0e2dbbfe56301c3555db8212281ef0fd9a26191f2b6256c",
+                         "blob_git":  "def2cdd60596d8158bc30d39f8d630c23586b2f1",
+                         "modificado_local":  "2026-11-15 11:17:27"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/m101_sequence_comparison.png",
+                         "bytes":  45128,
+                         "sha256":  "db23a15506f4398815c1879ac9f3820b97fbedf20ee16efa78b61822f1b4d65a",
+                         "blob_git":  "9854d9a9958327a5a4648199ddba5ca888113fba",
+                         "modificado_local":  "2026-11-15 11:17:27"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/m101_sequence_null.png",
+                         "bytes":  50140,
+                         "sha256":  "8f1a763060f227f3fd5b26365ef7dd5dca0fabf2296a94a41545dfdefffa7c87",
+                         "blob_git":  "f45db43d5244881b18a81a57570d459479c8e6be",
+                         "modificado_local":  "2026-11-15 11:17:27"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/vesta_d1_comoving.json",
+                         "bytes":  7613,
+                         "sha256":  "ed0f245c800f10a53edd4c7b1ea147e93fab1547b0c7fbd8b80a0e0b90700539",
+                         "blob_git":  "e721999756d45c9762471bad0309db79b192b6e3",
+                         "modificado_local":  "2026-11-15 11:21:59"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/vesta_d1_comoving_target.png",
+                         "bytes":  73438,
+                         "sha256":  "ffc6496abd1a0cd9085c3d8aff0d5edf2716107de6f8d67e5017f60be960e556",
+                         "blob_git":  "dc432de330effb6e15d8b790e50db26e849b083e",
+                         "modificado_local":  "2026-11-15 11:21:59"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_apr2026.json",
+                         "bytes":  93019,
+                         "sha256":  "cd36e1e87433bea95649aa986b41aac957a443bd8842d977c3505f9478e59029",
+                         "blob_git":  "a0f590866e3b9895cd94375433ed1e21522d0ec7",
+                         "modificado_local":  "2026-11-15 11:20:25"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_apr2026_comparison.png",
+                         "bytes":  165143,
+                         "sha256":  "1e1d38d8b8e108be6b57b5aaa82571b1310ba3c8e0221e351293d2fb3d15a1db",
+                         "blob_git":  "46da29b8a762d322d0bc7ec7699f4d602025783a",
+                         "modificado_local":  "2026-11-15 11:20:24"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_apr2026_null.png",
+                         "bytes":  103739,
+                         "sha256":  "4825575916e09ae076bb20945a9f25066dc20159295352906c4cd94615d8286c",
+                         "blob_git":  "3895d885da4ec34bdf81beec1023696b55f9649d",
+                         "modificado_local":  "2026-11-15 11:20:24"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_apr2026_target.png",
+                         "bytes":  134404,
+                         "sha256":  "3d3a5540672136cdc672d42c2c6baec185e76d41b9c937b1e6817b9e850387e9",
+                         "blob_git":  "158fc0ea7f0a731f5cd6388ebb6a3b12fc3317fa",
+                         "modificado_local":  "2026-11-15 11:20:25"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_dec2025.json",
+                         "bytes":  45816,
+                         "sha256":  "61b64ca1660b003ec388c2c778c44b11fb4348f32a53d7aec72275e9e49d8b32",
+                         "blob_git":  "f5318eb53cfc7d629d30a83511865f05a42e7599",
+                         "modificado_local":  "2026-11-15 11:19:51"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_dec2025_comparison.png",
+                         "bytes":  149636,
+                         "sha256":  "d553cf397f737c5b0970a217ba08cd5babb7725e87351ac7b181726b9988bf38",
+                         "blob_git":  "c1dbde4848d5f57f81a079b411f11f72250cc98b",
+                         "modificado_local":  "2026-11-15 11:19:50"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_dec2025_null.png",
+                         "bytes":  98066,
+                         "sha256":  "c0ffefd6a2d14de0a2693054b7d092d54b20ee2bbd36604f25676ea427d3291e",
+                         "blob_git":  "cf263d5f4a163d5e816971fa2dcee3de44f6d0a9",
+                         "modificado_local":  "2026-11-15 11:19:50"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_dec2025_target.png",
+                         "bytes":  62378,
+                         "sha256":  "637c71c10eb9932ccfd7cbdecf18fafbee18de30c34b4a1277432b0461189be6",
+                         "blob_git":  "ce77caebd10c125716879612d35669274270352c",
+                         "modificado_local":  "2026-11-15 11:19:50"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_may2025.json",
+                         "bytes":  28989,
+                         "sha256":  "8f354f281ec2c352df2d2961739efbf08055c2bb9931fe2dd5f59435a3864083",
+                         "blob_git":  "612b226a6b8745b00358aa4e089d81c264941fa7",
+                         "modificado_local":  "2026-11-15 11:20:29"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_may2025_comparison.png",
+                         "bytes":  128951,
+                         "sha256":  "6a2b7aecee36733b2e57ba8c8389a10b7992a63cb287d5e1763754afe59f1de7",
+                         "blob_git":  "80717d08e3afdffd4d5da289baf4010cc2447745",
+                         "modificado_local":  "2026-11-15 11:20:29"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_may2025_null.png",
+                         "bytes":  97271,
+                         "sha256":  "baab94abf475fc7b46cf80cb32ed5b455a5e34300aa62b90c8fd7e259e3b5891",
+                         "blob_git":  "41db2d9735e0f674004ed9f471c9149d4f09c87c",
+                         "modificado_local":  "2026-11-15 11:20:29"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_may2025_target.png",
+                         "bytes":  51823,
+                         "sha256":  "515cf2463cbdc30831af523b327f7194068048c59fbd54e385cdcc6f5683a564",
+                         "blob_git":  "3256e5fe006c3a6d44fc43f5472338804514c737",
+                         "modificado_local":  "2026-11-15 11:20:29"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_nov2025.json",
+                         "bytes":  108109,
+                         "sha256":  "d627771cd5cd164222aa0c329fe917d4b474fd62bf10bfe0eb683706506b13b2",
+                         "blob_git":  "52bcb7f925690511d43a19a032314f651840a814",
+                         "modificado_local":  "2026-11-15 11:19:44"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_nov2025_comparison.png",
+                         "bytes":  184047,
+                         "sha256":  "416354c6b6f251fa28db5a66a1b442e529cea8e4e78060416e8e710154153ab1",
+                         "blob_git":  "8380440b558647a615f570808eea04f0dd23b5e7",
+                         "modificado_local":  "2026-11-15 11:19:42"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_nov2025_null.png",
+                         "bytes":  102884,
+                         "sha256":  "b6029398bdbcfe02a7f58949c4273a5697abd16f27bacce22811438b1cdffb8f",
+                         "blob_git":  "ba5b21d610528550727d1427af04c31d2d6c5836",
+                         "modificado_local":  "2026-11-15 11:19:43"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "results/enhance/wise0855_d6_nov2025_target.png",
+                         "bytes":  155254,
+                         "sha256":  "e1d1baf5b983599b29bc52ba1b33b07f20718e3eb75647790861ac4ebe6582eb",
+                         "blob_git":  "1e07ea83bfaae34219a5cf3620a243fbca14c196",
+                         "modificado_local":  "2026-11-15 11:19:44"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "scripts/validate_enhance.py",
+                         "bytes":  34268,
+                         "sha256":  "a4ef2b7d9d7fb4008ab1236e54e5f500f7b126d228765a1eeed786bf1838993f",
+                         "blob_git":  "feafc310a52b9af73b31b83064d9dff147f529ba",
+                         "modificado_local":  "2026-11-15 11:13:05"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "skyclues/enhance.py",
+                         "bytes":  65185,
+                         "sha256":  "20dbff65290a9dd11374996c70369958a5af41e791df8688f481aba8f1eb7b15",
+                         "blob_git":  "87cc571bc548e6c7f140522c0f38201c3f2984a9",
+                         "modificado_local":  "2026-11-15 11:10:13"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "skyclues/enhance_page.py",
+                         "bytes":  18278,
+                         "sha256":  "5fd2b06cbce91bbc5ae882a17c88291963b922ec2c00dd34a40bf2c3037172e2",
+                         "blob_git":  "68795547c0688f6d46174eb20ad7a66a7fa6ba23",
+                         "modificado_local":  "2026-11-15 11:16:13"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "skyclues/enhance_view.py",
+                         "bytes":  8009,
+                         "sha256":  "db4cf929b2a1ae860844654268abc5c6464176e7878fd65c18b83991a942a1e1",
+                         "blob_git":  "60d4d4fb3aa014116b7c8d9b08e11d7fa4c85928",
+                         "modificado_local":  "2026-11-15 10:35:21"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "tests/test_enhance.py",
+                         "bytes":  20393,
+                         "sha256":  "cd0c761270e0a4295e2c2241ffff20609f46c940a9941deb0bc1385bf59663f7",
+                         "blob_git":  "30e2698bae1ee698175fc57217a7154479a4e636",
+                         "modificado_local":  "2026-11-15 11:10:38"
+                     },
+                     {
+                         "estado_en_B":  "nuevo sin confirmar",
+                         "ruta":  "tests/test_enhance_app.py",
+                         "bytes":  6153,
+                         "sha256":  "7391ed68a9baa176d81fcea487e89c3df0b23ef4d08a5c6e8d565f2f547f061d",
+                         "blob_git":  "c3ef5f38a0bc48fc42a5deea22c4757d622780f6",
+                         "modificado_local":  "2026-11-15 11:08:50"
+                     }
+                 ]
+}
