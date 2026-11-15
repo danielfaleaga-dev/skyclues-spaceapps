@@ -234,10 +234,9 @@ def render(level: str) -> None:
     if region.get("gaia"):
         st.caption("Fuente seleccionada en Gaia DR3 (ICRS, J2016.0). Las posiciones para las fechas SPHEREx son cálculos, no detecciones." if sci else 'Fuente de catálogo; no confirma una detección SPHEREx.')
     if region.get('solar'):
-        st.info('Cuerpo móvil: se consultan observaciones de este campo fijo, sin seguimiento orbital. '
-                'Una exposición que cubre el campo no confirma la presencia del objeto. Las coordenadas de '
-                'Horizons geocéntrico no sustituyen las posiciones desde SPHEREx durante cada exposición.' if sci else
-                'Estas imágenes muestran una zona fija del cielo; no siguen al objeto ni confirman que aparezca en ellas.')
+        from . import moving_page
+        moving_page.render(region,sci)
+        return
     refs = reference_reports()
 
     for e in state.pop("region_errors", []):

@@ -1,0 +1,21 @@
+{
+  "identity": {
+    "id": "JPL:999",
+    "name": "Pluto",
+    "type": "planet",
+    "spkid": "999",
+    "pdes": "134340",
+    "aliases": [],
+    "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+  },
+  "start": "2025-08-01T00:00:00.000",
+  "end": "2025-08-31T00:00:00.000",
+  "rows": [],
+  "provenance": {
+    "url": "https://irsa.ipac.caltech.edu/cgi-bin/MOST/nph-most?catalog=spherex&input_type=naifid_input&obj_naifid=999&obs_begin=2025+08+01+00%3A00%3A00&obs_end=2025+08+31+00%3A00%3A00&output_mode=Brief&ephem_step=0.02",
+    "queried_utc": "2026-11-15T02:00:54.776302+00:00",
+    "sha256": "783b4eaf01c25360c98f283b5e37c5f6c9c62430f8ab0f7ba5c1f788d01c2198",
+    "cache": false
+  },
+  "excluded_products": []
+}

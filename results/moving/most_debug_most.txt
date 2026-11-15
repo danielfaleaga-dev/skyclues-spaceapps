@@ -1,0 +1,1116 @@
+input_objname= |20000004|
+****Final objname=20000004
+
+Horizons NAIF ID request: https://ssd.jpl.nasa.gov/api/horizons_lookup.api?sstr=20000004&format=text
+most_do_curl_file: httpstr https://ssd.jpl.nasa.gov/api/horizons_lookup.api?sstr=20000004&format=text outfile objname_naifid.txt
+most_do_curl_file: HTTP response code is 200
+body_name_naifid: HORIZONS lookup completed
+lookup_SSO: returned OK
+----Input Parameter Values:----
+catalog=spherex
+observer_type= 1
+obs_begin=2025 08 05 00:04:00
+obs_end=2025 08 05 00:12:00
+ephem_step=0.000012
+input_type=naifid_input
+obj_full_name=4 Vesta
+obj_type=Asteroid
+new_orbit_file=default_elments.txt
+body_designation= 
+epoch=0.000000
+semimajor_axis=0.000000
+eccentricity=999.000000
+inclination=999.000000
+arg_perihelion=999.000000
+ascend_node=999.000000
+mean_anomaly=999.000000
+perih_dist=0.000000
+perih_time=0.000000
+search_region_size=3.000000
+output_mode=Full
+naif input file = /irsadata/MOST/ascii_kernel_files/naif_spkfiles_spherex_001.txt 
+Catalog Coverage: 2025 MAR 11 00:00:00.000 -> 2040 JAN 01 00:00:00.000 
+User Input Observation Time: 2025 08 05 00:04:00 -> 2025 08 05 00:12:00 
+sc_ephemeris_coverage: coverage startime "2025 APR 09 08:34:09.184" endtime "2026 OCT 16 12:01:09.184"
+Observer Ephemeris Coverage :2025 APR 09 08:32:59.998 - 2026 OCT 16 12:00:00.002 
+Observer Ephemeris Coverage [sec]: 797459649.184000 - 845424069.184000 
+Observation Time Span Processed: 2025 08 05 00:04:00 -> 2025 08 05 00:12:00 
+Object Name: 4 Vesta
+Object Type: Asteroid
+Object NAIF ID: 20000004
+Target Naifid Entered = |4 Vesta|
+HORIZONS start date = 2025 Aug 5 0.066667
+HORIZONS end date = 2025 Aug 5 0.200000
+Horizon element stepsize=|2%20day|
+HORIZONS server request: https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='DES=20000004%3B'&START_TIME='2025-Aug-5'&STOP_TIME='2025-Aug-5'&STEP_SIZE='2%20day'&OBJ_DATA='YES'&TABLE_TYPE='ELEMENTS'&CENTER='Sun'&REF_PLANE='ECLIPTIC'&QUANTITIES='A'&REF_SYSTEM='J2000'&OUT_UNITS='AU-D'&CAL_FORMAT='BOTH'&ANG_FORMAT='DEG'&TIME_DIGITS='FRACSEC'&RANGE_UNITS='AU'&SUPPRESS_RANGE_RATE='NO'&EXTRA_PREC='YES'&CSV_FORMAT='NO'&ELM_LABELS='YES'&TP_TYPE='ABSOLUTE'
+most_do_curl_file: httpstr https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='DES=20000004%3B'&START_TIME='2025-Aug-5'&STOP_TIME='2025-Aug-5'&STEP_SIZE='2%20day'&OBJ_DATA='YES'&TABLE_TYPE='ELEMENTS'&CENTER='Sun'&REF_PLANE='ECLIPTIC'&QUANTITIES='A'&REF_SYSTEM='J2000'&OUT_UNITS='AU-D'&CAL_FORMAT='BOTH'&ANG_FORMAT='DEG'&TIME_DIGITS='FRACSEC'&RANGE_UNITS='AU'&SUPPRESS_RANGE_RATE='NO'&EXTRA_PREC='YES'&CSV_FORMAT='NO'&ELM_LABELS='YES'&TP_TYPE='ABSOLUTE' outfile orbitElm.txt
+most_do_curl_file: HTTP response code is 200
+
+read_elements: read 0 element sets
+elements loaded ok
+Opening kernel lookup file for special cases: /irsadata/MOST/spk_special.tbl
+Horizons Target SPK request: https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='DES=20000004%3B'&EPHEM_TYPE=SPK&START_TIME='2025-JUL-26'&STOP_TIME='2025-AUG-15'&OBJ_DATA=NO
+most_do_curl_file: httpstr https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='DES=20000004%3B'&EPHEM_TYPE=SPK&START_TIME='2025-JUL-26'&STOP_TIME='2025-AUG-15'&OBJ_DATA=NO outfile /work/TMP_HvGaqZ_1205243/MOST/pid1205243/temp.bsp
+most_do_curl_file: HTTP response code is 200
+Load target_spk.bsp kernel for 4 Vesta: /work/TMP_HvGaqZ_1205243/MOST/pid1205243/target_spk.bsp
+Loaded target SPK file /work/TMP_HvGaqZ_1205243/MOST/pid1205243/target_spk.bsp
+Observation from 2025 08 05 00:04:00  -  2025 08 05 00:12:00 
+Start date = 2025 8 5 0.066667 = 2460892.502778
+End date   = 2025 8 5 0.200000 = 2460892.508333
+segment 0 start date = 2025 3 11 0.000000 = 2460745.500000
+segment 0 end date   = 2040 1 1 0.000000 = 2466154.500000
+including segment 0, overlap begin JD 2460892.502778 end 2460892.508333
+Number of Steps=480.000012
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50278935, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50280093, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50281250, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50283565, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50284722, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50285880, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50287037, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50288194, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50289352, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50290509, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50292824, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50293981, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50295139, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50296296, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50297454, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50298611, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50300926, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50302083, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50303241, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50304398, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50305556, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50306713, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50309028, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50310185, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50311343, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50312500, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50313657, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50314815, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50315972, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50318287, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50319444, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50320602, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50321759, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50322917, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50324074, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50326389, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50327546, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50328704, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50329861, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50331018, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50332176, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50333333, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50335648, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50336806, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50337963, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50339120, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50340278, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50341435, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50343750, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50344907, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50346065, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50347222, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50348380, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50349537, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50350694, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50353009, depth 0, delta_jd       0.00001157, ang_sep       0.00000336, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50354167, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50355324, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50356481, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50357639, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50358796, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50361111, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50362269, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50363426, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50364583, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50365741, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50366898, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50369213, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50370370, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50371528, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50372685, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50373843, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50375000, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50376157, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50378472, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50379630, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50380787, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50381944, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50383102, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50384259, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50386574, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50387731, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50388889, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50390046, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50391204, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50392361, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50393518, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50395833, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50396991, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50398148, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50399306, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50400463, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50401620, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50403935, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50405093, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50406250, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50407407, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50408565, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50409722, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50412037, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50413194, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50414352, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50415509, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50416667, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50417824, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50418981, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50421296, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50422454, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50423611, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50424768, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50425926, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50427083, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50429398, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50430556, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50431713, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50432870, depth 0, delta_jd       0.00001157, ang_sep       0.00000366, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50434028, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50435185, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50436343, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50438657, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50439815, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50440972, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50442130, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50443287, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50444444, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50446759, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50447917, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50449074, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50450231, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50451389, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50452546, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50453704, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50456019, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50457176, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50458333, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50459491, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50460648, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50461806, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50464120, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50465278, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50466435, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50467593, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50468750, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50469907, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50472222, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50473380, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50474537, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50475694, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50476852, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50478009, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50479167, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50481481, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50482639, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50483796, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50484954, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50486111, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50487268, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50489583, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50490741, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50491898, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50493056, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50494213, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50495370, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50496528, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50498843, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50500000, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50501157, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50502315, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50503472, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50504630, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50506944, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50508102, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50509259, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50510417, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50511574, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50512731, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50515046, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50516204, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50517361, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50518519, depth 0, delta_jd       0.00001157, ang_sep       0.00000335, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50519676, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50520833, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50521991, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50524306, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50525463, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50526620, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50527778, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50528935, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50530093, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50532407, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50533565, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50534722, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50535880, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50537037, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50538194, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50539352, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50541667, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50542824, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50543981, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50545139, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50546296, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50547454, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50549769, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50550926, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50552083, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50553241, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50554398, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50555556, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50556713, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50559028, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50560185, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50561343, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50562500, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50563657, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50564815, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50567130, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50568287, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50569444, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50570602, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50571759, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50572917, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50575231, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50576389, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50577546, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50578704, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50579861, depth 0, delta_jd       0.00001157, ang_sep       0.00000365, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50581018, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50582176, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50584491, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50585648, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50586806, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50587963, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50589120, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50590278, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50592593, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50593750, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50594907, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50596065, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50597222, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50598380, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50599537, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50601852, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50603009, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50604167, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50605324, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50606481, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50607639, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50609954, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50611111, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50612269, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50613426, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50614583, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50615741, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50618056, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50619213, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50620370, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50621528, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50622685, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50623843, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50625000, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50627315, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50628472, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50629630, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50630787, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50631944, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50633102, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50635417, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50636574, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50637731, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50638889, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50640046, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50641204, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50642361, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50644676, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50645833, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50646991, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50648148, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50649306, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50650463, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50652778, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50653935, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50655093, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50656250, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50657407, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50658565, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50659722, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50662037, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50663194, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50664352, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50665509, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50666667, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50667824, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50670139, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50671296, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50672454, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50673611, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50674768, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50675926, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50678241, depth 0, delta_jd       0.00001157, ang_sep       0.00000334, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50679398, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50680556, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50681713, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50682870, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50684028, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50685185, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50687500, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50688657, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50689815, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50690972, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50692130, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50693287, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50695602, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50696759, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50697917, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50699074, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50700231, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50701389, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50702546, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50704861, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50706019, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50707176, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50708333, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50709491, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50710648, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50712963, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50714120, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50715278, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50716435, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50717593, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50718750, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50719907, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50722222, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50723380, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50724537, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50725694, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50726852, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50728009, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50730324, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50731481, depth 0, delta_jd       0.00001157, ang_sep       0.00000364, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50732639, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50733796, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50734954, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50736111, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50738426, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50739583, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50740741, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50741898, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50743056, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50744213, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50745370, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50747685, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50748843, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50750000, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50751157, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50752315, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50753472, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50755787, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50756944, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50758102, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50759259, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50760417, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50761574, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50762731, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50765046, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50766204, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50767361, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50768518, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50769676, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50770833, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50773148, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50774306, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50775463, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50776620, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50777778, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50778935, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50781250, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50782407, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50783565, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50784722, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50785880, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50787037, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50788194, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50790509, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50791667, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50792824, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50793981, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50795139, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50796296, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50798611, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50799769, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50800926, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50802083, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50803241, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50804398, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50805556, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50807870, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50809028, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50810185, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50811343, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50812500, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50813657, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50815972, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50817130, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50818287, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50819444, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50820602, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50821759, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50822917, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50825231, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50826389, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50827546, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50828704, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50829861, depth 0, delta_jd       0.00001157, ang_sep       0.00000363, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50831018, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+calc_and_append_pos: WARNING: minimum time step reached at jd 2460892.50833333, depth 0, delta_jd       0.00001157, ang_sep       0.00000333, sep limit      20.00000000
+Created ephemeris with 1 segments and 481 points
+
+ get_moving_object_pos returned 1
+Full list of points:
+0: 0 223.023873 -11.992216 0.000000 60892.002778 2460892.50277778
+1: 0 223.023877 -11.992216 0.000003 60892.002789 2460892.50278935
+2: 0 223.023880 -11.992217 0.000004 60892.002801 2460892.50280093
+3: 0 223.023884 -11.992217 0.000003 60892.002812 2460892.50281250
+4: 0 223.023888 -11.992217 0.000004 60892.002824 2460892.50282407
+5: 0 223.023891 -11.992218 0.000004 60892.002836 2460892.50283565
+6: 0 223.023895 -11.992218 0.000003 60892.002847 2460892.50284722
+7: 0 223.023899 -11.992218 0.000004 60892.002859 2460892.50285880
+8: 0 223.023902 -11.992218 0.000003 60892.002870 2460892.50287037
+9: 0 223.023906 -11.992219 0.000004 60892.002882 2460892.50288194
+10: 0 223.023909 -11.992219 0.000004 60892.002894 2460892.50289352
+11: 0 223.023913 -11.992219 0.000003 60892.002905 2460892.50290509
+12: 0 223.023917 -11.992219 0.000004 60892.002917 2460892.50291667
+13: 0 223.023920 -11.992220 0.000003 60892.002928 2460892.50292824
+14: 0 223.023924 -11.992220 0.000004 60892.002940 2460892.50293981
+15: 0 223.023927 -11.992220 0.000003 60892.002951 2460892.50295139
+16: 0 223.023931 -11.992220 0.000004 60892.002963 2460892.50296296
+17: 0 223.023935 -11.992221 0.000004 60892.002975 2460892.50297454
+18: 0 223.023938 -11.992221 0.000003 60892.002986 2460892.50298611
+19: 0 223.023942 -11.992221 0.000004 60892.002998 2460892.50299769
+20: 0 223.023945 -11.992222 0.000003 60892.003009 2460892.50300926
+21: 0 223.023949 -11.992222 0.000004 60892.003021 2460892.50302083
+22: 0 223.023952 -11.992222 0.000003 60892.003032 2460892.50303241
+23: 0 223.023956 -11.992222 0.000004 60892.003044 2460892.50304398
+24: 0 223.023960 -11.992223 0.000004 60892.003056 2460892.50305556
+25: 0 223.023963 -11.992223 0.000003 60892.003067 2460892.50306713
+26: 0 223.023967 -11.992223 0.000004 60892.003079 2460892.50307870
+27: 0 223.023970 -11.992223 0.000003 60892.003090 2460892.50309028
+28: 0 223.023974 -11.992224 0.000004 60892.003102 2460892.50310185
+29: 0 223.023978 -11.992224 0.000003 60892.003113 2460892.50311343
+30: 0 223.023981 -11.992224 0.000004 60892.003125 2460892.50312500
+31: 0 223.023985 -11.992225 0.000004 60892.003137 2460892.50313657
+32: 0 223.023988 -11.992225 0.000003 60892.003148 2460892.50314815
+33: 0 223.023992 -11.992225 0.000004 60892.003160 2460892.50315972
+34: 0 223.023996 -11.992225 0.000003 60892.003171 2460892.50317130
+35: 0 223.023999 -11.992226 0.000004 60892.003183 2460892.50318287
+36: 0 223.024003 -11.992226 0.000003 60892.003194 2460892.50319444
+37: 0 223.024007 -11.992226 0.000004 60892.003206 2460892.50320602
+38: 0 223.024010 -11.992227 0.000004 60892.003218 2460892.50321759
+39: 0 223.024014 -11.992227 0.000003 60892.003229 2460892.50322917
+40: 0 223.024017 -11.992227 0.000004 60892.003241 2460892.50324074
+41: 0 223.024021 -11.992227 0.000003 60892.003252 2460892.50325231
+42: 0 223.024025 -11.992228 0.000004 60892.003264 2460892.50326389
+43: 0 223.024028 -11.992228 0.000003 60892.003275 2460892.50327546
+44: 0 223.024032 -11.992228 0.000004 60892.003287 2460892.50328704
+45: 0 223.024035 -11.992228 0.000004 60892.003299 2460892.50329861
+46: 0 223.024039 -11.992229 0.000003 60892.003310 2460892.50331018
+47: 0 223.024043 -11.992229 0.000004 60892.003322 2460892.50332176
+48: 0 223.024046 -11.992229 0.000003 60892.003333 2460892.50333333
+49: 0 223.024050 -11.992230 0.000004 60892.003345 2460892.50334491
+50: 0 223.024053 -11.992230 0.000003 60892.003356 2460892.50335648
+51: 0 223.024057 -11.992230 0.000004 60892.003368 2460892.50336806
+52: 0 223.024061 -11.992230 0.000004 60892.003380 2460892.50337963
+53: 0 223.024064 -11.992231 0.000003 60892.003391 2460892.50339120
+54: 0 223.024068 -11.992231 0.000004 60892.003403 2460892.50340278
+55: 0 223.024071 -11.992231 0.000003 60892.003414 2460892.50341435
+56: 0 223.024075 -11.992231 0.000004 60892.003426 2460892.50342593
+57: 0 223.024078 -11.992232 0.000003 60892.003437 2460892.50343750
+58: 0 223.024082 -11.992232 0.000004 60892.003449 2460892.50344907
+59: 0 223.024086 -11.992232 0.000004 60892.003461 2460892.50346065
+60: 0 223.024089 -11.992233 0.000003 60892.003472 2460892.50347222
+61: 0 223.024093 -11.992233 0.000004 60892.003484 2460892.50348380
+62: 0 223.024096 -11.992233 0.000003 60892.003495 2460892.50349537
+63: 0 223.024100 -11.992233 0.000004 60892.003507 2460892.50350694
+64: 0 223.024104 -11.992234 0.000004 60892.003519 2460892.50351852
+65: 0 223.024107 -11.992234 0.000003 60892.003530 2460892.50353009
+66: 0 223.024111 -11.992234 0.000004 60892.003542 2460892.50354167
+67: 0 223.024114 -11.992234 0.000003 60892.003553 2460892.50355324
+68: 0 223.024118 -11.992235 0.000004 60892.003565 2460892.50356481
+69: 0 223.024122 -11.992235 0.000003 60892.003576 2460892.50357639
+70: 0 223.024125 -11.992235 0.000004 60892.003588 2460892.50358796
+71: 0 223.024129 -11.992236 0.000004 60892.003600 2460892.50359954
+72: 0 223.024132 -11.992236 0.000003 60892.003611 2460892.50361111
+73: 0 223.024136 -11.992236 0.000004 60892.003623 2460892.50362269
+74: 0 223.024140 -11.992236 0.000003 60892.003634 2460892.50363426
+75: 0 223.024143 -11.992237 0.000004 60892.003646 2460892.50364583
+76: 0 223.024147 -11.992237 0.000003 60892.003657 2460892.50365741
+77: 0 223.024150 -11.992237 0.000004 60892.003669 2460892.50366898
+78: 0 223.024154 -11.992238 0.000004 60892.003681 2460892.50368056
+79: 0 223.024158 -11.992238 0.000003 60892.003692 2460892.50369213
+80: 0 223.024161 -11.992238 0.000004 60892.003704 2460892.50370370
+81: 0 223.024165 -11.992238 0.000003 60892.003715 2460892.50371528
+82: 0 223.024168 -11.992239 0.000004 60892.003727 2460892.50372685
+83: 0 223.024172 -11.992239 0.000003 60892.003738 2460892.50373843
+84: 0 223.024176 -11.992239 0.000004 60892.003750 2460892.50375000
+85: 0 223.024179 -11.992239 0.000004 60892.003762 2460892.50376157
+86: 0 223.024183 -11.992240 0.000003 60892.003773 2460892.50377315
+87: 0 223.024187 -11.992240 0.000004 60892.003785 2460892.50378472
+88: 0 223.024190 -11.992240 0.000003 60892.003796 2460892.50379630
+89: 0 223.024194 -11.992241 0.000004 60892.003808 2460892.50380787
+90: 0 223.024197 -11.992241 0.000003 60892.003819 2460892.50381944
+91: 0 223.024201 -11.992241 0.000004 60892.003831 2460892.50383102
+92: 0 223.024205 -11.992241 0.000004 60892.003843 2460892.50384259
+93: 0 223.024208 -11.992242 0.000003 60892.003854 2460892.50385417
+94: 0 223.024212 -11.992242 0.000004 60892.003866 2460892.50386574
+95: 0 223.024215 -11.992242 0.000003 60892.003877 2460892.50387731
+96: 0 223.024219 -11.992243 0.000004 60892.003889 2460892.50388889
+97: 0 223.024222 -11.992243 0.000003 60892.003900 2460892.50390046
+98: 0 223.024226 -11.992243 0.000004 60892.003912 2460892.50391204
+99: 0 223.024230 -11.992243 0.000004 60892.003924 2460892.50392361
+100: 0 223.024233 -11.992244 0.000003 60892.003935 2460892.50393518
+101: 0 223.024237 -11.992244 0.000004 60892.003947 2460892.50394676
+102: 0 223.024240 -11.992244 0.000003 60892.003958 2460892.50395833
+103: 0 223.024244 -11.992245 0.000004 60892.003970 2460892.50396991
+104: 0 223.024247 -11.992245 0.000003 60892.003981 2460892.50398148
+105: 0 223.024251 -11.992245 0.000004 60892.003993 2460892.50399306
+106: 0 223.024255 -11.992245 0.000004 60892.004005 2460892.50400463
+107: 0 223.024258 -11.992246 0.000003 60892.004016 2460892.50401620
+108: 0 223.024262 -11.992246 0.000004 60892.004028 2460892.50402778
+109: 0 223.024265 -11.992246 0.000003 60892.004039 2460892.50403935
+110: 0 223.024269 -11.992246 0.000004 60892.004051 2460892.50405093
+111: 0 223.024273 -11.992247 0.000003 60892.004062 2460892.50406250
+112: 0 223.024276 -11.992247 0.000004 60892.004074 2460892.50407407
+113: 0 223.024280 -11.992247 0.000004 60892.004086 2460892.50408565
+114: 0 223.024283 -11.992248 0.000003 60892.004097 2460892.50409722
+115: 0 223.024287 -11.992248 0.000004 60892.004109 2460892.50410880
+116: 0 223.024291 -11.992248 0.000003 60892.004120 2460892.50412037
+117: 0 223.024294 -11.992248 0.000004 60892.004132 2460892.50413194
+118: 0 223.024298 -11.992249 0.000004 60892.004144 2460892.50414352
+119: 0 223.024301 -11.992249 0.000003 60892.004155 2460892.50415509
+120: 0 223.024305 -11.992249 0.000004 60892.004167 2460892.50416667
+121: 0 223.024309 -11.992250 0.000003 60892.004178 2460892.50417824
+122: 0 223.024312 -11.992250 0.000004 60892.004190 2460892.50418981
+123: 0 223.024316 -11.992250 0.000003 60892.004201 2460892.50420139
+124: 0 223.024319 -11.992250 0.000004 60892.004213 2460892.50421296
+125: 0 223.024323 -11.992251 0.000004 60892.004225 2460892.50422454
+126: 0 223.024327 -11.992251 0.000003 60892.004236 2460892.50423611
+127: 0 223.024330 -11.992251 0.000004 60892.004248 2460892.50424768
+128: 0 223.024334 -11.992252 0.000003 60892.004259 2460892.50425926
+129: 0 223.024337 -11.992252 0.000004 60892.004271 2460892.50427083
+130: 0 223.024341 -11.992252 0.000003 60892.004282 2460892.50428241
+131: 0 223.024345 -11.992252 0.000004 60892.004294 2460892.50429398
+132: 0 223.024348 -11.992253 0.000004 60892.004306 2460892.50430556
+133: 0 223.024352 -11.992253 0.000003 60892.004317 2460892.50431713
+134: 0 223.024355 -11.992253 0.000004 60892.004329 2460892.50432870
+135: 0 223.024359 -11.992254 0.000003 60892.004340 2460892.50434028
+136: 0 223.024363 -11.992254 0.000004 60892.004352 2460892.50435185
+137: 0 223.024366 -11.992254 0.000003 60892.004363 2460892.50436343
+138: 0 223.024370 -11.992254 0.000004 60892.004375 2460892.50437500
+139: 0 223.024373 -11.992255 0.000004 60892.004387 2460892.50438657
+140: 0 223.024377 -11.992255 0.000003 60892.004398 2460892.50439815
+141: 0 223.024381 -11.992255 0.000004 60892.004410 2460892.50440972
+142: 0 223.024384 -11.992256 0.000003 60892.004421 2460892.50442130
+143: 0 223.024388 -11.992256 0.000004 60892.004433 2460892.50443287
+144: 0 223.024391 -11.992256 0.000003 60892.004444 2460892.50444444
+145: 0 223.024395 -11.992257 0.000004 60892.004456 2460892.50445602
+146: 0 223.024399 -11.992257 0.000004 60892.004468 2460892.50446759
+147: 0 223.024402 -11.992257 0.000003 60892.004479 2460892.50447917
+148: 0 223.024406 -11.992257 0.000004 60892.004491 2460892.50449074
+149: 0 223.024409 -11.992258 0.000003 60892.004502 2460892.50450231
+150: 0 223.024413 -11.992258 0.000004 60892.004514 2460892.50451389
+151: 0 223.024416 -11.992258 0.000003 60892.004525 2460892.50452546
+152: 0 223.024420 -11.992259 0.000004 60892.004537 2460892.50453704
+153: 0 223.024424 -11.992259 0.000004 60892.004549 2460892.50454861
+154: 0 223.024427 -11.992259 0.000003 60892.004560 2460892.50456019
+155: 0 223.024431 -11.992259 0.000004 60892.004572 2460892.50457176
+156: 0 223.024434 -11.992260 0.000003 60892.004583 2460892.50458333
+157: 0 223.024438 -11.992260 0.000004 60892.004595 2460892.50459491
+158: 0 223.024441 -11.992260 0.000003 60892.004606 2460892.50460648
+159: 0 223.024445 -11.992261 0.000004 60892.004618 2460892.50461806
+160: 0 223.024449 -11.992261 0.000004 60892.004630 2460892.50462963
+161: 0 223.024452 -11.992261 0.000003 60892.004641 2460892.50464120
+162: 0 223.024456 -11.992261 0.000004 60892.004653 2460892.50465278
+163: 0 223.024459 -11.992262 0.000003 60892.004664 2460892.50466435
+164: 0 223.024463 -11.992262 0.000004 60892.004676 2460892.50467593
+165: 0 223.024466 -11.992262 0.000003 60892.004687 2460892.50468750
+166: 0 223.024470 -11.992263 0.000004 60892.004699 2460892.50469907
+167: 0 223.024474 -11.992263 0.000004 60892.004711 2460892.50471065
+168: 0 223.024477 -11.992263 0.000003 60892.004722 2460892.50472222
+169: 0 223.024481 -11.992264 0.000004 60892.004734 2460892.50473380
+170: 0 223.024484 -11.992264 0.000003 60892.004745 2460892.50474537
+171: 0 223.024488 -11.992264 0.000004 60892.004757 2460892.50475694
+172: 0 223.024492 -11.992264 0.000004 60892.004769 2460892.50476852
+173: 0 223.024495 -11.992265 0.000003 60892.004780 2460892.50478009
+174: 0 223.024499 -11.992265 0.000004 60892.004792 2460892.50479167
+175: 0 223.024502 -11.992265 0.000003 60892.004803 2460892.50480324
+176: 0 223.024506 -11.992266 0.000004 60892.004815 2460892.50481481
+177: 0 223.024510 -11.992266 0.000003 60892.004826 2460892.50482639
+178: 0 223.024513 -11.992266 0.000004 60892.004838 2460892.50483796
+179: 0 223.024517 -11.992267 0.000004 60892.004850 2460892.50484954
+180: 0 223.024520 -11.992267 0.000003 60892.004861 2460892.50486111
+181: 0 223.024524 -11.992267 0.000004 60892.004873 2460892.50487268
+182: 0 223.024528 -11.992267 0.000003 60892.004884 2460892.50488426
+183: 0 223.024531 -11.992268 0.000004 60892.004896 2460892.50489583
+184: 0 223.024535 -11.992268 0.000003 60892.004907 2460892.50490741
+185: 0 223.024538 -11.992268 0.000004 60892.004919 2460892.50491898
+186: 0 223.024542 -11.992269 0.000004 60892.004931 2460892.50493056
+187: 0 223.024546 -11.992269 0.000003 60892.004942 2460892.50494213
+188: 0 223.024549 -11.992269 0.000004 60892.004954 2460892.50495370
+189: 0 223.024553 -11.992270 0.000003 60892.004965 2460892.50496528
+190: 0 223.024556 -11.992270 0.000004 60892.004977 2460892.50497685
+191: 0 223.024560 -11.992270 0.000003 60892.004988 2460892.50498843
+192: 0 223.024563 -11.992270 0.000004 60892.005000 2460892.50500000
+193: 0 223.024567 -11.992271 0.000004 60892.005012 2460892.50501157
+194: 0 223.024571 -11.992271 0.000003 60892.005023 2460892.50502315
+195: 0 223.024574 -11.992271 0.000004 60892.005035 2460892.50503472
+196: 0 223.024578 -11.992272 0.000003 60892.005046 2460892.50504630
+197: 0 223.024581 -11.992272 0.000004 60892.005058 2460892.50505787
+198: 0 223.024585 -11.992272 0.000003 60892.005069 2460892.50506944
+199: 0 223.024589 -11.992273 0.000004 60892.005081 2460892.50508102
+200: 0 223.024592 -11.992273 0.000004 60892.005093 2460892.50509259
+201: 0 223.024596 -11.992273 0.000003 60892.005104 2460892.50510417
+202: 0 223.024599 -11.992274 0.000004 60892.005116 2460892.50511574
+203: 0 223.024603 -11.992274 0.000003 60892.005127 2460892.50512731
+204: 0 223.024607 -11.992274 0.000004 60892.005139 2460892.50513889
+205: 0 223.024610 -11.992274 0.000003 60892.005150 2460892.50515046
+206: 0 223.024614 -11.992275 0.000004 60892.005162 2460892.50516204
+207: 0 223.024617 -11.992275 0.000004 60892.005174 2460892.50517361
+208: 0 223.024621 -11.992275 0.000003 60892.005185 2460892.50518519
+209: 0 223.024625 -11.992276 0.000004 60892.005197 2460892.50519676
+210: 0 223.024628 -11.992276 0.000003 60892.005208 2460892.50520833
+211: 0 223.024632 -11.992276 0.000004 60892.005220 2460892.50521991
+212: 0 223.024635 -11.992277 0.000003 60892.005231 2460892.50523148
+213: 0 223.024639 -11.992277 0.000004 60892.005243 2460892.50524306
+214: 0 223.024642 -11.992277 0.000004 60892.005255 2460892.50525463
+215: 0 223.024646 -11.992278 0.000003 60892.005266 2460892.50526620
+216: 0 223.024650 -11.992278 0.000004 60892.005278 2460892.50527778
+217: 0 223.024653 -11.992278 0.000003 60892.005289 2460892.50528935
+218: 0 223.024657 -11.992279 0.000004 60892.005301 2460892.50530093
+219: 0 223.024660 -11.992279 0.000004 60892.005313 2460892.50531250
+220: 0 223.024664 -11.992279 0.000003 60892.005324 2460892.50532407
+221: 0 223.024668 -11.992279 0.000004 60892.005336 2460892.50533565
+222: 0 223.024671 -11.992280 0.000003 60892.005347 2460892.50534722
+223: 0 223.024675 -11.992280 0.000004 60892.005359 2460892.50535880
+224: 0 223.024678 -11.992280 0.000003 60892.005370 2460892.50537037
+225: 0 223.024682 -11.992281 0.000004 60892.005382 2460892.50538194
+226: 0 223.024686 -11.992281 0.000004 60892.005394 2460892.50539352
+227: 0 223.024689 -11.992281 0.000003 60892.005405 2460892.50540509
+228: 0 223.024693 -11.992282 0.000004 60892.005417 2460892.50541667
+229: 0 223.024696 -11.992282 0.000003 60892.005428 2460892.50542824
+230: 0 223.024700 -11.992282 0.000004 60892.005440 2460892.50543981
+231: 0 223.024703 -11.992283 0.000003 60892.005451 2460892.50545139
+232: 0 223.024707 -11.992283 0.000004 60892.005463 2460892.50546296
+233: 0 223.024711 -11.992283 0.000004 60892.005475 2460892.50547454
+234: 0 223.024714 -11.992284 0.000003 60892.005486 2460892.50548611
+235: 0 223.024718 -11.992284 0.000004 60892.005498 2460892.50549769
+236: 0 223.024721 -11.992284 0.000003 60892.005509 2460892.50550926
+237: 0 223.024725 -11.992285 0.000004 60892.005521 2460892.50552083
+238: 0 223.024728 -11.992285 0.000003 60892.005532 2460892.50553241
+239: 0 223.024732 -11.992285 0.000004 60892.005544 2460892.50554398
+240: 0 223.024736 -11.992286 0.000004 60892.005556 2460892.50555556
+241: 0 223.024739 -11.992286 0.000003 60892.005567 2460892.50556713
+242: 0 223.024743 -11.992286 0.000004 60892.005579 2460892.50557870
+243: 0 223.024746 -11.992286 0.000003 60892.005590 2460892.50559028
+244: 0 223.024750 -11.992287 0.000004 60892.005602 2460892.50560185
+245: 0 223.024753 -11.992287 0.000003 60892.005613 2460892.50561343
+246: 0 223.024757 -11.992287 0.000004 60892.005625 2460892.50562500
+247: 0 223.024761 -11.992288 0.000004 60892.005637 2460892.50563657
+248: 0 223.024764 -11.992288 0.000003 60892.005648 2460892.50564815
+249: 0 223.024768 -11.992288 0.000004 60892.005660 2460892.50565972
+250: 0 223.024771 -11.992289 0.000003 60892.005671 2460892.50567130
+251: 0 223.024775 -11.992289 0.000004 60892.005683 2460892.50568287
+252: 0 223.024778 -11.992289 0.000003 60892.005694 2460892.50569444
+253: 0 223.024782 -11.992290 0.000004 60892.005706 2460892.50570602
+254: 0 223.024786 -11.992290 0.000004 60892.005718 2460892.50571759
+255: 0 223.024789 -11.992290 0.000003 60892.005729 2460892.50572917
+256: 0 223.024793 -11.992291 0.000004 60892.005741 2460892.50574074
+257: 0 223.024796 -11.992291 0.000003 60892.005752 2460892.50575231
+258: 0 223.024800 -11.992291 0.000004 60892.005764 2460892.50576389
+259: 0 223.024803 -11.992292 0.000003 60892.005775 2460892.50577546
+260: 0 223.024807 -11.992292 0.000004 60892.005787 2460892.50578704
+261: 0 223.024811 -11.992292 0.000004 60892.005799 2460892.50579861
+262: 0 223.024814 -11.992293 0.000003 60892.005810 2460892.50581018
+263: 0 223.024818 -11.992293 0.000004 60892.005822 2460892.50582176
+264: 0 223.024821 -11.992293 0.000003 60892.005833 2460892.50583333
+265: 0 223.024825 -11.992294 0.000004 60892.005845 2460892.50584491
+266: 0 223.024828 -11.992294 0.000003 60892.005856 2460892.50585648
+267: 0 223.024832 -11.992294 0.000004 60892.005868 2460892.50586806
+268: 0 223.024836 -11.992295 0.000004 60892.005880 2460892.50587963
+269: 0 223.024839 -11.992295 0.000003 60892.005891 2460892.50589120
+270: 0 223.024843 -11.992295 0.000004 60892.005903 2460892.50590278
+271: 0 223.024846 -11.992296 0.000003 60892.005914 2460892.50591435
+272: 0 223.024850 -11.992296 0.000004 60892.005926 2460892.50592593
+273: 0 223.024853 -11.992296 0.000003 60892.005937 2460892.50593750
+274: 0 223.024857 -11.992297 0.000004 60892.005949 2460892.50594907
+275: 0 223.024861 -11.992297 0.000004 60892.005961 2460892.50596065
+276: 0 223.024864 -11.992297 0.000003 60892.005972 2460892.50597222
+277: 0 223.024868 -11.992298 0.000004 60892.005984 2460892.50598380
+278: 0 223.024871 -11.992298 0.000003 60892.005995 2460892.50599537
+279: 0 223.024875 -11.992298 0.000004 60892.006007 2460892.50600694
+280: 0 223.024879 -11.992299 0.000004 60892.006019 2460892.50601852
+281: 0 223.024882 -11.992299 0.000003 60892.006030 2460892.50603009
+282: 0 223.024886 -11.992299 0.000004 60892.006042 2460892.50604167
+283: 0 223.024889 -11.992300 0.000003 60892.006053 2460892.50605324
+284: 0 223.024893 -11.992300 0.000004 60892.006065 2460892.50606481
+285: 0 223.024896 -11.992300 0.000003 60892.006076 2460892.50607639
+286: 0 223.024900 -11.992301 0.000004 60892.006088 2460892.50608796
+287: 0 223.024904 -11.992301 0.000004 60892.006100 2460892.50609954
+288: 0 223.024907 -11.992301 0.000003 60892.006111 2460892.50611111
+289: 0 223.024911 -11.992302 0.000004 60892.006123 2460892.50612269
+290: 0 223.024914 -11.992302 0.000003 60892.006134 2460892.50613426
+291: 0 223.024918 -11.992303 0.000004 60892.006146 2460892.50614583
+292: 0 223.024921 -11.992303 0.000003 60892.006157 2460892.50615741
+293: 0 223.024925 -11.992303 0.000004 60892.006169 2460892.50616898
+294: 0 223.024929 -11.992304 0.000004 60892.006181 2460892.50618056
+295: 0 223.024932 -11.992304 0.000003 60892.006192 2460892.50619213
+296: 0 223.024936 -11.992304 0.000004 60892.006204 2460892.50620370
+297: 0 223.024939 -11.992305 0.000003 60892.006215 2460892.50621528
+298: 0 223.024943 -11.992305 0.000004 60892.006227 2460892.50622685
+299: 0 223.024946 -11.992305 0.000003 60892.006238 2460892.50623843
+300: 0 223.024950 -11.992306 0.000004 60892.006250 2460892.50625000
+301: 0 223.024954 -11.992306 0.000004 60892.006262 2460892.50626157
+302: 0 223.024957 -11.992306 0.000003 60892.006273 2460892.50627315
+303: 0 223.024961 -11.992307 0.000004 60892.006285 2460892.50628472
+304: 0 223.024964 -11.992307 0.000003 60892.006296 2460892.50629630
+305: 0 223.024968 -11.992307 0.000004 60892.006308 2460892.50630787
+306: 0 223.024971 -11.992308 0.000003 60892.006319 2460892.50631944
+307: 0 223.024975 -11.992308 0.000004 60892.006331 2460892.50633102
+308: 0 223.024979 -11.992308 0.000004 60892.006343 2460892.50634259
+309: 0 223.024982 -11.992309 0.000003 60892.006354 2460892.50635417
+310: 0 223.024986 -11.992309 0.000004 60892.006366 2460892.50636574
+311: 0 223.024989 -11.992310 0.000003 60892.006377 2460892.50637731
+312: 0 223.024993 -11.992310 0.000004 60892.006389 2460892.50638889
+313: 0 223.024996 -11.992310 0.000003 60892.006400 2460892.50640046
+314: 0 223.025000 -11.992311 0.000004 60892.006412 2460892.50641204
+315: 0 223.025004 -11.992311 0.000004 60892.006424 2460892.50642361
+316: 0 223.025007 -11.992311 0.000003 60892.006435 2460892.50643519
+317: 0 223.025011 -11.992312 0.000004 60892.006447 2460892.50644676
+318: 0 223.025014 -11.992312 0.000003 60892.006458 2460892.50645833
+319: 0 223.025018 -11.992312 0.000004 60892.006470 2460892.50646991
+320: 0 223.025021 -11.992313 0.000003 60892.006481 2460892.50648148
+321: 0 223.025025 -11.992313 0.000004 60892.006493 2460892.50649306
+322: 0 223.025029 -11.992313 0.000004 60892.006505 2460892.50650463
+323: 0 223.025032 -11.992314 0.000003 60892.006516 2460892.50651620
+324: 0 223.025036 -11.992314 0.000004 60892.006528 2460892.50652778
+325: 0 223.025039 -11.992315 0.000003 60892.006539 2460892.50653935
+326: 0 223.025043 -11.992315 0.000004 60892.006551 2460892.50655093
+327: 0 223.025046 -11.992315 0.000003 60892.006562 2460892.50656250
+328: 0 223.025050 -11.992316 0.000004 60892.006574 2460892.50657407
+329: 0 223.025054 -11.992316 0.000004 60892.006586 2460892.50658565
+330: 0 223.025057 -11.992316 0.000003 60892.006597 2460892.50659722
+331: 0 223.025061 -11.992317 0.000004 60892.006609 2460892.50660880
+332: 0 223.025064 -11.992317 0.000003 60892.006620 2460892.50662037
+333: 0 223.025068 -11.992317 0.000004 60892.006632 2460892.50663194
+334: 0 223.025072 -11.992318 0.000004 60892.006644 2460892.50664352
+335: 0 223.025075 -11.992318 0.000003 60892.006655 2460892.50665509
+336: 0 223.025079 -11.992319 0.000004 60892.006667 2460892.50666667
+337: 0 223.025082 -11.992319 0.000003 60892.006678 2460892.50667824
+338: 0 223.025086 -11.992319 0.000004 60892.006690 2460892.50668981
+339: 0 223.025089 -11.992320 0.000003 60892.006701 2460892.50670139
+340: 0 223.025093 -11.992320 0.000004 60892.006713 2460892.50671296
+341: 0 223.025097 -11.992320 0.000004 60892.006725 2460892.50672454
+342: 0 223.025100 -11.992321 0.000003 60892.006736 2460892.50673611
+343: 0 223.025104 -11.992321 0.000004 60892.006748 2460892.50674768
+344: 0 223.025107 -11.992322 0.000003 60892.006759 2460892.50675926
+345: 0 223.025111 -11.992322 0.000004 60892.006771 2460892.50677083
+346: 0 223.025114 -11.992322 0.000003 60892.006782 2460892.50678241
+347: 0 223.025118 -11.992323 0.000004 60892.006794 2460892.50679398
+348: 0 223.025122 -11.992323 0.000004 60892.006806 2460892.50680556
+349: 0 223.025125 -11.992323 0.000003 60892.006817 2460892.50681713
+350: 0 223.025129 -11.992324 0.000004 60892.006829 2460892.50682870
+351: 0 223.025132 -11.992324 0.000003 60892.006840 2460892.50684028
+352: 0 223.025136 -11.992325 0.000004 60892.006852 2460892.50685185
+353: 0 223.025139 -11.992325 0.000003 60892.006863 2460892.50686343
+354: 0 223.025143 -11.992325 0.000004 60892.006875 2460892.50687500
+355: 0 223.025147 -11.992326 0.000004 60892.006887 2460892.50688657
+356: 0 223.025150 -11.992326 0.000003 60892.006898 2460892.50689815
+357: 0 223.025154 -11.992327 0.000004 60892.006910 2460892.50690972
+358: 0 223.025157 -11.992327 0.000003 60892.006921 2460892.50692130
+359: 0 223.025161 -11.992327 0.000004 60892.006933 2460892.50693287
+360: 0 223.025164 -11.992328 0.000003 60892.006944 2460892.50694444
+361: 0 223.025168 -11.992328 0.000004 60892.006956 2460892.50695602
+362: 0 223.025172 -11.992328 0.000004 60892.006968 2460892.50696759
+363: 0 223.025175 -11.992329 0.000003 60892.006979 2460892.50697917
+364: 0 223.025179 -11.992329 0.000004 60892.006991 2460892.50699074
+365: 0 223.025182 -11.992330 0.000003 60892.007002 2460892.50700231
+366: 0 223.025186 -11.992330 0.000004 60892.007014 2460892.50701389
+367: 0 223.025189 -11.992330 0.000003 60892.007025 2460892.50702546
+368: 0 223.025193 -11.992331 0.000004 60892.007037 2460892.50703704
+369: 0 223.025196 -11.992331 0.000004 60892.007049 2460892.50704861
+370: 0 223.025200 -11.992332 0.000003 60892.007060 2460892.50706019
+371: 0 223.025204 -11.992332 0.000004 60892.007072 2460892.50707176
+372: 0 223.025207 -11.992332 0.000003 60892.007083 2460892.50708333
+373: 0 223.025211 -11.992333 0.000004 60892.007095 2460892.50709491
+374: 0 223.025214 -11.992333 0.000003 60892.007106 2460892.50710648
+375: 0 223.025218 -11.992333 0.000004 60892.007118 2460892.50711806
+376: 0 223.025221 -11.992334 0.000004 60892.007130 2460892.50712963
+377: 0 223.025225 -11.992334 0.000003 60892.007141 2460892.50714120
+378: 0 223.025228 -11.992335 0.000004 60892.007153 2460892.50715278
+379: 0 223.025232 -11.992335 0.000003 60892.007164 2460892.50716435
+380: 0 223.025236 -11.992335 0.000004 60892.007176 2460892.50717593
+381: 0 223.025239 -11.992336 0.000003 60892.007187 2460892.50718750
+382: 0 223.025243 -11.992336 0.000004 60892.007199 2460892.50719907
+383: 0 223.025246 -11.992337 0.000004 60892.007211 2460892.50721065
+384: 0 223.025250 -11.992337 0.000003 60892.007222 2460892.50722222
+385: 0 223.025253 -11.992337 0.000004 60892.007234 2460892.50723380
+386: 0 223.025257 -11.992338 0.000003 60892.007245 2460892.50724537
+387: 0 223.025260 -11.992338 0.000004 60892.007257 2460892.50725694
+388: 0 223.025264 -11.992339 0.000004 60892.007269 2460892.50726852
+389: 0 223.025268 -11.992339 0.000003 60892.007280 2460892.50728009
+390: 0 223.025271 -11.992339 0.000004 60892.007292 2460892.50729167
+391: 0 223.025275 -11.992340 0.000003 60892.007303 2460892.50730324
+392: 0 223.025278 -11.992340 0.000004 60892.007315 2460892.50731481
+393: 0 223.025282 -11.992341 0.000003 60892.007326 2460892.50732639
+394: 0 223.025285 -11.992341 0.000004 60892.007338 2460892.50733796
+395: 0 223.025289 -11.992341 0.000004 60892.007350 2460892.50734954
+396: 0 223.025292 -11.992342 0.000003 60892.007361 2460892.50736111
+397: 0 223.025296 -11.992342 0.000004 60892.007373 2460892.50737269
+398: 0 223.025300 -11.992343 0.000003 60892.007384 2460892.50738426
+399: 0 223.025303 -11.992343 0.000004 60892.007396 2460892.50739583
+400: 0 223.025307 -11.992344 0.000003 60892.007407 2460892.50740741
+401: 0 223.025310 -11.992344 0.000004 60892.007419 2460892.50741898
+402: 0 223.025314 -11.992344 0.000004 60892.007431 2460892.50743056
+403: 0 223.025317 -11.992345 0.000003 60892.007442 2460892.50744213
+404: 0 223.025321 -11.992345 0.000004 60892.007454 2460892.50745370
+405: 0 223.025324 -11.992346 0.000003 60892.007465 2460892.50746528
+406: 0 223.025328 -11.992346 0.000004 60892.007477 2460892.50747685
+407: 0 223.025332 -11.992346 0.000003 60892.007488 2460892.50748843
+408: 0 223.025335 -11.992347 0.000004 60892.007500 2460892.50750000
+409: 0 223.025339 -11.992347 0.000004 60892.007512 2460892.50751157
+410: 0 223.025342 -11.992348 0.000003 60892.007523 2460892.50752315
+411: 0 223.025346 -11.992348 0.000004 60892.007535 2460892.50753472
+412: 0 223.025349 -11.992348 0.000003 60892.007546 2460892.50754630
+413: 0 223.025353 -11.992349 0.000004 60892.007558 2460892.50755787
+414: 0 223.025356 -11.992349 0.000003 60892.007569 2460892.50756944
+415: 0 223.025360 -11.992350 0.000004 60892.007581 2460892.50758102
+416: 0 223.025364 -11.992350 0.000004 60892.007593 2460892.50759259
+417: 0 223.025367 -11.992351 0.000003 60892.007604 2460892.50760417
+418: 0 223.025371 -11.992351 0.000004 60892.007616 2460892.50761574
+419: 0 223.025374 -11.992351 0.000003 60892.007627 2460892.50762731
+420: 0 223.025378 -11.992352 0.000004 60892.007639 2460892.50763889
+421: 0 223.025381 -11.992352 0.000003 60892.007650 2460892.50765046
+422: 0 223.025385 -11.992353 0.000004 60892.007662 2460892.50766204
+423: 0 223.025389 -11.992353 0.000004 60892.007674 2460892.50767361
+424: 0 223.025392 -11.992354 0.000003 60892.007685 2460892.50768518
+425: 0 223.025396 -11.992354 0.000004 60892.007697 2460892.50769676
+426: 0 223.025399 -11.992354 0.000003 60892.007708 2460892.50770833
+427: 0 223.025403 -11.992355 0.000004 60892.007720 2460892.50771991
+428: 0 223.025406 -11.992355 0.000003 60892.007731 2460892.50773148
+429: 0 223.025410 -11.992356 0.000004 60892.007743 2460892.50774306
+430: 0 223.025414 -11.992356 0.000004 60892.007755 2460892.50775463
+431: 0 223.025417 -11.992357 0.000003 60892.007766 2460892.50776620
+432: 0 223.025421 -11.992357 0.000004 60892.007778 2460892.50777778
+433: 0 223.025424 -11.992357 0.000003 60892.007789 2460892.50778935
+434: 0 223.025428 -11.992358 0.000004 60892.007801 2460892.50780093
+435: 0 223.025431 -11.992358 0.000003 60892.007812 2460892.50781250
+436: 0 223.025435 -11.992359 0.000004 60892.007824 2460892.50782407
+437: 0 223.025438 -11.992359 0.000004 60892.007836 2460892.50783565
+438: 0 223.025442 -11.992360 0.000003 60892.007847 2460892.50784722
+439: 0 223.025445 -11.992360 0.000004 60892.007859 2460892.50785880
+440: 0 223.025449 -11.992360 0.000003 60892.007870 2460892.50787037
+441: 0 223.025453 -11.992361 0.000004 60892.007882 2460892.50788194
+442: 0 223.025456 -11.992361 0.000004 60892.007894 2460892.50789352
+443: 0 223.025460 -11.992362 0.000003 60892.007905 2460892.50790509
+444: 0 223.025463 -11.992362 0.000004 60892.007917 2460892.50791667
+445: 0 223.025467 -11.992363 0.000003 60892.007928 2460892.50792824
+446: 0 223.025470 -11.992363 0.000004 60892.007940 2460892.50793981
+447: 0 223.025474 -11.992364 0.000003 60892.007951 2460892.50795139
+448: 0 223.025477 -11.992364 0.000004 60892.007963 2460892.50796296
+449: 0 223.025481 -11.992364 0.000004 60892.007975 2460892.50797454
+450: 0 223.025484 -11.992365 0.000003 60892.007986 2460892.50798611
+451: 0 223.025488 -11.992365 0.000004 60892.007998 2460892.50799769
+452: 0 223.025492 -11.992366 0.000003 60892.008009 2460892.50800926
+453: 0 223.025495 -11.992366 0.000004 60892.008021 2460892.50802083
+454: 0 223.025499 -11.992367 0.000003 60892.008032 2460892.50803241
+455: 0 223.025502 -11.992367 0.000004 60892.008044 2460892.50804398
+456: 0 223.025506 -11.992368 0.000004 60892.008056 2460892.50805556
+457: 0 223.025509 -11.992368 0.000003 60892.008067 2460892.50806713
+458: 0 223.025513 -11.992368 0.000004 60892.008079 2460892.50807870
+459: 0 223.025516 -11.992369 0.000003 60892.008090 2460892.50809028
+460: 0 223.025520 -11.992369 0.000004 60892.008102 2460892.50810185
+461: 0 223.025523 -11.992370 0.000003 60892.008113 2460892.50811343
+462: 0 223.025527 -11.992370 0.000004 60892.008125 2460892.50812500
+463: 0 223.025531 -11.992371 0.000004 60892.008137 2460892.50813657
+464: 0 223.025534 -11.992371 0.000003 60892.008148 2460892.50814815
+465: 0 223.025538 -11.992372 0.000004 60892.008160 2460892.50815972
+466: 0 223.025541 -11.992372 0.000003 60892.008171 2460892.50817130
+467: 0 223.025545 -11.992373 0.000004 60892.008183 2460892.50818287
+468: 0 223.025548 -11.992373 0.000003 60892.008194 2460892.50819444
+469: 0 223.025552 -11.992374 0.000004 60892.008206 2460892.50820602
+470: 0 223.025556 -11.992374 0.000004 60892.008218 2460892.50821759
+471: 0 223.025559 -11.992374 0.000003 60892.008229 2460892.50822917
+472: 0 223.025563 -11.992375 0.000004 60892.008241 2460892.50824074
+473: 0 223.025566 -11.992375 0.000003 60892.008252 2460892.50825231
+474: 0 223.025570 -11.992376 0.000004 60892.008264 2460892.50826389
+475: 0 223.025573 -11.992376 0.000003 60892.008275 2460892.50827546
+476: 0 223.025577 -11.992377 0.000004 60892.008287 2460892.50828704
+477: 0 223.025580 -11.992377 0.000004 60892.008299 2460892.50829861
+478: 0 223.025584 -11.992378 0.000003 60892.008310 2460892.50831018
+479: 0 223.025587 -11.992378 0.000004 60892.008322 2460892.50832176
+480: 0 223.025591 -11.992379 0.000003 60892.008333 2460892.50833333
+thin_points returned 2
+Optimized list of points:
+0: 0 223.023873 -11.992216 0.000000 60892.002778 2460892.50277778
+1: 0 223.025591 -11.992379 0.001688 60892.008333 2460892.50833333
+
+ compute_search_boxes returned 1
+Search Boxes:
+0: 0 223.023873 -11.992216  223.025591 -11.992379 223.860467 -11.316874  223.717068 -12.810175  222.184809 -12.665231  222.336586 -11.172729 60892.002778 60892.008333
+running gnuplot command: gnuplot -persist -e "p1=''" -e "p2='2025 08 05 00:04:00'" -e "p3='2025 08 05 00:12:00'" -e "p4='/work/TMP_HvGaqZ_1205243/MOST/pid1205243'" -e "p5='218'" -e "p6='229'" -e "p7='-15'" -e "p8='-9'" /irsa/cm/website/irsa/share/wsvc/MOST/orbitplot.plt
+start_most: starting image search
+Performing ODBC image search
+search_images_odbc: connecting to ODBC dsn "postgres"
+odbc_connect: SQLAllocHandle (env) returned 0
+odbc_connect: SQLSetEnvAttr returned 0
+odbc_connect: SQLAllocHandle (DBC) returned 0
+odbc_connect: SQLConnect returned 0
+search_images_odbc: composing odbc query, dsn postgres
+search_images_odbc: composing ODBC_CAOM query
+search_images_odbc: done composing ODBC_CAOM query
+search_images_odbc: compose query returned status 1
+search_images_odbc: Query length is 1716 chars
+========================
+select * from 
+(
+  -- box 0
+  (select
+        o.proposal_id, o.target_name,o.target_moving,
+        o.observationid, p.planeid, p.productid, o.instrument_name::varchar(16) as instrument,
+        TO_CHAR(TIMEZONE('UTC', TO_TIMESTAMP((p.time_bounds_lower - 40587.0)*86400)), 'YYYY-MM-DD HH24:MI:SS.MS')::varchar(24) as start_date,
+        TO_CHAR(TIMEZONE('UTC', TO_TIMESTAMP((p.time_bounds_upper - 40587.0)*86400)), 'YYYY-MM-DD HH24:MI:SS.MS')::varchar(24) as end_date,
+        p.time_bounds_lower as mjd_start,
+        p.time_bounds_upper as mjd_end,
+        p.time_exposure as exposure_time,
+        coord1(p.pt) as ra,
+        coord2(p.pt) as dec,
+        poly_to_ra(p.poly,1) as ra1, poly_to_dec(p.poly,1) as dec1,
+        poly_to_ra(p.poly,2) as ra2, poly_to_dec(p.poly,2) as dec2,
+        poly_to_ra(p.poly,3) as ra3, poly_to_dec(p.poly,3) as dec3,
+        poly_to_ra(p.poly,4) as ra4, poly_to_dec(p.poly,4) as dec4,
+        replace(a.uri, 'https://irsa.ipac.caltech.edu/', 'https://irsa.ipac.caltech.edu/') as uri
+    from spherex.observation o, spherex.plane p, spherex.artifact a
+    where
+    (o.obsid = p.obsid) and (p.planeid = a.planeid) and 
+    ( ( (p.poly is not null) and (ST_Intersects(poly,
+      ST_GeogFromText('POLYGON((223.860467 -11.316874, 223.717068 -12.810175, 222.184809 -12.665231, 222.336586 -11.172729, 223.860467 -11.316874))')) ) ) or 
+    ( (p.poly is null) and (p.pt is not null) and (ST_Intersects(pt,
+      ST_GeogFromText('POLYGON((223.860467 -11.316874, 223.717068 -12.810175, 222.184809 -12.665231, 222.336586 -11.172729, 223.860467 -11.316874))')) ) ) ) 
+      and (p.time_bounds_upper >= 60892.002778 and p.time_bounds_lower<= 60892.008333)
+  )
+) as foo
+order by mjd_start ;
+========================
+search_images_odbc: connecting to DB
+search_images_odbc: Running Query
+search_images_odbc: Done running Query, return status 1
+search_images_odbc: Writing Result
+Result set has 23 columns
+column 1, name "proposal_id", namelen 11, type 12, colsize 128, digits 0, nullable 1
+column 2, name "target_name", namelen 11, type 12, colsize 64, digits 0, nullable 1
+column 3, name "target_moving", namelen 13, type 12, colsize 5, digits 0, nullable 1
+column 4, name "observationid", namelen 13, type -1, colsize 256, digits 0, nullable 1
+column 5, name "planeid", namelen 7, type -11, colsize 37, digits 0, nullable 1
+column 6, name "productid", namelen 9, type 12, colsize 64, digits 0, nullable 1
+column 7, name "instrument", namelen 10, type 12, colsize 16, digits 0, nullable 1
+column 8, name "start_date", namelen 10, type 12, colsize 24, digits 0, nullable 1
+column 9, name "end_date", namelen 8, type 12, colsize 24, digits 0, nullable 1
+column 10, name "mjd_start", namelen 9, type 6, colsize 17, digits 0, nullable 1
+column 11, name "mjd_end", namelen 7, type 6, colsize 17, digits 0, nullable 1
+column 12, name "exposure_time", namelen 13, type 6, colsize 17, digits 0, nullable 1
+column 13, name "ra", namelen 2, type 6, colsize 17, digits 0, nullable 1
+column 14, name "dec", namelen 3, type 6, colsize 17, digits 0, nullable 1
+column 15, name "ra1", namelen 3, type 6, colsize 17, digits 0, nullable 1
+column 16, name "dec1", namelen 4, type 6, colsize 17, digits 0, nullable 1
+column 17, name "ra2", namelen 3, type 6, colsize 17, digits 0, nullable 1
+column 18, name "dec2", namelen 4, type 6, colsize 17, digits 0, nullable 1
+column 19, name "ra3", namelen 3, type 6, colsize 17, digits 0, nullable 1
+column 20, name "dec3", namelen 4, type 6, colsize 17, digits 0, nullable 1
+column 21, name "ra4", namelen 3, type 6, colsize 17, digits 0, nullable 1
+column 22, name "dec4", namelen 4, type 6, colsize 17, digits 0, nullable 1
+column 23, name "uri", namelen 3, type -1, colsize 8190, digits 0, nullable 1
+search_images_odbc: Done writing result
+search_images_odbc: Cleaning Up
+search_images_odbc: All Done
+search_images_odbc: initializing output table header
+search_images_odbc: Calling read_ipac_catalog()
+read_ipac_catalog: Processing spherex images from file irsa_catalog.tbl...
+read_ipac_catalog: columns ira1 14, idec1 15, ira2 16, idec2 17, ira3 18, idec3 19, ira4 20, idec4 21
+read_ipac_catalog: timestamp column is mjd_start, type MJD, in column 9
+read_ipac_catalog: CAOM columns icaom_proposal_id 0, icaom_observationid 3, icaom_productid 5
+  icaom_ra 12, icaom_dec 13, icaom_start_date 7, icaom_uri 22
+
+====> Start Processing irsa_catalog.tbl extracted from catalog: spherex ...
+read_ipac_catalog: timestamp prefiltering images within MJD date range 60892.002778 to 60892.008333
+Number of Image Frames Read So Far = 0
+read_ipac_catalog: images read:                       2
+read_ipac_catalog: images rejected by timestamp:      0 (  0.00%)
+read_ipac_catalog: images rejected by radius:         0 (  0.00%)
+read_ipac_catalog: images nearby:                     0 (  0.00%)
+read_ipac_catalog: images matched:                    2 (100.00%)
+read_ipac_catalog: images rejected as duplicate:      0 (  0.00%)
+search_images_odbc: Back from read_ipac_catalog()
+search_images_odbc: processing time 0.007 seconds
+Returned from ODBC image search
+
+
+Number of Images Processed            =      2
+Number of Image Rejected by timestamp =      0 (  0.00%)
+Number of Image Rejected by radius    =      0 (  0.00%)
+Number of Image Matched               =      2 (100.00%)
+Number of Image Nearby                =      0 (  0.00%)
+============================================================
+
+
+Opening Selected Image Table and Sort Them into Matched and Nearby Image Tables ... 
+ "imgTmp_merged_sorted.tbl" information
+ ----------------   
+                table index :            0
+                number of column:       31
+                number of keyval:        2
+                file index   :           0
+
+
+====================== Number of Image Frames Within Search Regions Excluding Overlaps and Inside Observation Time Span = 2
+
+
+====================== Number of Matched Image Frames = 2
+
+
+====================== Number of Nearby Image Frames = 0
+
+running gnuplot command: gnuplot -persist -e "p1=''" -e "p2='2025 08 05 00:04:00'" -e "p3='2025 08 05 00:12:00'" -e "p4='/work/TMP_HvGaqZ_1205243/MOST/pid1205243'" -e "p5='218'" -e "p6='229'" -e "p7='-15'" -e "p8='-9'" /irsa/cm/website/irsa/share/wsvc/MOST/orbitplot_match.plt
+Done with image search
+start_most: image search complete
+start_most: completed ok
+Summary of Processing Time:
+Initialize = 0.193 seconds
+Initial Setup = 0.554 seconds
+Fetch Image Metadata = 0.169 seconds
+Data Processing = 0.007 seconds
+Output Results Tables = 0.144 seconds
+Output Source Table = 0.000 seconds
+Output Image Cutouts = 0.000 seconds
+Output DS9 and Fits Files Tarballs = 0.000 seconds
+Total Time = 1.080 seconds
+
+
+Total Number of Search Regions Processed = 1
+Total Area of Search Regions = 0.000686121 steradians (2.2524 sq deg,   0.01% of sky) 
+
+Number of Image Frames Processed = 2
+Number of Matched Image Frames   = 2
+
+Number of Nearby Image Frames (not exact match) = 0

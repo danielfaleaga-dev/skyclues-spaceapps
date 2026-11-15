@@ -447,8 +447,9 @@ def solar_controls(region, level='scientific'):
                     st.rerun()
                 except (ValueError, solar_system.ServiceError) as e:
                     st.error(str(e))
-        st.caption('Tiempo y Espectro estudian este campo fijo: no siguen la órbita. El cubo combina fechas y no es un espectro del cuerpo móvil. Compartir la región conserva coordenadas, no la efeméride.' if sci else
-                   'Los exploradores muestran esta zona del cielo; no siguen al objeto en su recorrido.')
+        st.caption('Tiempo busca exposiciones a lo largo de la trayectoria del objeto. Espectro mantiene el campo fijo: '
+                   'el cubo combina fechas y no es un espectro del cuerpo móvil. Compartir coordenadas no conserva la efeméride.' if sci else
+                   'En Tiempo puede buscar imágenes que sigan el recorrido del objeto. Espectro muestra esta zona fija del cielo.')
         if p['identity'].get('spkid') == '1004083':
             st.markdown(f"[Observaciones oficiales de 3I/ATLAS]({solar_system.ATLAS_DOC}) · [Tabla original]({solar_system.ATLAS_TABLE})")
             if st.button('Consultar exposiciones oficiales de 3I/ATLAS'):

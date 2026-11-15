@@ -1,0 +1,4 @@
+|    ra_obj|   dec_obj|sun_dist|geo_dist|  dist_ctr|   phase|  vmag|match|
+|    double|    double|  double|  double|    double|  double|double|  int|
+ 223.024527 -11.992267   2.1489   1.8649     0.2908  28.1587   4.53     1
+ 223.024527 -11.992267   2.1489   1.8649     0.3001  28.1587   4.53     1

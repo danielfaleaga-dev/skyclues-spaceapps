@@ -55,6 +55,15 @@ No aplicar una pantalla opaca a absolutamente todo. Decisión explícita del usu
 - RGB: falso color, con asignación de canales. Rosa/morado rayado indica que falta dato en alguna banda; morado sin rayado puede ser un color válido. No interpolar ni cambiar máscaras para que la imagen parezca más bonita.
 - Resultados vacíos o no concluyentes deben seguir siendo distinguibles de detecciones. Simplificar la prosa no modifica la ciencia.
 
+## Objetos conocidos en movimiento: Time Explorer
+
+- El buscador existente conserva la identidad del cuerpo. Tiempo adapta su búsqueda a la trayectoria; no crear un explorador ni un buscador nuevos. El Atlas y Espectro conservan su región. El centro de referencia del buscador no se reescribe al avanzar cada fotograma; las posiciones previstas por exposición se identifican aparte.
+- Usar el reproductor, controles y paleta compartidos. Cuando las imágenes están preparadas, fechas y selección quedan en «Observaciones y fechas»; la imagen y el resultado ocupan el área principal. Si solo hay una representación válida, no dibujar un selector sin alternativas.
+- Cruz terracota = posición prevista; rosa = píxel enmascarado; lila = fuera de cobertura. Los píxeles originales se dibujan mediante WCS; una región sin cobertura no es una observación negra. Los apilamientos se identifican como remuestreados.
+- No presentar una animación cuando alguna imagen carece de señal candidata: conservar revisión Anterior / Siguiente. «Seguir al objeto» describe el centrado calculado, nunca movimiento medido. Sin solapamiento suficiente, no ofrecer un fondo fijo engañoso.
+- Sencillo conserva el estado, fechas y avisos esenciales de confusión/cobertura. Científico añade λ, detector, calibración, fondo, máscaras, controles, originales y reporte. Las advertencias de la misma selección se agrupan, no se convierten en múltiples paneles permanentes.
+- Cargas con `theme.loading`, fases reales y sin porcentajes inventados. Cachés de análisis/render incluyen la versión del código dependiente para evitar resultados obsoletos después de cambios de implementación. Conservar filtros, fechas y resultados al cambiar de nivel o navegar.
+
 ## Implementación y comprobación
 
 Puntos compartidos: `theme.py`, `region_component.css`, `region_component.js`, `player.py`. Reutilizar antes de crear variantes. Los iframes necesitan estilos propios coherentes porque no heredan el tema.

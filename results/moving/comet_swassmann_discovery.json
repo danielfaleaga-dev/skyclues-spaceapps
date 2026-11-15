@@ -1,0 +1,32 @@
+{
+  "identity": {
+    "id": "JPL:1000079",
+    "name": "Schwassmann-Wachmann 1",
+    "type": "comet (integrated barycenter)",
+    "spkid": "1000079",
+    "pdes": "29P",
+    "aliases": [
+      "1927 V1",
+      "1902 E1",
+      "1989 XV",
+      "1974 II",
+      "1957 IV",
+      "1941 VI",
+      "1927i",
+      "1925 II",
+      "1908 IV",
+      "4000029"
+    ],
+    "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+  },
+  "start": "2025-08-01T00:00:00.000",
+  "end": "2025-08-31T00:00:00.000",
+  "rows": [],
+  "provenance": {
+    "url": "https://irsa.ipac.caltech.edu/cgi-bin/MOST/nph-most?catalog=spherex&input_type=naifid_input&obj_naifid=1000079&obs_begin=2025+08+01+00%3A00%3A00&obs_end=2025+08+31+00%3A00%3A00&output_mode=Brief&ephem_step=0.02",
+    "queried_utc": "2026-11-15T02:00:57.747492+00:00",
+    "sha256": "ee28bced20407e83313e44c6d5ffe4cf0ce5587406a79fd21fad00be4e439ebe",
+    "cache": false
+  },
+  "excluded_products": []
+}

@@ -1,0 +1,178 @@
+<html>
+<head>
+<title>MOST Output</title>
+<link rel="stylesheet" type="text/css" media="screen,projection" href="/datasets.css" /> 
+<script type="text/javascript" src="/include/ga_incl.js"></script> 
+<script type="text/javascript"> { 
+    function mostPlot(url, ra, dec) {            
+        const lastIndex = url.lastIndexOf('/'); 
+        const Title = url.slice(lastIndex+1); 
+        var pos = ra + ";" + dec + ";EQ_J2000"
+        var params = { "Type"  : "URL",      
+                       "URL"      : url,       
+                "TitleOptions" : "FILE_NAME", 
+                "ZoomType" : "TO_WIDTH", 
+                "ColorTable"   : "1", 
+                "PostTitle" : Title, 
+		"OverlayPosition"    : pos }   
+        firefly.getViewer().showImage(params) 
+    } 
+    onFireflyLoaded= function(firefly) { 
+        window.extViewer = firefly.getViewer(); 
+        firefly.setGlobalImageDef({ 
+            ZoomType  :  'TO_WIDTH' 
+        }) ; 
+        firefly.debug= true; 
+        extViewer.setDefaultParams({ 
+            "TitleOptions" : "FILE_NAME", 
+            "ZoomType" : "TO_WIDTH", 
+            "ColorTable"   : "1", 
+    }) ; 
+} } </script> 
+<script type="text/javascript" language="javascript" src="/irsaviewer/firefly_loader.js"></script>
+<style type="text/css">
+h1 {color:#880088; text-decoration:underline, font-weight:bold;}
+h2 {color:#880088; text-decoration:underline, font-weight:bold;}
+h3 {color:#880088; font-weight:bold;}
+h4 {color:magenta; text-decoration:blink;}
+h5 {color:white; ; text-decoration:overline;}
+</style>
+</head>
+<body style="background-color:white; color:navy;">
+<hr />
+<h1>MOST (Moving Object Search Tool) Output</h1>
+<hr>
+<h3>Calculating Ephemeris ...</h3>
+<pre>
+MOST: Input Directory: /irsadata/MOST
+MOST: Output Directory: /work/TMP_HvGaqZ_1205243/MOST/pid1205243
+MOST: Workspace URL: https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243
+MOST: Search Server: irsa.ipac.caltech.edu:443
+MOST: dataset_name=spherex
+MOST: dataset_begin=
+MOST: dataset_end=
+MOST: catalog_name=ivo://irsa.ipac/spherex
+MOST: image_server=https://irsa.ipac.caltech.edu
+MOST: observer_type=1 (spacecraft)
+MOST: observer_naif_id=-453
+MOST: naif_spk_files=naif_spkfiles_spherex_001.txt
+MOST: catalog coverage segments=1
+MOST: catalog coverage segment 0: 2025 3 11 00:00:00 -> 2040 1 1 00:00:00
+</pre>
+<pre>
+MOST: Image Dataset Name: spherex
+
+MOST: Catalog Coverage: 2025 MAR 11 00:00:00.000 -> 2040 JAN 01 00:00:00.000
+
+MOST: User Input Observation Time: 2025 08 05 00:04:00 -> 2025 08 05 00:12:00
+MOST: Checking Observer Ephemeris Coverage ...
+MOST: Observer Ephemeris Coverage: 2025 APR 09 08:32:59.998 -> 2026 OCT 16 12:00:00.002
+
+MOST: Observation Time Span Processed: 2025 08 05 00:04:00 -> 2025 08 05 00:12:00 
+MOST: Object Type: Asteroid
+MOST: Object Name: 4 Vesta
+MOST: Object NAIF ID: 20000004
+
+       JD                 Date            RA_obs (J2000) Dec_obs   RA_geoc (J2000) Dec_geoc    ObsDist      GeoDist     HelioDist    Phase   Vmag
+Number of Search Regions = 1 
+Total Area of Search Regions = 0.000686121 steradians (2.2524 sq deg,   0.01% of the sky)
+</pre>
+<hr>
+<center>
+<h2>Orbital Path Plot for Asteroid: 4 Vesta</h2></center>
+<table>
+  <tr>
+    <td  align="center" bgcolor="azure">
+        <img src=https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243/orbitplot.png width=800 height=480 alt="Orbit plot with matched images"><br>
+    </td>
+  </tr>
+</table>
+View/Download Plot: <a href="https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243/orbitplot.png" target="_blank">Orbit Plot</a>
+<br />
+<hr>
+<h3>Fetching Metadata from IRSA catalog server...</h3>
+
+<h3>Processing Image Metadata ...</h3>
+
+<pre>
+Number of Images Processed             =      2
+Number of Images Rejected by timestamp =      0 (  0.00%)
+Number of Images Rejected by radius    =      0 (  0.00%)
+Number of Images Matched               =      2 (100.00%)
+Number of Images Nearby                =      0 (  0.00%)
+</pre>
+<h2>Search Results:</h2>
+<pre>
+\output_url = "https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243"
+\catalog = "spherex"
+\user_input_begin_time = "2025 08 05 00:04:00"
+\user_input_end_time = "2025 08 05 00:12:00"
+\object_name = ""
+\magnitude_parameters = " 0.00  0.00" 
+\job_time_stamp = "Sat Nov 14 18:34:13 2026"
+\description = MOST ODBC query result
+\ odbc_dsn = postgres
+\ odbc_table = (null)
+\fixlen = T
+|    ra_obj|   dec_obj|sun_dist|geo_dist|  dist_ctr|   phase|  vmag|match|                                                                                                                     proposal_id|                                                     target_name|target_moving|                                                                                                                                                                                                                                                  observationid|                             planeid|                                                       productid|      instrument|              start_date|                end_date|               mjd_start|                 mjd_end|           exposure_time|                      ra|                     dec|                     ra1|                    dec1|                     ra2|                    dec2|                     ra3|                    dec3|                     ra4|                    dec4|                                                                                                                                                                                                                                                            uri|
+|    double|    double|  double|  double|    double|  double|double|  int|                                                                                                                            char|                                                            char|         char|                                                                                                                                                                                                                                                           char|                                char|                                                            char|            char|                    char|                    char|                  double|                  double|                  double|                  double|                  double|                  double|                  double|                  double|                  double|                  double|                  double|                  double|                  double|                                                                                                                                                                                                                                                           char|
+ 223.024527 -11.992267   2.1489   1.8649     0.2908  28.1587   4.53     1                                                                                                                             null                                                   SPS_072469_S12             0                                                                                                                                                                                                                                               2025W32_1A_0225_1 01A0D844-2424-7CB1-804A-8B538C47B504                                                               D6          SPHEREx  2025-08-05 00:07:01.931  2025-08-05 00:08:57.048          60892.004883461          60892.006215839                 113.5826       222.80023469000298      -11.801480341605693        221.6795183909007       -9.560364664548844       225.00503023543237      -10.739327074334335       223.95398953287517      -14.079040388667725         220.564766421556      -12.872126937324417                                                                                                                                                  ibe/data/spherex/dr1/level2/2025W32_1A/l2b-v27-2026-226/6/level2_2025W32_1A_0225_1D6_spx_l2b-v27-2026-226.fits 
+ 223.024527 -11.992267   2.1489   1.8649     0.3001  28.1587   4.53     1                                                                                                                             null                                                   SPS_072469_S12             0                                                                                                                                                                                                                                               2025W32_1A_0225_1 01A0D842-86B4-7B5C-AA77-43A819929BA1                                                               D3          SPHEREx  2025-08-05 00:07:01.931  2025-08-05 00:08:57.048          60892.004883461          60892.006215839                 113.5826       222.80530810152572      -11.782435100546653       221.68177798950862       -9.545574054923053       225.00602113775142      -10.717023886587787       223.96170464901815      -14.055274178878502       220.57455944421832       -12.85600234450208                                                                                                                                                  ibe/data/spherex/dr1/level2/2025W32_1A/l2b-v27-2026-226/3/level2_2025W32_1A_0225_1D3_spx_l2b-v27-2026-226.fits 
+</pre>
+<hr>
+<center>
+<h2>Orbital Path Plot for Asteroid: 4 Vesta</h2></center>
+<table>
+  <tr>
+    <td  align="center" bgcolor="azure">
+        <img src=https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243/orbitplot_match.png width=800 height=480 alt="Orbit plot with matched images"><br>
+    </td>
+  </tr>
+</table>
+View/Download Plot: <a href="https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243/orbitplot_match.png" target="_blank">Orbit Plot</a>
+<br />
+<hr>
+<center><h2>Images with a Matched Object Position</h2></center>
+NOTE: Image ID may be only an identifier, not an actual file name.<br />
+<table border="1">
+<tr> <th>Download/<br />View</th><th>DS9<br />File</th><th>Image ID</th><th>date_obs</th> <th>time_obs</th> <th>mjd_obs</th> <th>ra_obj </th><th> dec_obj</th><th>r</th><th>&Delta;</th><th>dist_ctr</th><th>phase</th><th>vmag</th></tr>
+<tr> <th></th><th></th><th></th><th>(UTC)</th> <th>(UTC)</th> <th>(day)</th> <th>(deg)</th><th>(deg)</th><th>(AU)</th><th>(AU)</th><th>(deg)</th><th>(deg)</th><th></th></tr>
+<tr><td><a href="https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W32_1A/l2b-v27-2026-226/6/level2_2025W32_1A_0225_1D6_spx_l2b-v27-2026-226.fits"><img src="/images/download.png" border="0" align="bottom" alt="FITS"></img></a>&nbsp;&nbsp;<a href='javascript:mostPlot("https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W32_1A/l2b-v27-2026-226/6/level2_2025W32_1A_0225_1D6_spx_l2b-v27-2026-226.fits",223.024527,-11.992267)'><img src="/images/fftools-logo.png" border="0" align="bottom" alt="View"></img></a></td>
+<td><a href="https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243/ds9region/ds9_2025W32_1A_0225_1D6.reg" target="_blank">region</a></td><td>2025W32_1A_0225_1D6</td><td> 2025-08-05</td><td> 00:07:01.931</td><td>   60892.00488346</td><td>		   223.024527</td><td> -11.992267</td><td>    2.149</td><td>    1.865</td><td>  0.29081</td><td>  28.159</td><td> 4.53</td></tr>
+</tr>
+<tr><td><a href="https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W32_1A/l2b-v27-2026-226/3/level2_2025W32_1A_0225_1D3_spx_l2b-v27-2026-226.fits"><img src="/images/download.png" border="0" align="bottom" alt="FITS"></img></a>&nbsp;&nbsp;<a href='javascript:mostPlot("https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W32_1A/l2b-v27-2026-226/3/level2_2025W32_1A_0225_1D3_spx_l2b-v27-2026-226.fits",223.024527,-11.992267)'><img src="/images/fftools-logo.png" border="0" align="bottom" alt="View"></img></a></td>
+<td><a href="https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243/ds9region/ds9_2025W32_1A_0225_1D3.reg" target="_blank">region</a></td><td>2025W32_1A_0225_1D3</td><td> 2025-08-05</td><td> 00:07:01.931</td><td>   60892.00488346</td><td>		   223.024527</td><td> -11.992267</td><td>    2.149</td><td>    1.865</td><td>  0.30008</td><td>  28.159</td><td> 4.53</td></tr>
+</tr>
+</table>
+<br />
+<h3><hr>
+<h2>Download Files: </h2>
+<a href=https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243/results.tbl target="_blank">Download Results Table (above)</a>
+<br><br><a href=https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243/imgframes_matched_final_table.tbl target="_blank">Download Image Metadata with a Matched Object Position Table</a>
+<br><br><a href=https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243/ds9region/ds9_orbit_path.reg target="_blank">Download DS9 Region File with the Orbital Path</a>
+<br><br><a href=https://irsa.ipac.caltech.edu/workspace/TMP_HvGaqZ_1205243/MOST/pid1205243 target="_blank">List of All Created Files</a>
+<br><br></h3>
+
+<hr>
+<h2>Summary of Processing Time:</h2>
+Initialize = 0.193 seconds <br />
+Initial Setup = 0.554 seconds <br />
+Fetch Image Metadata = 0.169 seconds <br />
+Data Processing = 0.007 seconds <br />
+Output Results Tables = 0.144 seconds <br />
+Output Source Table = 0.000 seconds <br />
+Output Image Cutouts = 0.000 seconds <br />
+Output DS9 and Fits Files Tarballs = 0.000 seconds <br />
+Total Time = 1.080 seconds <br />
+<br />
+
+Total Number of Search Regions Processed = 1<br />
+Total Area of Search Regions = 0.000686121 steradians (2.2524 sq deg,   0.01% of sky) <br />
+
+Number of Image Frames Processed = 2<br />
+Number of Matched Image Frames   = 2<br />
+
+Number of Nearby Image Frames (not exact match) = 0
+<hr>
+</body>
+</html>

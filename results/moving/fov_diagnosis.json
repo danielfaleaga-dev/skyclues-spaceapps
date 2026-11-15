@@ -1,0 +1,9 @@
+{
+  "august_count": 160,
+  "full_field_inclusion_by_fov_deg": {
+    "0.05": 157,
+    "0.1": 151,
+    "0.5": 131
+  },
+  "continuum_predicted_separation_deg": 3.3579436835769356
+}

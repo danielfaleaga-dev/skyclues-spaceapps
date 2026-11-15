@@ -1,0 +1,71 @@
+[
+  {
+    "label": "atlas_aug_continuum",
+    "status": "candidate",
+    "frames": 2,
+    "failures": [],
+    "observed_motion": false
+  },
+  {
+    "label": "atlas_aug_co2_a",
+    "status": "candidate",
+    "frames": 1,
+    "failures": [],
+    "observed_motion": false
+  },
+  {
+    "label": "atlas_aug_co2_b",
+    "status": "candidate",
+    "frames": 1,
+    "failures": [],
+    "observed_motion": false
+  },
+  {
+    "label": "atlas_dec_continuum",
+    "status": "predicted",
+    "frames": 1,
+    "failures": [],
+    "observed_motion": false
+  },
+  {
+    "label": "atlas_dec_co2",
+    "status": "predicted",
+    "frames": 1,
+    "failures": [],
+    "observed_motion": false
+  },
+  {
+    "label": "atlas_dec_repeat",
+    "status": "candidate",
+    "frames": 2,
+    "failures": [],
+    "observed_motion": false
+  },
+  {
+    "label": "vesta_real",
+    "status": "predicted",
+    "frames": 1,
+    "failures": [],
+    "observed_motion": false
+  },
+  {
+    "label": "pluto_real",
+    "status": "candidate",
+    "frames": 1,
+    "failures": [],
+    "observed_motion": false
+  },
+  {
+    "label": "comet_29p_real",
+    "status": "predicted",
+    "frames": 2,
+    "failures": [],
+    "observed_motion": false
+  },
+  {
+    "label": "stationary_m101",
+    "status": "candidate",
+    "frames": 4,
+    "observed_motion": false
+  }
+]

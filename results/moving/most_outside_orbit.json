@@ -1,0 +1,3 @@
+{
+  "error": "MOST no devolvi\u00f3 una tabla de exposiciones: MOST: ephem_step 0.020000 day smaller than time range.\nMOST: ephem_step reset to the time range: -15.500000 day.\n"
+}

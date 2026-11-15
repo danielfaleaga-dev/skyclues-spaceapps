@@ -1,0 +1,5 @@
+# Verbatim service responses: preserve provider newlines and fixed-width padding.
+most_*.tbl -text -whitespace
+most_*.html -text -whitespace
+most_*.txt -text -whitespace
+most_*.xml -text -whitespace

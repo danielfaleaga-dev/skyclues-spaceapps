@@ -16,7 +16,7 @@ Aplicación web de ciencia ciudadana para el desafío **Planet X and SPHEREx** d
 | Ámbito | Decisión |
 |---|---|
 | Arquitectura | Python 3.11 + Streamlit + Astropy + PyVO. Nada de microservicios, base de datos ni autenticación. No migrar a React/Next sin un problema material. |
-| Datos | NASA/IPAC IRSA. Búsqueda por SIA2 (`https://irsa.ipac.caltech.edu/SIA`) en las colecciones `spherex_dr1` y `spherex_qr3` (también existen `_deep` y `spherex_dr1_cube`). Recortes IBE: `<access_url>?center=ra,dec&size=deg`. |
+| Datos | NASA/IPAC IRSA. Campos fijos: SIA2 (`https://irsa.ipac.caltech.edu/SIA`) en `spherex_dr1` y `spherex_qr3`. Objetos móviles conocidos: MOST `catalog=spherex`, identidad JPL y trayectoria desde SPHEREx; preferir DR1. Recortes IBE: `<access_url>?center=ra,dec&size=deg`. |
 | Repositorio | Único y canónico: `github.com/danielfaleaga-dev/SkyClues`. No se cambia su visibilidad, no se despliega y no se envía nada a NASA sin autorización del usuario. |
 | Genealogía | El código se escribe desde cero durante el evento. **No se copia código, cachés ni resultados de SkyCluesLab** (el prototipo previo). Sus lecciones científicas sí se aplican. |
 | Identidad visual | Diseño unificado de Claude B: blanco, tinta casi negra, líneas finas y acento terracota. Newsreader para títulos, IBM Plex Sans para interfaz e IBM Plex Mono para cifras. Detalles y cargas en DESIGN_SYSTEM.md. El visor científico es el protagonista. |
@@ -41,6 +41,7 @@ Aplicación web de ciencia ciudadana para el desafío **Planet X and SPHEREx** d
 ## Funcionalidades y continuidad
 
 - **Time Explorer** (núcleo): búsqueda por RA/Dec o nombre, secuencia cronológica animada con pausa y navegación por fechas, comparación A/B y blink, campo de visión (FOV) seleccionable por el usuario (recomendación oficial del desafío; es la región consultada, no un zoom), URL compartible, metadatos de calidad.
+- **Objetos móviles conocidos en Tiempo:** motor universal separado del estelar, activado por la identidad del buscador. MOST descubre exposiciones a lo largo de la trayectoria; posiciones por exposición, WCS, cobertura, máscaras, ePSF/aperturas multiescala, controles y apilamiento compatible. Una posición prevista o señal candidata no confirma identificación ni movimiento. Sin búsqueda ciega. La tabla de 3I/ATLAS es un adaptador opcional, no una condición del algoritmo. Decisión y límites de observador/época en `MOST_EVALUATION.md`; validación real en `MOVING_OBJECTS_REPORT.md`.
 - **Spectrum Explorer** implementado: selector de canal, IMAGE/NHITS, selección por clic o coordenadas, extracción exploratoria de posición, CSV con procedencia y transferencia de regiones. Las pruebas y limitaciones concretas están en STATE.
 - **Composición multibanda RGB** en Spectrum Explorer: tres canales auténticos del cubo DR1 en falso color, normalización por canal identificada y máscara común; solo visualización, sin combinación fotométrica ni restas.
 - **Buscador, enlaces y actualización**: autocompletado (índice local verificado + SIMBAD), enlaces `ra/dec/fov/explorer/canal`, «Actualizar observaciones» bajo demanda (SIA2, sin vigilancia) e identificación del cubo publicado. Detalle en `RELEASE_READINESS.md`.

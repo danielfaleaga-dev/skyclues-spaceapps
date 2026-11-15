@@ -1,0 +1,41 @@
+{
+  "obs_id": "2025W32_2D_0343_3",
+  "irsa": {
+    "ra": 247.1534029716621,
+    "dec": -16.84583968197335,
+    "source": "https://irsa.ipac.caltech.edu/data/SPHEREx/docs/comet3iatlas/obscore_3I_Atlas.vot",
+    "frame": "ICRS (tabla IRSA)",
+    "observer": "predicci\u00f3n por exposici\u00f3n publicada por IRSA",
+    "uncertainty_arcsec": null,
+    "refined": true,
+    "mjd_start": 60896.353349514,
+    "mjd_end": 60896.354681892,
+    "original_product": "https://irsa.ipac.caltech.edu/datalink/links/spherex?ID=ivo://irsa.ipac/spherex_qr2?2025W32_2D_0343_3/D1",
+    "provenance": {
+      "url": "https://irsa.ipac.caltech.edu/data/SPHEREx/docs/comet3iatlas/obscore_3I_Atlas.vot",
+      "queried_utc": "2026-11-15T01:53:51.193710+00:00",
+      "sha256": "11ff6a524c1b344b3c15c4875429b5b89fd053a18eef4d66328a5632382ef4af",
+      "cache": false
+    }
+  },
+  "most_refined": {
+    "ra": 247.154078,
+    "dec": -16.845588,
+    "source": "https://irsa.ipac.caltech.edu/cgi-bin/MOST/nph-most",
+    "frame": "J2000 (MOST)",
+    "observer": "MOST/SPHEREx",
+    "uncertainty_arcsec": null,
+    "time_sampling_s": 1.0,
+    "refined": true,
+    "mjd": 60896.354015703,
+    "provenance": {
+      "url": "https://irsa.ipac.caltech.edu/cgi-bin/MOST/nph-most?catalog=spherex&input_type=naifid_input&obj_naifid=1004083&obs_begin=2025+08+09+08%3A26%3A49&obs_end=2025+08+09+08%3A32%3A44&output_mode=Brief&ephem_step=1.1574074074074073e-05",
+      "queried_utc": "2026-11-15T02:13:42.127990+00:00",
+      "sha256": "d0c9e600b73aadfe93cf676121787a119f8e96f5615a80cbd319df9fcd85cff8",
+      "cache": false
+    },
+    "limitation": "Sin covarianza orbital publicada por MOST; paso solicitado de 1 s."
+  },
+  "separation_arcsec": 2.4960745252329413,
+  "note": "Comprobacion inicial con coordenadas MOST de inicio de exposicion. El contraste final al punto medio, y su diferencia de epoca, se documentan en most_evaluation.json y MOST_EVALUATION.md."
+}

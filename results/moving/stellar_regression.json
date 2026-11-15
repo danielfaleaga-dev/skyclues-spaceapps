@@ -1,0 +1,23 @@
+[
+  {
+    "case": "motion_barnard_d1",
+    "saved_outcome": "INSUFFICIENT_EVIDENCE",
+    "outcome": "INSUFFICIENT_EVIDENCE",
+    "unchanged": true,
+    "delta_arcsec": 0.0
+  },
+  {
+    "case": "motion_wise0855_d6",
+    "saved_outcome": "MOTION_MEASURED",
+    "outcome": "MOTION_MEASURED",
+    "unchanged": true,
+    "delta_arcsec": 0.0
+  },
+  {
+    "case": "motion_m101_d2_control",
+    "saved_outcome": "INSUFFICIENT_EVIDENCE",
+    "outcome": "INSUFFICIENT_EVIDENCE",
+    "unchanged": true,
+    "delta_arcsec": 0.0
+  }
+]

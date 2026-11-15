@@ -409,6 +409,27 @@ def presentation_key() -> str:
     return hashlib.sha256((_CSS + _BODY + _GLUE_JS).encode()).hexdigest()
 
 
+def observation_player(pngs: list[bytes], metadata: list[dict], legend: str, simple=False,
+                       animate=True) -> str:
+    """Shared transport/palette for other authentic time-series products in Time Explorer."""
+    if not pngs or len(pngs) != len(metadata):
+        raise ValueError('Imágenes y metadatos no coinciden')
+    css = _CSS % {'mask': render.MASK_COLOR, 'outside': render.OUTSIDE_COMMON_COLOR}
+    if simple:
+        css += '.badge .sub,.kbd:not(#pos),td:nth-child(n+3),th:nth-child(n+3){display:none}'
+    if not animate:
+        css += '#play,.box:has(#blink),.row:has(#fps){display:none}'
+    if len(pngs)==1:
+        css += '.transport,.row:has(#scrub){display:none}'
+    body = _BODY % {'legend': legend}
+    frames = ['data:image/png;base64,'+base64.b64encode(p).decode() for p in pngs]
+    glue = _GLUE_JS % {'frames':json.dumps(frames), 'meta':json.dumps(metadata)}
+    if not animate:
+        glue = glue.replace("P[act]();", "if (act === 'toggle') return; P[act]();")
+    return (f"<!doctype html><html><head><meta charset='utf-8'><style>{css}</style></head>"
+            f"<body>{body}<script>{PLAYER_CORE_JS}</script><script>{glue}</script></body></html>")
+
+
 def player_html(seq: TemporalSequence, pngs: list[bytes], subtract_zodi: bool = True,
                 restrict_to_common: bool = False, geometry: str = "exact", show_halo: bool = False, simple: bool = False) -> str:
     frames = ["data:image/png;base64," + base64.b64encode(p).decode() for p in pngs]
