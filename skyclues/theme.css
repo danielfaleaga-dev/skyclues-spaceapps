@@ -9,8 +9,8 @@
 .stApp:has(.sc-flag[data-view=time]){--sc-area:@@A_TIME@@}
 .stApp:has(.sc-flag[data-view=spectrum]){--sc-area:@@A_SPECTRUM@@}
 
-/* the astronomical plate: grain, a faint graticule, soft grey washes and a light vignette.
-   Decorative only: no stars and no values, so it can never be mistaken for data. */
+/* the astronomical plate: an invented, very faint negative star field, grain, soft grey washes and a
+   light vignette. Decorative only: no values; data views keep their own opaque backgrounds. */
 .stApp{background-color:var(--sc-paper);background-image:@@P_GRAIN@@,@@P_ARCS@@,
   radial-gradient(46vw 46vw at 8% 12%,rgba(20,20,20,.055),transparent 70%),
   radial-gradient(38vw 38vw at 92% 8%,rgba(20,20,20,.045),transparent 70%),
@@ -225,6 +225,8 @@ a:hover{color:var(--sc-ember);text-decoration-color:var(--sc-ember)}
 [data-testid="stDataFrame"]{border-radius:var(--sc-r);overflow:hidden}
 @keyframes sc-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .sc-view{animation:sc-in .2s ease}
+/* RGB composition: a fixed square chart scrolls inside its own box on narrow screens (never the page) */
+.st-key-mb_field_box{max-width:100%;overflow-x:auto;overflow-y:hidden}
 @media (max-width:900px){
   .sc-hero::after{width:70%;opacity:.4}
   .sc-steps{max-width:none}

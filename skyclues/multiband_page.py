@@ -130,8 +130,11 @@ def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel]
 
     left, right = st.columns([1.25, 1])
     with left:
-        st.altair_chart(mv.composite_chart(png, info, pixels, comp, target=target), width="stretch",
-                        key="mb_field")
+        # Fixed square chart (same arcsecond length on both axes); on a narrow screen it scrolls
+        # inside its own box instead of being scaled, which would misplace the pixel tooltips.
+        with st.container(key="mb_field_box"):
+            st.altair_chart(mv.composite_chart(png, info, pixels, comp, target=target), width="content",
+                            key="mb_field")
         st.caption((
             "Geometría WCS exacta: cada píxel nativo (12.9″) en su posición, sin remuestreo; norte arriba, este a la "
             "izquierda. Color solo donde los tres canales tienen datos. Rosa/morado con rayado blanco: valor no finito o NHITS = 0 en al "
@@ -145,6 +148,10 @@ def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel]
             st.markdown('Cambia los canales de arriba para explorar otras combinaciones.')
             if cov['fraccion_tres_canales'] < mb.COVERAGE_WARN_FRACTION:
                 st.warning('Solo parte de esta zona tiene datos en los tres colores. Prueba otros canales.')
+            if comp.display_stats()['poco_contraste']:
+                st.info('Con el mismo contraste, casi toda la zona se ve oscura: el cielo de fondo es mucho más tenue '
+                        'que sus puntos más brillantes. No es un fallo ni faltan datos. Para ver la forma en cada '
+                        'color, elige «Resaltar cada color».')
             if comp.stretch.degenerate:
                 st.info('Algún color es uniforme porque no cambia de brillo en esta zona.')
             if any(mb.striping_lines(c) for c in comp.channels.values()):

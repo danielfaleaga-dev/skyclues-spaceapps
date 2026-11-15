@@ -262,7 +262,64 @@ def test_flat_channel_is_reported_not_amplified(cube, grads):
     assert any('no tiene contraste' in w for w in comp.warnings)
 
 
-# 8 ------------------------------------------------------------------ several tiles
+def _faint_field_with_bright_spots(cube):
+    """Faint, nearly uniform background (~1 MJy/sr) plus 3 % of very bright pixels in the three
+    channels: the common 99.5th percentile is set by the spots, so the background is drawn dark."""
+    rng = np.random.default_rng(0)
+    base = {p: 1.0 + 0.05 * rng.standard_normal((32, 32)) for p in (NUMS[r] - 1 for r in mb.ROLES)}
+    spots = rng.random((32, 32)) < 0.03
+    for p in base:
+        base[p][spots] = 1000.0
+
+    def map_fn(ra, dec, fov, plane):
+        return synth_map(cube.tile, plane, base[plane], ra=ra, dec=dec, fov=fov)
+    return base, map_fn
+
+
+def test_common_scale_without_useful_contrast_is_measured_and_explained(cube):
+    base, map_fn = _faint_field_with_bright_spots(cube)
+    comp = build(cube, map_fn, 'comun')
+    ds = comp.display_stats()
+    # still ONE common physical scale; nothing replaced by three independent scales
+    assert len(set(comp.stretch.vmin.values())) == len(set(comp.stretch.vmax.values())) == 1
+    assert ds['poco_contraste'] and ds['fraccion_oscura'] >= mb.LOW_CONTRAST_FRACTION
+    assert ds['fraccion_blanca'] < 0.05                        # dark, not white
+    assert ds['n_pixeles'] == comp.coverage['tres_canales']
+    msg = [w for w in comp.warnings if 'poco contraste útil' in w]
+    assert len(msg) == 1 and 'Resaltar cada color' in msg[0] and 'no un fallo' in msg[0]
+    assert comp.provenance()['visualizacion'] == ds
+    for r in mb.ROLES:                                         # values never modified
+        np.testing.assert_array_equal(comp.maps[r].patches[0].image, base[NUMS[r] - 1])
+    # the same data with independent limits is not flagged (the flag describes the common scale)
+    ind = build(cube, map_fn, 'independiente')
+    assert not ind.display_stats()['poco_contraste']
+    assert not any('poco contraste útil' in w for w in ind.warnings)
+
+
+def test_well_spread_common_scale_is_not_flagged(cube, grads):
+    _, map_fn, _ = grads
+    comp = build(cube, map_fn, 'comun')
+    assert not comp.display_stats()['poco_contraste']
+    assert not any('poco contraste útil' in w for w in comp.warnings)
+
+
+def test_composite_chart_frame_does_not_depend_on_browser_width(cube, grads):
+    """Regression: the vertical domain was ``[-R*height/width, R*height/width]``; a chart created
+    while its column had no width got an infinite domain and drew nothing (blank image)."""
+    _, map_fn, _ = grads
+    comp = build(cube, map_fn, 'comun')
+    png, info = mv.composite_png(comp)
+    spec = mv.composite_chart(png, info, mv.pixel_table(comp), comp, target=cube.centre).to_dict()
+    text = json.dumps(spec)
+    assert 'height/width' not in text and '"container"' not in text
+    assert spec['width'] == spec['height']
+    R = info['half_arcsec']
+    domains = [enc['scale']['domain'] for layer in spec['layer']
+               for ch, enc in layer.get('encoding', {}).items() if ch in ('x', 'y') and 'scale' in enc]
+    assert domains and all(d == [-R, R] for d in domains)
+
+
+# 8------------------------------------------------------------------ several tiles
 def test_field_split_over_several_tiles(cube, grads):
     arrays, _, _ = grads
     other = sc.CubeTile(**{**cube.tile.to_dict(), 'ipix': 446})

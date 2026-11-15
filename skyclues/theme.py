@@ -4,8 +4,9 @@ Presentation only. Nothing in this module reads or changes observations, paramet
 
 Identity in one paragraph: a black-and-white page with ONE copper accent (``EMBER``, the colour of the
 field-of-view ring on the sky) used sparingly for selection, the active state and verdict marks. No
-greens, no blues. The page sits on a decorative "astronomical plate" (grain, a faint graticule, soft
-grey washes) that never contains stars or values. Few boxes: only the map, images, player and plots
+greens, no blues. The page sits on a decorative "astronomical plate": a faint, invented negative star
+field (dark points on light paper, as in printed sky surveys), grain and soft grey washes; it never
+carries values and every data view keeps its own opaque background. Few boxes: only the map, images, player and plots
 keep a container; everything else is text separated by hairlines. The three areas share the same
 graphite tone and are told apart by glyph and motif, not by colour. Headings and interface in IBM
 Plex Sans, every number in IBM Plex Mono. Styles live in ``theme.css``.
@@ -83,15 +84,54 @@ MOTIF = {
                      "<path d='M418 64v92' stroke='#c4411c' opacity='.8'/></svg>"),
 }
 
-#: The "astronomical plate" behind the page: a faint celestial graticule (meridians and parallels of an
-#: imaginary sphere, no stars, no values) and film grain. Purely decorative: it never carries information.
-PLATE_ARCS = _uri(
-    "<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000' viewBox='0 0 1600 1000' fill='none' "
-    "stroke='#141414' stroke-width='1'><g opacity='.05'><circle cx='1180' cy='560' r='520'/><circle cx='1180' cy='560' r='360'/>"
-    "<circle cx='1180' cy='560' r='200'/><ellipse cx='1180' cy='560' rx='520' ry='170'/><ellipse cx='1180' cy='560' "
-    "rx='520' ry='330'/><ellipse cx='1180' cy='560' rx='170' ry='520'/><ellipse cx='1180' cy='560' rx='330' ry='520'/>"
-    "<path d='M1180 20v1080M600 560h1160'/></g><g opacity='.035'><path d='M-40 190c260 90 560 100 820 20s470-200 880-130'/>"
-    "<path d='M-40 760c320-120 640-90 900 20s500 90 760-40'/></g></svg>")
+def _plate_stars(seed: int = 5461) -> str:
+    """A stylised NEGATIVE photographic plate (dark stars on light paper), as in printed sky surveys.
+
+    Deterministic (fixed seed) and invented: it is not any real region of the sky and never carries
+    information. Kept very faint so it reads as texture: many tiny points, a few medium ones, a handful
+    of bright stars with a soft halo and a thin ring, and one loose cluster with a diffuse glow."""
+    import math
+    import random
+
+    rnd = random.Random(seed)
+    W, H = 1600, 1000
+    dots = []
+
+    def dot(x, y, r, a):
+        dots.append(f"<circle cx='{x:.0f}' cy='{y:.0f}' r='{r:.2f}' opacity='{a:.2f}'/>")
+
+    for _ in range(620):                                    # faint field stars
+        dot(rnd.uniform(0, W), rnd.uniform(0, H), rnd.uniform(.6, 1.0), rnd.uniform(.2, .36))
+    for _ in range(110):                                    # medium stars
+        dot(rnd.uniform(0, W), rnd.uniform(0, H), rnd.uniform(1.1, 1.7), rnd.uniform(.32, .5))
+    # A loose cluster, low on the left: away from the header motif and its copper field-of-view ring,
+    # so it never looks like something "inside the field".
+    cx, cy = 300, 780
+    for _ in range(170):
+        d, t = abs(rnd.gauss(0, 95)), rnd.uniform(0, 2 * math.pi)
+        dot(cx + d * math.cos(t) * 1.25, cy + d * math.sin(t), rnd.uniform(.5, 1.35) * (1.25 if d < 60 else 1),
+            rnd.uniform(.2, .45))
+    bright = []
+    for x, y, r in ((210, 160, 2.6), (300, 690, 2.2), (760, 120, 1.9), (930, 820, 2.4), (1450, 640, 2.0),
+                    (1320, 905, 1.8), (560, 430, 1.7), (95, 905, 1.9)):
+        bright.append(f"<circle cx='{x}' cy='{y}' r='{r * 5.5:.1f}' fill='url(#h)'/>"
+                      f"<circle cx='{x}' cy='{y}' r='{r * 3.2:.1f}' fill='none' stroke='#141414' stroke-width='.7' "
+                      f"opacity='.10'/><circle cx='{x}' cy='{y}' r='{r}' opacity='.55'/>")
+    svg = ("<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000' viewBox='0 0 1600 1000' "
+           "preserveAspectRatio='xMidYMid slice'><defs>"
+           "<radialGradient id='h'><stop offset='0' stop-color='#141414' stop-opacity='.16'/>"
+           "<stop offset='1' stop-color='#141414' stop-opacity='0'/></radialGradient>"
+           "<radialGradient id='c'><stop offset='0' stop-color='#141414' stop-opacity='.05'/>"
+           "<stop offset='1' stop-color='#141414' stop-opacity='0'/></radialGradient></defs>"
+           f"<ellipse cx='{cx}' cy='{cy}' rx='330' ry='260' fill='url(#c)'/>"
+           f"<g fill='#141414' opacity='.72'>{''.join(dots)}{''.join(bright)}</g></svg>")
+    return _uri(svg)
+
+
+#: The "astronomical plate" behind the page: a stylised negative star field (invented, see
+#: ``_plate_stars``) and film grain. Purely decorative: it never carries information, and every map,
+#: image and plot keeps its own opaque background so it can never be mistaken for data.
+PLATE_ARCS = _plate_stars()
 PLATE_GRAIN = _uri(
     "<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%' height='100%'>"
     "<feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/>"

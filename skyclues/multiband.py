@@ -48,6 +48,13 @@ STRETCH_MODES = {
     "independiente": "límites propios de cada canal (percentiles 1–99.5, asinh)",
     "comun": "mismos límites en MJy/sr para los tres canales (percentiles 1–99.5 del conjunto, asinh)",
 }
+#: display intensity (0-1, after the stretch) below which a colour is practically black on screen.
+DARK_LEVEL = 0.10
+#: display intensity above which a colour is saturated (white when the three are).
+SATURATED_LEVEL = 0.99
+#: the common scale is reported as lacking useful contrast when at least this fraction of the
+#: field pixels has the three colours below DARK_LEVEL (presentation only; data are unchanged).
+LOW_CONTRAST_FRACTION = 0.50
 #: below this number of field pixels with data in the three channels the composition is refused.
 MIN_COMMON_PIXELS = 50
 #: warn when the pixels with data in the three channels are less than this fraction of the field.
@@ -194,6 +201,28 @@ class Composite:
             out[..., k][ok] = self.stretch.apply(r, p.image[ok])
         return out
 
+    def display_stats(self) -> dict:
+        """How the stretch renders the field pixels with data in the three channels (display only).
+
+        Per colour: fraction clipped to black (value <= vmin) and saturated (>= SATURATED_LEVEL).
+        Whole pixel: fraction practically black (three colours < DARK_LEVEL) and white (three
+        colours >= SATURATED_LEVEL). ``poco_contraste`` is True when the dark fraction reaches
+        LOW_CONTRAST_FRACTION. Measured on the same intensities that are drawn."""
+        parts = [self.rgb(i)[self.common_valid(i) & self.field_masks[i]] for i in range(len(self.patches))]
+        rgb = np.concatenate(parts) if parts else np.empty((0, 3))
+        n = len(rgb)
+        if not n:
+            return {"n_pixeles": 0, "recortado_a_negro": {}, "saturado": {}, "fraccion_oscura": 0.0,
+                    "fraccion_blanca": 0.0, "poco_contraste": False}
+        dark = float(np.mean(np.all(rgb < DARK_LEVEL, axis=1)))
+        return {"n_pixeles": n,
+                "recortado_a_negro": {r: float(np.mean(rgb[:, k] <= 0.0)) for k, r in enumerate(ROLES)},
+                "saturado": {r: float(np.mean(rgb[:, k] >= SATURATED_LEVEL)) for k, r in enumerate(ROLES)},
+                "fraccion_oscura": dark,
+                "fraccion_blanca": float(np.mean(np.all(rgb >= SATURATED_LEVEL, axis=1))),
+                "umbral_oscuro": DARK_LEVEL, "umbral_saturado": SATURATED_LEVEL,
+                "poco_contraste": self.stretch.mode == "comun" and dark >= LOW_CONTRAST_FRACTION}
+
     def provenance(self) -> dict:
         tiles = {}
         for ps in self.patches:
@@ -206,7 +235,7 @@ class Composite:
                             "lambda_um": c.wavelength_um, "lambda_min_um": c.wl_min_um, "lambda_max_um": c.wl_max_um,
                             "ancho_um": c.bandwidth_um, "R": c.resolving_power}
                         for r, c in self.channels.items()},
-            "escala": self.stretch.to_dict(),
+            "escala": self.stretch.to_dict(), "visualizacion": self.display_stats(),
             "alineacion": self.alignment, "cobertura": self.coverage,
             "remuestreo": "ninguno: los tres planos comparten la rejilla HEALPix nativa de cada tesela",
             "valores": "IMAGE original del cubo en MJy/sr (sin modificar); sin datos = NaN o NHITS = 0",
@@ -316,6 +345,13 @@ def _warnings(comp: Composite, samples: dict[str, np.ndarray]) -> list[str]:
             if own < lo + 0.05 * (hi - lo):
                 w.append(f"Escala común: el canal {ch[r].number} ({ROLE_NAMES[r]}) es mucho más débil que los demás "
                          "en MJy/sr y apenas aporta color; no significa que carezca de datos.")
+        ds = comp.display_stats()
+        if ds["poco_contraste"]:
+            w.append(f"Escala común con poco contraste útil: en el {ds['fraccion_oscura']:.0%} del campo los tres colores "
+                     f"quedan por debajo del {DARK_LEVEL:.0%} de la escala (casi negro), porque el cielo de fondo es "
+                     f"mucho más tenue en MJy/sr que los píxeles más brillantes que fijan el límite común "
+                     f"({lo:.4g}–{hi:.4g} MJy/sr). Es la consecuencia correcta de comparar intensidades físicas, no un "
+                     "fallo ni falta de datos. Para ver la forma en cada canal use «Resaltar cada color».")
     for r in st.degenerate:
         w.append(f"El canal {ch[r].number} ({ROLE_NAMES[r]}) no tiene contraste en el campo (percentiles iguales): "
                  "su componente de color es uniforme.")

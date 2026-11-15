@@ -2,6 +2,25 @@
 
 Última actualización: integración científica del 15-11-2026 (Claude Code A, rama `integration/science-v1`, copia `C:\Users\danie\Documents\SkyClues-integrated`). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md); las reglas visuales obligatorias están en [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md). La primera sección prevalece sobre el historial conservado debajo.
 
+## RGB «Mismo contraste» y fondo estelar — 15-11-2026 (rama `ux/redesign-v1`)
+
+- **Problema:** el panel RGB aparecía vacío (sin imagen ni círculo y sin marcas verticales) aunque los tres canales tenían datos.
+- **Causa comprobada:** era un fallo de renderizado, no de contraste. El dominio vertical era `[-R·height/width, R·height/width]`. Si el gráfico se creaba con la columna sin anchura, el dominio salía infinito y no se recalculaba. Se reprodujo en el navegador ocultando la columna durante el redibujado: 1,1 % de píxeles no blancos, frente al 81 % normal.
+- **Corrección:** gráfico cuadrado y fijo, con dominio ±R″ en ambos ejes. Después de corregirlo, la misma prueba da el 62 % en todas las alternancias.
+- **Física:** el diagnóstico con datos reales (`scripts/diagnose_rgb_contrast.py`, 14 casos, canales 88/47/21 y otras combinaciones) da como máximo un 0,2 % de píxeles blancos y un 3 % recortados a negro. La fracción casi negra va del 0 al 47 %, y llega al 89 % en campos tenues. La oscuridad es la consecuencia correcta de la escala común, que se conserva. Se añade `Composite.display_stats()` (solo de presentación) y el aviso de poco contraste en ambos niveles.
+- **Fondo:** la retícula se sustituye por un campo estelar en negativo, estilizado y tenue (ver `DESIGN_SYSTEM.md`).
+- **Comprobado en navegador** (puerto 8524, datos reales):
+  - Científico a 1400 px;
+  - Sencillo con el aviso en el campo tenue (268,22°, +4,53°);
+  - 375 px, sin desplazamiento horizontal de la página, con el gráfico desplazable en su caja;
+  - fondo en Región y Espectro.
+  
+  Evidencias en `results/rgb_contrast/`.
+- **Pruebas:** 3 nuevas en `tests/test_multiband.py`. La de regresión falla con el código anterior.
+- **Pendiente:**
+  - la vista «Un canal» (`spectral_view.py`) conserva el mismo dominio dependiente de la anchura y no se ha cambiado;
+  - en el móvil hay que desplazar el gráfico RGB para verlo entero.
+
 ## Integración científica — 15-11-2026 (Claude Code A, rama `integration/science-v1`)
 
 Dictamen **`PASS_WITH_LIMITATIONS`**. Informe: [`INTEGRATION_REPORT.md`](INTEGRATION_REPORT.md). Local, sin push ni despliegue.

@@ -134,8 +134,13 @@ def composite_chart(png: bytes, info: dict, pixels: pd.DataFrame, comp: mb.Compo
     import altair as alt
 
     R = info["half_arcsec"]
+    # Square plot with the same fixed extent on both axes: one arcsecond has the same length
+    # horizontally and vertically by construction. The frame never depends on the width the browser
+    # measures when the chart is created: a vertical domain derived from ``height/width`` became
+    # infinite (blank chart: no image, no circle, no vertical ticks) when the chart was built while
+    # its column had no width, and it was not recomputed afterwards.
     xs = alt.Scale(domain=[-R, R], reverse=True, nice=False, zero=False)
-    ys = alt.Scale(domain=alt.ExprRef(expr=f"[-{R}*height/width, {R}*height/width]"), nice=False, zero=False)
+    ys = alt.Scale(domain=[-R, R], nice=False, zero=False)
     tx, ty = "Desplazamiento al este (″) · este a la izquierda", "Desplazamiento al norte (″)"
     X, Y = alt.X("este:Q", scale=xs, title=tx), alt.Y("norte:Q", scale=ys, title=ty)
     uri = "data:image/png;base64," + base64.b64encode(png).decode()
@@ -164,8 +169,7 @@ def composite_chart(png: bytes, info: dict, pixels: pd.DataFrame, comp: mb.Compo
                                       opacity=0.6).encode(x=X, y=Y))
         layers.append(mark.mark_point(shape="cross", size=140, strokeWidth=1.8, filled=False, color="#ffffff").encode(
             x=X, y=Y, tooltip=[alt.Tooltip("m:N", title="marca")]))
-    return alt.layer(*layers).properties(width="container", height=size,
-                                         autosize=alt.AutoSizeParams(type="fit", contains="padding"))
+    return alt.layer(*layers).properties(width=size, height=size)
 
 
 def assignment_table(comp: mb.Composite) -> pd.DataFrame:
