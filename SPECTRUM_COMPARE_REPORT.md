@@ -104,7 +104,7 @@ M101 (objetivo del tutorial oficial de recortes de IRSA; tesela 2858), apertura 
 
 - **552 correctas, 1 fallo**, 9 min 11 s.
 - El único fallo es externo: `tests/test_motion_app.py::test_real_eps_ind_b_d3_reproduces_from_cached_originals` necesita el archivo Gaia de la ESA, que el 15-11-2026 devolvía `ConnectTimeout` (repetido tres veces con el mismo resultado). No toca código de esta fase y pasaba en la línea base del día anterior.
-- Antes del rebase, sobre la instantánea: 492 correctas y 3 fallos (ese mismo y los 2 heredados de la instantánea, que el commit `2cb02af` de la rama del rediseño ya corrige).
+- Antes del rebase, sobre la instantánea: 492 correctas y 3 fallos (ese mismo y los 2 heredados de la instantánea, que sobre la base actual ya pasan).
 - De esta fase: 41 sintéticas + 9 de interfaz + 3 con datos reales = **53 pruebas nuevas, todas correctas**. Lectura del cubo, máscaras, un canal, RGB, región y navegación: sin cambios y con sus pruebas en verde.
 
 ## 10. Rendimiento (medido en frío, caché vacía)
