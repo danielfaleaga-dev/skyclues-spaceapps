@@ -232,3 +232,150 @@ def test_joint_native_weak_signal_and_negative_tracks():
     assert any(t['candidate'] for t in joint['tests']),joint
     blank=[frame(shift=2*i-7,seed=50+i,flux=0,stars=False) for i in range(8)]
     assert not any(t['candidate'] for t in n.joint_signal(blank,[n.evaluate_frame(f,'compact') for f in blank])['tests'])
+
+
+# ----------------------------------------------------------------------------- measured motion (relay of Claude B)
+def with_outlier_flag(f,radius=1.6):
+    """The Level-2 pipeline flags an uncatalogued compact source as OUTLIER: reproduce that on the target."""
+    p=f.prediction
+    x,y=f.image.wcs.all_world2pix(p['ra'],p['dec'],0)
+    yy,xx=np.indices(f.image.image.shape)
+    f.image.outlier=np.hypot(xx-x,yy-y)<=radius
+    f.image.valid=lambda classes=None,ignore=():f.image.mask&(True if 'OUTLIER' in ignore else ~f.image.outlier)
+    return f
+
+
+def test_target_flagged_as_outlier_is_still_measured_and_reported():
+    f=with_outlier_flag(frame(stars=False))
+    r=n.evaluate_frame(f)
+    assert r['tests'][0]['candidate'] and r['tests'][0]['outlier_pixels_used']>0
+    p=n.locate(f)
+    assert p['measured'] and p['outlier_pixels_in_core']>0
+    assert np.hypot(*p['offset_from_prediction_arcsec'])<1.
+
+
+def test_strict_mask_alone_hides_an_outlier_flagged_target(monkeypatch):
+    """Documents the defect that hid 3I/ATLAS: with OUTLIER masked, the source's own core is removed."""
+    f=with_outlier_flag(frame(stars=False,flux=80))        # as bright as the comet was: S/N of a few tens
+    assert n.locate(f)['measured']
+    monkeypatch.setattr(n,'TARGET_IGNORED_FLAGS',set())
+    assert not n.locate(f)['measured']
+    assert not n.evaluate_frame(f,'compact')['tests'][0].get('candidate')
+
+
+def test_motion_of_outlier_flagged_target_is_observed_with_strict_stars():
+    a,b=with_outlier_flag(frame(shift=-12)),with_outlier_flag(frame(shift=12,seed=2))
+    r=n.assess([a,b],.2)
+    assert r['observed_motion'] and r['status']=='observed'
+    m=r['motion']
+    assert abs(m['displacement_arcsec']-24*6.15)<3 and m['control_stars']>=4
+    assert m['catalogue_comparison']['difference_arcsec']<3
+    assert all(e['analysis']['position_measured']['measured'] for e in r['frames'])
+
+
+def test_positions_do_not_need_the_same_wavelength_but_stacks_do():
+    a,b=frame(shift=-12),frame(shift=12,seed=2)
+    b.row['lambda_um']=1.60
+    r=n.assess([a,b],.2)
+    assert not r['compatible'] and not r['stack_allowed']
+    assert r['observed_motion']
+
+
+def test_different_detectors_are_not_compared_for_disappearance():
+    a,b=frame(shift=-12),frame(shift=12,seed=2)
+    b.row['detector']=5
+    r=n.assess([a,b],.2)
+    assert not r['observed_motion'] and 'Detectores distintos' in r['motion_reason']
+
+
+@pytest.mark.parametrize('shift',[0,1,2])
+def test_shift_below_three_pixels_is_never_observed_motion(shift):
+    a,b=frame(shift=0),frame(shift=shift,seed=2)
+    r=n.assess([a,b],.2)
+    assert not r['observed_motion']
+
+
+def test_faint_source_gives_no_position_and_states_why():
+    p=n.locate(frame(flux=20,stars=False))
+    assert not p['measured'] and 'S/N' in p['reason']
+
+
+def test_single_epoch_signal_is_not_motion():
+    a,b=frame(shift=-12),frame(shift=12,seed=2,flux=0)
+    r=n.assess([a,b],.2)
+    assert not r['observed_motion'] and sum(p['measured'] for p in r['motion']['positions'])==1
+
+
+def test_too_few_common_stars_keeps_the_signal_as_candidate():
+    a,b=frame(shift=-12,stars=False),frame(shift=12,seed=2,stars=False)
+    r=n.assess([a,b],.2)
+    assert not r['observed_motion'] and 'estrellas comunes' in r['motion_reason']
+
+
+def test_misregistered_stars_block_the_claim():
+    a,b=frame(shift=-12),frame(shift=12,seed=2)
+    yy,xx=np.indices(b.image.image.shape)
+    rng=np.random.default_rng(5)
+    data=rng.normal(0,1,b.image.image.shape)+10
+    data+=4000/(2*np.pi)*np.exp(-((xx-102)**2+(yy-90)**2)/2)
+    # every star lands several pixels away, each in a different direction: no consistent registration
+    for (x,y),(dx,dy) in zip([(35,35),(75,35),(120,35),(145,65),(145,125),(115,145),(60,140),(30,110)],
+                             [(2.9,0),(-2.9,0),(0,2.9),(0,-2.9),(2.1,2.1),(-2.1,-2.1),(2.1,-2.1),(-2.1,2.1)]):
+        data+=3000/(2*np.pi)*np.exp(-((xx-x-dx)**2+(yy-y-dy)**2)/2)
+    b.image.image=data
+    r=n.assess([a,b],.2)
+    assert not r['observed_motion']
+
+
+def motion_row(i,ra,detector=1,margin=200,dt=.01):
+    return {'url':f'synthetic://{detector}/{i}','obs_id':f'S{i}','detector':detector,'mjd':60000+i*dt,
+            'collection':'SYNTHETIC','version':'1',
+            'margin_px':margin,'lambda_um':1.+.02*i,'bandwidth_um':.03,'prediction':{'ra':ra,'dec':0.}}
+
+
+def test_motion_groups_need_shared_sky_a_real_separation_and_one_detector():
+    step=30/3600                                   # 30 arcsec between consecutive exposures
+    rows=[motion_row(i,10+i*step) for i in range(4)]
+    g=s.motion_groups(rows)
+    assert len(g)==1 and [r['obs_id'] for r in g[0]]==['S0','S1','S2','S3']
+    assert s.motion_groups([motion_row(0,10),motion_row(1,10+5/3600)])==[]          # 5 arcsec: not separable
+    assert s.motion_groups([motion_row(0,10),motion_row(1,10.5)])==[]               # no shared sky
+    assert s.motion_groups([motion_row(0,10),motion_row(1,10+step,detector=2)])==[]  # two detectors
+    assert s.motion_groups([motion_row(0,10),motion_row(1,10+step,margin=3)])==[]    # target at the detector edge
+
+
+def test_motion_groups_keep_both_ends_of_the_baseline_and_ignore_wavelength():
+    step=20/3600
+    rows=[motion_row(i,10+i*step) for i in range(12)]
+    g=s.motion_groups(rows,max_frames=8)[0]
+    assert len(g)==8 and g[0]['obs_id']=='S0' and g[-1]['obs_id']=='S11'
+    assert not all(s.compatible(a,b) for a in g for b in g)       # different channels are welcome here
+
+
+def saturated(f,radius=1.3):
+    p=f.prediction
+    x,y=f.image.wcs.all_world2pix(p['ra'],p['dec'],0)
+    yy,xx=np.indices(f.image.image.shape)
+    f.image.mask=f.image.mask&(np.hypot(xx-x,yy-y)>radius)       # the core is unusable (overflow), the wings are not
+    return f
+
+
+def test_saturated_bright_body_is_measured_from_its_wings_with_a_one_pixel_floor():
+    a,b=saturated(frame(shift=-12,flux=400000)),saturated(frame(shift=12,seed=2,flux=400000))
+    pa=n.locate(a)
+    assert pa['measured'] and pa['morphology']=='saturated' and pa['masked_core_pixels']>0
+    assert pa['error_arcsec']>=6.15
+    r=n.assess([a,b],.2)
+    assert r['observed_motion'] and abs(r['motion']['displacement_arcsec']-24*6.15)<6.15
+
+
+def test_faint_source_with_masked_core_is_not_measured():
+    p=n.locate(saturated(frame(flux=80,stars=False)))
+    assert not p['measured'] and 'alas de la PSF no es fiable' in p['reason']
+
+
+def test_fixed_view_is_centred_between_both_ends_of_the_track():
+    a,b=frame(shift=-12),frame(shift=12,seed=2)
+    ra,dec=n.track_centre([a,b])
+    x,y=a.image.wcs.all_world2pix(ra,dec,0)
+    assert abs(x-90)<.05 and abs(y-90)<.05

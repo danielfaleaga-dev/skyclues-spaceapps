@@ -12,7 +12,9 @@ from astropy.time import Time
 
 from . import moving_sources as sources, non_sidereal as ns, moving_view, player, theme
 
-BANDS={'Continuo · 1,0–1,5 µm':(1.,1.5),'CO₂ · 4,23–4,28 µm':(4.23,4.28),'Todas las bandas':(.7,5.1)}
+MOTION='Movimiento · fechas próximas sobre el mismo cielo'
+BANDS={MOTION:None,'Continuo · 1,0–1,5 µm':(1.,1.5),'CO₂ · 4,23–4,28 µm':(4.23,4.28),'Todas las bandas':(.7,5.1)}
+FOLLOW,FIXED='Seguir al objeto','Fondo estelar fijo'
 
 
 def pipeline_key():
@@ -47,7 +49,8 @@ def analyse(identity_json,rows_json,fov,pipeline):
 @st.cache_data(show_spinner=False,max_entries=12)
 def display(identity_json,rows_json,fov,pipeline,follow,simple,animate,presentation):
     frames,_=prepare(identity_json,rows_json,fov,pipeline)
-    return moving_view.build(frames,fov,follow,simple,animate)
+    positions=analyse(identity_json,rows_json,fov,pipeline)['motion']['positions']
+    return moving_view.build(frames,fov,follow,simple,animate,positions)
 
 
 def _select(identity,ij,fov):
@@ -76,13 +79,23 @@ def _select(identity,ij,fov):
     if d.get('reference_warning'):
         st.warning('La tabla de referencia no respondió. Se usarán las posiciones de MOST por exposición, con su procedencia explícita.')
     st.caption(f"{len(d['rows'])} exposiciones encontradas · NASA/IPAC IRSA")
-    band=st.selectbox('Longitudes de onda',list(BANDS),key=theme.bind('moving_band',next(iter(BANDS))),
-                      on_change=theme.keep,args=('moving_band',))
-    gs=sources.groups(d['rows'],*BANDS[band])
+    motion_sets=sources.motion_groups(d['rows'])
+    # Measuring a displacement is the first choice whenever the archive allows it.
+    band=st.selectbox('Qué comparar',list(BANDS),key=theme.bind('moving_band',MOTION if motion_sets else list(BANDS)[1]),
+                      on_change=theme.keep,args=('moving_band',),
+                      help='Movimiento: imágenes del mismo detector tomadas con horas de diferencia, que comparten cielo. '
+                           'Las bandas agrupan imágenes de la misma longitud de onda para comparar brillo.')
+    gs=motion_sets if band==MOTION else sources.groups(d['rows'],*BANDS[band])
     if not gs:
-        st.info('Hay exposiciones, pero ninguna en este intervalo de longitudes de onda. Elija otra banda.');return
+        st.info('No hay imágenes lo bastante próximas en el tiempo para medir un desplazamiento. Elija una banda o amplíe las fechas.'
+                if band==MOTION else
+                'Hay exposiciones, pero ninguna en este intervalo de longitudes de onda. Elija otra banda.');return
     def label(i):
         g=gs[i]
+        if band==MOTION:
+            t=[Time(r['mjd'],format='mjd').isot[:16].replace('T',' ') for r in g]
+            lam=sorted(r['lambda_um'] for r in g)
+            return f"{len(g)} imágenes · {t[0]} → {t[-1][-5:] if t[0][:10]==t[-1][:10] else t[-1]} UTC · D{g[0]['detector']} · {lam[0]:.2f}–{lam[-1]:.2f} µm"
         dates=[Time(r['mjd'],format='mjd').isot[:10] for r in g]
         return f"{len(g)} {'imágenes' if len(g)>1 else 'imagen'} · {dates[0]}"+(' → '+dates[-1] if len(g)>1 else '')+f" · D{g[0]['detector']} · {g[0]['lambda_um']:.3f} µm"
     group_key='moving_group_'+str(identity['spkid'])+'_'+band+'_'+start.isoformat()+'_'+end.isoformat()
@@ -134,28 +147,47 @@ def render(region,scientific=False):
     st.caption('SPHEREx '+', '.join(releases))
     if any(f.row['collection']=='spherex_qr2' for f in frames):
         st.warning('Producto QR2 anterior: esta consulta no encontró un reemplazo DR1 para estas exposiciones.')
-    st.write(report['motion_reason'] if scientific else
-             'La señal aún debe confirmarse. La cruz marca una posición prevista.'
-             if not report['observed_motion'] else 'Las imágenes muestran un desplazamiento medido frente a estrellas comunes.')
+    motion=report['motion']
+    motion_set=st.session_state.get('opt_moving_band')==MOTION
+    if report['observed_motion']:
+        minutes=motion['interval_hours']*60
+        theme.facts([
+            ('Desplazamiento medido',f"{motion['displacement_arcsec']:.0f}″",f"± {motion['error_arcsec']:.0f}″"),
+            ('Intervalo',f"{minutes:.0f} min" if minutes<180 else f"{motion['interval_hours']:.1f} h",''),
+            ('Ritmo aparente',f"{motion['rate_arcsec_per_hour']:.0f}″/h",'sobre el cielo, visto desde SPHEREx'),
+            ('Estrellas de control',str(motion['control_stars']),f"no se mueven: ≤ {motion['control_radius_arcsec']:.1f}″")])
+        st.write(motion['reason'] if scientific else
+                 'El objeto aparece en un lugar en la primera imagen y en otro en la última, y ya no está donde estaba: '
+                 'se ha movido respecto a las estrellas.')
+    else:
+        st.write(report['motion_reason'] if scientific or motion.get('pair') else
+                 'La señal aún debe confirmarse. La cruz marca una posición prevista.')
     common=report['common_valid_fraction']
-    views=['Seguir al objeto','Fondo estelar fijo'] if common>=.3 and len(frames)>1 and report['compatible'] else ['Seguir al objeto']
-    if theme.persistent('moving_view','Seguir al objeto') not in views:
-        st.session_state['opt_moving_view']='Seguir al objeto'
-    view=(st.radio('Representación',views,horizontal=True,key=theme.bind('moving_view','Seguir al objeto'),
-                   on_change=theme.keep,args=('moving_view',)) if len(views)>1 else views[0])
+    # A fixed-star view needs shared sky, not a shared wavelength: positions are comparable, brightness is not.
+    views=[FIXED,FOLLOW] if common>=.3 and len(frames)>1 and (motion_set or report['compatible']) else [FOLLOW]
+    view_key='moving_view_motion' if motion_set else 'moving_view'
+    default=FIXED if motion_set and FIXED in views else FOLLOW
+    if theme.persistent(view_key,default) not in views:
+        st.session_state['opt_'+view_key]=FOLLOW
+    view=(st.radio('Representación',views,horizontal=True,key=theme.bind(view_key,default),
+                   on_change=theme.keep,args=(view_key,)) if len(views)>1 else views[0])
     notes=[]
     if len(frames)>1 and common<.3:
         notes.append('Las imágenes no comparten suficiente cielo para comparar un fondo fijo.')
     if not report['compatible']:
-        st.warning('La calibración de los FITS revela bandas incompatibles: se revisan por separado, sin animación ni apilamiento.')
-    if any(any(s['separation_arcsec']<12 for s in f.row.get('stellar_context',{}).get('nearby',[])) for f in frames):
+        notes.append('Las imágenes son de longitudes de onda distintas: su posición es comparable, su brillo no.'
+                     if motion_set else
+                     'La calibración de los FITS revela bandas incompatibles: se revisan por separado, sin animación ni apilamiento.')
+    if not report['observed_motion'] and any(any(s['separation_arcsec']<12 for s in
+                                                 f.row.get('stellar_context',{}).get('nearby',[])) for f in frames):
         notes.append('Hay estrellas próximas que podrían confundirse con el objeto.')
     if notes:
         st.warning(' '.join(notes))
     with theme.loading('Alineando las exposiciones para visualizarlas…','moving_render'):
-        animate=(len(frames)>1 and report['compatible'] and
-                 all(f['analysis']['status']=='candidate' for f in report['frames']))
-        html=display(*selection,view=='Seguir al objeto',not scientific,animate,player.presentation_key())
+        seen=[f['analysis']['status']=='candidate' or (f['analysis'].get('position_measured') or {}).get('measured')
+              for f in report['frames']]
+        animate=len(frames)>1 and all(seen) and (report['compatible'] or report['observed_motion'])
+        html=display(*selection,view==FOLLOW,not scientific,animate,player.presentation_key())
     components.html(html,height=760,scrolling=True)
     if len(frames)>1 and not animate:
         st.caption('Revisión por fechas: alguna imagen no aporta señal suficiente para una animación. Use Anterior / Siguiente.')
@@ -165,14 +197,30 @@ def render(region,scientific=False):
             with st.expander('Señal débil: combinación de mediciones nativas'):
                 st.json(report['joint_signal'])
         table=[]
-        for f,r in zip(frames,report['frames']):
+        for f,r,m in zip(frames,report['frames'],motion['positions']):
             p=f.prediction
+            off=m.get('offset_from_prediction_arcsec') or [None,None]
             table.append({'exposición':f.row['obs_id'],'fecha UTC':Time(f.row['mjd'],format='mjd').isot,
                           'detector':f.row['detector'],'λ (µm)':f.row['lambda_um'],'Δλ (µm)':f.row['bandwidth_um'],
                           'liberación':f.row['collection'],'calibración':f.row['version'],
-                          'RA prevista':p['ra'],'Dec prevista':p['dec'],'observador':p['observer'],
-                          'estado':ns.LABELS[r['analysis']['status']]})
+                          'RA prevista':p['ra'],'Dec prevista':p['dec'],
+                          'RA medida':m.get('ra'),'Dec medida':m.get('dec'),'S/N':m.get('snr'),
+                          'medida − prevista E (″)':off[0],'medida − prevista N (″)':off[1],
+                          'píxeles OUTLIER usados':m.get('outlier_pixels_in_core'),
+                          'observador':p['observer'],'estado':ns.LABELS[r['analysis']['status']],
+                          'sin posición medida':m.get('reason','')})
         st.dataframe(pd.DataFrame(table),hide_index=True,width='stretch')
+        if motion.get('pair'):
+            with st.expander('Medición del movimiento: pruebas y controles'):
+                st.write(motion['reason'])
+                st.json({k:motion[k] for k in ('pair','registration_arcsec','control_radius_arcsec','control_stars',
+                         'control_stars_rejected','measured_displacement_arcsec','error_arcsec','significance',
+                         'rate_arcsec_per_hour','position_angle_deg','catalogue_comparison') if k in motion})
+                st.caption('La posición se ajusta en los píxeles de cada imagen (PSF oficial), partiendo de la prevista. '
+                           'El objeto debe aparecer en su posición y haber desaparecido de ella en la otra imagen del mismo '
+                           'detector. El registro usa estrellas comunes, con la máscara estricta. En el objeto se admiten '
+                           'píxeles OUTLIER: la cadena oficial marca así las fuentes compactas ausentes de su catálogo. '
+                           'La efeméride se compara al final y no interviene en la decisión.')
         st.caption(f'Campo solicitado: {fov*60:.1f}′. Contexto descargado para fondos/controles: {max(fov,.25)*60:.1f}′. '
                    f'Cobertura válida común: {common:.1%}. Cada posición corresponde a su exposición. '
                    'Las incertidumbres orbitales no publicadas permanecen desconocidas, nunca cero.')

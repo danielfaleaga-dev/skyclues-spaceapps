@@ -271,3 +271,42 @@ def stellar_context(row):
     return {'nearby':sorted(nearby,key=lambda x:x['separation_arcsec']), 'truncated':truncated,
             'provenance':provenance,'note':'Gaia DR3, movimiento angular propagado desde J2016.0; '
             'sin paralaje ni comparación fotométrica con infrarrojo. No excluye fuentes ausentes de Gaia.'}
+
+
+def _separation_deg(a, b):
+    from .geometry import separation_deg
+    return float(separation_deg(a['prediction']['ra'], a['prediction']['dec'],
+                                b['prediction']['ra'], b['prediction']['dec']))
+
+
+def motion_groups(rows, context_deg=.25, max_frames=8, min_margin_px=12.):
+    """Exposures suited to MEASURING a displacement, for any body and at any wavelength.
+
+    Same detector; predicted positions far enough apart to be told from one stationary source
+    (at least 20 arcsec) yet close enough for every exposure to contain the sky where the body
+    was in the others (0.35 of the downloaded context), so the appear/disappear test and the
+    registration with common stars are possible. Spectral compatibility is NOT required: a
+    position is not a brightness. Predictions only choose which exposures to read.
+    """
+    limit = .35 * context_deg
+    out, used = [], set()
+    by_detector = {}
+    for r in rows:
+        if r.get('margin_px', 0) >= min_margin_px:
+            by_detector.setdefault(r['detector'], []).append(r)
+    for detector, members in by_detector.items():
+        members.sort(key=lambda r: r['mjd'])
+        for i, seed in enumerate(members):
+            if seed['url'] in used:
+                continue
+            group = [seed] + [r for r in members[i+1:] if _separation_deg(seed, r) <= limit]
+            if len(group) < 2 or _separation_deg(group[0], group[-1]) * 3600 < 20:
+                continue
+            if len(group) > max_frames:            # keep both ends of the time baseline
+                head = max_frames // 2
+                group = group[:head] + group[-(max_frames - head):]
+            used.update(r['url'] for r in group)
+            out.append(group)
+    # Shorter wavelengths first: the PSF is sharper there, so positions are better defined and faint
+    # neighbours blend less. Then more exposures and a longer displacement. Nothing is object-specific.
+    return sorted(out, key=lambda g: (g[0]['detector'], -len(g), -_separation_deg(g[0], g[-1]), g[0]['mjd']))

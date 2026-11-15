@@ -24,3 +24,22 @@ Productos SPHEREx DR1 L2b v27. Las coordenadas son predicciones por exposición,
 M101 es un campo estacionario real de control: una señal candidata en él no identifica un cuerpo móvil. Los FITS de ese control ya formaban parte de las referencias del proyecto.
 
 Las imágenes de CO₂ de agosto se analizan por separado porque no cumplen la compatibilidad espectral. La corrección temporal de MOST se aplicó nuevamente a Vesta, Plutón y 29P; se preservan los informes finales de esa repetición.
+
+## Movimiento medido (15-11-2026)
+
+Secuencias elegidas por `moving_sources.motion_groups`: mismo detector, horas o días de diferencia, cielo común. Cada informe guarda las posiciones medidas, las pruebas de aparición/desaparición, las estrellas de control y la comparación final con la efeméride. Figuras `*_first.png` y `*_second.png`: las dos imágenes de la medida sobre el mismo fondo estelar.
+
+| Informe | Objeto | Exposiciones | Resultado |
+|---|---|---|---|
+| [atlas_aug_motion_d1](atlas_aug_motion_d1.json) | 3I/ATLAS | 2025W32_2D_0343_1–4, 0355_1–3 (D1) | Movimiento observado: 165,8″ ± 2,7″ en 99 min |
+| [atlas_aug_motion_co2](atlas_aug_motion_co2.json) | 3I/ATLAS | 2025W32_2D_0189_1–4, 0201_1–3 (D5) | Movimiento observado: 156,1″ ± 4,4″ en 95 min |
+| [atlas_aug_motion_d2](atlas_aug_motion_d2.json) | 3I/ATLAS | 2025W32_2D_0189_1–4, 0201_1–4 (D2) | No demostrado: posiciones a menos de tres píxeles |
+| [atlas_dec_motion_d2](atlas_dec_motion_d2.json) | 3I/ATLAS | 2025W50_2A_0685_1–4, 0698_1–4 (D2) | Movimiento observado: 293,9″ ± 4,4″ en 101 min |
+| [atlas_dec_motion_co2](atlas_dec_motion_co2.json) | 3I/ATLAS | las mismas exposiciones, D5 | Movimiento observado: 293,9″ ± 4,4″ en 101 min |
+| [pluto_motion](pluto_motion.json) | Plutón | 2025-10-06 → 10-12 (D1) | Movimiento observado: 50,2″ ± 4,9″ en 148,3 h |
+| [pluto_motion_d3](pluto_motion_d3.json) | Plutón | 2025-09-25 → 10-07 (D3) | Movimiento observado: 247,0″ ± 4,4″ en 265,7 h |
+| [juno_motion](juno_motion.json) | 3 Juno | 2025-07-13 → 07-14 (D1) | Movimiento observado: 214,8″ ± 8,7″ en 24,4 h |
+| [vesta_motion](vesta_motion.json), [vesta_motion_d2](vesta_motion_d2.json) | 4 Vesta | 2025-07-08 (D1), 2025-06-28/29 (D2) | No evaluable: núcleo saturado |
+| [stationary_m101](stationary_m101.json) | Control M101 | cuatro épocas de referencia | Sin movimiento |
+
+Resumen completo, con los seis controles de predicción desplazada: [motion_validation_summary.json](motion_validation_summary.json). Las filas de la tabla superior conservan los informes de la primera validación, hechos con la máscara estricta y parejas de la misma longitud de onda.

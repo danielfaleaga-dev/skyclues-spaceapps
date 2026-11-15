@@ -20,7 +20,21 @@ import astropy.units as u
 from . import archive, fitsdata, motion, moving_sources
 from .geometry import gnomonic
 
-METHOD = 'non-sidereal 1.0'
+METHOD = 'non-sidereal 1.1'
+#: Flags ignored ONLY where the target itself is measured. The Level-2 pipeline marks as OUTLIER
+#: ("Pixel flagged by Detect Outliers") compact sources that are not in its reference catalogue
+#: (SOURCE = "Pixel mapped to a known source"): a moving body is, by construction, such a source.
+#: With the strict mask its own core is removed and nothing can be measured. Background, controls'
+#: sky and stationary stars keep the strict mask; the number of OUTLIER pixels used is reported.
+TARGET_IGNORED_FLAGS = {'OUTLIER'}
+SEARCH_PX = 2.5                 # the fit starts at the prediction and may move this far (native px)
+MIN_POSITION_SNR = 8.
+POSITION_FLOOR_PX = {'compact': .3, 'extended': .5, 'saturated': 1.}   # undersampled PSF: no finer claim
+MIN_WING_SNR = 30.              # a saturated or masked core is measured from the PSF wings only if this bright
+MIN_SEPARATION_PX = 3.          # closer positions cannot be told apart from one stationary source
+MIN_SHIFT_PX = 2.               # an observed displacement never rests on sub-pixel precision
+ABSENT_FRACTION = .5            # "gone": less than half the flux, at 3 sigma
+MIN_COMMON_STARS = 4
 LABELS = {'predicted': 'Posición prevista', 'candidate': 'Señal candidata',
           'observed': 'Movimiento observado', 'unevaluable': 'No evaluable', 'no_coverage': 'Sin cobertura'}
 SCALES_ARCSEC = (12., 24., 48., 96.)
@@ -63,6 +77,11 @@ def world_to_pixel(wcs,ra,dec):
         else:
             xy[list(bad)]=np.nan
         return xy[:,0].reshape(ra.shape),xy[:,1].reshape(dec.shape)
+
+
+def target_valid(img):
+    """Usable pixels for measuring the moving target (strict mask, OUTLIER allowed)."""
+    return img.valid(('unusable','artifact'),TARGET_IGNORED_FLAGS)
 
 
 def inside(img,x,y):
@@ -135,11 +154,13 @@ def _measure(img, x, y, radius, compact=False):
     ann=(rr>=max(1.6*r,5))&(rr<=max(2.5*r,8))
     data=(img.image-img.zodi)[y0:y1,x0:x1]
     var=img.variance[y0:y1,x0:x1]
-    ok=img.valid()[y0:y1,x0:x1]&np.isfinite(data)&np.isfinite(var)&(var>0)
+    finite=np.isfinite(data)&np.isfinite(var)&(var>0)
+    ok=img.valid()[y0:y1,x0:x1]&finite                  # sky and controls: strict mask
+    ok_ap=target_valid(img)[y0:y1,x0:x1]&finite         # the tested aperture: OUTLIER allowed
     fy,fx=np.mgrid[int(y)-h:int(y)+h+2,int(x)-h:int(x)+h+2]
     fr=np.hypot(fx-x,fy-y)
     expected=int(np.sum(fr<=r))
-    coverage=float(np.sum(ap&ok)/max(expected,1))
+    coverage=float(np.sum(ap&ok_ap)/max(expected,1))
     expected_ann=int(np.sum((fr>=max(1.6*r,5))&(fr<=max(2.5*r,8))))
     if coverage<.8 or np.sum(ann&ok)<max(30,.65*expected_ann):
         return {'evaluable':False,'coverage':min(coverage,1.),'reason':'apertura o fondo con cobertura insuficiente'}
@@ -153,7 +174,7 @@ def _measure(img, x, y, radius, compact=False):
         if bg.sum()<30:
             return {'evaluable':False,'reason':'fondo contaminado o insuficiente'}
     cov=np.linalg.pinv(a[bg].T@a[bg])*scatter**2
-    support=ap&ok
+    support=ap&ok_ap
     noise=np.maximum(var,scatter**2)
     psf_description=None
     if compact:
@@ -167,9 +188,9 @@ def _measure(img, x, y, radius, compact=False):
         psf_description=psf.description
     else:
         weights=support.astype(float)
-    flux=float(np.sum(np.where(ok,resid,0)*weights))
+    flux=float(np.sum(np.where(ok_ap,resid,0)*weights))
     sensitivity=np.sum(a*weights[...,None],axis=(0,1))
-    err=math.sqrt(float(np.sum(np.where(ok,noise,0)*weights**2)+sensitivity@cov@sensitivity))
+    err=math.sqrt(float(np.sum(np.where(ok_ap,noise,0)*weights**2)+sensitivity@cov@sensitivity))
     lam=img.wavelength_um[y0:y1,x0:x1][support]
     bw=img.bandwidth_um[y0:y1,x0:x1][support]
     spread=float(np.ptp(lam)/np.median(bw)) if len(lam) else np.inf
@@ -177,7 +198,7 @@ def _measure(img, x, y, radius, compact=False):
             'response':flux,'error':err,'snr':flux/err,'background':float(beta[0]),
             'background_scatter':scatter,'background_pixels':int(bg.sum()),
             'coverage':min(coverage,1.),'spectral_span_bw':spread,'radius_arcsec':radius,
-            'psf':psf_description,'x':x,'y':y}
+            'psf':psf_description,'x':x,'y':y,'outlier_pixels_used':int(np.sum(support&~ok))}
 
 
 def evaluate_frame(frame, morphology='both'):
@@ -235,6 +256,15 @@ def grid(ra,dec,fov,scale=6.15):
     w.wcs.ctype=['RA---TAN','DEC--TAN'];w.wcs.crval=[ra,dec]
     w.wcs.crpix=[(n+1)/2,(n+1)/2];w.wcs.cdelt=[-scale/3600,scale/3600]
     return w,(n,n)
+
+
+def track_centre(frames):
+    """Sky midpoint between the first and last predicted positions: a fixed-star view centred here
+    shows both ends of the track whenever the displacement fits in the field. Display only."""
+    a,b=frames[0].prediction,frames[-1].prediction
+    mid=SkyCoord(a['ra']*u.deg,a['dec']*u.deg).cartesian+SkyCoord(b['ra']*u.deg,b['dec']*u.deg).cartesian
+    c=SkyCoord(mid)
+    return float(c.ra.deg),float(c.dec.deg)
 
 
 def requested_field(shape,fov):
@@ -335,6 +365,8 @@ def assess(frames,fov,morphology='both',progress=None):
         report['status']='candidate'
     log('Comprobando posiciones medidas y controles del fondo estelar…')
     report['motion'] = measure_motion(frames,results)
+    for entry,position in zip(report['frames'],report['motion']['positions']):
+        entry['analysis']['position_measured']=position
     if report['motion']['observed']:
         report.update(status='observed',observed_motion=True,motion_reason=report['motion']['reason'])
     else:
@@ -387,87 +419,233 @@ def joint_signal(frames,results):
     return out
 
 
-def _compact_position(img,x,y):
-    """Shared ePSF primitive only, independently gated for this morphology.
+# ----------------------------------------------------------------------------- measured motion
+# The decision is made from pixels only:
+#   1. a position is fitted in every exposure, starting at the prediction (which only locates the test);
+#   2. the source must be GONE from that same sky position in another exposure of the same detector,
+#      and the other exposure's source must be gone from this one (a star stays, a moving body does not);
+#   3. both exposures are registered with stars they share, measured with the same fit;
+#   4. the displacement between the two measured positions must be significant and larger than two
+#      native pixels and than the scatter of those stars.
+# Wavelengths do not have to match: a position is not a brightness. The prediction is compared with
+# the measurement only at the end.
 
-    Neither the stellar seasons/detector nor its thresholds are changed. A diffuse
-    aperture response never enters this astrometric test.
-    """
-    if img.meta.get('FINAST')!=0:
-        return None
+def _fit_position(img,x,y,usable,max_shift=SEARCH_PX):
+    """Free-position ePSF fit near (x, y); None when nothing measurable is there."""
+    flags=getattr(img,'flags',None)
+    saturation=None
+    if flags is not None and getattr(img,'flag_defs',None) is not None:
+        from .quality import SATURATION
+        saturation=(flags&img.flag_defs.names_bitmask(SATURATION))!=0
     psf=motion.psf_for(img,x,y)
-    fit=motion.fit_psf(img.image-img.zodi,img.variance,img.valid(),psf,x,y,max_shift=2.)
-    if (not fit or fit['snr']<8 or fit['chi2_red']>3 or fit['n_masked_core'] or
-            not fit['converged']):
+    fit=motion.fit_psf(img.image-img.zodi,img.variance,usable,psf,x,y,max_shift=max_shift,saturation=saturation)
+    if fit is not None:
+        fit['psf']=psf.description
+    return fit
+
+
+def _fixed_flux(img,x,y,usable,half=4,wings=False):
+    """PSF amplitude and constant sky at a FIXED position (weighted least squares). (flux, error) or None."""
+    data,var=img.image-img.zodi,img.variance
+    ny,nx=data.shape
+    if not np.isfinite(x+y):
         return None
+    xi,yi=int(round(x)),int(round(y))
+    if xi-half<0 or yi-half<0 or xi+half>=nx or yi+half>=ny:
+        return None
+    ys,xs=np.mgrid[yi-half:yi+half+1,xi-half:xi+half+1]
+    m=usable[ys,xs]&np.isfinite(data[ys,xs])&np.isfinite(var[ys,xs])&(var[ys,xs]>0)
+    core=np.hypot(xs-x,ys-y)<=1.5
+    if m.sum()<40 or ((core&~m).any() and not wings):      # wings=True: a saturated core is fitted from its wings
+        return None
+    p=motion.psf_for(img,x,y)(xs[m]-x,ys[m]-y)
+    a=np.column_stack([p,np.ones_like(p)])
+    w=1/var[ys,xs][m]
+    try:
+        cov=np.linalg.inv(a.T@(a*w[:,None]))
+    except np.linalg.LinAlgError:
+        return None
+    beta=cov@(a.T@(data[ys,xs][m]*w))
+    resid=data[ys,xs][m]-a@beta
+    scale=max(1.,float(np.sum(resid**2*w)/max(m.sum()-2,1)))      # never more optimistic than the residuals
+    return float(beta[0]),float(math.sqrt(cov[0,0]*scale))
+
+
+def locate(frame):
+    """Where the source IS in this exposure, from its pixels. The prediction only starts the fit."""
+    img=frame.image
+    out={'measured':False,'obs_id':frame.row.get('obs_id'),'mjd':frame.row.get('mjd')}
+    x0,y0=target_pixel(frame)
+    if not inside(img,x0,y0):
+        return {**out,'reason':'La posición prevista cae fuera de la imagen.'}
+    if img.meta.get('FINAST')!=0:
+        return {**out,'reason':'Astrometría oficial no fina (FINAST ≠ 0): la posición no se mide.'}
+    fit=_fit_position(img,x0,y0,target_valid(img))
+    if fit is None:
+        return {**out,'reason':'Sin fuente medible junto a la posición prevista (borde, máscara o ajuste sin solución).'}
+    if not fit['converged']:
+        return {**out,'reason':'El ajuste de la posición no converge.','snr':fit['snr']}
+    wings=bool(fit['n_masked_core'] or fit['saturated_core'])
+    if wings and fit['snr']<MIN_WING_SNR:
+        return {**out,'reason':'Núcleo saturado o enmascarado: el ajuste con las alas de la PSF no es fiable '
+                               f"(S/N {fit['snr']:.1f} < {MIN_WING_SNR:g}, χ² reducido {fit['chi2_red']:.0f}). "
+                               'No se mide la posición.','snr':fit['snr'],'chi2_red':fit['chi2_red']}
+    if fit['snr']<MIN_POSITION_SNR:
+        return {**out,'reason':f"Señal insuficiente para medir una posición (S/N {fit['snr']:.1f} < {MIN_POSITION_SNR:g}).",
+                'snr':fit['snr']}
+    scale=pixel_scale(img)
+    kind='saturated' if wings else 'compact' if fit['chi2_red']<=3 else 'extended'
+    fit_err=math.sqrt(float(np.max(np.linalg.eigvalsh(np.array(fit['cov_px'])))))
     ra,dec=img.wcs.all_pix2world(fit['x'],fit['y'],0)
-    # Conservative native-pixel floor; no subpixel precision claim for this prototype.
-    err=max(pixel_scale(img),pixel_scale(img)*math.sqrt(np.max(np.linalg.eigvalsh(fit['cov_px']))))
-    return {'ra':float(ra),'dec':float(dec),'error_arcsec':err,'fit':fit}
+    p=frame.prediction
+    east,north=gnomonic(float(ra),float(dec),p['ra'],p['dec'])
+    ys,xs=np.indices(img.image.shape)
+    core=np.hypot(xs-fit['x'],ys-fit['y'])<=1.5
+    strict=img.valid()
+    flags=getattr(img,'flags',None)
+    known=None
+    if flags is not None and getattr(img,'flag_defs',None) is not None:
+        known=int(((flags&img.flag_defs.names_bitmask({'SOURCE'}))!=0)[core].sum())
+    return {**out,'measured':True,'ra':float(ra),'dec':float(dec),'x':fit['x'],'y':fit['y'],
+            'flux':fit['flux'],'flux_err':fit['flux_err'],'snr':fit['snr'],'chi2_red':fit['chi2_red'],
+            'morphology':kind,'psf':fit['psf'],
+            'error_arcsec':scale*max(POSITION_FLOOR_PX[kind],fit_err),'fit_error_arcsec':scale*fit_err,
+            'offset_from_prediction_arcsec':[float(east*3600),float(north*3600)],
+            'outlier_pixels_in_core':int((core&~strict&target_valid(img)).sum()),
+            'known_source_pixels_in_core':known,'masked_core_pixels':int(fit['n_masked_core']),
+            'note':('Núcleo saturado o enmascarado: posición medida con las alas de la PSF, con un error mínimo de '
+                    'un píxel. ' if wings else '')+'Posición medida en los píxeles. La predicción solo sitúa la búsqueda.'}
 
 
-def measure_motion(frames,results):
-    out={'observed':False,'positions':[],'controls':[],
-         'reason':'Sin dos posiciones compactas medidas y controles estacionarios comunes, el movimiento no está demostrado.'}
-    for f,result in zip(frames,results):
-        compact=next((r for r in result['tests'] if r['morphology']=='compact'),{})
-        stars=f.row.get('stellar_context',{})
-        confused=any(s['separation_arcsec']<12 for s in stars.get('nearby',[]))
-        p=_compact_position(f.image,*target_pixel(f)) if compact.get('candidate') and not confused else None
-        out['positions'].append(p)
-    chosen=[i for i,p in enumerate(out['positions']) if p]
-    if len(chosen)<2:
-        return out
-    ia,ib=chosen[0],chosen[-1]
-    a,b=frames[ia],frames[ib]
-    if not moving_sources.compatible(a.row,b.row):
-        out['reason']='Las dos posiciones no pertenecen a bandas y calibraciones compatibles.';return out
-    pa,pb=out['positions'][ia],out['positions'][ib]
-    for origin,other,measured in ((a,b,pa),(b,a,pb)):
-        x,y=world_to_pixel(other.image.wcs,measured['ra'],measured['dec'])
-        if inside(other.image,float(x),float(y)):
-            old=_compact_position(other.image,float(x),float(y))
-            separation=SkyCoord(pa['ra']*u.deg,pa['dec']*u.deg).separation(SkyCoord(pb['ra']*u.deg,pb['dec']*u.deg)).arcsec
-            if old and separation>3*pixel_scale(other.image):
-                out['reason']='Persiste una fuente en la misma posición del cielo: posible contaminación estelar.'
-                return out
-    # Match isolated image sources in sky coordinates. Predictions only EXCLUDE
-    # the target zone; they do not set the measured shift or registration.
-    sources=motion.detect_sources(a.image,threshold=12)[:60]
-    controls=[]
+def _gone(pos,origin,other):
+    """Is the source measured in ``origin`` absent from the same sky position in ``other``?"""
+    x,y=world_to_pixel(other.image.wcs,pos['ra'],pos['dec'])
+    x,y=float(x),float(y)
+    here=_fixed_flux(origin.image,pos['x'],pos['y'],target_valid(origin.image),wings=pos['morphology']=='saturated')
+    there=_fixed_flux(other.image,x,y,target_valid(other.image)) if inside(other.image,x,y) else None
+    if here is None or there is None:
+        return {'testable':False,'reason':'La otra imagen no cubre esa posición del cielo con píxeles válidos.'}
+    f0,e0=here
+    f1,e1=there
+    return {'testable':True,'flux_here':f0,'flux_there':f1,'error_there':e1,
+            'absent':bool(f1+3*e1<ABSENT_FRACTION*f0),'persistent':bool(f1-3*e1>ABSENT_FRACTION*f0),
+            'ratio':f1/f0 if f0>0 else None}
+
+
+def _common_stars(a,b,exclude):
+    """Stars seen in both exposures, fitted with the same ePSF and the STRICT mask: (east, north) of b − a."""
+    shifts=[]
+    sources=motion.detect_sources(a.image,threshold=12)[:80]
     for s in sources:
-        sep=min(SkyCoord(s['ra']*u.deg,s['dec']*u.deg).separation(
-            SkyCoord(f.prediction['ra']*u.deg,f.prediction['dec']*u.deg)).arcsec for f in (a,b))
-        if sep<120:
+        if any(SkyCoord(s['ra']*u.deg,s['dec']*u.deg).separation(SkyCoord(r*u.deg,d*u.deg)).arcsec<40 for r,d in exclude):
             continue
         if any(t is not s and math.hypot(t['x']-s['x'],t['y']-s['y'])<4 for t in sources):
             continue
         x,y=world_to_pixel(b.image.wcs,s['ra'],s['dec'])
         if not inside(b.image,float(x),float(y)):
             continue
-        c1=_compact_position(a.image,s['x'],s['y']);c2=_compact_position(b.image,float(x),float(y))
-        if not c1 or not c2:
+        fa=_fit_position(a.image,s['x'],s['y'],a.image.valid(),2.)
+        fb=_fit_position(b.image,float(x),float(y),b.image.valid(),2.)
+        if not all(f and f['snr']>=8 and f['converged'] and not f['n_masked_core'] for f in (fa,fb)):
             continue
-        dx,dy=gnomonic(c2['ra'],c2['dec'],c1['ra'],c1['dec'])
-        controls.append([float(dx*3600),float(dy*3600)])
-        if len(controls)>=12:
+        ra1,dec1=a.image.wcs.all_pix2world(fa['x'],fa['y'],0)
+        ra2,dec2=b.image.wcs.all_pix2world(fb['x'],fb['y'],0)
+        dx,dy=gnomonic(float(ra2),float(dec2),float(ra1),float(dec1))
+        shifts.append([float(dx*3600),float(dy*3600)])
+        if len(shifts)>=16:
             break
-    out['controls']=controls
-    if len(controls)<4:
-        out['reason']='No hay cuatro estrellas comunes medibles para verificar el registro; se conserva la señal como candidata.'
+    return shifts
+
+
+def measure_motion(frames,results=None):
+    """Observed motion of one source between two exposures, or the precise reason why not."""
+    positions=[locate(f) for f in frames]
+    out={'observed':False,'positions':positions,'controls':[],'pairs':[],'method':METHOD,
+         'reason':'Sin dos posiciones medidas en los píxeles, el movimiento no está demostrado.'}
+    located=[i for i,p in enumerate(positions) if p['measured']]
+    if len(located)<2:
+        why=[p['reason'] for p in positions if not p['measured']]
+        if why:
+            out['reason']+=' '+why[0]
         return out
-    c=np.array(controls);shift=np.median(c,axis=0)
-    residual=c-shift
-    control_radius=float(np.max(np.linalg.norm(residual,axis=1)))
-    if control_radius>2*max(pixel_scale(a.image),pixel_scale(b.image)):
-        out['reason']='Registro inconsistente entre las estrellas de control.';return out
+    pairs=[]
+    for n,i in enumerate(located):
+        for j in located[n+1:]:
+            a,b,pa,pb=frames[i],frames[j],positions[i],positions[j]
+            sep=SkyCoord(pa['ra']*u.deg,pa['dec']*u.deg).separation(SkyCoord(pb['ra']*u.deg,pb['dec']*u.deg)).arcsec
+            pair={'first':i,'second':j,'separation_arcsec':float(sep),'dt_days':float(b.row['mjd']-a.row['mjd']),
+                  'same_detector':a.row.get('detector')==b.row.get('detector')}
+            scale=max(pixel_scale(a.image),pixel_scale(b.image))
+            if not pair['same_detector']:
+                pair['status']='Detectores distintos: no se comparan brillos de la misma posición.'
+            elif sep<MIN_SEPARATION_PX*scale:
+                pair['status']='Posiciones demasiado próximas para distinguirlas de una fuente fija.'
+            else:
+                pair['first_in_second']=_gone(pa,a,b)
+                pair['second_in_first']=_gone(pb,b,a)
+                t1,t2=pair['first_in_second'],pair['second_in_first']
+                if t1.get('persistent') or t2.get('persistent'):
+                    pair['status']='Persiste una fuente en la misma posición del cielo: posible contaminación estelar.'
+                elif not (t1['testable'] and t2['testable']):
+                    pair['status']='Sin cielo común para comprobar que la fuente no es estacionaria.'
+                elif t1['absent'] and t2['absent']:
+                    pair['status']='ok'
+                else:
+                    pair['status']='La desaparición de la fuente en la otra fecha no es concluyente.'
+            pairs.append(pair)
+    out['pairs']=pairs
+    good=[p for p in pairs if p['status']=='ok']
+    # The longest baseline whose two positions pass the appear/disappear test; otherwise the longest pair
+    # is still registered and reported, so a non-detection carries its numbers and its cause.
+    chosen=max(good or pairs,key=lambda p:(abs(p['dt_days']),p['separation_arcsec']))
+    a,b=frames[chosen['first']],frames[chosen['second']]
+    pa,pb=positions[chosen['first']],positions[chosen['second']]
+    out['pair']=chosen
+    if chosen['status']!='ok':
+        out['reason']=chosen['status']
+    predictions=[(f.prediction['ra'],f.prediction['dec']) for f in (a,b)]+[(p['ra'],p['dec']) for p in (pa,pb)]
+    controls=_common_stars(a,b,predictions)
+    out['controls']=controls
+    if len(controls)<MIN_COMMON_STARS:
+        if chosen['status']=='ok':
+            out['reason']=(f'No hay {MIN_COMMON_STARS} estrellas comunes medibles para verificar el registro; '
+                           'se conserva la señal como candidata.')
+        return out
+    c=np.array(controls)
+    shift=np.median(c,axis=0)
+    resid=np.linalg.norm(c-shift,axis=1)
+    scale=max(pixel_scale(a.image),pixel_scale(b.image))
+    keep=resid<=max(3*1.4826*np.median(resid),.5*scale)          # one robust pass: blends and mismatches
+    if keep.sum()>=MIN_COMMON_STARS:
+        shift=np.median(c[keep],axis=0)
+        resid=np.linalg.norm(c[keep]-shift,axis=1)
+    control_radius=float(resid.max())
     dx,dy=gnomonic(pb['ra'],pb['dec'],pa['ra'],pa['dec'])
     disp=np.array([dx*3600,dy*3600])-shift
+    size=float(np.linalg.norm(disp))
     err=math.sqrt(pa['error_arcsec']**2+pb['error_arcsec']**2+control_radius**2)
-    sig=float(np.linalg.norm(disp)/err)
+    hours=abs(chosen['dt_days'])*24
     out.update(registration_arcsec=shift.tolist(),control_radius_arcsec=control_radius,
-               measured_displacement_arcsec=disp.tolist(),error_arcsec=err,significance=sig,
-               observed=bool(sig>=5 and np.linalg.norm(disp)>3*control_radius),
-               reason='Desplazamiento medido de una respuesta compacta, tras registro con estrellas comunes.' if sig>=5 and
-                    np.linalg.norm(disp)>3*control_radius else 'Desplazamiento no significativo frente a los controles y errores.')
+               control_stars=int(len(resid)),control_stars_rejected=int((~keep).sum()),
+               measured_displacement_arcsec=disp.tolist(),displacement_arcsec=size,error_arcsec=err,
+               significance=size/err,interval_hours=hours,
+               rate_arcsec_per_hour=size/hours if hours>0 else None,
+               position_angle_deg=float(np.degrees(np.arctan2(disp[0],disp[1]))%360))
+    px,py=gnomonic(b.prediction['ra'],b.prediction['dec'],a.prediction['ra'],a.prediction['dec'])
+    predicted=np.array([px*3600,py*3600])
+    out['catalogue_comparison']={
+        'predicted_displacement_arcsec':predicted.tolist(),
+        'difference_arcsec':float(np.linalg.norm(disp-predicted)),
+        'difference_sigma':float(np.linalg.norm(disp-predicted)/err),
+        'note':'Comparación posterior con la efeméride. No interviene en la medida ni en la decisión.'}
+    if control_radius>2*scale:
+        out['reason']='Registro inconsistente entre las estrellas de control.'
+        return out
+    if chosen['status']!='ok':
+        return out
+    significant=size/err>=5 and size>3*control_radius and size>=MIN_SHIFT_PX*scale
+    out['observed']=bool(significant)
+    out['reason']=('La fuente aparece en su posición en cada imagen y ha desaparecido de ella en la otra; el '
+                   'desplazamiento se midió en los píxeles tras registrar ambas imágenes con estrellas comunes.'
+                   if significant else 'Desplazamiento no significativo frente a los controles y errores.')
     return out

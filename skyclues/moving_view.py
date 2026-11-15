@@ -9,7 +9,7 @@ from . import non_sidereal as ns, player, render
 
 
 @render.serialized
-def frame_png(frame,fov,norm,centre=None):
+def frame_png(frame,fov,norm,centre=None,measured=None):
     img=frame.image
     p=frame.prediction
     centre=centre or (p['ra'],p['dec'])
@@ -20,7 +20,13 @@ def frame_png(frame,fov,norm,centre=None):
     fig=Figure(figsize=(6.8,6.6),dpi=110,facecolor='white')
     ax=fig.add_axes([.12,.16,.80,.77])
     ax.set_facecolor('#f2eaf5')
-    data=np.where(img.valid(),img.image-img.zodi,np.nan)
+    shown=img.valid()
+    if measured and measured.get('measured'):
+        # The measured source itself: its pixels carry the pipeline's OUTLIER flag (uncatalogued compact
+        # source). They are drawn with their real values only here, where they were measured.
+        py,px=np.indices(img.shape)
+        shown=shown|(ns.target_valid(img)&(np.hypot(px-measured['x'],py-measured['y'])<=3))
+    data=np.where(shown,img.image-img.zodi,np.nan)
     rgba=render.native_rgba(data,norm)
     render.draw_native(ax,(sx,sy),rgba,shape)
     ax.add_patch(Circle(((shape[1]-1)/2,(shape[0]-1)/2),fov*3600/6.15/2,
@@ -28,6 +34,12 @@ def frame_png(frame,fov,norm,centre=None):
     tx,ty=w.all_world2pix(p['ra'],p['dec'],0)
     if -.5<=tx<shape[1]-.5 and -.5<=ty<shape[0]-.5:
         ax.plot(tx,ty,'+',color='#c4411c',ms=12,mew=1.4)
+    if measured and measured.get('measured'):
+        # Ring = where the source IS in these pixels; the cross is only where it was expected.
+        mx,my=w.all_world2pix(measured['ra'],measured['dec'],0)
+        if -.5<=mx<shape[1]-.5 and -.5<=my<shape[0]-.5:
+            ax.add_patch(Circle((mx,my),3.4,fill=False,edgecolor='#14171c',linewidth=2.4))
+            ax.add_patch(Circle((mx,my),3.4,fill=False,edgecolor='white',linewidth=1.1))
     ticks=np.linspace(0,shape[0]-1,5)
     ax.set_xticks(ticks,[f'{(t-(shape[1]-1)/2)*-6.15:.0f}' for t in ticks])
     ax.set_yticks(ticks,[f'{(t-(shape[0]-1)/2)*6.15:.0f}' for t in ticks])
@@ -40,18 +52,23 @@ def frame_png(frame,fov,norm,centre=None):
     return render.figure_png(fig)
 
 
-def build(frames,fov,follow=True,simple=True,animate=True):
+def build(frames,fov,follow=True,simple=True,animate=True,positions=None):
     # Normalization only over the requested displayed field, not extra sky context.
     arrays,_,_=ns.aligned(frames,fov,follow)
     norm=render.shared_norm(arrays,lo=5,hi=99)
     p0=frames[0].prediction
-    pngs=[frame_png(f,fov,norm,None if follow else (p0['ra'],p0['dec'])) for f in frames]
+    positions=positions or [None]*len(frames)
+    fixed=ns.track_centre(frames)
+    pngs=[frame_png(f,fov,norm,None if follow else fixed,m) for f,m in zip(frames,positions)]
     meta=[{'i':i,'date':Time(f.row['mjd'],format='mjd').isot[:19].replace('T',' ')+' UTC',
            'dt_days':f.row['mjd']-frames[0].row['mjd'],'obs_id':f.row['obs_id'],
            'collection':f.row['collection'],'detector':f.row['detector'],
            'lambda_um':f.row['lambda_um'],'valid_pct':float(np.isfinite(arrays[i])[ns.requested_field(arrays[i].shape,fov)].mean()*100),
            'file':f.row['url'].rsplit('/',1)[-1]} for i,f in enumerate(frames)]
-    legend=('Cruz terracota: posición prevista, no detección. Rosa: píxeles enmascarados; lila: sin cobertura. '
+    legend=('Cruz terracota: posición prevista, no detección. '
+            +('Anillo blanco: posición medida en los píxeles; dentro se muestran los píxeles del objeto que la cadena '
+               'oficial marca como atípicos por no estar en su catálogo. ' if any(m and m.get('measured') for m in positions) else '')
+            +'Rosa: píxeles enmascarados; lila: sin cobertura. '
             +('Cada imagen sigue la posición prevista del objeto.' if follow else 'Fondo fijo según WCS.')+
             ' Imágenes originales, misma escala de brillo; sin suavizado.' )
     return player.observation_player(pngs,meta,legend,simple,animate)
