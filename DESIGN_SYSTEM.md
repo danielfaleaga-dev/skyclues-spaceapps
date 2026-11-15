@@ -69,6 +69,31 @@ No aplicar una pantalla opaca a absolutamente todo. Decisión explícita del usu
 - Sencillo conserva el estado, fechas y avisos esenciales de confusión/cobertura. Científico añade λ, detector, calibración, fondo, máscaras, controles, originales y reporte. Las advertencias de la misma selección se agrupan, no se convierten en múltiples paneles permanentes.
 - Cargas con `theme.loading`, fases reales y sin porcentajes inventados. Cachés de análisis/render incluyen la versión del código dependiente para evitar resultados obsoletos después de cambios de implementación. Conservar filtros, fechas y resultados al cambiar de nivel o navegar.
 
+## Espectro: «¿Qué podría indicar este espectro?»
+
+- Una sola sección dentro de Espectro, después del análisis de picos y valles y antes de la calidad de los canales. No es un explorador nuevo. Mismos datos, veredicto y referencias en los dos niveles: el nivel solo cambia cuánto se explica.
+- Cinco veredictos fijos, con `theme.badge`:
+  - «Referencia compatible»;
+  - «Varias referencias compatibles»;
+  - «Coincidencia insuficientemente respaldada»;
+  - «Ninguna referencia compatible»;
+  - «No evaluable».
+  
+  Tonos del tema: `sc-ok` para los dos primeros, `sc-warn` para la coincidencia insuficiente y neutro para los otros dos. No hay porcentajes ni puntuaciones, porque no existe un modelo calibrado que los respalde.
+- Sin selección, una fila por pico o valle con su veredicto y un botón «Examinar» que fija el mismo intervalo que el inspector. Con selección, cada espectro (A y B) se explica por separado, nunca su diferencia.
+- **Sencillo:** tres frases, en este orden:
+  1. qué observamos («Detectamos un exceso de emisión cerca de 3,3 µm»);
+  2. qué podría representar, siempre en condicional y nombrando las alternativas;
+  3. «Qué impide estar seguros».
+  
+  Nunca escribir «hemos encontrado X». Sin tablas.
+- **Científico:** `theme.facts` con λ observada, detector y R, z con su fuente, y la clase del dato. Debajo, una tabla con estas columnas: Referencia, Tipo, λ en reposo, λ esperada, Canal previsto, Compatibilidad, z para la que se mantiene, Motivo. «Qué impide la certeza» se muestra siempre. Condiciones, confusiones, bibliografía, método y biblioteca van en plegables.
+- Marcas de referencia en el gráfico: interruptor apagado por defecto y persistente entre niveles (`opt_sx_refs`).
+  - Cada marca es una regla vertical punteada, fina y gris; se resaltan en terracota las referencias que coinciden con la selección.
+  - Solo esas llevan una etiqueta, que es única y combinada (p. ej. «PAH 3,3 · Pfδ»). Las demás muestran su nombre solo en el tooltip.
+  - No se dibujan bandas ni perfiles inventados.
+- Un desplazamiento al rojo solo se muestra con su fuente (NED y la galaxia cuya isofota contiene la apertura). Si no se conoce, se dice «desconocido» y se compara en reposo.
+
 ## Implementación y comprobación
 
 Puntos compartidos: `theme.py`, `region_component.css`, `region_component.js`, `player.py`. Reutilizar antes de crear variantes. Los iframes necesitan estilos propios coherentes porque no heredan el tema.

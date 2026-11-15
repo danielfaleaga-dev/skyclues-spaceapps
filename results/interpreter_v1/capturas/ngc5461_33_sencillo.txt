@@ -1,0 +1,172 @@
+Skip to main content
+SkyClues
+SPHEREX · IRSA
+
+Región
+
+Tiempo
+
+Espectro
+
+Sencillo
+
+Científico
+
+coordenadas elegidas
+RA
+210.923546°
+DEC
++54.319916°
+CAMPO
+6.0′
+Explora esta zona en distintos colores infrarrojos. Para comparar fechas, abre «Tiempo».
+
+Imagen infrarroja
+
+Un canal
+
+Composición multibanda (RGB)
+
+ELIGE UN COLOR INFRARROJO
+
+◀
+
+63 · 3.293 µm
+
+1 · 0.753 µm
+
+102 · 4.988 µm
+
+▶
+
+−180
+−160
+−140
+−120
+−100
+−80
+−60
+−40
+−20
+0
+20
+40
+60
+80
+100
+120
+140
+160
+180
+Desplazamiento al este (″) · este a la izquierda
+−80
+−60
+−40
+−20
+0
+20
+40
+60
+80
+Desplazamiento al norte (″)
+
+Al pulsar la imagen eliges
+
+Punto A
+
+Punto B
+
+Pulsa la imagen para elegir un punto. Rosa: sin datos.
+
+LONGITUD DE ONDA
+3.29 µm
+canal 63 de 102
+PÍXELES CON DATOS
+100%
+del campo en este canal
+
+POSICIÓN DEL ESPECTRO
+
+El rombo naranja marca el punto elegido.
+
+Obtener el espectro en esta posición
+
+La luz del punto elegido
+0.8
+1.0
+1.2
+1.4
+1.6
+1.8
+2.0
+2.2
+2.4
+2.6
+2.8
+3.0
+3.2
+3.4
+3.6
+3.8
+4.0
+4.2
+4.4
+4.6
+4.8
+5.0
+Longitud de onda (µm)
+0
+10
+20
+30
+40
+Flujo en apertura (mJy)
+D1
+D2
+D3
+D4
+D5
+D6
+PAH 3,3 · Pfδ
+▽
+▽
+▼
+▼
+▼
+▼
+sin precaución
+OVERFLOW/OUTLIER en la apertura
+
+Para comparar con otro punto, elige «Punto B» junto a la imagen y púlsala.
+
+LO QUE HAS SEÑALADO · 3,293 µm (CANAL 63)
+
+Quitar
+
+A — pico: un 191% más brillante que los colores vecinos. Se distingue con claridad.
+
+Un pico o un valle no identifica por sí solo un material.
+
+Señalado en el gráfico (▼ pico, ▲ valle): A: pico en 0.95 µm, pico en 1.10 µm, pico en 1.86 µm, pico en 3.29 µm, pico en 4.08 µm, pico en 4.67 µm.
+
+¿QUÉ PODRÍA INDICAR ESTE ESPECTRO?
+
+Mostrar en el gráfico dónde caen las referencias
+
+A · Varias referencias compatibles
+
+Detectamos un exceso de emisión cerca de 3,3 µm. Podría relacionarse con compuestos aromáticos de carbono (PAH), aunque otras emisiones cercanas, como la del hidrógeno ionizado (línea Pfund δ), también pueden contribuir.
+
+Por qué: Su posición coincide con la que tendría esa luz, una vez corregida la velocidad a la que se aleja la galaxia M101 (NGC 5457). Moléculas de carbono con forma de anillos que brillan en este color cuando las ilumina la luz ultravioleta de estrellas jóvenes.
+
+Qué impide estar seguros: SPHEREx no separa colores tan próximos. Un pico o un valle no basta para identificar un material.
+
+Cuanto más alto el punto, más luz en ese color infrarrojo. Marcas rosas: sin datos.
+
+Vista orientativa: los picos por sí solos no identifican materiales.
+
+keyboard_arrow_right
+
+Compartir esta región
+
+Datos: SPHEREx · NASA/IPAC IRSA.

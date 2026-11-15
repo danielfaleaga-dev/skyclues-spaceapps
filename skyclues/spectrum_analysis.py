@@ -17,12 +17,13 @@ from . import config, theme
 from . import spectral_features as sf
 from . import spectral_quality as sq
 from . import spectral_view as sv
+from . import spectrum_interpretation as sxi
 
 POINTS = ["Punto A", "Punto B"]
 DERIVED = {"Diferencia A − B": "diferencia", "Relación A / B": "relacion"}
 B_KEY, INSPECT_KEY, CHART_KEY = "sx_b", "sx_inspect", "sx_spectrum_chart"
 RANK = {sf.QUANTIFIABLE: 3, sf.VISIBLE: 2, sf.NO_FEATURE: 1, sf.NOT_EVALUABLE: 0}
-BADGE = {sf.QUANTIFIABLE: "ok", sf.VISIBLE: "warn", sf.NOT_EVALUABLE: "", sf.NO_FEATURE: ""}
+BADGE = {sf.QUANTIFIABLE: "sc-ok", sf.VISIBLE: "sc-warn", sf.NOT_EVALUABLE: "", sf.NO_FEATURE: ""}  # theme.py classes
 
 
 # ----------------------------------------------------------------------------- the two positions
@@ -266,9 +267,12 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
         # The band drawn is the interval reported for the feature (half height); without one, what was selected.
         focus = ((ref.lam_lo, ref.lam_hi) if ref.lam_lo is not None and ref.klass in (sf.QUANTIFIABLE, sf.VISIBLE)
                  else (float(sa.lam_min[sa.index(ref.trial_lo)]), float(sa.lam_max[sa.index(ref.trial_hi)])))
+    # What the features could indicate (each spectrum on its own): read from the results above, never recomputed.
+    interp = sxi.build({"A": spec_a, **({"B": spec_b} if sb is not None else {})}, pairs, quals, found)
 
     st.altair_chart(sv.spectrum_chart(spec_a, quantity, selected_channel=channel_number, other=spec_b,
-                                      features=fa + fb, focus=focus, interactive=True),
+                                      features=fa + fb, focus=focus, interactive=True,
+                                      references=sxi.chart_marks(interp)),
                     width="stretch", key=CHART_KEY, on_select=_on_select, selection_mode=["canal", "intervalo"])
 
     # ------------------------------------------------------------ A and B
@@ -356,6 +360,7 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
                 f"- **Oscilaciones no señaladas** (máximos y mínimos locales por debajo de los criterios): {small}.\n"
                 "- **Qué no es:** ni una detección ni una identificación. Un pico cerca de una banda conocida no "
                 f"demuestra esa banda. Método: {m['metodo']}.")
+    sxi.render(interp, sci, INSPECT_KEY)
     _quality_section(quals, sci)
 
 

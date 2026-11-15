@@ -1,6 +1,44 @@
 # SkyClues — estado del proyecto
 
-Última actualización: relevo de Claude Code B del 15-11-2026 sobre `redesign/unified-region` (detector no sideral). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md); las reglas visuales obligatorias están en [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md). La primera sección prevalece sobre el historial conservado debajo.
+Última actualización: intérprete físico de espectros V1, 15-11-2026 (Claude Code A, rama `feature/spectral-physical-interpreter-v1`, sin integrar). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md); las reglas visuales obligatorias están en [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md). La primera sección prevalece sobre el historial conservado debajo.
+
+## Espectro: «¿Qué podría indicar este espectro?» (intérprete físico V1) — 15-11-2026 (Claude Code A, rama `feature/spectral-physical-interpreter-v1`, sin integrar)
+
+- **Qué hace:** compara cada pico o valle ya señalado por el analizador con seis referencias documentadas:
+  - H₂O hielo 3,0 µm;
+  - PAH 3,3 µm;
+  - H I Pfund δ 3,297 µm;
+  - H I Brackett α 4,052 µm;
+  - CO₂ hielo 4,27 µm;
+  - CO hielo 4,67 µm.
+  
+  Usa la resolución de cada canal, el error del centro de banda (Hui et al. 2026), el tipo (emisión o absorción), la calidad y un z trazable (NED, dentro de la isofota D25). Devuelve uno de cinco veredictos: compatible, varias, insuficiente, ninguna o no evaluable.
+- **Qué no hace:** identificar sustancias, dar probabilidades ni estimar z.
+- **Archivos:** registro `spectral_references.py`, motor `spectral_interpreter.py`, presentación `spectrum_interpretation.py` e integración mínima en `spectrum_analysis.py` y `spectral_view.py`. Informe completo: [`SPECTRAL_INTERPRETER_V1_REPORT.md`](SPECTRAL_INTERPRETER_V1_REPORT.md).
+- **Sin cambios en resultados:** analizador, umbrales, fotometría, máscaras, V01–V03, Time y S/N.
+- **Corrección de presentación:** las insignias de Espectro usaban las clases `ok`/`warn`, que el tema no define; ahora usan `sc-ok`/`sc-warn`.
+- **Resultados reales:**
+  - NGC 5461 (M101): 3,3 µm «Varias referencias compatibles» (PAH y Pfδ, no confirmado); 4,08 µm «Referencia compatible» (Brα).
+  - Arp 220: z = 0,018398 aplicado; 3,3 µm insuficientemente respaldada.
+  - M51: z distinto para M51a y M51b.
+  - TW Hya: no evaluable por el escalón D4/D5 y OVERFLOW.
+  - NGC 7027 y M82: sin datos en 3,3 µm, no evaluable.
+- **Pruebas:**
+  - batería de Espectro: 143 superadas;
+  - con el código definitivo: 42 superadas;
+  - 26 pruebas nuevas del motor y 5 de integración.
+- **Navegador:** servidor local del clon (puerto 8521), Edge sin interfaz. Se comprobó:
+  - NGC 5461, Arp 220, TW Hya, NGC 7027 y M82, en Sencillo y Científico;
+  - 420 px sin desplazamiento horizontal;
+  - selección e interruptor conservados al cambiar de nivel.
+  
+  No se comprobaron los fallos de red ni la consola. Capturas en `results/interpreter_v1/capturas/`.
+- **Pendiente para V2:**
+  - respuesta espectral completa;
+  - continuo y τ para hielos;
+  - más líneas de H I (Paα, Pfβ…);
+  - z del usuario;
+  - coherencia entre rasgos del mismo espectro.
 
 ## Espectro: inspector A/B y validación ciega en NGC 7023 — 15-11-2026 (Claude Code A, rama `feature/spectrum-compare`, sin integrar)
 

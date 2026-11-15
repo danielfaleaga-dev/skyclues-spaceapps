@@ -1,0 +1,257 @@
+Skip to main content
+SkyClues
+SPHEREX · IRSA
+
+Región
+
+Tiempo
+
+Espectro
+
+Sencillo
+
+Científico
+
+coordenadas elegidas
+RA
+210.923546°
+DEC
++54.319916°
+CAMPO
+6.0′
+Producto combinado, no temporal. Cada imagen es un canal del cubo DR1: el promedio de muchas exposiciones de fechas distintas (sin luz zodiacal), en píxeles de 12.9″. Sirve para ver cómo cambia el cielo con la longitud de onda; no muestra cambios en el tiempo (para eso, «Tiempo» usa observaciones individuales de 6.15″/px).
+
+Imagen infrarroja
+
+Un canal
+
+Composición multibanda (RGB)
+
+CANAL ESPECTRAL · LONGITUD DE ONDA CRECIENTE
+
+◀
+
+63 · 3.293 µm
+
+1 · 0.753 µm
+
+102 · 4.988 µm
+
+▶
+
+Capa
+
+IMAGE · brillo superficial (MJy/sr)
+
+NHITS · cobertura (píxeles de entrada)
+
+−180
+−160
+−140
+−120
+−100
+−80
+−60
+−40
+−20
+0
+20
+40
+60
+80
+100
+120
+140
+160
+180
+Desplazamiento al este (″) · este a la izquierda
+−80
+−60
+−40
+−20
+0
+20
+40
+60
+80
+Desplazamiento al norte (″)
+
+El clic en la imagen coloca
+
+Punto A
+
+Punto B
+
+Geometría WCS: cada píxel nativo del cubo (12.9″) se dibuja en su posición, con su valor original, sin remuestreo ni suavizado; norte arriba, este a la izquierda (raster base de 540 píxeles, 0.7″/px; su tamaño en pantalla se adapta al visor). Escala de visualización propia de cada canal (percentiles 1–99.5 del campo, asinh); compare intensidades entre canales con el espectro. Rosa/morado: valor no finito o NHITS = 0 (sin dato utilizable); no significa cielo oscuro. Gris claro: fuera de la región leída. Cruz azul: objetivo; rombo ámbar: posición del espectro, con su apertura y su anillo de fondo. Pase el cursor para ver el valor de cada píxel; haga clic para elegir la posición del espectro.
+
+λ CENTRAL
+3.293 µm
+3.242–3.342 µm
+DETECTOR · SUBCANAL
+D4 · 12
+R = λ/Δλ = 35
+PÍXELES CON DATOS
+100.0%
+609 de 609
+NHITS MEDIANO
+9
+mínimo 1
+
+Canal 63 de 102 = plano 62 del cubo (0-based) · ancho 0.094 µm · teselas HEALPix 2858 · píxeles del campo con OVERFLOW: 0, OUTLIER: 19, SOURCE: 541. λ, intervalo y R proceden de la tabla SPECTRAL_CHANNELS del FITS.
+
+POSICIÓN DEL ESPECTRO
+
+RA (°)
+
+Dec (°)
+
+Radio de apertura (píxeles del cubo)
+
+2.00
+
+1.00
+
+5.00
+
+Anillo de fondo: radios interior y exterior (píxeles)
+
+4.00
+
+7.00
+
+1.50
+
+20.00
+
+Apertura 26″ · anillo 52″–90″ (1 píxel = 12.88″).
+
+Obtener el espectro en esta posición
+
+Espectro exploratorio de una posición
+
+Magnitud representada
+
+Densidad de flujo en apertura (mJy) · exploratoria
+
+Brillo superficial del píxel (MJy/sr)
+
+0.8
+1.0
+1.2
+1.4
+1.6
+1.8
+2.0
+2.2
+2.4
+2.6
+2.8
+3.0
+3.2
+3.4
+3.6
+3.8
+4.0
+4.2
+4.4
+4.6
+4.8
+5.0
+Longitud de onda (µm)
+0
+10
+20
+30
+40
+Flujo en apertura (mJy)
+D1
+D2
+D3
+D4
+D5
+D6
+▽
+▽
+▼
+▼
+▼
+▼
+sin precaución
+OVERFLOW/OUTLIER en la apertura
+
+Pulse un punto del gráfico o arrastre sobre un intervalo de longitudes de onda para caracterizarlo respecto a su entorno. Doble clic deshace la selección.
+
+Marcas del gráfico (▼ pico, ▲ valle; relleno = cuantificable, hueco = visible). A: 4 cuantificables y 2 visibles. Ninguna es una detección: el cubo no tiene incertidumbres.
+
+keyboard_arrow_right
+
+Picos y valles: tabla, método y criterios
+
+¿QUÉ PODRÍA INDICAR ESTE ESPECTRO?
+
+Mostrar referencias en el gráfico
+
+Cada característica clasificada se compara con la biblioteca (skyclues-referencias 1.0 (2026-11-15)). Pulse «Examinar» o seleccione el canal en el gráfico para ver hipótesis, pruebas y límites.
+
+A · pico 0.955 µm (canal 11) No evaluable
+
+Examinar
+
+A · pico 1.102 µm (canal 17) No evaluable
+
+Examinar
+
+A · pico 1.861 µm (canal 40) Ninguna referencia compatible
+
+Examinar
+
+A · pico 3.293 µm (canal 63) Varias referencias compatibles
+
+Examinar
+
+A · pico 4.076 µm (canal 76) Referencia compatible
+
+Examinar
+
+A · pico 4.669 µm (canal 93) Ninguna referencia compatible
+
+Examinar
+
+keyboard_arrow_right
+
+Dónde caería cada referencia en este espectro
+
+keyboard_arrow_right
+
+Biblioteca de referencias, ventana de compatibilidad y límites
+
+keyboard_arrow_right
+
+Calidad de los canales: cobertura de la apertura y máscaras
+
+Posición RA 210.92355°, Dec +54.31992°. 100 de 102 canales con valor; 2 sin valor (marcas rosas sobre el eje: canales 51 y 52 sin datos en DR1, o apertura/fondo sin datos). Un punto por canal real; la barra horizontal es el intervalo del canal (WL_MIN–WL_MAX), no un error. Sin curva ni interpolación. Contorno hueco: algún píxel de entrada de la apertura tenía OVERFLOW (saturación) u OUTLIER. Línea discontinua vertical: canal mostrado arriba.
+
+keyboard_arrow_right
+
+Cómo leer este gráfico
+
+Qué es y qué no es este espectro. Fotometría de apertura sobre el cubo combinado, adaptando el método del tutorial de IRSA: apertura circular sobre el cielo de 2 píxeles (26″; fracciones de píxel con 5×5 submuestras), menos la media con recorte 3σ del anillo 4–7 píxeles por el área de la apertura, multiplicada por el ángulo sólido del píxel (3.9011e-09 sr, píxeles HEALPix de igual área) → mJy. IRSA advierte que un espectro extraído del cubo solo es apropiado para visualización: no tiene incertidumbres (el cubo no incluye varianza; la dispersión del fondo no es un error del flujo). El tutorial usa círculos en coordenadas de píxel y Photutils con solapamiento exacto; aquí se usan distancias angulares y submuestras, por lo que los valores pueden diferir. No corrige la fracción de la PSF fuera de la apertura, puede incluir fuentes vecinas y el rayado del mosaico cerca de líneas intensas. No es una medida de precisión del flujo de una estrella ni permite afirmar la presencia de líneas o materiales. Para espectrofotometría científica, use la herramienta oficial SPHEREx Spectrophotometry de IRSA (fotometría forzada sobre las imágenes Level 2, con incertidumbres; solo interfaz web, sin API documentada).
+keyboard_arrow_right
+
+Tabla del espectro (valores por canal)
+
+keyboard_arrow_right
+
+Procedencia del producto y limitaciones
+
+keyboard_arrow_right
+
+Referencias astronómicas · Gaia / WISE
+
+keyboard_arrow_right
+
+Compartir esta región
+
+Datos: NASA/IPAC IRSA · SPHEREx DR1 All-Sky spectral cube (doi:10.26131/IRSA679), leído por rangos de bytes de los FITS oficiales (sin descargar teselas completas).
+
+Cubo publicado: dr1-hips_20261026 · DOI 10.26131/IRSA679. Actualizar observaciones SIA2 no modifica este cubo.

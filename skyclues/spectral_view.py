@@ -331,15 +331,37 @@ def _focus_layer(focus, xsc):
         x=alt.X("a:Q", scale=xsc), x2="b:Q")
 
 
+def _reference_layers(refs: list[dict], xsc):
+    """Documented reference positions: thin dashed rules behind the data, named only in the tooltip; the ones
+    compatible with the examined feature in the selection accent, with one short label."""
+    import altair as alt
+
+    df = pd.DataFrame(refs)
+    tip = [alt.Tooltip("nombre:N", title="referencia"), alt.Tooltip("naturaleza:N", title="tipo"),
+           alt.Tooltip("lambda_um:Q", title="λ esperada (µm)", format=".3f"), alt.Tooltip("nota:N", title="nota")]
+    rule = alt.Chart(df).mark_rule(strokeDash=[1, 3], strokeWidth=1.4, strokeCap="round").encode(   # dotted: not the
+                                                                                                   # dashed channel rule
+        x=alt.X("lambda_um:Q", scale=xsc),
+        color=alt.condition("datum.destacada", alt.value(FOCUS), alt.value(MUTED)),
+        opacity=alt.condition("datum.destacada", alt.value(0.9), alt.value(0.6)), tooltip=tip)
+    layers = [rule]
+    lab = df[df["etiqueta"] != ""]
+    if len(lab):
+        layers.append(alt.Chart(lab).mark_text(align="left", dx=4, fontSize=11, baseline="top", color=FOCUS).encode(
+            x=alt.X("lambda_um:Q", scale=xsc), y=alt.value(18), text="etiqueta:N", tooltip=tip))
+    return layers
+
+
 def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: int | None = None,
                    width: int = 760, height: int = 320, *, other: sc.Spectrum | None = None, features=None,
-                   focus=None, interactive: bool = False):
+                   focus=None, interactive: bool = False, references=None):
     """One point per real channel; no line, no smoothing; channels without a value marked on the axis.
 
     Optional, all on the same axes: ``other`` = a second spectrum (B) to compare with ``spec`` (A);
     ``features`` = peaks and valleys to mark (``spectral_features.Feature``: solid glyph = quantifiable,
     hollow = visible); ``focus`` = (λ_min, λ_max) of the interval under inspection; ``interactive`` =
-    click a point (selection "canal") or drag an interval (selection "intervalo").
+    click a point (selection "canal") or drag an interval (selection "intervalo"); ``references`` = documented
+    reference positions to mark ({lambda_um, nombre, naturaleza, nota, destacada, etiqueta}).
     """
     import altair as alt
 
@@ -404,6 +426,8 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
     layers = [band, band_lbl, zero]
     if focus is not None:
         layers.append(_focus_layer(focus, xsc))
+    if references:
+        layers += _reference_layers(references, xsc)
     if selected_channel is not None:
         lam = float(df.loc[df.canal == selected_channel, "lambda_um"].iloc[0])
         layers.append(alt.Chart(pd.DataFrame({"x": [lam]})).mark_rule(color=INK_2, strokeDash=[2, 2]).encode(
