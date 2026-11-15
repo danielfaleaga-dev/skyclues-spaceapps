@@ -8,6 +8,7 @@
 - **Validación ciega NGC 7023:** protocolo, resultados congelados, comparación y dictamen («RECUPERACIÓN PARCIAL») en `results/blind_ngc7023/`. Aprendizaje para futuras pruebas:
   - la regla morfológica debe excluir fuentes puntuales catalogadas;
   - la fotometría con anillo local reduce la sensibilidad a la emisión extensa.
+- **Validación ciega V02:** T01 (NGC 7027), T02 (núcleo de M82) y T03 (Elias 29) resultan **NO EVALUABLE**. Las tres fuentes saturan o pierden píxeles del cubo DR1 justo donde están sus rasgos de referencia; el analizador no etiquetó nada cuantificable. Detalle en `results/blind_v02/INFORME_FINAL.md`.
 
 ## Movimiento medido de objetos conocidos — 15-11-2026 (Claude Code B)
 
