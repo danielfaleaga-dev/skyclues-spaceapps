@@ -33,7 +33,8 @@ Features (peaks and valleys)
    original values are never smoothed or replaced.
 3. **Reference scatter** σ_ref = the largest of (a) the residual scatter of the environment
    about its fit, (b) the robust scatter (3σ-clipped, started from the MAD) of the leave-one-out
-   residuals of the whole detector, in absolute and in relative terms, and (c) the scatter of the background annulus propagated to the aperture,
+   residuals of the whole detector, in absolute and in relative terms, computed without the
+   channels of the candidates of the scan (so that one line does not hide another), and (c) the scatter of the background annulus propagated to the aperture,
    σ_ring · √(N_ap + N_ap²/N_ring) · Ω (flux) or σ_ring (single pixel). The contrast is compared
    with σ_ref · √(1 + leverage of the fit at that channel).
    **This is a descriptive threshold, not a photometric uncertainty and not a statistical
@@ -42,7 +43,8 @@ Features (peaks and valleys)
 4. **Scan.** Trial intervals of 1, 3, 5, 7 and 9 channels centred on every channel; the
    narrowest scale within 10 % of the best contrast ratio is kept; the strongest candidate is
    accepted, its channels (the run of same-sign contrast around its extreme) are excluded
-   from later environments, and the scan repeats.
+   from later environments, and the scan repeats. The whole scan is run again (at most
+   ``MAX_ROUNDS`` times) with the channels of every candidate left out of the detector scatter.
    A contrast below ``MIN_RELATIVE`` of a positive continuum is never labelled: under that
    level the local polynomial cannot tell a feature from the curvature of a smooth spectrum.
 5. **Classes** (never "detections"):
@@ -66,8 +68,8 @@ DEGREE = 2                       # local polynomial
 MAX_SKIP = 5                     # channels of other features an environment may step over
 HALF_WIDTHS = (0, 1, 2, 3, 4)    # trial intervals of 1, 3, 5, 7, 9 channels
 SCALE_TOLERANCE = 0.9            # narrowest scale within 10 % of the best ratio
-Q_VISIBLE = 4.0                  # see tests/test_spectral_features.py: rates on pure noise
-Q_QUANTIFIABLE = 6.0
+Q_VISIBLE = 5.0                  # see tests/test_spectral_features.py: rates on pure noise
+Q_QUANTIFIABLE = 7.0
 MIN_RELATIVE = 0.01              # contrast below 1 % of a positive continuum is never labelled
 MAX_FEATURES = 12
 MAX_MANUAL_CHANNELS = 15         # widest interval a local continuum is attempted for
@@ -75,6 +77,9 @@ BROAD_MIN_CHANNELS = 3           # half-height width from which a feature is cal
 COVERAGE_CHANGE = 2.0            # NHITS ratio feature/environment beyond which coverage "changes"
 RATIO_MIN_DENOMINATOR = 3.0      # B must exceed this many reference scatters for A/B
 MIN_RESIDUALS = 6                # leave-one-out residuals needed for a detector scatter
+Q_PROVISIONAL = 2.5              # candidates from this ratio are left out of the detector scatter
+MAX_ROUNDS = 2                   # passes of the scan: one with every channel, one without the candidates
+MAX_CANDIDATES = 40
 MAD_TO_SIGMA = 1.4826
 
 UNITS = {"flux": "mJy", "pixel": "MJy/sr"}
@@ -563,26 +568,37 @@ def _robust_sigma(r) -> float:
     return sig
 
 
-def detector_scatter(s: Series) -> dict:
-    """Robust scatter per detector of the leave-one-out residuals (value − continuum of its neighbours).
-
-    Returns {detector: {"abs": scatter in the unit of the spectrum, "rel": scatter relative to the
-    continuum, or NaN}}. The reference used for a channel is the larger of ``abs`` and
-    ``rel × continuum``: noise that grows with the signal and noise that does not are both covered.
-    """
-    res: dict[int, list] = {}
+def _residuals(s: Series, masked) -> list:
+    """Leave-one-out residuals (index, detector, residual, residual / continuum) of the channels that
+    keep a full environment once ``masked`` channels are stepped over."""
+    out = []
     for i in np.flatnonzero(s.measured):
-        left, right = _side(s.value, i - 1, -1, ()), _side(s.value, i + 1, 1, ())
+        i = int(i)
+        if i in masked:
+            continue
+        left, right = _side(s.value, i - 1, -1, masked), _side(s.value, i + 1, 1, masked)
         if len(left) < N_SIDE or len(right) < N_SIDE:
             continue
-        pred, lev, _, _ = _continuum(s, left + right, [int(i)], 2)
+        pred, lev, _, _ = _continuum(s, left + right, [i], DEGREE)
         r = float(s.value[i] - pred[0]) / math.sqrt(1.0 + float(lev[0]))
-        res.setdefault(int(s.detector[i]), []).append((r, r / float(pred[0]) if pred[0] > 0 else float("nan")))
+        out.append((i, int(s.detector[i]), r, r / float(pred[0]) if pred[0] > 0 else float("nan")))
+    return out
+
+
+def detector_scatter(s: Series, exclude=()) -> dict:
+    """Robust scatter per detector of the leave-one-out residuals (value − continuum of its neighbours).
+
+    ``exclude``: channel indices left out, both as centres and from the environments of the others
+    (see ``analyse``). Returns {detector: {"abs": scatter in the unit of the spectrum, "rel": scatter
+    relative to the continuum, or NaN}}. The reference used for a channel is the larger of ``abs`` and
+    ``rel × continuum``: noise that grows with the signal and noise that does not are both covered.
+    """
+    res = _residuals(s, set(exclude))
     out = {}
-    for det, pairs in res.items():
-        if len(pairs) < MIN_RESIDUALS:
+    for det in {d for _, d, _, _ in res}:
+        r = np.array([(v, w) for _, d, v, w in res if d == det])
+        if len(r) < MIN_RESIDUALS:
             continue
-        r = np.array(pairs)
         rel = r[:, 1][np.isfinite(r[:, 1])]
         out[det] = {"abs": _robust_sigma(r[:, 0]),
                     "rel": _robust_sigma(rel) if rel.size >= MIN_RESIDUALS else float("nan")}
@@ -598,14 +614,24 @@ def _detector_ref(sdet: dict, det: int, continuum: float) -> float:
     return max(vals) if vals else float("nan")
 
 
-def find_features(s: Series) -> list[Feature]:
-    """Peaks and valleys of a spectrum (see the module docstring). Sorted by wavelength."""
-    sdet = detector_scatter(s)
+@dataclass
+class Analysis:
+    """Result of the scan of one spectrum."""
+
+    features: list                   # labelled peaks and valleys, by wavelength
+    scatter: dict                    # detector scatter used for them (and for any later selection)
+    excluded: list                   # channels left out of that scatter (features and provisional candidates)
+    rounds: int
+
+
+def _scan(s: Series, sdet: dict) -> list:
+    """One greedy pass: the strongest candidate is accepted, its channels are masked, repeat.
+    Returns every candidate with a contrast ratio ≥ Q_PROVISIONAL (labelled or not)."""
     masked: set[int] = set()
     cache: dict[tuple[int, int], Feature] = {}
     found: list[Feature] = []
     measured = [int(i) for i in np.flatnonzero(s.measured)]
-    while len(found) < MAX_FEATURES:
+    while len(found) < MAX_CANDIDATES:
         best = None
         for i in measured:
             if i in masked:
@@ -618,7 +644,7 @@ def find_features(s: Series) -> list[Feature]:
                 if (i, h) not in cache:
                     cache[i, h] = _evaluate(s, lo, hi, masked, sdet, origin="automática", centre=i)
                 f = cache[i, h]
-                if f.ratio is not None and f.klass in (QUANTIFIABLE, VISIBLE):
+                if f.ratio is not None and f.kind is not None and abs(f.ratio) >= Q_PROVISIONAL:
                     trials.append((h, f))
             if not trials:
                 continue
@@ -634,7 +660,39 @@ def find_features(s: Series) -> list[Feature]:
         reach = max(HALF_WIDTHS) + N_SIDE + MAX_SKIP + h + 1
         for key in [k for k in cache if abs(k[0] - i) <= reach]:
             del cache[key]
-    return sorted(found, key=lambda f: f.lam)
+    return found
+
+
+def analyse(s: Series) -> Analysis:
+    """Peaks and valleys of a spectrum (see the module docstring).
+
+    A line spoils the scatter of its detector (its own residual and those of the six neighbours whose
+    environment contains it), so in a line-rich spectrum the lines would hide each other. The scan is
+    therefore repeated: the channels of every candidate (contrast ratio ≥ Q_PROVISIONAL, labelled or
+    not) are left out of the detector scatter and of the environments used for it, until a pass adds
+    no channel. A detector left with fewer than MIN_RESIDUALS residuals keeps its scatter with every
+    channel (larger, hence conservative).
+    """
+    exclude: set[int] = set()
+    base = detector_scatter(s)                       # with every channel: the fallback of a starved detector
+    sdet, cands, rounds = base, [], 0
+    for rounds in range(1, MAX_ROUNDS + 1):
+        sdet = {**base, **detector_scatter(s, exclude)} if exclude else base
+        cands = _scan(s, sdet)
+        new = set()
+        for f in cands:                               # the half-height channels of each candidate
+            new.update(range(s.index(f.canal_lo), s.index(f.canal_hi) + 1))
+        if new <= exclude:
+            break
+        exclude |= new
+    labelled = sorted((f for f in cands if f.klass in (QUANTIFIABLE, VISIBLE)), key=lambda f: -abs(f.ratio))
+    return Analysis(sorted(labelled[:MAX_FEATURES], key=lambda f: f.lam), sdet,
+                    sorted(int(s.canal[i]) for i in exclude), rounds)
+
+
+def find_features(s: Series) -> list[Feature]:
+    """Labelled peaks and valleys of a spectrum, sorted by wavelength."""
+    return analyse(s).features
 
 
 def _masked_for(s: Series, features, lo: int, hi: int) -> set:
@@ -648,8 +706,9 @@ def _masked_for(s: Series, features, lo: int, hi: int) -> set:
     return out
 
 
-def measure_interval(s: Series, canal_lo: int, canal_hi: int, features=()) -> Feature:
-    """Characterise the channels [canal_lo, canal_hi] chosen by the user (same rules as the scan)."""
+def measure_interval(s: Series, canal_lo: int, canal_hi: int, features=(), scatter: dict | None = None) -> Feature:
+    """Characterise the channels [canal_lo, canal_hi] chosen by the user (same rules as the scan).
+    ``scatter``: the detector scatter of ``analyse(s)``; computed here if not given."""
     lo, hi = sorted((s.index(canal_lo), s.index(canal_hi)))
     if hi - lo + 1 > MAX_MANUAL_CHANNELS:
         return Feature(serie=s.label, origin="selección", klass=NOT_EVALUABLE, kind=None, unit=s.unit, limitations=[],
@@ -657,16 +716,18 @@ def measure_interval(s: Series, canal_lo: int, canal_hi: int, features=()) -> Fe
                        reasons=[f"Intervalo de {hi - lo + 1} canales: demasiado ancho para un continuo local "
                                 f"(máximo {MAX_MANUAL_CHANNELS}). Lo que se ve a esa escala es la forma general del "
                                 "espectro."])
-    return _evaluate(s, lo, hi, _masked_for(s, features, lo, hi), detector_scatter(s), origin="selección")
+    sdet = analyse(s).scatter if scatter is None else scatter
+    return _evaluate(s, lo, hi, _masked_for(s, features, lo, hi), sdet, origin="selección")
 
 
-def inspect_channel(s: Series, canal: int, features=()) -> Feature:
+def inspect_channel(s: Series, canal: int, features=(), scatter: dict | None = None) -> Feature:
     """The feature that contains a channel: a found one, or the best trial centred on it."""
     for f in features or ():
         if f.contains(canal):
             return f
     i = s.index(canal)
-    sdet, trials, last = detector_scatter(s), [], None
+    sdet = analyse(s).scatter if scatter is None else scatter
+    trials, last = [], None
     for h in HALF_WIDTHS:
         lo, hi = i - h, i + h
         if lo < 0 or hi >= s.n:

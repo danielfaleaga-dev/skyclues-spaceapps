@@ -216,7 +216,7 @@ def test_pure_noise_is_rarely_labelled():
         fs = sf.find_features(mk(y))
         visible += sum(f.klass == sf.VISIBLE for f in fs)
         quantifiable += sum(f.klass == sf.QUANTIFIABLE for f in fs)
-    assert quantifiable <= 6 and visible / 120 <= 0.35           # measured: ~0.02 and ~0.13 per spectrum
+    assert quantifiable <= 5 and visible / 120 <= 0.25           # measured on 300: ~0.015 and ~0.10 per spectrum
 
 
 def test_pure_noise_with_a_background_reference_is_not_labelled():
