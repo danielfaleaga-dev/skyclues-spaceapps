@@ -1,0 +1,314 @@
+{
+  "A": {
+    "inspeccion": {
+      "62": {
+        "klass": "visible",
+        "kind": "pico",
+        "trial_lo": 60,
+        "trial_hi": 68,
+        "value": 149.03222652777308,
+        "continuum": 66.27757140472406,
+        "contrast": 82.75465512304902,
+        "relative": 1.2486072342287202,
+        "ratio": 6.327481566038811,
+        "ref": 6.1180594977258,
+        "ref_local": 3.394124687944098,
+        "ref_detector": 5.033436199337151,
+        "ref_background": 6.1180594977258,
+        "reasons": [
+          "Contraste de 6.3 veces la dispersión de referencia, entre 5 y 7."
+        ],
+        "limitations": [
+          "Píxeles de entrada con OVERFLOW u OUTLIER en los canales 67: el valor puede no ser fiable.",
+          "El intervalo y su entorno abarcan los detectores D4, D5: calibración y resolución distintas pueden producir un escalón.",
+          "Característica ancha: si se extiende más allá del intervalo, el entorno la incluye y el contraste queda subestimado."
+        ]
+      },
+      "63": {
+        "klass": "visible",
+        "kind": "pico",
+        "trial_lo": 60,
+        "trial_hi": 68,
+        "value": 149.03222652777308,
+        "continuum": 66.27757140472406,
+        "contrast": 82.75465512304902,
+        "relative": 1.2486072342287202,
+        "ratio": 6.327481566038811,
+        "ref": 6.1180594977258,
+        "ref_local": 3.394124687944098,
+        "ref_detector": 5.033436199337151,
+        "ref_background": 6.1180594977258,
+        "reasons": [
+          "Contraste de 6.3 veces la dispersión de referencia, entre 5 y 7."
+        ],
+        "limitations": [
+          "Píxeles de entrada con OVERFLOW u OUTLIER en los canales 67: el valor puede no ser fiable.",
+          "El intervalo y su entorno abarcan los detectores D4, D5: calibración y resolución distintas pueden producir un escalón.",
+          "Característica ancha: si se extiende más allá del intervalo, el entorno la incluye y el contraste queda subestimado."
+        ]
+      },
+      "64": {
+        "klass": "visible",
+        "kind": "pico",
+        "trial_lo": 60,
+        "trial_hi": 68,
+        "value": 149.03222652777308,
+        "continuum": 66.27757140472406,
+        "contrast": 82.75465512304902,
+        "relative": 1.2486072342287202,
+        "ratio": 6.327481566038811,
+        "ref": 6.1180594977258,
+        "ref_local": 3.394124687944098,
+        "ref_detector": 5.033436199337151,
+        "ref_background": 6.1180594977258,
+        "reasons": [
+          "Contraste de 6.3 veces la dispersión de referencia, entre 5 y 7."
+        ],
+        "limitations": [
+          "Píxeles de entrada con OVERFLOW u OUTLIER en los canales 67: el valor puede no ser fiable.",
+          "El intervalo y su entorno abarcan los detectores D4, D5: calibración y resolución distintas pueden producir un escalón.",
+          "Característica ancha: si se extiende más allá del intervalo, el entorno la incluye y el contraste queda subestimado."
+        ]
+      },
+      "65": {
+        "klass": "visible",
+        "kind": "pico",
+        "trial_lo": 60,
+        "trial_hi": 68,
+        "value": 149.03222652777308,
+        "continuum": 66.27757140472406,
+        "contrast": 82.75465512304902,
+        "relative": 1.2486072342287202,
+        "ratio": 6.327481566038811,
+        "ref": 6.1180594977258,
+        "ref_local": 3.394124687944098,
+        "ref_detector": 5.033436199337151,
+        "ref_background": 6.1180594977258,
+        "reasons": [
+          "Contraste de 6.3 veces la dispersión de referencia, entre 5 y 7."
+        ],
+        "limitations": [
+          "Píxeles de entrada con OVERFLOW u OUTLIER en los canales 67: el valor puede no ser fiable.",
+          "El intervalo y su entorno abarcan los detectores D4, D5: calibración y resolución distintas pueden producir un escalón.",
+          "Característica ancha: si se extiende más allá del intervalo, el entorno la incluye y el contraste queda subestimado."
+        ]
+      }
+    },
+    "fondo": {
+      "60": {
+        "fondo_mjysr": 0.4773714149800631,
+        "fondo_sigma_mjysr": 0.4657849822400292,
+        "n_fondo": 111
+      },
+      "61": {
+        "fondo_mjysr": 0.5465878915864152,
+        "fondo_sigma_mjysr": 0.5589772594069384,
+        "n_fondo": 112
+      },
+      "62": {
+        "fondo_mjysr": 0.8309644154376454,
+        "fondo_sigma_mjysr": 1.0695852853819932,
+        "n_fondo": 110
+      },
+      "63": {
+        "fondo_mjysr": 1.185029088191583,
+        "fondo_sigma_mjysr": 1.3370648164453522,
+        "n_fondo": 102
+      },
+      "64": {
+        "fondo_mjysr": 0.6328453591236701,
+        "fondo_sigma_mjysr": 0.4133463014319677,
+        "n_fondo": 106
+      },
+      "65": {
+        "fondo_mjysr": 0.682575060405593,
+        "fondo_sigma_mjysr": 0.6205610218050897,
+        "n_fondo": 109
+      },
+      "66": {
+        "fondo_mjysr": 0.7622280218203863,
+        "fondo_sigma_mjysr": 0.8222712879322454,
+        "n_fondo": 111
+      }
+    },
+    "dispersion_detector": {
+      "1": {
+        "abs": 1.6632002084995239,
+        "rel": 0.057350820432278966
+      },
+      "2": {
+        "abs": 7.631569184946775,
+        "rel": 0.06524777008449556
+      },
+      "3": {
+        "abs": 11.010235949644505,
+        "rel": 0.09546095218472202
+      },
+      "4": {
+        "abs": 5.033436199337151,
+        "rel": 0.054014099435908236
+      },
+      "5": {
+        "abs": 7.455587216666012,
+        "rel": 0.06451165963971002
+      },
+      "6": {
+        "abs": 10.28863019213834,
+        "rel": 0.12279925879090149
+      }
+    },
+    "n_apertura_px": 12.84
+  },
+  "B": {
+    "inspeccion": {
+      "62": {
+        "klass": "sin_caracteristica",
+        "kind": "valle",
+        "trial_lo": 62,
+        "trial_hi": 62,
+        "value": 38.29059909367981,
+        "continuum": 42.05015562835907,
+        "contrast": -3.7595565346792625,
+        "relative": -0.08940648324601629,
+        "ratio": -0.14210964940550294,
+        "ref": 21.59813176409251,
+        "ref_local": 21.59813176409251,
+        "ref_detector": 8.050223239570286,
+        "ref_background": 7.022284973632727,
+        "reasons": [
+          "Contraste de 0.1 veces la dispersión de referencia, por debajo de 5: fluctuación que no se etiqueta."
+        ],
+        "limitations": [
+          "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+        ]
+      },
+      "63": {
+        "klass": "sin_caracteristica",
+        "kind": "pico",
+        "trial_lo": 63,
+        "trial_hi": 63,
+        "value": 95.16782134705944,
+        "continuum": 40.08158555861532,
+        "contrast": 55.08623578844412,
+        "relative": 1.3743527113688152,
+        "ratio": 3.4232626860643856,
+        "ref": 13.138398829657683,
+        "ref_local": 5.899643332952036,
+        "ref_detector": 7.673353563647233,
+        "ref_background": 13.138398829657683,
+        "reasons": [
+          "Contraste de 3.4 veces la dispersión de referencia, por debajo de 5: fluctuación que no se etiqueta."
+        ],
+        "limitations": [
+          "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+        ]
+      },
+      "64": {
+        "klass": "sin_caracteristica",
+        "kind": "valle",
+        "trial_lo": 64,
+        "trial_hi": 64,
+        "value": 43.423676477961756,
+        "continuum": 63.288293477815934,
+        "contrast": -19.864616999854178,
+        "relative": -0.31387506137793403,
+        "ratio": -0.5940839090893658,
+        "ref": 27.298871664200608,
+        "ref_local": 27.298871664200608,
+        "ref_detector": 12.116123789188936,
+        "ref_background": 9.282385251527169,
+        "reasons": [
+          "Contraste de 0.6 veces la dispersión de referencia, por debajo de 5: fluctuación que no se etiqueta."
+        ],
+        "limitations": [
+          "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+        ]
+      },
+      "65": {
+        "klass": "sin_caracteristica",
+        "kind": "valle",
+        "trial_lo": 64,
+        "trial_hi": 66,
+        "value": 40.577575489355,
+        "continuum": 80.65921551428323,
+        "contrast": -40.081640024928234,
+        "relative": -0.49692573587987016,
+        "ratio": -0.8326706587733048,
+        "ref": 34.92320924255539,
+        "ref_local": 34.92320924255539,
+        "ref_detector": 15.441671535233976,
+        "ref_background": 7.245218648947564,
+        "reasons": [
+          "Contraste de 0.8 veces la dispersión de referencia, por debajo de 5: fluctuación que no se etiqueta."
+        ],
+        "limitations": [
+          "El intervalo y su entorno abarcan los detectores D4, D5: calibración y resolución distintas pueden producir un escalón."
+        ]
+      }
+    },
+    "fondo": {
+      "60": {
+        "fondo_mjysr": 0.41262466138279114,
+        "fondo_sigma_mjysr": 0.21724068417676567,
+        "n_fondo": 111
+      },
+      "61": {
+        "fondo_mjysr": 0.4297064286139276,
+        "fondo_sigma_mjysr": 0.22354438850036107,
+        "n_fondo": 111
+      },
+      "62": {
+        "fondo_mjysr": 0.8764840428034465,
+        "fondo_sigma_mjysr": 0.47559602505457776,
+        "n_fondo": 111
+      },
+      "63": {
+        "fondo_mjysr": 1.8583119157198313,
+        "fondo_sigma_mjysr": 0.8889748893694308,
+        "n_fondo": 109
+      },
+      "64": {
+        "fondo_mjysr": 1.258612917049935,
+        "fondo_sigma_mjysr": 0.6286651061908971,
+        "n_fondo": 111
+      },
+      "65": {
+        "fondo_mjysr": 1.034325221379598,
+        "fondo_sigma_mjysr": 0.49069458203833055,
+        "n_fondo": 111
+      },
+      "66": {
+        "fondo_mjysr": 0.7184497951655775,
+        "fondo_sigma_mjysr": 0.37761238126130164,
+        "n_fondo": 111
+      }
+    },
+    "dispersion_detector": {
+      "1": {
+        "abs": 0.378840231247499,
+        "rel": NaN
+      },
+      "2": {
+        "abs": 1.2786186868394718,
+        "rel": NaN
+      },
+      "3": {
+        "abs": 3.169779424788498,
+        "rel": 1.772492511448086
+      },
+      "4": {
+        "abs": 4.014556695250458,
+        "rel": 0.1914433637468188
+      },
+      "5": {
+        "abs": 1.3996552377051341,
+        "rel": 0.034696614280741216
+      },
+      "6": {
+        "abs": 1.1365650719796152,
+        "rel": 0.02904105252500756
+      }
+    },
+    "n_apertura_px": 12.84
+  }
+}
