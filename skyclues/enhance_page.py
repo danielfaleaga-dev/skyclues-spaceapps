@@ -122,8 +122,14 @@ def _options(seq, sci: bool) -> dict[str, str]:
 
 def render(seq, report_json: str, sci: bool) -> None:
     options = _options(seq, sci)
-    if theme.persistent("enhance_what", SEQUENCE) not in options:
+    # The choice is an index into THIS sequence's dates: kept across levels and pages, but a new region
+    # (or a new sequence of the same region) starts again from its own dates, never from another one's.
+    ident = (round(float(seq.ra), 7), round(float(seq.dec), 7), float(seq.field_deg),
+             tuple(str(f.date_utc) for f in seq.frames))
+    if (st.session_state.get("enhance_what_for") != ident
+            or theme.persistent("enhance_what", SEQUENCE) not in options):
         st.session_state["opt_enhance_what"] = SEQUENCE
+    st.session_state["enhance_what_for"] = ident
     choice = st.selectbox("Qué combinar", list(options), format_func=options.get,
                           key=theme.bind("enhance_what", SEQUENCE), on_change=theme.keep, args=("enhance_what",),
                           help="Las fechas de la secuencia comparten longitud de onda: su combinación conserva el "
@@ -231,19 +237,32 @@ def _show(p: dict, sci: bool) -> None:
             "extensión VARIANCE), con la máscara estricta y sin interpolar: cada píxel copia el valor del píxel "
             "nativo que contiene su centro. La ganancia es el cociente entre la S/N de las mismas fuentes en la "
             "combinación y en una exposición (mediana), con la misma apertura y errores propagados y contrastados "
-            "con una imagen nula." + (" <b>Banda ancha:</b> mezcla longitudes de onda del mismo detector; sirve para "
+            f"con una imagen nula. Ganancia ×{g['median']:.2f}: equivale a una sola exposición unas "
+            f"{g['median'] ** 2:.0f} veces más larga." + (" <b>Banda ancha:</b> mezcla longitudes de onda del mismo detector; sirve para "
                                       "detectar y situar fuentes, no para medir brillo monocromático ni compararlo "
                                       "entre fechas." if broadband else ""))
     else:
         st.markdown(
             f"Al combinar {stack.n_exposures} imágenes reales de la misma zona, el ruido baja y se distinguen "
             "puntos más débiles. No se suaviza ni se inventa nada: cada punto es el promedio de las medidas reales "
-            "de ese trozo de cielo." + (" Esta imagen mezcla colores infrarrojos vecinos: sirve para ver y situar "
+            f"de ese trozo de cielo. «×{g['median']:.1f}» significa que los mismos objetos, medidos igual en las dos "
+            "imágenes, destacan sobre el ruido esas veces más que en una sola imagen." + (" Esta imagen mezcla colores infrarrojos vecinos: sirve para ver y situar "
                                         "objetos, no para comparar su brillo entre fechas." if broadband else ""))
     if p["new"]:
-        st.caption(f"Los círculos señalan {len(p['new'])} "
-                   + ("fuentes ≥ 5σ en la combinación que ninguna exposición individual detecta." if sci
-                      else "puntos que solo se distinguen en la imagen combinada."))
+        # The null image holds only noise: as many peaks there as new ones here means the new ones are
+        # not distinguishable from noise, so they are not presented as sources.
+        null_peaks = det["null_image_spurious"]
+        if null_peaks >= len(p["new"]):
+            st.caption(f"Los círculos señalan {len(p['new'])} picos ≥ 5σ que ninguna exposición detecta, pero la imagen "
+                       f"nula, que solo contiene ruido, muestra {null_peaks}: no se distinguen del ruido y no son "
+                       "detecciones." if sci else
+                       f"Los círculos señalan {len(p['new'])} puntos que solo aparecen en la imagen combinada, pero el "
+                       "ruido produce otros tantos: no se pueden dar por objetos reales.")
+        else:
+            st.caption(f"Los círculos señalan {len(p['new'])} "
+                       + ("fuentes ≥ 5σ en la combinación que ninguna exposición individual detecta "
+                          f"(imagen nula: {null_peaks} picos espurios)." if sci
+                          else "puntos que solo se distinguen en la imagen combinada."))
     if det["single_exposure_only"] and sci:
         st.caption(f"{det['single_exposure_only']} detecciones proceden de una sola exposición (transitorio, artefacto "
                    "u objeto en movimiento): se identifican, no se cuentan como fuentes estacionarias ni se eliminan.")
@@ -269,6 +288,9 @@ def _controls(p: dict) -> None:
         return "—" if v is None or (isinstance(v, float) and not np.isfinite(v)) else fmt.format(v)
 
     shift = None if ast["median_shift_arcsec"] is None else float(np.hypot(*ast["median_shift_arcsec"]))
+
+    def bright(k):
+        return f"{k} fuente brillante" if k == 1 else f"{k} fuentes brillantes"
     st.markdown(
         f"- **Ruido:** la imagen nula (mitad A − mitad B)/2 tiene una dispersión de {num(stack.noise.get('null_scale'))} "
         f"veces su error formal ({num(stack.noise.get('single_scale'))} en diferencias de exposiciones individuales). "
@@ -278,12 +300,12 @@ def _controls(p: dict) -> None:
         f"espurias, {det['null_image_at_sources']} residuos de muestreo sobre fuentes reales y "
         f"{det['null_image_single_exposure']} rasgos de una sola exposición. Imagen invertida: {det['negative_image']}.\n"
         f"- **Resolución:** anchura de la PSF ×{num(res['width_ratio'])} respecto a una exposición "
-        f"({res['n_sources']} fuentes brillantes).\n"
+        f"({bright(res['n_sources'])}).\n"
         f"- **Posiciones:** centroide combinado − individual {num(shift)}″ (mediana); registro entre exposiciones "
         f"≤ {num(reg.get('max_shift_arcsec'))}″ con fuentes comunes; error propio del remuestreo "
         f"{num(reg.get('placement_rms_arcsec'))}″ (rms).\n"
         f"- **Flujo:** cociente combinación / media de exposiciones {num(ph['flux_ratio_median'], '{:.3f}')} "
-        f"({ph['n_sources']} fuentes brillantes).\n"
+        f"({bright(ph['n_sources'])}).\n"
         f"- **Valores no físicos:** {sum(stack.selection.get('nonphysical_negative_pixels', []))} píxeles negativos "
         f"a más de {enhance.NONPHYSICAL_SIGMA:g}σ bajo su cielo y bajo las demás exposiciones, descartados.")
 

@@ -98,6 +98,44 @@ def test_nearby_route_states_available_processing_result(monkeypatch):
 REPORT: list = []
 
 
+def test_new_peaks_are_not_called_sources_when_the_null_image_has_as_many(monkeypatch):
+    import json
+    report = json.dumps(json.loads((Path(APP).parent / "results" / "sequence_m101.json").read_text(encoding="utf-8")),
+                        sort_keys=True, default=str)
+    real = enhance_page._sequence_product.__wrapped__(report, enhance_page.pipeline_key())
+
+    def product(null_peaks):
+        det = {**real["metrics"]["detections"], "null_image_spurious": null_peaks}
+        return {**real, "new": real["metrics"]["sources"][:2], "metrics": {**real["metrics"], "detections": det}}
+
+    for null_peaks, sci_text, simple_text in ((2, "no se distinguen del ruido", "no se pueden dar por objetos reales"),
+                                              (0, "fuentes ≥ 5σ en la combinación", "solo se distinguen")):
+        monkeypatch.setattr(enhance_page, "_nearby_product", lambda *a, n=null_peaks: product(n))
+        at = open_example()
+        at.toggle(key="w_enhance").set_value(True).run()
+        at.selectbox(key="w_enhance_what").set_value("near0").run()
+        at.button(key="enhance_run").click().run()
+        assert not at.exception and "Imagen mejorada" in html(at)
+        assert sci_text in text(at)
+        at.button_group(key="level").set_value("Sencillo").run()
+        assert not at.exception and simple_text in text(at)
+
+
+def test_choice_of_dates_does_not_travel_to_another_region():
+    at = open_example()
+    at.toggle(key="w_enhance").set_value(True).run()
+    at.selectbox(key="w_enhance_what").set_value("near1").run()
+    assert not at.exception and at.session_state["opt_enhance_what"] == "near1"
+    at.button_group(key="level").set_value("Sencillo").run()                  # same sequence: the choice stays
+    assert not at.exception and at.session_state["opt_enhance_what"] == "near1"
+    at.button_group(key="nav").set_value("Región").run()
+    at.button(key="example_sequence_wise0855_pm").click().run()
+    assert not at.exception and at.session_state["opt_enhance"]
+    # A new region starts from its own sequence, not from the index of a date of M101.
+    assert at.session_state["opt_enhance_what"] == enhance_page.SEQUENCE
+    assert "No disponible para estas observaciones" in html(at) and "emborronaría" in text(at)
+
+
 def test_nearby_route_reports_too_few_exposures_and_archive_failures(monkeypatch):
     monkeypatch.setattr(enhance_page, "_nearby_product", lambda *a: {
         "ok": False, "reason": "El archivo solo contiene 1 exposición del detector D2 con este campo completo."})

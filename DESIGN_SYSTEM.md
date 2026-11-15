@@ -76,6 +76,8 @@ Propuesta por el usuario (actividad `SKYCLUES_SPHEREX_INFRARED_SNR_ENHANCEMENT_0
 - Sencillo: tres cifras (imágenes combinadas, mejora de la señal, puntos distinguibles) y dos frases llanas; avisa de que una imagen de banda ancha no sirve para comparar brillo. Científico: exposiciones, detector y λ, intervalo, ganancia S/N medida, ruido por píxel, tabla de exposiciones con procedencia, controles (imagen nula, resolución, posiciones, flujo) e informe JSON.
 - La cifra del objetivo solo aparece cuando es débil en una exposición (S/N < 30): en fuentes brillantes no describe la mejora.
 - El nivel no cambia el producto: ambos leen la misma combinación en caché. La opción y la selección se conservan al cambiar de nivel o navegar. La imagen combinada no interviene en «Movimiento».
+- Al cambiar de región o de secuencia, «Qué combinar» vuelve a las fechas de la nueva secuencia: una fecha elegida en otra región nunca se arrastra.
+- Los círculos solo se llaman «fuentes» cuando la imagen nula tiene menos picos espurios que fuentes nuevas hay; si tiene tantos o más, el texto dice que no se distinguen del ruido y que no son detecciones. Junto a la ganancia, una frase breve explica qué significa: en Sencillo, cuántas veces más destacan los mismos objetos sobre el ruido; en Científico, a cuántas veces más tiempo de exposición equivale.
 
 ## Implementación y comprobación
 

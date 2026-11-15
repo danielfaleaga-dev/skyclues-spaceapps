@@ -1,6 +1,31 @@
 # SkyClues — estado del proyecto
 
-Última actualización: relevo de Claude Code B del 15-11-2026 sobre `redesign/unified-region` (detector no sideral). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md); las reglas visuales obligatorias están en [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md). La primera sección prevalece sobre el historial conservado debajo.
+Última actualización: relevo S/N de Claude Code A del 15-11-2026, rama `handoff/snr-finish-A` (copia `C:\Users\danie\Documents\SkyClues-snr-A`, base `d01917e`). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md); las reglas visuales obligatorias están en [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md). La primera sección prevalece sobre el historial conservado debajo.
+
+## Mejora infrarroja S/N — 15-11-2026 (Claude Code B; cierre de Claude Code A)
+
+Actividades `SKYCLUES_SPHEREX_INFRARED_SNR_ENHANCEMENT_01` y `SKYCLUES_SNR_HANDOFF_AND_COMPLETION_01`. Local, sin push ni despliegue.
+
+- **Relevo.** Claude B agotó su cuota con todo el trabajo sin confirmar en `SkyClues`. Esos 50 archivos se copiaron sin cambios a una copia independiente y se confirmaron tal cual (`561e195`). La comprobación se hizo blob a blob: 0 diferencias. El inventario con SHA-256, el parche binario y el registro de la validación final están en `results/handoff_snr/`. La carpeta de B no se modificó.
+- **Implementación** (B). Está en `skyclues/enhance.py`, `enhance_page.py` y `enhance_view.py`, y en el interruptor «Mejora infrarroja» de `time_page.py`. Método, cifras y límites en [`INFRARED_SNR_REPORT.md`](INFRARED_SNR_REPORT.md), escrito en el relevo porque README y CONTEXT ya lo citaban.
+- **Correcciones del relevo** (A):
+  - «Qué combinar» ya no arrastra la fecha elegida a otra región.
+  - Los círculos no se llaman «fuentes» cuando la imagen nula tiene tantos picos espurios como fuentes nuevas (M101 de banda ancha: 3 y 3).
+  - Frase sobre qué significa la ganancia en los dos niveles.
+  - Concordancia «1 fuente brillante».
+  - 2 pruebas nuevas.
+- **Resultados reales.** M101 en secuencia ×1,88; M101 D2 de banda ancha, diciembre de 2025, ×2,91; WISE 0855 en noviembre de 2025 ×3,49 (S/N del objetivo 12,6; 29 de 29 fuentes nuevas con contrapartida en AllWISE). M101 en secuencia y WISE en noviembre se recalcularon en el relevo y dieron resultados **idénticos**. El ×3,44 comunicado antes corresponde a otro grupo de M101 (12 exposiciones en 210 días); el código final lo reproduce exactamente, pero el producto solo combina a ±7 días.
+- **Pruebas** (copia, 15-11-2026):
+  - `test_enhance.py` y `test_enhance_app.py`: **33 superadas**.
+  - Regresión fuera de línea (`-m "not network"`, sin las de S/N): **439 superadas**.
+  - Pruebas de aplicación de Tiempo, Movimiento, Objetos móviles y Referencias: **22 superadas, 1 fallida**. La fallida es `test_motion_app.py::test_real_eps_ind_b_d3_reproduces_from_cached_originals`, porque ESA Gaia no respondió (ConnectTimeout, también al reintentar y en una consulta directa). Es el mismo fallo externo registrado por B; `motion.py` y `non_sidereal.py` son idénticos a `d01917e`.
+- **Navegador** (servidor de la copia, puerto 8521, navegador integrado):
+  - M101 en Científico: «Imagen mejorada», mismo canal.
+  - M101 a ±7 días del 22-5-2026: 12 exposiciones D2 de 1,10 a 1,64 µm, banda ancha, ×3,17. Este paso había fallado en el script de B por un selector, no por la aplicación.
+  - WISE 0855 en secuencia: «No disponible», el objetivo se desplaza 8,2″.
+  - WISE a ±7 días del 9-5-2026: 5 exposiciones, ×2,27, objetivo S/N 1,9 → 4,7; flujo 1,003 y PSF ×1,08 (una sola fuente brillante).
+  - Sencillo con el mismo producto; 420 px sin desplazamiento horizontal.
+- **Pendiente para integrar:** fusionar `handoff/snr-finish-A` con `redesign/unified-region` y después con `feature/spectrum-compare` (`f321c7c`). Instrucciones en [`SKYCLUES_SNR_HANDOFF_FINAL.md`](SKYCLUES_SNR_HANDOFF_FINAL.md).
 
 ## Movimiento medido de objetos conocidos — 15-11-2026 (Claude Code B)
 
