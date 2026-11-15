@@ -35,6 +35,8 @@
 .rg-object{font-size:13.5px;color:var(--muted);min-height:1.45em}
 .rg-object b{color:var(--ink);font-weight:600}
 .rg-notes p{font-size:12.5px;color:var(--muted);margin-top:4px;padding-left:10px;border-left:2px solid var(--line)}
+.sc-region[data-level=simple] .rg-sexa,.sc-region[data-level=simple] .rg-coords label span{display:none}
+.sc-region[data-level=simple] .rg-notes p{font-size:14px;border:0;padding-left:0}
 
 /* coordinates */
 .rg-coords{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -95,6 +97,33 @@ select.rg-tool option{color:#14171c;background:#fff}
 .rg-status{position:absolute;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);max-width:70%;text-align:center;
   font-size:13px;color:#d7dbe0;background:rgba(13,15,18,.82);padding:8px 12px;border-radius:6px}
 .rg-status.rg-err-text{color:#ffb4a8!important}
+.rg-status{pointer-events:none}
+.rg-object[data-loading=true]::before{content:"";display:inline-block;
+  width:10px;height:10px;margin-right:7px;border:1.5px solid currentColor;border-right-color:transparent;
+  border-radius:50%;animation:rg-spin .9s linear infinite}
+.rg-gaia-status{position:absolute;z-index:20;left:10px;top:56px;max-width:calc(100% - 20px);
+  display:flex;gap:7px;align-items:center;box-sizing:border-box;padding:6px 9px;border-radius:6px;
+  background:rgba(13,15,18,.82);color:#eef0f2;font-size:12.5px;pointer-events:none}
+.rg-gaia-status[hidden],.rg-gaia-retry[hidden],.rg-status[hidden]{display:none}
+.rg-loading-card{display:flex;align-items:center;gap:8px}
+.rg-loading-detail{display:none}
+.rg-activity{width:10px;height:10px;flex:none;border:1.5px solid #71808b;border-top-color:#d5eafa;
+  border-radius:50%;animation:rg-spin .9s linear infinite}
+.rg-gaia-status:not([data-state=loading]) .rg-activity{display:none}
+.rg-gaia-retry{font:inherit;color:inherit;background:none;border:0;text-decoration:underline;cursor:pointer;pointer-events:auto}
+/* Prominent only while waiting: frosted map, accessible controls, no pointer interception. */
+.rg-gaia-status[data-state=loading],.rg-status[data-loading=true]{inset:0;max-width:none;transform:none;
+  z-index:18;border-radius:inherit;display:flex;justify-content:center;align-items:center;padding:24px;
+  background:rgba(255,255,255,.07);backdrop-filter:blur(6px) saturate(.8);-webkit-backdrop-filter:blur(6px) saturate(.8);color:var(--ink)}
+.rg-gaia-status[data-state=loading] .rg-loading-card,.rg-status[data-loading=true] .rg-loading-card{
+  flex-direction:column;text-align:center;gap:16px;width:min(100%,380px);padding:30px 24px;
+  border:1px solid rgba(255,255,255,.9);border-radius:14px;background:rgba(255,255,255,.85);
+  box-shadow:0 12px 40px rgba(20,23,28,.09);font-size:23px;font-weight:500;line-height:1.25}
+.rg-gaia-status[data-state=loading] .rg-activity,.rg-status[data-loading=true] .rg-activity{
+  width:42px;height:42px;border:2px solid #e2d9d4;border-top-color:var(--ember);border-right-color:var(--ember);margin:0 0 3px}
+.rg-gaia-status[data-state=loading] .rg-loading-detail{display:block;font-size:14px;font-weight:400;line-height:1.6;color:var(--muted)}
+.rg-status[data-loading=false] .rg-activity{display:none}
+@keyframes rg-spin{to{transform:rotate(360deg)}}
 .rg-layerinfo,.rg-gaiainfo{font-size:12.5px;color:var(--muted)}
 .rg-gaiainfo:empty{display:none}
 .rg-mapwrap .aladin-container{font-family:inherit}
@@ -111,6 +140,8 @@ select.rg-tool option{color:#14171c;background:#fff}
 @media (max-width:520px){
   .rg-actions{grid-template-columns:1fr}
   .rg-mapwrap{min-height:320px}
+  .rg-gaia-status:not([data-state=loading]){top:120px}
+  .rg-gaia-status[data-state=loading] .rg-loading-card{padding:22px 16px;font-size:20px}
 }
 @media (prefers-reduced-motion:reduce){
   .sc-region *,.sc-region{transition:none!important;animation:none!important}

@@ -85,7 +85,7 @@ def _finite(v, what):
 # ----------------------------------------------------------------------------- the region
 def _blank(ra, dec, fov, rev=0) -> dict:
     return {"ra": ra, "dec": dec, "fov": fov, "name": None, "astrometry": None, "anchor": None,
-            "fixed_centre": False, "report": None, "notes": [], "extended": False, "rev": rev}
+            "fixed_centre": False, "report": None, "notes": [], "extended": False, "solar": None, "gaia": None, "rev": rev}
 
 
 def get_region(state, params) -> dict:
@@ -142,7 +142,7 @@ def move_region(state, params, ra, dec, fov) -> dict:
     anchor = old.get("anchor")
     on_anchor = bool(anchor) and separation_arcsec(ra, dec, anchor[0], anchor[1]) <= ANCHOR_TOLERANCE_ARCSEC
     if not on_anchor:
-        region.update(name=None, astrometry=None, anchor=None, fixed_centre=False, report=None, notes=[],
+        region.update(name=None, astrometry=None, anchor=None, fixed_centre=False, report=None, notes=[], solar=None, gaia=None,
                       extended=False)
     elif abs(fov - old["fov"]) > 1e-9:
         region.update(report=None)
@@ -162,6 +162,31 @@ def set_object(state, params, astro, warnings=(), extended=False, position=None)
     fov = get_region(state, params)["fov"]
     return set_region(state, params, ra, dec, fov, name=astro.name, astrometry=astro.to_dict(),
                       notes=list(warnings), extended=extended)
+
+
+def set_solar(state, params, position):
+    region = set_region(state, params, position['ra'], position['dec'], get_region(state, params)['fov'],
+                        name=position['identity']['name'], fixed_centre=True)
+    region['solar'] = position
+    return region
+
+
+def set_gaia(state, params, source, provenance):
+    """Use the fetched Gaia record verbatim; retain the 64-bit identifier as text."""
+    from .astrometry import Astrometry
+    sid = source['source_id']
+    if not isinstance(sid, str) or not sid.isdecimal() or not 0 < int(sid) < 2**63:
+        raise ValueError('source_id Gaia inválido')
+    if source['ref_epoch'] != 2016.0:
+        raise ValueError('Época Gaia DR3 inesperada')
+    a = Astrometry(f'Gaia DR3 {sid}', source['ra'], source['dec'], source['ref_epoch'],
+                   pmra_masyr=source.get('pmra'), pmdec_masyr=source.get('pmdec'),
+                   parallax_mas=source.get('parallax'), rv_kms=source.get('radial_velocity'),
+                   source='ESA Gaia DR3 · gaiadr3.gaia_source · ' + provenance.get('sha256', ''))
+    r = set_object(state, params, a)
+    r['gaia'] = {'source_id': sid, 'catalogue_epoch': source['ref_epoch'], 'provenance': dict(provenance)}
+    r['notes'] = ['Coordenadas de catálogo Gaia DR3 (ICRS, J2016.0). Seleccionar esta fuente no confirma una detección SPHEREx.']
+    return r
 
 
 def set_from_report(state, params, stem: str, report: dict, label: str | None = None) -> dict:

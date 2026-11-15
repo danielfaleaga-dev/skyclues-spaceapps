@@ -73,8 +73,7 @@ if view == "region":
     st.html('<div class="sc-view"><p class="sc-eyebrow">Región del cielo</p></div>')
     st.markdown("# Elija dónde mirar")
     st.html('<p class="sc-lede">' + (
-        "Escriba el nombre de un objeto, sus coordenadas o mueva el mapa. Las tres formas cambian la misma región; "
-        "el círculo naranja es exactamente el cielo que se estudiará."
+        "Busca un objeto, escribe sus coordenadas o mueve el mapa."
         if level == "simple" else
         "Nombre, coordenadas y atlas editan una única región (centro ICRS y campo de visión). El círculo es el campo "
         "científico, de diámetro angular fijo; el zoom del mapa no lo modifica.") + "</p>")
@@ -87,13 +86,16 @@ if view == "region":
         with st.container(horizontal=True, vertical_alignment="center"):
             for stem, title in examples:
                 st.button(title, key=f"example_{stem}", on_click=time_page.open_saved, args=(stem, title.split(" · ")[0]))
-        st.caption("Observaciones reales ya comprobadas: se abren en «Tiempo» sin repetir la búsqueda en el archivo.")
-    with st.expander("Procedencia de los mapas del atlas"):
-        region_ui.provenance()
+        if level == "scientific":
+            st.caption("Observaciones reales ya comprobadas: se abren en «Tiempo» sin repetir la búsqueda en el archivo.")
+    if level == "scientific":
+        with st.expander("Procedencia de los mapas del atlas"):
+            region_ui.provenance()
 elif view == "time":
     navigation.write_url(qp, region, view)
     time_page.render(level)
 else:
     spectrum_page.render(level)
-    st.caption(f"Cubo publicado: {config.CUBE_RELEASE_ID} · DOI {config.CUBE_DOI}. Actualizar observaciones SIA2 no "
-               "modifica este cubo.")
+    if level == "scientific":
+        st.caption(f"Cubo publicado: {config.CUBE_RELEASE_ID} · DOI {config.CUBE_DOI}. Actualizar observaciones SIA2 no "
+                   "modifica este cubo.")

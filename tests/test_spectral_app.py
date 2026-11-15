@@ -22,6 +22,7 @@ def app_cube(cube,monkeypatch):
 def spectral_app(cube,channel=63):
     at=AppTest.from_file(APP,default_timeout=30)
     at.query_params={'explorer':'espectral','ra':str(cube.centre[0]),'dec':str(cube.centre[1]),'fov':'.1','canal':str(channel)}
+    at.session_state['level']='Científico'
     at.run()
     assert not at.exception
     return at
@@ -43,11 +44,11 @@ def test_url_channels_pick_extraction_and_return(app_cube):
     at.button(key='sx_extract').click().run()
     assert not at.exception
     assert at.session_state['sx_spec_params'][0]==round(app_cube.centre[0]+.001,6)
-    at.button(key='sx_to_time').click().run()
+    at.button_group(key='nav').set_value('Tiempo').run()
     assert not at.exception
-    assert at.number_input(key='ra_in').value==pytest.approx(key[0],abs=1e-6)
-    assert at.number_input(key='dec_in').value==pytest.approx(key[1],abs=1e-6)
-    assert at.radio(key='fov_preset').value=='6′'
+    assert at.session_state['region']['ra']==pytest.approx(key[0],abs=1e-6)
+    assert at.session_state['region']['dec']==pytest.approx(key[1],abs=1e-6)
+    assert at.session_state['region']['fov']==.1
     assert not any(m.label=='Épocas' for m in at.metric)
 
 
@@ -59,15 +60,15 @@ def test_time_transfer_keeps_wise_region_not_expected_marker(app_cube,monkeypatc
     stem=next(s for s in config.VALIDATED_EXAMPLES if 'wise' in s)
     at.button(key='example_'+stem).click().run()
     assert not at.exception
-    shared=at.session_state['shared_region'].copy()
-    at.button(key='to_spectrum').click().run()
+    shared=at.session_state['region'].copy()
+    at.button_group(key='nav').set_value('Espectro').run()
     assert not at.exception
     assert at.session_state['sx_region_key']==(round(shared['ra'],6),round(shared['dec'],6),shared['fov'])
-    text=' '.join(md.value for md in at.markdown)
+    text=' '.join(str(x.proto) for x in at if hasattr(x, 'proto'))
     assert 'no es una época efectiva' in text and 'no una detección' in text
-    at.button(key='sx_to_time').click().run()
+    at.button_group(key='nav').set_value('Tiempo').run()
     assert not at.exception
-    assert at.number_input(key='ra_in').value==pytest.approx(shared['ra'],abs=1e-6)
+    assert at.session_state['region']['ra']==pytest.approx(shared['ra'],abs=1e-6)
     assert 'report' not in at.session_state
 
 
@@ -90,7 +91,7 @@ def test_invalid_spectral_url_never_reads_cube(app_cube,monkeypatch,query):
     at.query_params={'explorer':'espectral',**query}
     at.run()
     assert not at.exception
-    assert any('URL no válidos' in e.value for e in at.error)
+    assert any('no válid' in e.value for e in at.error)
 
 
 def test_click_callback_uses_native_pixel_coordinates(app_cube,monkeypatch):

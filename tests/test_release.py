@@ -73,8 +73,8 @@ def test_link_independent_sessions(mode):
         for _ in range(2):
             at=AppTest.from_file(APP,default_timeout=30);at.query_params=query;at.run()
             assert not at.exception
-            assert at.number_input(key='ra_in').value==pytest.approx(210.802429)
-            assert at.radio(key='fov_preset').value=='6′'
+            assert at.session_state['region']['ra']==pytest.approx(210.802429)
+            assert at.session_state['region']['fov']==.1
 
 @pytest.mark.parametrize('name,identity',[('Andrómeda','M  31'),('NGC224','M  31'),('m31','M  31'),('M101','M 101'),('Barnard','GJ 699'),('WISE 0855','WISEA J085510.74-071442.5'),('Epsilon Indi','* eps Ind'),('M42','M  42'),('M45','Cl Melotte   22'),('HD209458','HD 209458')])
 def test_verified_aliases(name,identity):
@@ -93,10 +93,11 @@ def test_object_state_transfer():
     a,_,_=search.resolve('Barnard')
     for mode in ['temporal','espectral']:
         state,params={},{}
-        navigation.open_object(state,params,a,mode,.1)
-        assert float(params['ra'])==a.ra_deg and float(params['fov'])==.1
-        r=state['resolved' if mode=='temporal' else 'sx_resolved']['astrometry']
+        navigation.set_object(state,params,a)
+        r=state['region']['astrometry']
+        assert float(params['fov'])==.1
         assert r['pmra_masyr']==a.pmra_masyr and r['epoch_jyear']==2000
+
 
 def test_remote_outage_local_remains(monkeypatch):
     def down(*a,**kw):raise search.requests.Timeout()
@@ -133,15 +134,19 @@ def test_refresh_ui_requests_new_query(monkeypatch):
     def find(*a,**kw):
         calls.append(kw)
         return None,{'target':{'ra_deg':10.,'dec_deg':0.},'selected':None,'elapsed_s':0,'n_records':0}
-    monkeypatch.setattr(sequence,'find_sequence',find)
+    from skyclues import time_page
+    monkeypatch.setattr(time_page,'find_sequence',find)
     at=AppTest.from_file(str(config.ROOT/'app.py'),default_timeout=30)
-    at.query_params={'ra':'10','dec':'0','fov':'.1'};at.run()
-    at.button(key='refresh_observations').click().run()
+    at.query_params={'ra':'10','dec':'0','fov':'.1','explorer':'temporal'};at.session_state['level']='Científico';at.run()
+    at.button_group(key='nav').set_value('Región').run()
+    at.session_state['time_tab']='Procedencia'
+    at.button(key='example_sequence_m101').click().run()
+    at.button(key='refresh_saved').click().run()
     assert not at.exception and calls[-1]['refresh'] is True
 
 
 def test_suggestion_cache_success_but_not_outage(monkeypatch):
-    from skyclues import release_ui
+    from skyclues import region_ui as release_ui
     release_ui.suggestions.clear();calls=[]
     def answer(q):calls.append(q);return [],'https://simbad.harvard.edu'
     monkeypatch.setattr(search,'remote_suggestions',answer)

@@ -334,6 +334,7 @@ def app_cube(cube, monkeypatch):
 
 def spectral_app(cube, channel=63):
     at = AppTest.from_file(APP, default_timeout=60)
+    at.session_state['level'] = 'Científico'
     at.query_params = {'explorer': 'espectral', 'ra': str(cube.centre[0]), 'dec': str(cube.centre[1]), 'fov': '.5',
                        'canal': str(channel)}
     at.run()
@@ -351,7 +352,7 @@ def test_switch_to_multiband_and_back_keeps_region_channel_and_pick(app_cube):
     at.select_slider(key='sx_channel').set_value(94).run()
     at.number_input(key='sx_pick_ra').set_value(app_cube.centre[0] + .001).run()
     at.slider(key='sx_rap').set_value(3.0).run()
-    at.radio(key='sx_mode').set_value(mpage.MODES[1]).run()
+    at.button_group(key='sx_mode').set_value(mpage.MODES[1]).run()
     assert not at.exception
     offered = {int(o.split()[1]) for o in at.selectbox(key='mb_R').options}
     assert len(offered) == 100 and {51, 52}.isdisjoint(offered)
@@ -366,7 +367,7 @@ def test_switch_to_multiband_and_back_keeps_region_channel_and_pick(app_cube):
     assert any(c.value.startswith(f'λ {lam:.3f} µm') for c in at.caption)
     assert not any(e for e in at.error)
     # back to single-channel: channel, pick and aperture preserved, spectrum shown again
-    at.radio(key='sx_mode').set_value(mpage.MODES[0]).run()
+    at.button_group(key='sx_mode').set_value(mpage.MODES[0]).run()
     assert not at.exception and no_widget_state_warning(at)
     assert at.session_state['sx_channel'] == 94
     assert at.number_input(key='sx_pick_ra').value == pytest.approx(app_cube.centre[0] + .001)
@@ -381,7 +382,7 @@ def test_switch_to_multiband_and_back_keeps_region_channel_and_pick(app_cube):
     rap = at.slider(key='sx_rap').proto
     assert (list(rap.value) if rap.set_value else list(rap.default)) == [3.0]
     # and the multiband selection survives the round trip, also on screen
-    at.radio(key='sx_mode').set_value(mpage.MODES[1]).run()
+    at.button_group(key='sx_mode').set_value(mpage.MODES[1]).run()
     assert not at.exception and no_widget_state_warning(at)
     assert at.selectbox(key='mb_R').value == 90 and at.selectbox(key='mb_B').value == 10
     for role, n in (('R', 90), ('B', 10)):
@@ -394,6 +395,7 @@ def test_multiband_reader_failure_is_visible_without_image(app_cube, monkeypatch
         raise archive.ArchiveTransientError('test')
     monkeypatch.setattr(page, 'cached_map', fail)
     at = AppTest.from_file(APP, default_timeout=60)
+    at.session_state['level'] = 'Científico'
     at.query_params = {'explorer': 'espectral', 'ra': str(app_cube.centre[0]), 'dec': str(app_cube.centre[1]),
                        'fov': '.5'}
     at.session_state['sx_mode'] = mpage.MODES[1]
@@ -413,6 +415,7 @@ def test_insufficient_coverage_message_in_app(app_cube, monkeypatch):
         return sc.ChannelMap(m.channel, ra, dec, fov, [sc.Patch(p.tile, p.x0, p.y0, img, p.nhits, p.flags)])
     monkeypatch.setattr(page, 'cached_map', sparse)
     at = AppTest.from_file(APP, default_timeout=60)
+    at.session_state['level'] = 'Científico'
     at.query_params = {'explorer': 'espectral', 'ra': str(app_cube.centre[0]), 'dec': str(app_cube.centre[1]),
                        'fov': '.5'}
     at.session_state['sx_mode'] = mpage.MODES[1]
@@ -427,18 +430,18 @@ def test_returning_to_spectrum_explorer_with_the_same_region_keeps_working(app_c
     at = AppTest.from_file(APP, default_timeout=60).run()
     stem = next(s for s in config.VALIDATED_EXAMPLES if 'm101' in s)
     at.button(key='example_' + stem).click().run()
-    explorer = at.radio(key='explorer').options
+    explorer = ['Tiempo', 'Espectro']
     for _ in range(2):
-        at.radio(key='explorer').set_value(explorer[1]).run()
+        at.button_group(key='nav').set_value(explorer[1]).run()
         assert not at.exception
-        at.radio(key='explorer').set_value(explorer[0]).run()
+        at.button_group(key='nav').set_value(explorer[0]).run()
         assert not at.exception
-    at.radio(key='explorer').set_value(explorer[1]).run()
+    at.button_group(key='nav').set_value(explorer[1]).run()
     assert not at.exception
     assert at.session_state['sx_pick_ra'] == pytest.approx(at.session_state['sx_region_key'][0])
-    at.radio(key='sx_mode').set_value(mpage.MODES[1]).run()           # also through the multiband mode
-    at.radio(key='explorer').set_value(explorer[0]).run()
-    at.radio(key='explorer').set_value(explorer[1]).run()
+    at.button_group(key='sx_mode').set_value(mpage.MODES[1]).run()           # also through the multiband mode
+    at.button_group(key='nav').set_value(explorer[0]).run()
+    at.button_group(key='nav').set_value(explorer[1]).run()
     assert not at.exception
-    at.radio(key='sx_mode').set_value(mpage.MODES[0]).run()
+    at.button_group(key='sx_mode').set_value(mpage.MODES[0]).run()
     assert not at.exception

@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from . import archive, config, motion, references
+from . import archive, config, motion, references, theme
 from .astrometry import Astrometry
 
 SOURCE_MODES = ["Objetivo del catálogo", "Fuente detectada en la época 1", "Coordenadas RA/Dec"]
@@ -64,7 +64,19 @@ def saved_investigations() -> dict[str, Path]:
     return out
 
 
-def show_result(r: dict, key: str) -> None:
+def show_result(r: dict, key: str, simple: bool = False) -> None:
+    if simple:
+        st.markdown(f'<span class="sc-badge {BADGE.get(r["outcome"], "")}">{r["outcome_label"]}</span>', unsafe_allow_html=True)
+        messages = {motion.MOTION_MEASURED: 'La comparación encontró un cambio de posición medible.',
+                    motion.INSUFFICIENT_EVIDENCE: 'No hay evidencia suficiente para confirmar un movimiento.',
+                    motion.INCOMPATIBLE: 'Estas imágenes no permiten una comparación fiable.',
+                    motion.INSUFFICIENT_DATA: 'Faltan imágenes adecuadas para comprobar el movimiento.'}
+        st.markdown(messages.get(r['outcome'], r['outcome_label']))
+        d = r.get('displacement')
+        if d and r['outcome'] == motion.MOTION_MEASURED:
+            theme.facts([('Cambio de posición', f"{d['total_arcsec']:.2f} ± {d['total_err_arcsec']:.2f}″", f"en {d['delta_t_days']:.0f} días")])
+        st.caption('En Científico puedes revisar las medidas, los motivos y las imágenes utilizadas.')
+        return
     st.markdown(f'<span class="sc-badge {BADGE.get(r["outcome"], "")}">{r["outcome_label"]} · {r["outcome"]}</span>'
                 f' &nbsp; <span class="sc-badge">{r.get("source", {}).get("label") or "fuente seleccionada"}</span>',
                 unsafe_allow_html=True)
@@ -140,13 +152,11 @@ def _pair(v):
 
 
 def render(seq, report_json: str, level: str = "scientific") -> None:
-    """``level`` only changes the wording of the introduction; the measurement is the same."""
+    """Presentation level changes explanations, never measurement or its parameters."""
+    sci = level == 'scientific'
     if level == "simple":
         st.markdown(
-            '<div class="sc-note"><b>¿Se mueve algo?</b> Elija una fuente y SkyClues medirá su posición en cada '
-            'observación real, usando estrellas fijas del campo como referencia. El resultado puede ser <i>Movimiento '
-            'medido</i>, <i>Evidencia insuficiente</i>, <i>Observaciones incompatibles</i> o <i>Datos insuficientes</i>, '
-            'siempre con sus motivos. Una posición calculada con un catálogo nunca cuenta como detección.</div>',
+            '<div class="sc-note"><b>¿Se mueve algo?</b> Elige un punto para comprobar si su posición cambia entre fechas.</div>',
             unsafe_allow_html=True)
     else:
         st.markdown(
@@ -158,17 +168,17 @@ def render(seq, report_json: str, level: str = "scientific") -> None:
             unsafe_allow_html=True)
     saved = saved_investigations()
     if saved:
-        with st.expander("Investigaciones reales guardadas (results/motion_*.json)"):
+        with st.expander("Investigaciones reales guardadas (results/motion_*.json)" if sci else 'Investigaciones guardadas'):
             label = st.selectbox("Resultado", list(saved), key="mv_saved")
-            show_result(json.loads(saved[label].read_text(encoding="utf-8")), key="mv_saved_view")
+            show_result(json.loads(saved[label].read_text(encoding="utf-8")), key="mv_saved_view", simple=not sci)
     a = seq.astrometry
     modes = SOURCE_MODES if a is not None else SOURCE_MODES[1:]
     src_mode = st.radio("Fuente a investigar", modes, horizontal=True, key="mv_source")
     f0 = seq.frames[0]
     if src_mode == SOURCE_MODES[0]:
         start = seq.target_position(0)
-        st.caption(f"{a.name}: posición de catálogo calculada para la época 1 (RA {start[0]:.6f}°, Dec "
-                   f"{start[1]:+.6f}°). Solo define el círculo de búsqueda; la posición se mide en cada temporada.")
+        st.caption((f"{a.name}: posición de catálogo calculada para la época 1 (RA {start[0]:.6f}°, Dec "
+                   f"{start[1]:+.6f}°). Solo define el círculo de búsqueda; la posición se mide en cada temporada.") if sci else f'Objeto seleccionado: {a.name}.')
     elif src_mode == SOURCE_MODES[1]:
         dets = motion.detect_sources(f0.image)
         if not dets:
@@ -176,15 +186,19 @@ def render(seq, report_json: str, level: str = "scientific") -> None:
             return
         opts = {f"#{i + 1} · {d['significance']:.0f}σ · RA {d['ra']:.5f}°, Dec {d['dec']:+.5f}° · píxel ({d['x']}, {d['y']})": d
                 for i, d in enumerate(dets[:25])}
-        d = opts[st.selectbox("Fuente detectada (filtro adaptado a la PSF, época 1)", list(opts), key="mv_detected")]
+        d = opts[st.selectbox("Fuente detectada (filtro adaptado a la PSF, época 1)" if sci else 'Punto en la primera imagen', list(opts), key="mv_detected",
+                             format_func=lambda x: x if sci else 'Punto ' + x.split(' · ')[0].lstrip('#'))]
         start = (d["ra"], d["dec"])
     else:
         c1, c2 = st.columns(2)
         start = (c1.number_input("RA (°)", value=float(seq.ra), format="%.6f", key="mv_ra"),
                  c2.number_input("Dec (°)", value=float(seq.dec), format="%.6f", key="mv_dec"))
-    radius = st.slider("Radio de búsqueda alrededor de la selección (″)", 5, 40, int(motion.SEARCH_RADIUS_ARCSEC),
-                       key="mv_radius", help="La fuente se busca en cada temporada dentro de este círculo, sin usar "
-                                             "predicciones. Debe cubrir el desplazamiento posible entre las fechas.")
+    radius = st.session_state.get('mv_radius', st.session_state.get('_mv_radius', int(motion.SEARCH_RADIUS_ARCSEC)))
+    if sci:
+        radius = st.slider("Radio de búsqueda alrededor de la selección (″)", 5, 40, radius,
+                           key="mv_radius", help="La fuente se busca en cada temporada dentro de este círculo, sin usar "
+                                                 "predicciones. Debe cubrir el desplazamiento posible entre las fechas.")
+    st.session_state['_mv_radius'] = radius
     span = seq.metrics["span_days"]
     img_mode = st.radio("Imágenes", IMAGE_MODES, key="mv_images", horizontal=True,
                         captions=[f"{seq.n} imágenes · {span:.0f} d · campo {seq.field_deg * 60:g}′",
@@ -196,7 +210,8 @@ def render(seq, report_json: str, level: str = "scientific") -> None:
             "Imágenes por temporada", [2, 3, 4, 6, 8], value=motion.PER_SEASON, key="mv_per_season",
             help="Más exposiciones por temporada mejoran la señal de una fuente débil y la comprobación de "
                  "consistencia interna, a cambio de más recortes (~4 MB cada uno).")
-        st.caption(f"Hasta {motion.MAX_SEASONS * per_season} recortes (~{4 * motion.MAX_SEASONS * per_season} MB, "
+        if sci:
+            st.caption(f"Hasta {motion.MAX_SEASONS * per_season} recortes (~{4 * motion.MAX_SEASONS * per_season} MB, "
                    "se reutilizan desde la caché). El resultado depende de las exposiciones elegidas: se registra en "
                    "el informe.")
     if img_mode == IMAGE_MODES[0] and span < 30:
@@ -207,7 +222,7 @@ def render(seq, report_json: str, level: str = "scientific") -> None:
                      default=str)
     label = a.name if src_mode == SOURCE_MODES[0] and a else src_mode
     if run:
-        with st.status("Midiendo posiciones en las imágenes originales…", expanded=True) as box:
+        with st.status("Midiendo posiciones en las imágenes originales…", expanded=True) as box, theme.loading("Comparando la posición entre fechas…", "motion"):
             try:
                 if img_mode == IMAGE_MODES[0]:
                     box.write("Consultando Gaia DR3 (estrellas estacionarias del campo)…")
@@ -232,6 +247,6 @@ def render(seq, report_json: str, level: str = "scientific") -> None:
                 st.error(f"{type(err).__name__}: {err}. No se ha mostrado ningún resultado parcial.")
     res = st.session_state.get("mv_result")
     if res and res["key"] == key:
-        show_result(res["result"], key="mv_current")
+        show_result(res["result"], key="mv_current", simple=not sci)
     elif res:
         st.caption("Ha cambiado la selección: pulse «Investigar movimiento» para obtener un resultado nuevo.")

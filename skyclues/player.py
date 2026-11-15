@@ -238,33 +238,43 @@ if (typeof module !== 'undefined') { module.exports = { createPlayer, shortcutAc
 """
 
 _CSS = """
-:root{--ink:#14181f;--muted:#4a5463;--line:#d8dde5;--surface:#f3f5f8;--accent:#1f5fbf;--mask:%(mask)s;--outside:%(outside)s}
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{--ink:#14171c;--muted:#5b6470;--line:#e3e6ea;--surface:#f6f7f8;--accent:#c4411c;--mask:%(mask)s;--outside:%(outside)s;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
 *{box-sizing:border-box}
-body{margin:0;font-family:"Source Sans Pro","Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:#fff}
+body{margin:0;font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.45}
 .sc{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
 .stage{position:relative;border:1px solid var(--line);border-radius:8px;background:#fff;padding:6px;width:max-content;max-width:100%%}
 .stage img{display:block;max-width:100%%;height:auto;image-rendering:pixelated}
 .badge{position:absolute;left:12px;top:10px;background:rgba(255,255,255,.92);border:1px solid var(--line);
   border-radius:6px;padding:3px 8px;font-size:13px;font-weight:600}
 .badge .sub{font-weight:400;color:var(--muted)}
-.side{flex:1;min-width:260px;max-width:440px}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
-button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);
-  border-radius:6px;padding:6px 12px;cursor:pointer}
-button:hover{border-color:var(--accent)}
-button.primary{background:var(--accent);color:#fff;border-color:var(--accent);min-width:118px}
-input[type=range]{flex:1;accent-color:var(--accent)}
-select{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;background:#fff}
-label{font-size:14px;color:var(--ink)}
-.box{border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--surface);margin-top:10px}
-.box h4{margin:2px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-table{border-collapse:collapse;width:100%%;font-size:12.5px}
-td,th{padding:3px 6px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-tr.on{background:#e6eefb}
-tbody tr{cursor:pointer}
+.side{flex:1;min-width:260px;max-width:440px;padding:4px 0}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.transport{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:6px}
+button{font:inherit;font-size:13px;font-weight:500;border:1px solid var(--line);background:#fff;color:var(--ink);
+  border-radius:6px;padding:8px 7px;cursor:pointer;transition:background .14s,border-color .14s}
+button:hover{border-color:var(--ink);background:var(--surface)}
+button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.primary:hover{background:#30353d}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+input[type=range]{flex:1;min-width:90px;height:18px;accent-color:var(--accent);cursor:pointer}
+input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;margin:0;cursor:pointer}
+select{font:inherit;font-size:12.5px;color:var(--ink);border:1px solid var(--line);border-radius:5px;padding:6px;background:#fff;max-width:100%%}
+label{display:inline-flex;gap:7px;align-items:center;font-size:13px;color:var(--muted)}
+.box{border:0;border-top:1px solid var(--line);border-radius:0;padding:14px 0 4px;background:#fff;margin-top:16px}
+.box h4{margin:0 0 10px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.table-scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%%;font-size:11px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+td,th{padding:6px 5px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--muted);font-weight:500}
+tr.on{background:#fcf0eb;box-shadow:inset 2px 0 var(--accent)}
+tbody tr{cursor:pointer}tbody tr:hover{background:var(--surface)}
 .legend{font-size:12px;color:var(--muted);margin-top:6px}
 .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px -1px 8px;border:1px solid #c9ced6}
 .kbd{font-size:11px;color:var(--muted)}
+#pos{font-family:var(--mono);font-size:10.5px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 """
 
 _BODY = """
@@ -274,7 +284,7 @@ _BODY = """
     <div class="badge" id="badge"></div>
   </div>
   <div class="side">
-    <div class="row">
+    <div class="row transport">
       <button id="prev" title="Época anterior (←)">◀ Anterior</button>
       <button id="play" class="primary" title="Reproducir / pausa (espacio)">▶ Reproducir</button>
       <button id="next" title="Época siguiente (→)">Siguiente ▶</button>
@@ -295,14 +305,14 @@ _BODY = """
       <h4>Blink</h4>
       <div class="row">
         <label><input type="checkbox" id="blink"> Alternar</label>
-        <select id="ba"></select><span>↔</span><select id="bb"></select>
-        <select id="bfps"><option value="1">1 Hz</option><option value="2" selected>2 Hz</option><option value="4">4 Hz</option></select>
+        <select id="ba" aria-label="Primera época de blink"></select><span>↔</span><select id="bb" aria-label="Segunda época de blink"></select>
+        <select id="bfps" aria-label="Frecuencia de blink"><option value="1">1 Hz</option><option value="2" selected>2 Hz</option><option value="4">4 Hz</option></select>
       </div>
     </div>
     <div class="box">
       <h4>Épocas (observaciones auténticas)</h4>
-      <table><thead><tr><th>#</th><th>Fecha</th><th>Δt (d)</th><th>λ (µm)</th><th>válido</th></tr></thead>
-      <tbody id="rows"></tbody></table>
+      <div class="table-scroll"><table><thead><tr><th>#</th><th>Fecha</th><th>Δt (d)</th><th>λ (µm)</th><th>válido</th></tr></thead>
+      <tbody id="rows"></tbody></table></div>
     </div>
     <div class="legend">%(legend)s</div>
     <div class="kbd">Teclado (con el foco fuera de los controles): espacio = reproducir/pausa · ← → = paso.
@@ -393,20 +403,28 @@ def legend_html(subtract_zodi: bool = True, restrict_to_common: bool = False, ge
 
 
 def player_html(seq: TemporalSequence, pngs: list[bytes], subtract_zodi: bool = True,
-                restrict_to_common: bool = False, geometry: str = "exact", show_halo: bool = False) -> str:
+                restrict_to_common: bool = False, geometry: str = "exact", show_halo: bool = False, simple: bool = False) -> str:
     frames = ["data:image/png;base64," + base64.b64encode(p).decode() for p in pngs]
     css = _CSS % {"mask": render.MASK_COLOR, "outside": render.OUTSIDE_COMMON_COLOR}
     body = _BODY % {"legend": legend_html(subtract_zodi, restrict_to_common, geometry, show_halo,
                                           seq.target_moves, precision_note(seq))}
     glue = _GLUE_JS % {"frames": json.dumps(frames), "meta": json.dumps(frame_metadata(seq))}
+    if simple:
+        css += '.badge .sub,.kbd,td:nth-child(n+3),th:nth-child(n+3){display:none}.legend{font-size:14px;line-height:1.5}'
+        legend = 'Rosa: sin datos. Cruz azul: posición de referencia.'
+        if show_halo:
+            legend += ' Cobre: zonas de calidad limitada.'
+        body = _BODY % {'legend': legend}
+        body = body.replace('Épocas (observaciones auténticas)', 'Fechas disponibles')
+        glue = glue.replace("'época '", "'fecha '")
     return (f"<!doctype html><html><head><meta charset='utf-8'><style>{css}</style></head>"
             f"<body>{body}<script>{PLAYER_CORE_JS}</script><script>{glue}</script></body></html>")
 
 
 def build_player(seq: TemporalSequence, subtract_zodi: bool = True, restrict_to_common: bool = False,
-                 geometry: str = "exact", show_halo: bool = False) -> str:
+                 geometry: str = "exact", show_halo: bool = False, simple: bool = False) -> str:
     """Ready-to-embed HTML player. Display options never alter the sequence or its metrics."""
     norm = sequence_norm(seq, subtract_zodi)
     pngs = [render_frame_png(seq, i, norm, subtract_zodi, restrict_to_common, geometry, show_halo)
             for i in range(seq.n)]
-    return player_html(seq, pngs, subtract_zodi, restrict_to_common, geometry, show_halo)
+    return player_html(seq, pngs, subtract_zodi, restrict_to_common, geometry, show_halo, simple)

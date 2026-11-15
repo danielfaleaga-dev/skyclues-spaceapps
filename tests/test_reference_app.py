@@ -16,16 +16,17 @@ def test_time_reference_region_and_gaia_outage(monkeypatch):
     monkeypatch.setattr(page,'cached_gaia',outage)
     at=AppTest.from_file(APP,default_timeout=30).run()
     assert not at.exception
-    shared=at.session_state['shared_region']
+    at.button(key='example_sequence_m101').click().run()
+    shared=at.session_state['region']
     at.toggle(key='time_ref_open').set_value(True).run()
     assert not at.exception and not calls
     at.checkbox(key='time_ref_query').check().run()
     assert not at.exception
     assert calls[-1]==(shared['ra'],shared['dec'],shared['fov'])
     assert any('Gaia DR3 no disponible' in x.value for x in at.warning)
-    html=at.get('iframe')[0].proto.srcdoc
+    html=next(x.proto.srcdoc for x in at.get('iframe') if 'gaiaLoaded' in x.proto.srcdoc)
     assert 'AllWISE' in html and '"gaiaLoaded": false' in html
-    assert any(x.label=='Épocas' for x in at.metric)
+    assert at.session_state['region']['report']=='sequence_m101'
 
 
 def test_spectrum_reference_field_and_transfer(app_cube,monkeypatch):
@@ -36,6 +37,10 @@ def test_spectrum_reference_field_and_transfer(app_cube,monkeypatch):
     key=at.session_state['sx_region_key']
     at.toggle(key='spectrum_ref_open').set_value(True).run()
     assert not at.exception and calls[-1]==pytest.approx(key)
-    at.button(key='sx_to_time').click().run()
+    from skyclues import time_page
+    def result(inp,refresh):
+        return {'target':{'ra_deg':inp['ra'],'dec_deg':inp['dec'],'field_deg':inp['fov']},'selected':None,'n_records':0}
+    monkeypatch.setattr(time_page,'run_search',result)
+    at.button_group(key='nav').set_value('Tiempo').run()
     at.toggle(key='time_ref_open').set_value(True).run()
     assert not at.exception and calls[-1]==pytest.approx(key)

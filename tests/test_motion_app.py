@@ -27,9 +27,12 @@ def test_motion_tab_renders_and_gaia_outage_is_explained(monkeypatch):
         raise references.ReferenceError("Gaia DR3 (ESA) no responde.")
     monkeypatch.setattr(motion_page, "_gaia", down)
     at = AppTest.from_file(APP, default_timeout=120)
+    at.session_state['level']='Científico'
+    at.session_state['time_tab']='Movimiento'
     at.run()
+    at.button(key='example_sequence_m101').click().run()
     assert not at.exception
-    assert any(t.label == "Buscar algo que se mueve" for t in at.tabs)
+    assert any(t.label == "Movimiento" for t in at.tabs)
     assert at.selectbox(key="mv_saved").options
     at.button(key="mv_run").click().run()
     assert not at.exception
@@ -65,7 +68,10 @@ def test_real_eps_ind_b_d3_reproduces_from_cached_originals():
 
 def test_extended_baseline_offers_images_per_season(monkeypatch):
     at = AppTest.from_file(APP, default_timeout=120)
+    at.session_state['level']='Científico'
+    at.session_state['time_tab']='Movimiento'
     at.run()
+    at.button(key='example_sequence_m101').click().run()
     assert not at.exception
     at.radio(key="mv_images").set_value(motion_page.IMAGE_MODES[1]).run()
     assert not at.exception

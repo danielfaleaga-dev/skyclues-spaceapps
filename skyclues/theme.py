@@ -10,6 +10,7 @@ The symbol is the field-of-view ring with two points in it: where something was 
 from __future__ import annotations
 
 from pathlib import Path
+from contextlib import contextmanager
 
 import streamlit as st
 
@@ -57,6 +58,17 @@ h1{{font-size:2.05rem;line-height:1.12}} h2{{font-size:1.5rem}} h3{{font-size:1.
 .st-key-level p,.st-key-nav p{{font-size:inherit}}
 
 /* shared pieces */
+[data-testid="stSpinner"]{{border-left:2px solid var(--sc-ember);padding:.6rem .85rem;background:var(--sc-surface);
+  border-radius:0 6px 6px 0;color:var(--sc-ink);margin:.4rem 0}}
+[data-testid="stStatusWidget"]{{border:1px solid var(--sc-line);border-radius:6px;background:#fff}}
+[class*="st-key-sc_loading_"] [data-testid="stSpinner"]{{position:relative;isolation:isolate;min-height:215px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;text-align:center;
+  padding:28px;border:1px solid #e6e8eb;border-radius:14px;background:linear-gradient(135deg,rgba(246,247,248,.92),rgba(255,255,255,.86));
+  backdrop-filter:blur(7px);box-shadow:0 8px 30px rgba(20,23,28,.045);font-size:1.12rem;line-height:1.5}}
+[class*="st-key-sc_loading_"] [data-testid="stSpinner"]::before{{content:"";width:42px;height:42px;flex-shrink:0;
+  border:2px solid #e2d9d4;border-top-color:var(--sc-ember);border-right-color:var(--sc-ember);border-radius:50%;animation:sc-loading 1s linear infinite}}
+[class*="st-key-sc_loading_"] [data-testid="stSpinner"] p{{font-size:1.12rem;font-weight:500;max-width:45ch}}
+@keyframes sc-loading{{to{{transform:rotate(360deg)}}}}
 .sc-eyebrow{{font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--sc-muted);margin:0 0 .25rem}}
 .sc-lede{{color:var(--sc-muted);font-size:1rem;max-width:68ch;margin:.1rem 0 0}}
 .sc-sub{{color:var(--sc-muted);font-size:.95rem}}
@@ -111,6 +123,14 @@ h1{{font-size:2.05rem;line-height:1.12}} h2{{font-size:1.5rem}} h3{{font-size:1.
 
 def inject() -> None:
     st.html(CSS)
+
+
+@contextmanager
+def loading(text: str, key: str):
+    """Prominent inline wait for a main data product; cached/brief work never flashes a card."""
+    with st.container(key=f"sc_loading_{key}"):
+        with st.spinner(text, show_time=True, width="stretch"):
+            yield
 
 
 def brand_html() -> str:

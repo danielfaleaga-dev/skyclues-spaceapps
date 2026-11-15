@@ -25,12 +25,24 @@ def local_suggestions(text):
 
 def resolve(text):
     text=validate_name(text)
+    text = canonical_name(text)
+    if normalize(text) == 'm 102':
+        raise ValueError('M102 tiene una identificación histórica ambigua: seleccione NGC 5866 o M101 explícitamente.')
     exact=[x for x in INDEX if normalize(text) in [normalize(a) for a in [x['id'],*x['aliases']]]]
     if len(exact)==1:
         item=exact[0];a=Astrometry.from_dict(item['astrometry'])
         return a,a.warnings(),item['extended']
     a,w=resolve_name(text)
     return a,w,False
+
+
+def canonical_name(text):
+    """Normalize catalogue notation without restricting resolution to the small suggestion index."""
+    text = re.sub(r'^messier\s*', 'M ', text.strip(), flags=re.I)
+    text = re.sub(r'^(M|NGC|IC)\s*0*(\d+)', lambda m: m[1].upper()+' '+str(int(m[2])), text, flags=re.I)
+    if re.fullmatch(r'M \d+', text) and not 1 <= int(text[2:]) <= 110:
+        raise ValueError('Los identificadores Messier van de M1 a M110.')
+    return text
 
 def remote_suggestions(text):
     text=validate_name(text)

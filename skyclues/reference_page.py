@@ -32,7 +32,7 @@ def render(ra: float, dec: float, fov: float, *, key: str) -> None:
             if st.button("Reintentar / actualizar Gaia", key=f"{key}_retry"):
                 cached_gaia.clear(ra, dec, fov)
             try:
-                with st.spinner("Consultando Gaia DR3 (máximo 500 fuentes)…"):
+                with st.spinner("Consultando Gaia DR3 (máximo 500 fuentes)…", show_time=True):
                     result = cached_gaia(ra, dec, fov)
             except ref.ReferenceError as err:
                 error = str(err)
