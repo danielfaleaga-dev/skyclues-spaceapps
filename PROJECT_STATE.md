@@ -9,6 +9,7 @@
   - la regla morfológica debe excluir fuentes puntuales catalogadas;
   - la fotometría con anillo local reduce la sensibilidad a la emisión extensa.
 - **Validación ciega V02:** T01 (NGC 7027), T02 (núcleo de M82) y T03 (Elias 29) resultan **NO EVALUABLE**. Las tres fuentes saturan o pierden píxeles del cubo DR1 justo donde están sus rasgos de referencia; el analizador no etiquetó nada cuantificable. Detalle en `results/blind_v02/INFORME_FINAL.md`.
+- **Diagnóstico V02 y validación ciega V03:** los canales sin valor de V02 son píxeles NaN/NHITS=0 con bandera BLOOM en el propio FITS, ampliados por la regla de apertura (sin defecto de código; \SPECTRAL_V02_DIAGNOSIS.md\). V03 ejecutó 3 de 14 candidatos que pasaron los criterios instrumentales: Arp 220 y núcleo de M51 PARCIAL (PAH 3,3 µm en el canal esperado), TW Hya NO EVALUABLE (OVERFLOW y salto entre detectores). Informe en \SPECTRAL_BLIND_V03_REPORT.md\.
 
 ## Movimiento medido de objetos conocidos — 15-11-2026 (Claude Code B)
 

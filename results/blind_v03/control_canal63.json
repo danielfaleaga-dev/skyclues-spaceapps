@@ -1,0 +1,44 @@
+{
+ "M101 A": [
+  "sin_caracteristica",
+  2.82,
+  0.038,
+  0.55
+ ],
+ "M101 B": [
+  "sin_caracteristica",
+  22.36,
+  1.244,
+  3.39
+ ],
+ "C05": [
+  "sin_caracteristica",
+  9.58,
+  0.221,
+  2.84
+ ],
+ "C12": [
+  "sin_caracteristica",
+  1.98,
+  0.014,
+  0.02
+ ],
+ "C14": [
+  "sin_caracteristica",
+  34.64,
+  0.095,
+  3.53
+ ],
+ "NGC7023 A": [
+  "sin_caracteristica",
+  7.88,
+  0.066,
+  0.32
+ ],
+ "NGC7023 B": [
+  "sin_caracteristica",
+  55.09,
+  1.374,
+  3.42
+ ]
+}
