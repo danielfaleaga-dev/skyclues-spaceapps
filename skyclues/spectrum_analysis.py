@@ -15,6 +15,7 @@ import streamlit as st
 
 from . import config, theme
 from . import spectral_features as sf
+from . import spectral_quality as sq
 from . import spectral_view as sv
 
 POINTS = ["Punto A", "Punto B"]
@@ -251,6 +252,7 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
                 spec_b = extract(*b_pos)
         except Exception as err:  # noqa: BLE001
             show_error(err, "No se pudo obtener el espectro del punto B")
+    quals = {"A": sq.spectrum_quality(spec_a), **({"B": sq.spectrum_quality(spec_b)} if spec_b is not None else {})}
     sa = sf.series_from_spectrum(spec_a, quantity, "A")
     sb = sf.series_from_spectrum(spec_b, quantity, "B") if spec_b is not None else None
     pairs = [(s, analysis_of(s)) for s in (sa, sb) if s is not None]
@@ -308,6 +310,7 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
             for k, f in found.items():
                 st.markdown(f"**{k}** — {_plain(f)}")
             st.caption("Un pico o un valle no identifica por sí solo un material.")
+        _interval_quality(quals, found, sci)
     else:
         st.caption("Pulsa un punto del gráfico, o arrastra sobre un intervalo, para examinar ese pico o valle." if not sci
                    else "Pulse un punto del gráfico o arrastre sobre un intervalo de longitudes de onda para "
@@ -353,6 +356,111 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
                 f"- **Oscilaciones no señaladas** (máximos y mínimos locales por debajo de los criterios): {small}.\n"
                 "- **Qué no es:** ni una detección ni una identificación. Un pico cerca de una banda conocida no "
                 f"demuestra esa banda. Método: {m['metodo']}.")
+    _quality_section(quals, sci)
+
+
+# ----------------------------------------------------------------------------- why a channel has no value
+def _interval_quality(quals: dict, found: dict, sci: bool) -> None:
+    """Coverage of the aperture for the channels examined (and their immediate surroundings), only if something
+    is wrong with them. The diagnosis never changes a measurement: it explains the missing or cautioned ones."""
+    ref = max(found.values(), key=lambda f: (RANK[f.klass], abs(f.ratio or 0.0)))
+    if ref.trial_lo is None:
+        return
+    lo, hi = ref.trial_lo - sf.N_SIDE, ref.trial_hi + sf.N_SIDE
+    window = {k: [q for q in qs if lo <= q.canal <= hi] for k, qs in quals.items()}
+    if not any(q.affected for w in window.values() for q in w):
+        return
+    if not sci:
+        single = ref.trial_lo == ref.trial_hi
+        for k, w in window.items():
+            text = _plain_quality(w, ref.trial_lo if single else None)
+            if text:
+                st.markdown(f"**{k}** — {text}")
+        return
+    st.markdown("**Calidad de la apertura en el intervalo y su entorno**")
+    _quality_table(_quality_rows(window))
+    st.caption(f"{sq.CAUSE_TEXT[sq.INCOMPLETE]} Las causas pueden coexistir: no son categorías excluyentes. Se muestran "
+               f"los canales {lo}–{hi} que tienen algo que contar.")
+
+
+QUALITY_WIDTHS = {"Espectro": 70, "Canal": 55, "λ (µm)": 60, "Detector": 65, "Píxeles válidos": 130,
+                  "Píxeles sin datos": 170, "Peso perdido": 90, "BLOOM": 60, "OVERFLOW": 80, "Estado": 200, "Causas": 260}
+
+
+def _quality_rows(parts: dict) -> list:
+    """Rows of the coverage table for {label: [ChannelQuality]}; the spectrum column only when there are two."""
+    return [({"Espectro": k} if len(parts) > 1 else {}) | r for k, qs in parts.items()
+            for r in sq.table_rows([q for q in qs if q.affected])]
+
+
+def _quality_table(rows: list) -> None:
+    """The scientific coverage table: fixed widths so that no column is cut at the usual page width."""
+    cfg = {c: st.column_config.Column(width=w) for c, w in QUALITY_WIDTHS.items()}
+    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", column_config=cfg)
+
+
+def _plain_quality(window: list, channel: int | None) -> str | None:
+    """Sencillo wording for the channels around a selection (or for the single channel selected)."""
+    if channel is not None:
+        one = next((q for q in window if q.canal == channel), None)
+        parts = [sq.plain(one)] if one is not None and (not one.valid_for_extraction or one.caution) else []
+        near = [q for q in window if q.canal != channel and not q.valid_for_extraction and q.status != "blank"]
+        if near:                            # the neighbours decide whether the environment of the channel exists
+            parts.append(f"Cerca de este color, {len(near)} {'no puede' if len(near) == 1 else 'no pueden'} analizarse "
+                         "porque parte de la región seleccionada no tiene datos utilizables.")
+        return " ".join(parts) or None
+    lost = [q for q in window if not q.valid_for_extraction and q.status != "blank"]
+    blank = [q for q in window if q.status == "blank"]
+    caution = [q for q in window if q.caution]
+    parts = []
+    if lost:
+        parts.append(f"{len(lost)} de {len(window)} colores de esta zona {'no puede' if len(lost) == 1 else 'no pueden'} "
+                     "analizarse porque parte de la región seleccionada no tiene datos utilizables.")
+    if blank:
+        parts.append("Algún color de esta zona no tiene datos en el catálogo de SPHEREx.")
+    if caution:
+        parts.append(f"En {len(caution)} {'color' if len(caution) == 1 else 'colores'} hay datos, pero parte de la luz "
+                     f"pudo saturarse: {'tómalo' if len(caution) == 1 else 'tómalos'} con cautela.")
+    return " ".join(parts) or None
+
+
+def _quality_section(quals: dict, sci: bool) -> None:
+    """One collapsed section for the whole spectrum (nothing is added to the plot)."""
+    if not sci:
+        lines = []
+        for k, qs in quals.items():
+            lost = [(q.canal, q.lambda_um) for q in qs if not q.valid_for_extraction and q.status != "blank"]
+            if lost:
+                lines.append(f"- **{k}:** {len(lost)} {'color' if len(lost) == 1 else 'colores'} sin analizar "
+                             f"({sq.ranges_text(lost)}).")
+        if not lines:
+            return
+        with st.expander("¿Por qué faltan algunos colores?"):
+            st.markdown("En esos colores, parte de la región seleccionada no tiene datos utilizables en el catálogo de "
+                        "SPHEREx, así que SkyClues no los analiza. No se rellenan ni se inventan valores.\n" + "\n".join(lines))
+        return
+    with st.expander("Calidad de los canales: cobertura de la apertura y máscaras"):
+        for k, qs in quals.items():
+            s = sq.summary(qs)
+            first = next((q for q in qs if q.available and q.px_total), None)
+            st.markdown(
+                f"**{k}** — {s['con_valor']} de {s['canales']} canales con valor"
+                + (f" (apertura de {first.px_total} píxeles)" if first else "")
+                + f". Sin valor: {s['rechazados_apertura_incompleta']} por apertura incompleta, {s['vacios_dr1']} vacíos "
+                  f"en DR1 y {s['sin_fondo']} por fondo insuficiente. Con BLOOM en la apertura: {s['con_bloom']}; con "
+                  f"OVERFLOW: {s['con_overflow']}; con precaución (OVERFLOW/OUTLIER) y valor: {s['con_precaucion']}. "
+                  "Los grupos se solapan." + (f" Sin información de cobertura: {s['sin_informacion']}."
+                                              if s["sin_informacion"] else ""))
+        rows = _quality_rows(quals)
+        if rows:
+            _quality_table(rows)
+        else:
+            st.caption("Ningún canal tiene píxeles sin datos, máscaras BLOOM/OVERFLOW ni valores con precaución.")
+        st.caption(
+            f"{sq.CAUSE_TEXT[sq.INCOMPLETE]} La cobertura cuenta los píxeles de la apertura (los que tienen peso > 0); "
+            "«peso perdido» es la parte del área de la apertura que ocupan los píxeles sin datos. BLOOM y OVERFLOW son "
+            "máscaras del FITS (extensión FLAGS) contadas en esos píxeles; no se interpreta su origen. Las causas "
+            "pueden coexistir. Solo se muestran los canales con algo que contar; la tabla del espectro lista los 102.")
 
 
 def _comparison_text(cmp: sf.Comparison, spec_a, spec_b, kind: str, sci: bool) -> None:

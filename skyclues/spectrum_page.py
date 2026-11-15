@@ -435,6 +435,8 @@ def render(level: str) -> None:
         cols = ["canal", "lambda_um", "lambda_min_um", "lambda_max_um", "detector", "subcanal", "estado", "flujo_mjy",
                 "fondo_mjysr", "fondo_sigma_mjysr", "n_fondo", "pixel_mjysr", "pixel_nhits", "nhits_min_apertura",
                 "flags_apertura"]
+        cols += [c for c in ("ap_pix_total", "ap_pix_invalidos", "ap_pix_nan", "ap_pix_nhits0", "ap_bloom",
+                             "ap_overflow") if c in df.columns]          # coverage of the aperture (diagnostic)
         st.dataframe(df[cols], hide_index=True, width="stretch")
         st.caption("«fondo_sigma_mjysr» es la dispersión (recortada a 3σ) de los píxeles del anillo: describe el "
                    "fondo, no es la incertidumbre del flujo.")
@@ -464,8 +466,11 @@ def render(level: str) -> None:
             "- **Valores:** IMAGE en MJy/sr con la luz zodiacal ya restada por el pipeline; cada píxel es la media de "
             "NHITS píxeles de entrada (asignación al píxel más próximo, sin suavizado). Los píxeles de entrada con "
             "TRANSIENT, SUR_ERROR, NONFUNC, DICHROIC, MISSING_DATA, HOT, COLD, PHANMISS, NONLINEAR, PERSIST, "
-            "CROSSTALK, STREAK, BLOOM, SNOWBALL, HALO o SATELLITE_HALO se excluyeron antes de promediar; FLAGS solo "
-            "conserva OVERFLOW, SOURCE y OUTLIER (Explanatory Supplement v2.1, §2.5 y §3.4).\n"
+            "CROSSTALK, STREAK, BLOOM, SNOWBALL, HALO o SATELLITE_HALO se excluyeron antes de promediar "
+            "(Explanatory Supplement v2.1, §2.5 y §3.4). La extensión FLAGS del cubo declara esas máscaras (más "
+            "OVERFLOW, SOURCE y OUTLIER) y las activas aparecen en los píxeles resultantes; SkyClues cuenta BLOOM y "
+            "OVERFLOW en los píxeles de la apertura y trata OVERFLOW y OUTLIER como precaución. Un canal con algún "
+            "píxel de la apertura sin datos (valor NaN o NHITS = 0) no se mide: ver «Calidad de los canales».\n"
             "- **λ:** de la tabla SPECTRAL_CHANNELS de cada FITS (λ central, WL_MIN, WL_MAX, R). "
             "Canal n = 17·(detector − 1) + subcanal; plano = n − 1.\n"
             "- **Limitaciones:** producto combinado de fechas distintas (no temporal); píxel de 12.9″ (≈ 2 píxeles "

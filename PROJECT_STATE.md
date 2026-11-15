@@ -11,6 +11,13 @@
 - **Validación ciega V02:** T01 (NGC 7027), T02 (núcleo de M82) y T03 (Elias 29) resultan **NO EVALUABLE**. Las tres fuentes saturan o pierden píxeles del cubo DR1 justo donde están sus rasgos de referencia; el analizador no etiquetó nada cuantificable. Detalle en `results/blind_v02/INFORME_FINAL.md`.
 - **Diagnóstico V02 y validación ciega V03:** los canales sin valor de V02 son píxeles NaN/NHITS=0 con bandera BLOOM en el propio FITS, ampliados por la regla de apertura (sin defecto de código; \SPECTRAL_V02_DIAGNOSIS.md\). V03 ejecutó 3 de 14 candidatos que pasaron los criterios instrumentales: Arp 220 y núcleo de M51 PARCIAL (PAH 3,3 µm en el canal esperado), TW Hya NO EVALUABLE (OVERFLOW y salto entre detectores). Informe en \SPECTRAL_BLIND_V03_REPORT.md\.
 
+## Espectro: diagnóstico universal de calidad — 15-11-2026 (Claude Code A, rama `feature/spectrum-compare`, sin integrar)
+
+- **Qué hace:** explica por qué un canal no es evaluable, sin cambiar el método. La extracción (`spectral_cube.extract_spectrum`) añade a cada fila contadores `ap_*` (píxeles de la apertura, sin datos, NaN, NHITS = 0, BLOOM, OVERFLOW y peso perdido), calculados con los datos que ya leía. `spectral_quality.py` los traduce en causas coexistentes, y el inspector y una sección plegable las muestran en Sencillo y Científico.
+- **Sin cambios en resultados:** fotometría, continuo, picos y valles, umbrales, canales 51/52 y resultados congelados V01–V03. `scripts/quality_verify.py` lo comprueba con NGC 7027, M82, Elias 29 y M101 (filas antiguas idénticas con el código anterior y con los resultados congelados; contadores iguales a una lectura independiente del FITS).
+- **Aviso para la integración:** `spectral_cube.py` ya no coincide con la huella de V02, así que la línea «método intacto: spectral_cube.py» de `scripts/v03_verify.py` fallará. Es esperado: el cambio es solo aditivo.
+- **No incluye:** fotometría de aperturas parcialmente válidas, interpolación ni reconstrucción de píxeles.
+
 ## Movimiento medido de objetos conocidos — 15-11-2026 (Claude Code B)
 
 Actividad `SKYCLUES_NONSIDEREAL_CODEX_RECOVERY_02`. Local, sin push ni despliegue. No se tocó `SkyClues-spectra` (Claude Code A).

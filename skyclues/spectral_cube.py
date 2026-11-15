@@ -961,6 +961,10 @@ def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, su
     nh_min = np.full(nz, np.iinfo(np.int64).max)
     nh_sum = np.zeros(nz)
     flags_or = np.zeros(nz, np.int64)
+    # Diagnostics only (never used for the flux): how much of the aperture lacks data, and why.
+    flag_bit = {nm: b for b, nm in flag_bits(home).items()}
+    dg = {k: np.zeros(nz, int) for k in ("bad", "nan", "nh0", "bloom", "overflow")}
+    dg_bad_w, dg_px = np.zeros(nz), 0
     pixel_val = np.full(nz, np.nan)
     pixel_nh = np.zeros(nz, int)
     pixel_fl = np.zeros(nz, np.int64)
@@ -1011,6 +1015,16 @@ def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, su
             nh_min = np.minimum(nh_min, nh.min(axis=1))
             nh_sum += (nh * wa[m][None, :]).sum(axis=1)
             flags_or |= np.bitwise_or.reduce(aux["FLAGS"][:, m].astype(np.int64), axis=1)
+            nodata = ~np.isfinite(vals) | (nh <= 0)                 # the same condition that rejects the channel
+            dg_px += int(m.sum())
+            dg["bad"] += nodata.sum(axis=1)
+            dg["nan"] += (~np.isfinite(vals)).sum(axis=1)
+            dg["nh0"] += (nh <= 0).sum(axis=1)
+            dg_bad_w += (nodata * wa[m][None, :]).sum(axis=1)
+            fl_px = aux["FLAGS"][:, m].astype(np.int64)
+            for nm in ("bloom", "overflow"):
+                if nm.upper() in flag_bit:
+                    dg[nm] += ((fl_px >> flag_bit[nm.upper()]) & 1).sum(axis=1)
         if contains:
             pixel_val = img[:, yc - b.y0, xc - b.x0]
             pixel_nh = aux["NHITS"][:, yc - b.y0 - r0, xc - b.x0]
@@ -1029,7 +1043,12 @@ def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, su
                "n_fondo": int(a.size), "nhits_min_apertura": int(nh_min[p]) if nh_min[p] < 2**62 else 0,
                "nhits_medio_apertura": float(nh_sum[p] / ap_w_total) if ap_w_total else 0.0,
                "flags_apertura": "|".join(flag_names(home, int(flags_or[p]))),
-               "precaucion": any(f in flag_names(home, int(flags_or[p])) for f in CAUTION_FLAGS)}
+               "precaucion": any(f in flag_names(home, int(flags_or[p])) for f in CAUTION_FLAGS),
+               # aperture coverage (diagnostic; pixels with weight > 0): see spectral_quality.py
+               "ap_pix_total": dg_px, "ap_pix_invalidos": int(dg["bad"][p]), "ap_pix_nan": int(dg["nan"][p]),
+               "ap_pix_nhits0": int(dg["nh0"][p]), "ap_peso_total": float(ap_w_total),
+               "ap_peso_invalido": float(dg_bad_w[p]), "ap_bloom": int(dg["bloom"][p]),
+               "ap_overflow": int(dg["overflow"][p])}
         if c.blank:
             row["status"] = "blank"
             if a.size or np.isfinite(pixel_val[p]) or not ap_bad[p]:
