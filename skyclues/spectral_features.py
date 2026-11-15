@@ -680,8 +680,10 @@ def analyse(s: Series) -> Analysis:
         sdet = {**base, **detector_scatter(s, exclude)} if exclude else base
         cands = _scan(s, sdet)
         new = set()
-        for f in cands:                               # the half-height channels of each candidate
-            new.update(range(s.index(f.canal_lo), s.index(f.canal_hi) + 1))
+        for f in cands:       # half-height channels; for a strong candidate, its whole same-sign run (wings)
+            strong = abs(f.ratio) >= Q_VISIBLE
+            new.update(range(s.index(f.mask_lo if strong else f.canal_lo),
+                             s.index(f.mask_hi if strong else f.canal_hi) + 1))
         if new <= exclude:
             break
         exclude |= new
