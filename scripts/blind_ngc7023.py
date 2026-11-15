@@ -127,7 +127,7 @@ def _plot_reference(ra, dec, ref, excess, star, sel, pix):
              "(0,75–1,09 µm), log", {"cmap": "gray"}),
             (axes[1], excess, "Exceso relativo sobre la mediana azimutal (disco de 2 px)",
              {"cmap": "RdBu_r", "vmin": -0.6, "vmax": 0.6})):
-        sc_ = ax.scatter(east, north, c=val, s=22, marker="s", **kw)
+        sc_ = ax.scatter(east, north, c=val, s=70, marker="s", **kw)
         fig.colorbar(sc_, ax=ax, shrink=0.8)
         for key, col in (("A", "#1f6fd1"), ("B", "#eb6834")):
             p = sel[key]

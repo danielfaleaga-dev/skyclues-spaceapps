@@ -1,0 +1,114 @@
+{
+  "actividad": "SKYCLUES_SPECTRAL_BLIND_VALIDATION_01",
+  "fecha_utc": "2026-11-15T16:37:49+00:00",
+  "nominal": {
+    "ra": 315.4038,
+    "dec": 68.1633
+  },
+  "campo_deg": 0.1,
+  "imagen_referencia": {
+    "definicion": "mediana de los canales del detector 1",
+    "canales": [
+      {
+        "canal": 1,
+        "lambda_um": 0.753000020980835
+      },
+      {
+        "canal": 2,
+        "lambda_um": 0.7710000276565552
+      },
+      {
+        "canal": 3,
+        "lambda_um": 0.7900000214576721
+      },
+      {
+        "canal": 4,
+        "lambda_um": 0.8090000152587891
+      },
+      {
+        "canal": 5,
+        "lambda_um": 0.828000009059906
+      },
+      {
+        "canal": 6,
+        "lambda_um": 0.8479999899864197
+      },
+      {
+        "canal": 7,
+        "lambda_um": 0.8679999709129333
+      },
+      {
+        "canal": 8,
+        "lambda_um": 0.8889999985694885
+      },
+      {
+        "canal": 9,
+        "lambda_um": 0.9100000262260437
+      },
+      {
+        "canal": 10,
+        "lambda_um": 0.9319999814033508
+      },
+      {
+        "canal": 11,
+        "lambda_um": 0.9549999833106995
+      },
+      {
+        "canal": 12,
+        "lambda_um": 0.9779999852180481
+      },
+      {
+        "canal": 13,
+        "lambda_um": 1.0010000467300415
+      },
+      {
+        "canal": 14,
+        "lambda_um": 1.024999976158142
+      },
+      {
+        "canal": 15,
+        "lambda_um": 1.0499999523162842
+      },
+      {
+        "canal": 16,
+        "lambda_um": 1.0750000476837158
+      },
+      {
+        "canal": 17,
+        "lambda_um": 1.1019999980926514
+      }
+    ]
+  },
+  "escala_px_arcsec": 12.883074044315272,
+  "estrella": {
+    "ra": 315.4025786080779,
+    "dec": 68.16470270741213,
+    "dist_nominal_arcsec": 5.3079858721787945,
+    "brillo_ref_mjysr": 32.736595153808594
+  },
+  "A": {
+    "ra": 315.4031089448031,
+    "dec": 68.19378167570105,
+    "dist_estrella_arcsec": 104.68669123657831,
+    "pa_estrella_deg": 0.3881600315017769,
+    "brillo_ref_mjysr": 3.500135898590088,
+    "exceso_relativo": 1.977842740485717
+  },
+  "B": {
+    "ra": 315.3371451104101,
+    "dec": 68.14434658279636,
+    "dist_estrella_arcsec": 114.25120757888446,
+    "pa_estrella_deg": 230.13321597539917,
+    "brillo_ref_mjysr": 0.32061994075775146,
+    "exceso_relativo": -0.2812506253980654
+  },
+  "separacion_AB_arcsec": 198.67121765929443,
+  "n_candidatos_A": 356,
+  "n_candidatos_B": 61,
+  "huellas_sha256": {
+    "skyclues/spectral_features.py": "318f9a0071bff1fe979d7440494608abb36930a4fed8ae85f32076d717cbdfce",
+    "skyclues/spectral_cube.py": "ea0a26901cf0b61813cd62c2b46d3fc949fcf533427ee6a5b255e4f4a694e6e0",
+    "skyclues/geometry.py": "d20e0df3820c8a85469bc8f8ec0d9e9c95b981968cdb37301fa58479420ffd98",
+    "scripts/blind_ngc7023.py": "c0e9891097386ba322bdda4a14e0300fad5246685f1ead1e47e7d5b86756c784"
+  }
+}
