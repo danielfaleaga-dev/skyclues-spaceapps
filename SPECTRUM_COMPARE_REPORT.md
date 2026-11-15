@@ -100,7 +100,12 @@ M101 (objetivo del tutorial oficial de recortes de IRSA; tesela 2858), apertura 
 
 ## 9. Regresiones
 
-Ver la sección «Regresión final» al pie (se rellena con la última ejecución).
+`python -m pytest -q` completo (incluye pruebas de red y las sintéticas de movimiento), sobre la rama ya rebasada en `d01917e`:
+
+- **552 correctas, 1 fallo**, 9 min 11 s.
+- El único fallo es externo: `tests/test_motion_app.py::test_real_eps_ind_b_d3_reproduces_from_cached_originals` necesita el archivo Gaia de la ESA, que el 15-11-2026 devolvía `ConnectTimeout` (repetido tres veces con el mismo resultado). No toca código de esta fase y pasaba en la línea base del día anterior.
+- Antes del rebase, sobre la instantánea: 492 correctas y 3 fallos (ese mismo y los 2 heredados de la instantánea, que el commit `2cb02af` de la rama del rediseño ya corrige).
+- De esta fase: 41 sintéticas + 9 de interfaz + 3 con datos reales = **53 pruebas nuevas, todas correctas**. Lectura del cubo, máscaras, un canal, RGB, región y navegación: sin cambios y con sus pruebas en verde.
 
 ## 10. Rendimiento (medido en frío, caché vacía)
 
@@ -125,6 +130,8 @@ Límite de la comprobación: el panel del navegador estaba oculto y los clics si
 - El enlace compartible no guarda B ni la selección.
 - Fuera de alcance, según la orden: identificación de moléculas, biblioteca de bandas, SPLICES, mapas PAH o de hielos, densidades de columna.
 
-## 13. Commits locales
+## 13. Commits locales (sin push)
 
-`git log --oneline feature/spectrum-compare` (sin push).
+Rama `feature/spectrum-compare` = `d01917e` (último commit de `redesign/unified-region` el 15-11-2026) + tres commits propios, más el de cierre de este informe. La instantánea inicial ya no forma parte de la rama: el rebase sobre `d01917e` no tuvo conflictos. Queda `backup/spectrum-compare-antes-del-rebase` como referencia del estado anterior.
+
+Para integrarla: `git merge --ff-only feature/spectrum-compare` desde `redesign/unified-region` si esa rama no ha avanzado; si ha avanzado, `git rebase redesign/unified-region feature/spectrum-compare` (los únicos archivos compartidos son `spectrum_page.py`, en cinco puntos, y `spectral_view.py`). Esa integración no se ha hecho: la carpeta principal es de otro agente.
