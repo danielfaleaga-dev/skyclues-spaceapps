@@ -51,6 +51,11 @@ def _remove_b() -> None:
 
 def point_controls(sci: bool, region_key) -> None:
     """Next to the image: which point the next click places, and the way back to a single position."""
+    with st.container(key="sx_points"):
+        _point_controls(sci, region_key)
+
+
+def _point_controls(sci: bool, region_key) -> None:
     has_b = point_b(region_key) is not None
     left, right = st.columns([3, 2], vertical_alignment="bottom")
     with left:
@@ -150,35 +155,76 @@ def _plain(f: sf.Feature) -> str:
                    ". Es una variación leve o con datos dudosos.")
 
 
-def _where(f: sf.Feature) -> str:
-    if f.lam is None:
-        return f"canales {f.trial_lo}–{f.trial_hi}" if f.trial_lo != f.trial_hi else f"canal {f.trial_lo}"
-    ch = f"canal {f.canal_lo}" if f.canal_lo == f.canal_hi else f"canales {f.canal_lo}–{f.canal_hi}"
-    # The eyebrow is set in capitals: the unit keeps its case (µm must never read as MM).
-    return f'{f.lam:.3f}&nbsp;<span style="text-transform:none">µm</span> ({ch})'
+NOT_IDENTIFIED, NOT_APPLICABLE = "No identificada", "No aplica"
 
 
-def _science_rows(fs: dict) -> pd.DataFrame:
+def _labelled(f: sf.Feature) -> bool:
+    """A classified feature (a centre, a type and a half-height width exist only for these)."""
+    return f.klass in (sf.QUANTIFIABLE, sf.VISIBLE) and f.lam is not None
+
+
+def _comma(v: float, digits: int = 3) -> str:
+    return f"{v:.{digits}f}".replace(".", ",")
+
+
+def _channels(lo: int, hi: int) -> str:
+    return f"canal {lo}" if lo == hi else f"canales {lo}–{hi}"
+
+
+def _examined_span(f: sf.Feature, series: sf.Series | None) -> tuple[float, float] | None:
+    if series is None or f.trial_lo is None:
+        return None
+    return float(series.lam_min[series.index(f.trial_lo)]), float(series.lam_max[series.index(f.trial_hi)])
+
+
+def _where(f: sf.Feature, series: sf.Series | None = None) -> str:
+    """Header text: the centre of a classified feature, otherwise only the interval that was examined
+    (never a wavelength presented as the centre of something that was not identified)."""
+    um = theme.unit("µm")        # the header is set in capitals: µ must never read as M
+    if _labelled(f):
+        return f"{_comma(f.lam)}&nbsp;{um} ({_channels(f.canal_lo, f.canal_hi)})"
+    span = _examined_span(f, series)
+    where = _channels(f.trial_lo, f.trial_hi)
+    return f"{_comma(span[0])}–{_comma(span[1])}&nbsp;{um} ({where})" if span else where
+
+
+def _heading(f: sf.Feature, sci: bool, series: sf.Series | None) -> str:
+    if not sci:
+        return "Lo que has señalado · " + _where(f, series)
+    return ("Característica examinada · " if _labelled(f) else "Intervalo examinado · ") + _where(f, series)
+
+
+def _science_rows(fs: dict, series: sf.Series | None = None) -> pd.DataFrame:
+    """Inspector table. A centre, a type and a half-height width are given only for a classified feature;
+    the exploratory values of the interval (value, continuum, contrast, scatter) are always kept."""
     def col(f: sf.Feature) -> list:
+        span = _examined_span(f, series)
+        examined = (f"{span[0]:.3f}–{span[1]:.3f} · " if span else "") + _channels(f.trial_lo, f.trial_hi)
         if f.contrast is None:
-            return [f.label, "—", "—", "—", f"{f.trial_lo}–{f.trial_hi}", "—", "—", "—", "—", "—", "—", "—", "—", "—"]
+            return [f.label, NOT_IDENTIFIED, examined, NOT_APPLICABLE, NOT_APPLICABLE,
+                    f"— · {f.trial_lo}–{f.trial_hi}", "—", "—", "—", "—", "—", "—", "—", "—", "—"]
         refs = " · ".join(f"{n} {_num(v)}" for n, v in (("entorno", f.ref_local), ("detector", f.ref_detector),
                                                          ("fondo", f.ref_background)) if v is not None)
-        labelled = f.klass in (sf.QUANTIFIABLE, sf.VISIBLE)
-        return [f.label, f"{f.kind} · {f.width}" if f.kind and labelled else "—",
-                f"{f.lam:.3f} (centroide {f.lam_centroid:.3f})", f"{f.lam_lo:.3f}–{f.lam_hi:.3f} ({f.width_um:.3f})",
-                f"{f.canal_lo}–{f.canal_hi} · {f.trial_lo}–{f.trial_hi}", _num(f.value, f.unit),
+        if _labelled(f):
+            kind, centre = f"{f.kind} · {f.width}", f"{f.lam:.3f} (centroide {f.lam_centroid:.3f})"
+            half = f"{f.lam_lo:.3f}–{f.lam_hi:.3f} ({f.width_um:.3f})"
+            chans = f"{f.canal_lo}–{f.canal_hi} · {f.trial_lo}–{f.trial_hi}"
+        else:
+            kind, centre, half = NOT_IDENTIFIED, NOT_APPLICABLE, NOT_APPLICABLE
+            chans = f"{NOT_APPLICABLE.lower()} · {f.trial_lo}–{f.trial_hi}"
+        value = _num(f.value, f.unit) + ("" if f.canal is None else f" (canal {f.canal})")
+        return [f.label, kind, examined, centre, half, chans, value,
                 _num(f.continuum, f.unit), _num(f.contrast, f.unit, signed=True),
                 "—" if f.relative is None else f"{f.relative:+.1%}",
                 "> 1000" if abs(f.ratio) > 1000 else f"{abs(f.ratio):.1f}", f"{_num(f.ref, f.unit)} ({refs})",
                 f"{f.env_left[0]}–{f.env_left[-1]} y {f.env_right[0]}–{f.env_right[-1]}",
                 ", ".join(f"D{d}" for d in f.detectors),
                 "—" if f.nhits_feature is None else f"{f.nhits_feature:.0f} / {f.nhits_env:.0f}"]
-    names = ["Clase", "Tipo", "λ del extremo (µm)", "Intervalo a media altura (µm)",
-             "Canales: a media altura · fuera del ajuste", "Valor en el extremo", "Continuo local", "Contraste",
-             "Contraste relativo",
+    names = ["Clase", "Tipo", "Intervalo examinado (µm)", "Centro de la característica (µm)",
+             "Intervalo a media altura (µm)", "Canales: a media altura · fuera del ajuste",
+             "Valor de mayor contraste en el intervalo", "Continuo local", "Contraste", "Contraste relativo",
              "Contraste / dispersión de referencia", "Dispersión de referencia", "Canales del entorno", "Detectores",
-             "NHITS característica / entorno"]
+             "NHITS del intervalo / entorno"]
     return pd.DataFrame({"Magnitud": names, **{f"Espectro {k}": col(f) for k, f in fs.items()}})
 
 
@@ -190,6 +236,11 @@ def _feature_list(fs: list) -> str:
 def render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, extract, show_error) -> None:
     """The spectrum plot and what attaches to it. ``extract(ra, dec)`` returns the spectrum of another
     position with the SAME aperture and annulus as ``spec_a`` (nothing is tuned per position)."""
+    with st.container(key="sx_analysis"):            # scope of the full-opacity explanatory notes (theme.CSS)
+        _render(spec_a, quantity, channel_number, sci, region_key, extract, show_error)
+
+
+def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, extract, show_error) -> None:
     state = st.session_state
     unit = sf.UNITS[quantity]
     spec_b, b_pos = None, point_b(region_key)
@@ -238,15 +289,14 @@ def render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, ex
     if found:
         head = st.columns([5, 1], vertical_alignment="center")
         with head[0]:
-            theme.eyebrow(("Característica examinada · " if sci else "Lo que has señalado · ") + _where(
-                max(found.values(), key=lambda f: (RANK[f.klass], abs(f.ratio or 0.0)))))
+            theme.eyebrow(_heading(max(found.values(), key=lambda f: (RANK[f.klass], abs(f.ratio or 0.0))), sci, sa))
         head[1].button("Quitar", key="sx_inspect_clear", on_click=_clear_inspection,
                        help="Deja de examinar este intervalo. El espectro no cambia.")
         if sci:
             st.html("".join(f'<p style="margin:.1rem 0">Espectro {k}: {theme.badge(f.label, BADGE[f.klass])} '
                             f'<span class="sc-muted">{sf.CLASS_MEANING[f.klass]}.</span></p>' for k, f in found.items()))
-            rows = _science_rows(found)
-            st.dataframe(rows, hide_index=True, width="stretch", height=35 * (len(rows) + 1) + 3)
+            rows = _science_rows(found, sa)
+            st.dataframe(rows, hide_index=True, width="stretch", height="content")   # every row, no blank tail
             for k, f in found.items():
                 notes = f.reasons + f.limitations
                 if notes:

@@ -117,8 +117,14 @@ def test_selection_inspector_and_state_survive_level_mode_and_view_changes(app_c
     table = inspector(at)
     assert list(table.columns) == ["Magnitud", "Espectro A", "Espectro B"]
     by = dict(zip(table["Magnitud"], zip(table["Espectro A"], table["Espectro B"])))
-    assert by["Clase"] == ("Cuantificable", "Sin característica") and by["Tipo"][0] == "pico · estrecha"
+    assert by["Clase"] == ("Cuantificable", "Sin característica") and by["Tipo"] == ("pico · estrecha", "No identificada")
     assert by["Contraste relativo"][0] == "+40.0%"
+    # B was examined over the same interval but holds no feature: no type, no centre, its values kept
+    assert by["Centro de la característica (µm)"][1] == "No aplica" and by["Intervalo a media altura (µm)"][1] == "No aplica"
+    assert by["Intervalo examinado (µm)"][0] == by["Intervalo examinado (µm)"][1]
+    assert by["Contraste"][1] not in ("—", "") and by["Continuo local"][1] != "—"
+    head = next(h.body for h in at.html if "examinad" in h.body and "sc-eyebrow" in h.body)
+    assert "Característica examinada · " in head and '<span class="sc-unit">µm</span>' in head
     keep = {k: at.session_state[k] for k in (sa.B_KEY, sa.INSPECT_KEY, "sx_spec_params", "sx_channel")}
     at.session_state["opt_sx_derived"] = "Relación A / B"
 
@@ -183,4 +189,37 @@ def test_same_numbers_in_both_levels(app_cube, bumped):
     series = sf.series_from_spectrum(spec, "flux", "A")
     (f,) = sf.find_features(series)
     assert f.canal == 31 and f.relative == pytest.approx(0.4, rel=1e-6)
-    assert "un 40%" in sa._plain(f) and sa._science_rows({"A": f})["Espectro A"][8] == "+40.0%"
+    rows = sa._science_rows({"A": f}, series)
+    assert "un 40%" in sa._plain(f) and dict(zip(rows["Magnitud"], rows["Espectro A"]))["Contraste relativo"] == "+40.0%"
+
+
+def test_an_interval_without_a_feature_is_never_given_a_type_or_a_centre(app_cube, bumped):
+    """The defect seen in M101: A «Sin característica» showed «pico · estrecha» and a centre at 3.383 µm."""
+    bumped.centre = app_cube.centre
+    series = sf.series_from_spectrum(sc.extract_spectrum(*app_cube.centre), "flux", "A")
+    an = sf.analyse(series)
+    (peak,) = an.features
+    flat = sf.measure_interval(series, 60, 62, an.features, an.scatter)       # far from the simulated peak
+    assert flat.klass == sf.NO_FEATURE and flat.kind is not None and flat.contrast != 0   # the core is unchanged
+    col = dict(zip(*sa._science_rows({"A": flat}, series).to_dict("list").values()))
+    assert col["Tipo"] == "No identificada" and col["Centro de la característica (µm)"] == "No aplica"
+    assert col["Intervalo a media altura (µm)"] == "No aplica" and col["Canales: a media altura · fuera del ajuste"].startswith("no aplica")
+    assert col["Contraste"] == sa._num(flat.contrast, flat.unit, signed=True)          # kept, not set to zero
+    assert col["Intervalo examinado (µm)"].endswith("canales 60–62")
+    assert sa._heading(flat, True, series).startswith("Intervalo examinado · ")
+    assert f"{flat.lam:.3f}".replace(".", ",") not in sa._heading(flat, True, series)   # no centre is shown
+    assert sa._heading(peak, True, series).startswith("Característica examinada · " + f"{peak.lam:.3f}".replace(".", ","))
+    assert "pico" not in sa._plain(flat) and "valle" not in sa._plain(flat)
+
+
+def test_units_survive_the_capitals_of_labels():
+    from skyclues import theme
+    head = sa._where(sf.Feature(serie="A", origin="x", klass=sf.QUANTIFIABLE, kind="pico", reasons=[], limitations=[], unit="mJy", canal=63,
+                                canal_lo=63, canal_hi=63, lam=3.293))
+    assert head == '3,293&nbsp;<span class="sc-unit">µm</span> (canal 63)'
+    assert ".sc-unit{text-transform:none!important" in theme.CSS
+    css = theme.CSS
+    assert css.index(".sc-unit{") > css.index(".sc-eyebrow{")              # declared after the capitals rule
+    assert theme.unit("λ") == '<span class="sc-unit">λ</span>'
+    # notes under the spectrum plots keep the full secondary tone (Streamlit fades captions to 60 %)
+    assert '[class*="st-key-sx_notes_"] [data-testid="stCaptionContainer"]{opacity:1}' in css

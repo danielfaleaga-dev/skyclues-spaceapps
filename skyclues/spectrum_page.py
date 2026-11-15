@@ -320,7 +320,7 @@ def render(level: str) -> None:
         s = cmap.summary()
         if sci:
             theme.facts([
-                ("λ central", f"{ch.wavelength_um:.3f} µm", f"{ch.wl_min_um:.3f}–{ch.wl_max_um:.3f} µm"),
+                (theme.unit("λ") + " central", f"{ch.wavelength_um:.3f} µm", f"{ch.wl_min_um:.3f}–{ch.wl_max_um:.3f} µm"),
                 ("Detector · subcanal", f"D{ch.detector} · {ch.subchannel}", f"R = λ/Δλ = {ch.resolving_power:.0f}"),
                 ("Píxeles con datos", f"{s['valid_fraction']:.1%}", f"{s['n_valid']} de {s['n_field']}"),
                 ("NHITS mediano", f"{s['nhits_median']:.0f}", f"mínimo {s['nhits_min']}")])
@@ -388,7 +388,7 @@ def render(level: str) -> None:
                              lambda ra, dec: cached_spectrum(round(ra, 6), round(dec, 6), *sp[2:]), _show_error)
     n_missing = sum(r["status"] != "ok" for r in spec.rows)
     if sci:
-        st.caption(
+        st.container(key="sx_notes_plot").caption(
             f"Posición RA {spec.ra:.5f}°, Dec {spec.dec:+.5f}°. {spec.n_measured} de 102 canales con valor; {n_missing} sin "
             "valor (marcas rosas sobre el eje: canales 51 y 52 sin datos en DR1, o apertura/fondo sin datos). Un punto "
             "por canal real; la barra horizontal es el intervalo del canal (WL_MIN–WL_MAX), no un error. Sin curva ni "
@@ -398,7 +398,7 @@ def render(level: str) -> None:
             theme.reading_guide(reading_guide(quantity, sci))
     else:
         st.markdown('Cuanto más alto el punto, más luz en ese color infrarrojo. **Marcas rosas: sin datos.**')
-        st.caption('Vista orientativa: los picos por sí solos no identifican materiales.')
+        st.container(key="sx_notes_plot_simple").caption('Vista orientativa: los picos por sí solos no identifican materiales.')
         if spec.warnings:
             st.warning('Hay datos limitados en esta posición. El modo Científico muestra los detalles.')
         _footer(ra_c, dec_c, fov, state['sx_canal'])

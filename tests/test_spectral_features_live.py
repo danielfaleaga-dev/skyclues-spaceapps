@@ -54,6 +54,21 @@ def test_peak_near_3p3_um_is_quantifiable_in_b_and_absent_in_a(spectra):
     assert fa.klass == sf.NO_FEATURE and abs(fa.ratio) < sf.Q_VISIBLE
     assert not an_a.features                                                    # nothing is labelled in the nucleus
     assert {f.canal for f in an_b.features if f.klass == sf.QUANTIFIABLE} >= {40, 63, 76, 93}
+    # The inspector for this comparison: only B is given a type and a centre; A keeps its exploratory values.
+    from skyclues import spectrum_analysis as spa
+    rows = spa._science_rows({"A": fa, "B": fb}, sb)
+    col = {k: dict(zip(rows["Magnitud"], rows[f"Espectro {k}"])) for k in "AB"}
+    assert (col["A"]["Clase"], col["B"]["Clase"]) == ("Sin característica", "Cuantificable")
+    assert col["A"]["Tipo"] == "No identificada" and col["B"]["Tipo"] == "pico · estrecha"
+    assert col["A"]["Centro de la característica (µm)"] == "No aplica"
+    assert col["B"]["Centro de la característica (µm)"].startswith("3.293")
+    assert col["A"]["Intervalo examinado (µm)"] == col["B"]["Intervalo examinado (µm)"]
+    assert col["A"]["Contraste"] == spa._num(fa.contrast, "mJy", signed=True) and fa.contrast > 0
+    assert col["B"]["Contraste / dispersión de referencia"] == f"{abs(fb.ratio):.1f}"
+    head = spa._heading(fb, True, sb)
+    assert head == 'Característica examinada · 3,293&nbsp;<span class="sc-unit">µm</span> (canal 63)'
+    print("A:", col["A"]["Contraste"], col["A"]["Contraste / dispersión de referencia"], "| B:", col["B"]["Contraste"],
+          col["B"]["Contraste / dispersión de referencia"])
 
 
 def test_repeated_extraction_is_reproducible_and_local(spectra):

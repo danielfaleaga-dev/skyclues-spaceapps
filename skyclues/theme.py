@@ -15,6 +15,9 @@ from contextlib import contextmanager
 import streamlit as st
 
 INK, MUTED, FAINT, LINE, SURFACE, EMBER = "#14171c", "#5b6470", "#8a929c", "#e3e6ea", "#f6f7f8", "#c4411c"
+def unit(text: str) -> str:
+    """A unit or symbol inside a label set in capitals (µ and λ must never become M and Λ)."""
+    return f'<span class="sc-unit">{text}</span>'
 BRAND_DIR = Path(__file__).resolve().parent.parent / "assets" / "brand"
 LEVELS = {"Sencillo": "simple", "Científico": "scientific"}
 NAV = {"Región": "region", "Tiempo": "time", "Espectro": "spectrum"}
@@ -74,6 +77,10 @@ h1{{font-size:2.05rem;line-height:1.12}} h2{{font-size:1.5rem}} h3{{font-size:1.
 [class*="st-key-sc_loading_"] [data-testid="stSpinner"]>div>div>span{{font-family:var(--sc-mono);font-size:.78rem;color:var(--sc-muted)}}
 @keyframes sc-loading{{to{{transform:rotate(360deg)}}}}
 .sc-eyebrow{{font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--sc-muted);margin:0 0 .25rem}}
+.sc-unit{{text-transform:none!important;letter-spacing:normal}}
+/* Notes under the spectrum plots: Streamlit draws captions at 60 % opacity; here they keep the full secondary tone. */
+.st-key-sx_points [data-testid="stCaptionContainer"],.st-key-sx_analysis [data-testid="stCaptionContainer"],
+[class*="st-key-sx_notes_"] [data-testid="stCaptionContainer"]{{opacity:1}}
 .sc-lede{{color:var(--sc-muted);font-size:1rem;max-width:68ch;margin:.1rem 0 0}}
 .sc-sub{{color:var(--sc-muted);font-size:.95rem}}
 .sc-strip{{display:flex;flex-wrap:wrap;align-items:baseline;gap:.35rem 1.4rem;padding:.7rem 0;border-bottom:1px solid var(--sc-line);

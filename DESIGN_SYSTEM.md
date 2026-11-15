@@ -7,6 +7,8 @@ Actualizado: 14-11-2026. Lectura obligatoria para cualquier agente antes de modi
 - Página clara, fondo blanco, tinta casi negra, líneas finas y espacio suficiente. Mantener logotipo y recursos de `assets/brand/`.
 - Tipografía: **Newsreader** en títulos; **IBM Plex Sans** en interfaz y texto; **IBM Plex Mono** en coordenadas, cifras y tablas. Los iframes deben usar las mismas fuentes y alternativas.
 - Paleta compartida (`skyclues/theme.py`): tinta `#14171c`, texto secundario `#5b6470`, auxiliar `#8a929c`, líneas `#e3e6ea`, superficie `#f6f7f8`, acento terracota `#c4411c`.
+- En etiquetas en mayúsculas (`sc-eyebrow`, `sc-facts dt`), unidades y símbolos van en `theme.unit(...)` (clase `sc-unit`): «µm» y «λ» nunca se convierten en «MM» o «Λ».
+- Las notas bajo los gráficos de Espectro se muestran con el gris secundario a opacidad completa (Streamlit atenúa `st.caption` al 60 %). Ámbito: contenedores `sx_points`, `sx_analysis` y `sx_notes_*`; no es un cambio global.
 - Acción principal negra; secundarias blancas con borde fino. Terracota para selección, actividad y pequeños acentos. Evitar el azul genérico de botones del navegador.
 - El azul de los marcadores Gaia y el naranja del campo son códigos del mapa, no una nueva paleta global. Los colores científicos de datos/máscaras se conservan con sus significados.
 - Navegación: **Región / Tiempo / Espectro**. Región integra nombre, RA/Dec, FOV y Atlas. Tiempo y Espectro son los dos exploradores. RGB es una representación dentro de Espectro, nunca otra página.

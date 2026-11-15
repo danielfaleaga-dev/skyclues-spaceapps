@@ -134,4 +134,18 @@ Límite de la comprobación: el panel del navegador estaba oculto y los clics si
 
 Rama `feature/spectrum-compare` = `d01917e` (último commit de `redesign/unified-region` el 15-11-2026) + tres commits propios, más el de cierre de este informe. La instantánea inicial ya no forma parte de la rama: el rebase sobre `d01917e` no tuvo conflictos. Queda `backup/spectrum-compare-antes-del-rebase` como referencia del estado anterior.
 
+### Corrección del inspector (`SKYCLUES_SPECTRUM_S1_INSPECTOR_CORRECTIONS_01`, sobre `f68b613`)
+
+- **Intervalo examinado frente a característica clasificada.** En M101 a 3,293 µm, A («Sin característica», contraste +5,233 mJy, 1,2 veces la dispersión) mostraba un centro en 3,383 µm: era el canal de mayor contraste dentro del intervalo, presentado como si fuera el centro de una característica. Ahora el tipo, el centro y el intervalo a media altura solo se dan para clases «Cuantificable» o «Visible»; en las demás aparecen «No identificada» / «No aplica». La tabla añade «Intervalo examinado (µm)», igual en A y B, y conserva valor, continuo, contraste y dispersión. El encabezado dice «Característica examinada» solo si hay una clasificada; si no, «Intervalo examinado» y el rango de λ.
+- **«µm» como «MM».** `.sc-eyebrow` aplica `text-transform: uppercase`, que convierte `µ` (U+00B5) en `Μ` (mu mayúscula, idéntica a una M). Ya se protegía con estilo en línea; ahora la unidad va en la clase compartida `sc-unit` (`text-transform:none !important`), y se protegió también «λ central», que se mostraba como «Λ CENTRAL». El encabezado usa coma decimal («3,293 µm»); las tablas mantienen el punto del resto de la app.
+- **Legibilidad.** Streamlit dibuja `st.caption` con `opacity: 0.6`, que lleva el gris secundario `#5b6470` a un contraste de unos 2,6:1. Las notas bajo los gráficos de Espectro pasan a opacidad completa (unos 6,3:1); no hay cambio de color, tipografía ni disposición. La tabla del inspector usa `height="content"`, sin fila vacía al final.
+- **Sin cambios científicos.** No se modificó `spectral_features.py`. En la reproducción real: A sigue «Sin característica» (+5,233 mJy; 1,2) y B «Cuantificable» (+26,49 mJy; 14,0).
+- **Pruebas.**
+  - 27 pasan: interfaz del inspector (11, dos nuevas), aplicación espectral y datos reales de M101 (que ahora también comprueban la tabla y el encabezado).
+  - Las 41 pruebas sintéticas del núcleo también pasan.
+- **Navegador.**
+  - Comprobado con M101 en Sencillo y en Científico; la selección se conserva al cambiar de nivel.
+  - A 480 px, la página no se desplaza en horizontal; la tabla se desplaza dentro de su marco.
+  - Capturas: `results/spectrum-inspector-m101-cientifico.jpg`, `-sencillo.jpg` y `-480px.jpg`.
+
 Para integrarla: `git merge --ff-only feature/spectrum-compare` desde `redesign/unified-region` si esa rama no ha avanzado; si ha avanzado, `git rebase redesign/unified-region feature/spectrum-compare` (los únicos archivos compartidos son `spectrum_page.py`, en cinco puntos, y `spectral_view.py`). Esa integración no se ha hecho: la carpeta principal es de otro agente.
