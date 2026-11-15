@@ -2,9 +2,11 @@
 
 Presentation only. Nothing in this module reads or changes observations, parameters or results.
 
-Identity in one paragraph: white page, near-black ink, hairline rules instead of boxes, one warm
-accent ("ember", the colour used for the field-of-view ring on the sky). Headings in Newsreader
-(editorial serif), interface in IBM Plex Sans, every number that can be copied in IBM Plex Mono.
+Identity in one paragraph: warm grey paper, black ink, white instrument panels, black for
+actions and copper-ember for selection (the colour of the field-of-view ring on the sky). Each area
+has its own accent (Región deep copper, Tiempo graphite, Espectro light copper) and an abstract header
+motif that is never data. Headings and interface in IBM Plex Sans, every number in IBM Plex Mono.
+Styles live in ``theme.css``.
 The symbol is the field-of-view ring with two points in it: where something was and where it is.
 """
 from __future__ import annotations
@@ -14,7 +16,12 @@ from contextlib import contextmanager
 
 import streamlit as st
 
-INK, MUTED, FAINT, LINE, SURFACE, EMBER = "#14171c", "#5b6470", "#8a929c", "#e3e6ea", "#f6f7f8", "#c4411c"
+INK, MUTED, FAINT, LINE, SURFACE, EMBER = "#141414", "#5a5a5a", "#8c8c8c", "#dcdad7", "#eeece9", "#c4411c"
+#: Primary action colour (black) and the three area accents (orientation, sequence, infrared light).
+PETROL, AREA = "#161616", {"region": "#8f4321", "time": "#4a4f55", "spectrum": "#c06a2b"}
+PAPER = "#f4f3f1"
+
+
 def unit(text: str) -> str:
     """A unit or symbol inside a label set in capitals (µ and λ must never become M and Λ)."""
     return f'<span class="sc-unit">{text}</span>'
@@ -32,104 +39,62 @@ def symbol_svg(size: int = 28, ink: str = INK, accent: str = EMBER) -> str:
             f'<circle cx="20.2" cy="12.4" r="3" fill="{accent}"/></svg>')
 
 
-CSS = f"""
-<style>
-:root{{--sc-ink:{INK};--sc-muted:{MUTED};--sc-faint:{FAINT};--sc-line:{LINE};--sc-surface:{SURFACE};--sc-ember:{EMBER};
-  --sc-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
-  --sc-serif:"Newsreader","Iowan Old Style","Palatino Linotype",Georgia,serif}}
-[data-testid="stSidebar"],[data-testid="stSidebarCollapsedControl"],[data-testid="stExpandSidebarButton"]{{display:none!important}}
-[data-testid="stHeader"]{{background:transparent;height:0;min-height:0}}
-[data-testid="stToolbar"]{{top:.4rem}}
-.block-container,[data-testid="stMainBlockContainer"]{{padding-top:1.1rem;padding-bottom:4rem;max-width:1320px}}
-h1,h2,h3,h4{{font-family:var(--sc-serif);font-weight:500;letter-spacing:-.015em;color:var(--sc-ink)}}
-h1{{font-size:2.05rem;line-height:1.12}} h2{{font-size:1.5rem}} h3{{font-size:1.22rem}} h4{{font-size:1.05rem}}
-[data-testid="stHeadingWithActionElements"] a{{display:none}}
+def _uri(svg: str) -> str:
+    from urllib.parse import quote
+    return "url(\"data:image/svg+xml," + quote(svg, safe="=:/ ,'") + "\")"
 
-/* header */
-.st-key-sc_header{{border-bottom:1px solid var(--sc-line);padding-bottom:.7rem;margin-bottom:.4rem;align-items:center;row-gap:.5rem}}
-.sc-brand{{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--sc-ink)}}
-.sc-brand span{{font-family:var(--sc-serif);font-size:1.5rem;font-weight:500;letter-spacing:-.02em;line-height:1}}
-.sc-brand small{{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--sc-faint);margin-left:4px;
-  padding-left:12px;border-left:1px solid var(--sc-line)}}
-.st-key-nav [data-testid="stButtonGroup"],.st-key-level [data-testid="stButtonGroup"]{{gap:0}}
-.st-key-nav button{{border:0!important;background:transparent!important;border-radius:0!important;padding:.35rem .95rem!important;
-  color:var(--sc-muted)!important;font-weight:500;box-shadow:inset 0 -2px 0 transparent;transition:color .16s ease,box-shadow .16s ease}}
-.st-key-nav button:hover{{color:var(--sc-ink)!important}}
-.st-key-nav button[kind="segmented_controlActive"],.st-key-nav button[aria-checked="true"],.st-key-nav button[aria-pressed="true"]{{
-  color:var(--sc-ink)!important;box-shadow:inset 0 -2px 0 var(--sc-ember)}}
-.st-key-level button{{font-size:.8rem!important;padding:.2rem .7rem!important;min-height:0!important;transition:background-color .16s ease,color .16s ease}}
-.st-key-level p,.st-key-nav p{{font-size:inherit}}
 
-/* shared pieces */
-[data-testid="stSpinner"]{{border-left:2px solid var(--sc-ember);padding:.6rem .85rem;background:var(--sc-surface);
-  border-radius:0 6px 6px 0;color:var(--sc-ink);margin:.4rem 0}}
-[data-testid="stStatusWidget"]{{border:1px solid var(--sc-line);border-radius:6px;background:#fff}}
-[class*="st-key-sc_loading_"] [data-testid="stSpinner"]{{position:relative;isolation:isolate;min-height:215px;
-  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;text-align:center;
-  padding:28px;border:1px solid #e6e8eb;border-radius:14px;background:linear-gradient(135deg,rgba(246,247,248,.92),rgba(255,255,255,.86));
-  backdrop-filter:blur(7px);box-shadow:0 8px 30px rgba(20,23,28,.045);font-size:1.12rem;line-height:1.5}}
-[class*="st-key-sc_loading_"] [data-testid="stSpinner"]::before{{content:"";width:42px;height:42px;flex-shrink:0;
-  border:2px solid #e2d9d4;border-top-color:var(--sc-ember);border-right-color:var(--sc-ember);border-radius:50%;animation:sc-loading 1s linear infinite}}
-[class*="st-key-sc_loading_"] [data-testid="stSpinner"] p{{font-size:1.12rem;font-weight:500;max-width:45ch}}
-[class*="st-key-sc_loading_"] [data-testid="stSpinner"]>div{{justify-content:center;width:100%}}
-[class*="st-key-sc_loading_"] [data-testid="stSpinner"]>div>span{{display:none}}
-[class*="st-key-sc_loading_"] [data-testid="stSpinner"]>div>div{{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}}
-[class*="st-key-sc_loading_"] [data-testid="stSpinner"]>div>div>span{{font-family:var(--sc-mono);font-size:.78rem;color:var(--sc-muted)}}
-@keyframes sc-loading{{to{{transform:rotate(360deg)}}}}
-.sc-eyebrow{{font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--sc-muted);margin:0 0 .25rem}}
-.sc-unit{{text-transform:none!important;letter-spacing:normal}}
-/* Notes under the spectrum plots: Streamlit draws captions at 60 % opacity; here they keep the full secondary tone. */
-.st-key-sx_points [data-testid="stCaptionContainer"],.st-key-sx_analysis [data-testid="stCaptionContainer"],
-[class*="st-key-sx_notes_"] [data-testid="stCaptionContainer"]{{opacity:1}}
-.sc-lede{{color:var(--sc-muted);font-size:1rem;max-width:68ch;margin:.1rem 0 0}}
-.sc-sub{{color:var(--sc-muted);font-size:.95rem}}
-.sc-strip{{display:flex;flex-wrap:wrap;align-items:baseline;gap:.35rem 1.4rem;padding:.7rem 0;border-bottom:1px solid var(--sc-line);
-  animation:sc-in .18s ease}}
-.sc-strip .sc-name{{font-family:var(--sc-serif);font-size:1.45rem;font-weight:500;letter-spacing:-.015em;margin-right:.4rem}}
-.sc-strip dl{{display:flex;flex-wrap:wrap;gap:.3rem 1.4rem;margin:0}}
-.sc-strip dt{{font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--sc-faint);font-weight:600}}
-.sc-strip dd{{margin:0;font-family:var(--sc-mono);font-size:.9rem;font-variant-numeric:tabular-nums}}
-.sc-badge{{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:600;
-  border:1px solid var(--sc-line);background:#fff;color:var(--sc-ink);white-space:nowrap}}
-.sc-badge::before{{content:"";width:7px;height:7px;border-radius:50%;background:var(--sc-faint)}}
-.sc-ok{{border-color:#b9d8c0;color:#1d5c2b}} .sc-ok::before{{background:#2e8b47}}
-.sc-warn{{border-color:#ecd08a;color:#7a5300}} .sc-warn::before{{background:#d39a13}}
-.sc-fail{{border-color:#efb3ad;color:#8f2118}} .sc-fail::before{{background:#c4372b}}
-.sc-note{{border-left:2px solid var(--sc-ink);padding:.15rem 0 .15rem .95rem;color:var(--sc-ink);font-size:.92rem;margin:.6rem 0;max-width:86ch}}
-.sc-note b{{font-weight:600}}
-.sc-read{{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.9rem 1.6rem;border-top:1px solid var(--sc-line);
-  border-bottom:1px solid var(--sc-line);padding:.9rem 0;margin:.4rem 0 .8rem}}
-.sc-read div{{font-size:.9rem;color:var(--sc-muted)}}
-.sc-read b{{display:block;font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--sc-ink);font-weight:600;margin-bottom:.2rem}}
-.sc-facts{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.9rem 1.6rem;margin:.9rem 0}}
-.sc-facts div{{border-top:1px solid var(--sc-line);padding-top:.5rem}}
-.sc-facts dt{{font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--sc-faint);font-weight:600}}
-.sc-facts dd{{margin:.15rem 0 0;font-family:var(--sc-serif);font-size:1.5rem;letter-spacing:-.01em;line-height:1.15}}
-.sc-facts small{{display:block;font-family:var(--sc-mono);font-size:.74rem;color:var(--sc-muted);margin-top:.15rem}}
-.sc-empty{{border:1px dashed var(--sc-line);border-radius:10px;padding:1.6rem 1.4rem;color:var(--sc-muted);max-width:74ch}}
-.sc-empty b{{color:var(--sc-ink)}}
+#: Area glyphs (navigation and headers). Pictograms, never data.
+ICON = {
+    "region": _uri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6' "
+                   "stroke-linecap='round'><circle cx='8' cy='8' r='5.2'/><path d='M8 .9v3.2M8 11.9v3.2M.9 8h3.2M11.9 8h3.2'/>"
+                   "<circle cx='8' cy='8' r='1' fill='black' stroke='none'/></svg>"),
+    "time": _uri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black'><rect x='.8' y='4' width='4' "
+                 "height='8' rx='1' opacity='.35'/><rect x='6' y='3' width='4' height='10' rx='1' opacity='.65'/>"
+                 "<rect x='11.2' y='2' width='4' height='12' rx='1'/></svg>"),
+    "spectrum": _uri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' "
+                     "stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12.5c1.6 0 1.8-3 3.2-3"
+                     "s1.6 2.6 3 2.6 1.6-9.6 3.2-9.6 1.4 7.7 2.8 7.7 1 .6 1.8.6'/></svg>"),
+}
 
-/* Streamlit widgets, quieter */
-[data-testid="stMetricValue"]{{font-family:var(--sc-serif);font-weight:500;letter-spacing:-.01em}}
-[data-testid="stMetricLabel"] p{{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--sc-faint);font-weight:600}}
-[data-testid="stExpander"] details{{border:0;border-top:1px solid var(--sc-line);border-radius:0}}
-[data-testid="stExpander"] summary{{padding-left:0;font-weight:500}}
-[data-testid="stTabs"] [data-baseweb="tab-list"]{{gap:1.4rem}}
-[data-testid="stTabs"] button[role="tab"]{{padding-left:0;padding-right:0}}
-.stButton button,.stDownloadButton button{{transition:background-color .14s ease,border-color .14s ease,color .14s ease,transform .12s ease}}
-.stButton button:active{{transform:scale(.985)}}
-[data-testid="stCaptionContainer"]{{color:var(--sc-muted)}}
-[data-testid="stElementContainer"] iframe{{border-radius:8px}}
-@keyframes sc-in{{from{{opacity:0;transform:translateY(4px)}}to{{opacity:1;transform:none}}}}
-.sc-view{{animation:sc-in .2s ease}}
-@media (max-width:760px){{
-  .block-container,[data-testid="stMainBlockContainer"]{{padding-left:1rem;padding-right:1rem}}
-  .sc-brand small{{display:none}}
-  h1{{font-size:1.7rem}}
-}}
-@media (prefers-reduced-motion:reduce){{*{{animation:none!important;transition:none!important}}}}
-</style>
-"""
+#: Decorative backgrounds of the area headers. Abstract motifs (no axes, values or stars): they must
+#: never be mistaken for observations.
+MOTIF = {
+    "region": _uri("<svg xmlns='http://www.w3.org/2000/svg' width='520' height='220' viewBox='0 0 520 220' fill='none' "
+                   "stroke='#8f4321' stroke-width='1'><g opacity='.5'><ellipse cx='400' cy='110' rx='190' ry='190'/>"
+                   "<ellipse cx='400' cy='110' rx='120' ry='190'/><ellipse cx='400' cy='110' rx='55' ry='190'/>"
+                   "<path d='M400-80v380'/><path d='M210 110h380'/><path d='M222 40c110 22 246 22 356 0M222 180c110-22 246-22 356 0'/>"
+                   "</g><circle cx='400' cy='110' r='34' stroke='#c4411c' stroke-width='1.6' opacity='.8'/></svg>"),
+    "time": _uri("<svg xmlns='http://www.w3.org/2000/svg' width='520' height='220' viewBox='0 0 520 220' fill='none'>"
+                 "<g stroke='#4a4f55' stroke-width='1.2'><rect x='190' y='62' width='72' height='96' rx='8' opacity='.18'/>"
+                 "<rect x='270' y='56' width='76' height='108' rx='8' opacity='.32'/><rect x='354' y='50' width='80' "
+                 "height='120' rx='8' opacity='.5'/><rect x='442' y='44' width='84' height='132' rx='8' opacity='.75'/></g>"
+                 "<g fill='#c4411c'><circle cx='222' cy='118' r='3' opacity='.3'/><circle cx='305' cy='108' r='3' "
+                 "opacity='.5'/><circle cx='392' cy='98' r='3.4' opacity='.75'/><circle cx='482' cy='88' r='4'/></g>"
+                 "<path d='M190 196h330' stroke='#4a4f55' stroke-dasharray='2 8' opacity='.5'/></svg>"),
+    "spectrum": _uri("<svg xmlns='http://www.w3.org/2000/svg' width='520' height='220' viewBox='0 0 520 220'>"
+                     "<defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='#7a2a1e' stop-opacity='0'/>"
+                     "<stop offset='.35' stop-color='#c06a2b' stop-opacity='.22'/><stop offset='.75' stop-color='#e0a24a' "
+                     "stop-opacity='.26'/><stop offset='1' stop-color='#e0a24a' stop-opacity='.08'/></linearGradient></defs>"
+                     "<rect x='120' y='70' width='400' height='80' fill='url(#g)'/><g stroke='#7a2a1e' opacity='.28'>"
+                     "<path d='M236 64v92M262 64v92M331 64v92M342 64v92M418 64v92M470 64v92'/></g></svg>"),
+}
+
+
+def _css() -> str:
+    tokens = {"INK": INK, "MUTED": MUTED, "FAINT": FAINT, "LINE": LINE, "SURFACE": SURFACE, "EMBER": EMBER,
+              "PAPER": PAPER, "PETROL": PETROL}
+    for k, v in AREA.items():
+        tokens[f"A_{k.upper()}"] = v
+        tokens[f"I_{k.upper()}"] = ICON[k]
+        tokens[f"M_{k.upper()}"] = MOTIF[k]
+    text = (Path(__file__).with_name("theme.css")).read_text(encoding="utf-8")
+    for k, v in tokens.items():
+        text = text.replace(f"@@{k}@@", v)
+    return "<style>" + text + "</style>"
+
+
+CSS = _css()
 
 
 def inject() -> None:
@@ -177,11 +142,31 @@ def facts(items: list[tuple[str, str, str]]) -> None:
 
 
 def region_strip(name: str, ra: float, dec: float, fov: float, extra: str = "") -> None:
-    """The active region, as the explorer is using it. One line; the same in both explorers."""
+    """The active region, as the explorer is using it. One bar; the same in both explorers."""
+    sci = scientific()
     st.html(
-        f'<div class="sc-strip"><span class="sc-name">{name}</span><dl>'
+        f'<div class="sc-strip"><span class="sc-name"><small>{"Región activa" if sci else "Zona que exploras"}</small>{name}</span><dl>'
         f'<div><dt>RA</dt><dd>{ra:.6f}°</dd></div><div><dt>Dec</dt><dd>{dec:+.6f}°</dd></div>'
-        f'<div><dt>Campo</dt><dd>{fov * 60:.1f}′</dd></div></dl>{extra}</div>')
+        f'<div><dt>{"Campo" if sci else "Tamaño"}</dt><dd>{fov * 60:.1f}′</dd></div></dl>{extra}</div>')
+
+
+def area_flag(view: str) -> None:
+    """Marks the visible area so the shared styles take its accent (presentation only)."""
+    st.html(f'<span class="sc-flag" data-view="{view}"></span>')
+
+
+def hero(view: str, kicker: str, title: str, lede: str = "", extra: str = "") -> None:
+    """Header of an area: what this screen is for. The motif behind it is decorative, never data."""
+    st.html(f'<header class="sc-hero" data-view="{view}"><p class="sc-kicker">{kicker}</p><h1>{title}</h1>'
+            + (f'<p class="sc-lede">{lede}</p>' if lede else "") + extra + "</header>")
+
+
+def result(kind: str, label: str, text: str, more: str = "") -> None:
+    """A scientific verdict in plain words: badge with the outcome, what it means, what it does not mean.
+
+    ``kind`` is "ok", "warn", "fail" or "" (neutral); it only chooses the tone."""
+    st.html(f'<div class="sc-result" data-kind="{kind}">{badge(label, f"sc-{kind}" if kind else "")}'
+            f'<p>{text}</p>' + (f'<p class="sc-more">{more}</p>' if more else "") + "</div>")
 
 
 def reading_guide(items: list[tuple[str, str]]) -> None:
@@ -208,4 +193,5 @@ def keep(name: str) -> None:
 
 
 __all__ = ["inject", "brand_html", "symbol_svg", "level", "scientific", "eyebrow", "note", "badge", "facts",
-           "region_strip", "reading_guide", "persistent", "bind", "keep", "LEVELS", "NAV", "NAV_LABEL"]
+           "region_strip", "reading_guide", "persistent", "bind", "keep", "LEVELS", "NAV", "NAV_LABEL",
+           "area_flag", "hero", "result", "AREA", "PETROL"]

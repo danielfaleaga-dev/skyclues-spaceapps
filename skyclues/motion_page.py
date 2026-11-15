@@ -66,15 +66,31 @@ def saved_investigations() -> dict[str, Path]:
 
 def show_result(r: dict, key: str, simple: bool = False) -> None:
     if simple:
-        st.markdown(f'<span class="sc-badge {BADGE.get(r["outcome"], "")}">{r["outcome_label"]}</span>', unsafe_allow_html=True)
-        messages = {motion.MOTION_MEASURED: 'La comparación encontró un cambio de posición medible.',
-                    motion.INSUFFICIENT_EVIDENCE: 'No hay evidencia suficiente para confirmar un movimiento.',
-                    motion.INCOMPATIBLE: 'Estas imágenes no permiten una comparación fiable.',
-                    motion.INSUFFICIENT_DATA: 'Faltan imágenes adecuadas para comprobar el movimiento.'}
-        st.markdown(messages.get(r['outcome'], r['outcome_label']))
+        # Plain-language verdicts: the outcome comes from the engine unchanged; only the wording is simpler.
+        plain = {
+            motion.MOTION_MEASURED: ("ok", "Movimiento detectado",
+                                     "Comparamos la posición del objeto en imágenes reales de fechas distintas, alineadas "
+                                     "con estrellas fijas de referencia: se ha desplazado más de lo que permite explicar "
+                                     "la incertidumbre de la medida."),
+            motion.INSUFFICIENT_EVIDENCE: ("warn", "Movimiento no confirmado",
+                                           "Estas imágenes no muestran un desplazamiento claramente mayor que su "
+                                           "incertidumbre. Eso no demuestra que el objeto esté quieto: puede moverse "
+                                           "menos de lo que estas imágenes permiten medir."),
+            motion.INCOMPATIBLE: ("fail", "No evaluable",
+                                  "Las imágenes no son comparables entre sí (detector, cobertura o calidad), así que "
+                                  "no se puede decir si hubo movimiento."),
+            motion.INSUFFICIENT_DATA: ("", "Datos insuficientes",
+                                       "Faltan imágenes adecuadas (por ejemplo, de dos temporadas distintas) para "
+                                       "comprobar si hubo movimiento.")}
+        kind, label, text = plain.get(r["outcome"], ("", r["outcome_label"], ""))
+        reasons = r.get("reasons") or []
+        more = ("Motivo: " + reasons[0]) if reasons and r["outcome"] != motion.MOTION_MEASURED else ""
+        theme.result(kind, label, text, more)
         d = r.get('displacement')
         if d and r['outcome'] == motion.MOTION_MEASURED:
-            theme.facts([('Cambio de posición', f"{d['total_arcsec']:.2f} ± {d['total_err_arcsec']:.2f}″", f"en {d['delta_t_days']:.0f} días")])
+            theme.facts([('Cambio de posición', f"{d['total_arcsec']:.2f} ± {d['total_err_arcsec']:.2f}″",
+                          "± es la incertidumbre de la medida"),
+                         ('Tiempo entre imágenes', f"{d['delta_t_days']:.0f} días", f"{d['first']} → {d['last']}")])
         st.caption('En Científico puedes revisar las medidas, los motivos y las imágenes utilizadas.')
         return
     st.markdown(f'<span class="sc-badge {BADGE.get(r["outcome"], "")}">{r["outcome_label"]} · {r["outcome"]}</span>'

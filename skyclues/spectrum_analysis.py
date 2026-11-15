@@ -69,9 +69,9 @@ def _point_controls(sci: bool, region_key) -> None:
     if has_b:
         right.button("Quitar el punto B", key="sx_b_remove", on_click=_remove_b,
                      help="Vuelve a trabajar con una sola posición. No cambia el punto A ni su espectro.")
-        st.caption("A: rombo azul · B: cuadrado naranja, con los colores de sus espectros. Línea continua: apertura; "
+        st.caption("A: rombo negro · B: cuadrado cobrizo, con los colores de sus espectros. Línea continua: apertura; "
                    "discontinua: anillo de fondo (los mismos radios en ambos)." if sci else
-                   "A: rombo azul · B: cuadrado naranja, con los mismos colores que sus curvas.")
+                   "A: rombo negro · B: cuadrado cobrizo, con los mismos colores que sus curvas.")
     elif st.session_state.get("opt_sx_active") == POINTS[1]:
         st.caption("Pulsa la imagen para colocar el punto B y comparar su espectro con el de A.")
 

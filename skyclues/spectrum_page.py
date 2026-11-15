@@ -215,12 +215,19 @@ def render(level: str) -> None:
     state["sx_canal"] = int(state["sx_channel"])
     navigation.write_url(params, {"ra": ra_c, "dec": dec_c, "fov": fov}, "spectrum", state["sx_canal"])
 
+    if not sci:
+        theme.hero("spectrum", "Espectro · la luz infrarroja de esta zona", "¿Qué luz infrarroja emite esta zona?",
+                   "La luz infrarroja es invisible al ojo. SPHEREx la separa en 102 colores (longitudes de onda). "
+                   "Elige un color para ver la imagen, pulsa un punto y obtén su espectro: cuánta luz llega en cada "
+                   "color. Sus picos y valles pueden dar pistas sobre gas, polvo o hielos, pero no los identifican por "
+                   "sí solos.")
     theme.region_strip(inp["label"], ra_c, dec_c, fov, _region_extra(epoch_info, inp["follow"]) if sci else '')
     theme.note(("<b>Producto combinado, no temporal.</b> " +
             "Cada imagen es un canal del cubo DR1: el promedio de muchas exposiciones de fechas distintas (sin luz "
             "zodiacal), en píxeles de 12.9″. Sirve para ver cómo cambia el cielo con la longitud de onda; no muestra "
             "cambios en el tiempo (para eso, «Tiempo» usa observaciones individuales de 6.15″/px).") if sci else
-            "Explora esta zona en distintos colores infrarrojos. Para comparar fechas, abre «Tiempo».")
+            "Estas imágenes combinan muchas fechas: muestran colores, no cambios en el tiempo. Para comparar fechas, "
+            "abre «Tiempo».")
     if epoch_info.get("warning"):
         st.warning(epoch_info["warning"] + f" Época de referencia: {astro.epoch_jyear:.2f}. No es una detección.")
     if epoch_info.get("propagated") and "mjd_mid" in epoch_info and sci:
@@ -351,7 +358,7 @@ def render(level: str) -> None:
             r_ap, r_in, r_out = measure_controls()
         else:
             st.markdown('El rombo naranja marca el punto elegido.' if pick_b is None else
-                        'El rombo azul (A) y el cuadrado naranja (B) marcan los dos puntos.')
+                        'El rombo negro (A) y el cuadrado cobrizo (B) marcan los dos puntos.')
             r_ap = state.get('sx_rap', multiband_page.kept('sx_rap', defaults[0]))
             r_in, r_out = state.get('sx_ann', multiband_page.kept('sx_ann', defaults[1:]))
         state["sx_rin"], state["sx_rout"] = r_in, r_out
@@ -397,7 +404,13 @@ def render(level: str) -> None:
         with st.expander("Cómo leer este gráfico"):
             theme.reading_guide(reading_guide(quantity, sci))
     else:
-        st.markdown('Cuanto más alto el punto, más luz en ese color infrarrojo. **Marcas rosas: sin datos.**')
+        theme.reading_guide([
+            ("Eje horizontal", "El color infrarrojo (longitud de onda, en µm): de 0,75 µm a la izquierda a 5 µm a "
+                               "la derecha."),
+            ("Altura de cada punto", "Cuánta luz llega en ese color. Un punto por color medido; las marcas rosas "
+                                     "son colores sin datos, no luz cero."),
+            ("Picos y valles", "Un pico es más luz que en los colores vecinos; un valle, menos. Pulsa uno en el "
+                               "gráfico para examinarlo.")])
         st.container(key="sx_notes_plot_simple").caption('Vista orientativa: los picos por sí solos no identifican materiales.')
         if spec.warnings:
             st.warning('Hay datos limitados en esta posición. El modo Científico muestra los detalles.')

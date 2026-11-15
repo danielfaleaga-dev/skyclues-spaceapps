@@ -64,30 +64,39 @@ view = theme.NAV.get(state.get("nav"), "region")
 level = theme.level()
 if view != "spectrum":
     spectrum_page.stash_state()        # keep the channel, the pick and the mode while another view is shown
+theme.area_flag(view)                  # the visible area gives its accent to the shared styles
 
 # ---------------------------------------------------------------- views
 if view == "region":
     navigation.write_url(qp, region, view)
     for e in state.pop("region_errors", []):
         st.error(e)
-    st.html('<div class="sc-view"><p class="sc-eyebrow">Región del cielo</p></div>')
-    st.markdown("# Elija dónde mirar")
-    st.html('<p class="sc-lede">' + (
-        "Busca un objeto, escribe sus coordenadas o mueve el mapa."
-        if level == "simple" else
-        "Nombre, coordenadas y atlas editan una única región (centro ICRS y campo de visión). El círculo es el campo "
-        "científico, de diámetro angular fijo; el zoom del mapa no lo modifica.") + "</p>")
-    st.html('<div style="height:.4rem"></div>')
+    if level == "simple":
+        theme.hero(
+            "region", "Región · elige dónde mirar", "¿Qué zona del cielo quieres investigar?",
+            "SkyClues abre observaciones infrarrojas reales del telescopio espacial SPHEREx (NASA). Elige un objeto o "
+            "una zona del cielo y descubre si algo cambió entre fechas o qué luz infrarroja emite.",
+            '<ol class="sc-steps" aria-label="Qué puedes hacer">'
+            '<li data-v="region"><i></i>Busca un nombre o mueve el mapa</li>'
+            '<li data-v="time"><i></i>Tiempo: ¿algo cambia entre fechas?</li>'
+            '<li data-v="spectrum"><i></i>Espectro: ¿qué luz infrarroja emite?</li></ol>')
+    else:
+        theme.hero(
+            "region", "Región del cielo", "Centro y campo de la exploración",
+            "Nombre, coordenadas y atlas editan una única región (centro ICRS y campo de visión). El círculo es el "
+            "campo científico, de diámetro angular fijo; el zoom del mapa no lo modifica.")
     region_ui.render(level)
 
     examples = [(stem, title) for stem, title in config.VALIDATED_EXAMPLES.items() if time_page.saved_path(stem)]
     if examples:
-        st.html('<div style="height:1.2rem"></div><p class="sc-eyebrow">Secuencias verificadas</p>')
+        st.html('<div style="height:1.4rem"></div><p class="sc-eyebrow">'
+                + ("Ejemplos listos para explorar" if level == "simple" else "Secuencias verificadas") + "</p>")
         with st.container(horizontal=True, vertical_alignment="center"):
             for stem, title in examples:
                 st.button(title, key=f"example_{stem}", on_click=time_page.open_saved, args=(stem, title.split(" · ")[0]))
-        if level == "scientific":
-            st.caption("Observaciones reales ya comprobadas: se abren en «Tiempo» sin repetir la búsqueda en el archivo.")
+        st.caption("Observaciones reales ya comprobadas: se abren en «Tiempo» sin repetir la búsqueda en el archivo."
+                   if level == "scientific" else
+                   "Imágenes reales de SPHEREx ya comprobadas: se abren en «Tiempo» al instante.")
     if level == "scientific":
         with st.expander("Procedencia de los mapas del atlas"):
             region_ui.provenance()

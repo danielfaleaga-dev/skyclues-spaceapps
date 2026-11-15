@@ -29,7 +29,7 @@ FRAME_MARGIN = 1.10          # display frame = 1.1 x field diameter
 DISPLAY_NPIX = 540
 MASK_COLOR = render.MASK_COLOR               # no data in this channel (NaN, NHITS = 0)
 OUTSIDE_COLOR = "#eef1f5"                    # not read: outside the field's tile boxes
-SERIES = "#2a78d6"                           # one series: the spectrum
+SERIES = "#1f1f1f"                           # one series: the spectrum
 INK, INK_2, MUTED = "#14181f", "#4a5463", "#9aa4b2"
 BAND_FILL = "#f3f5f8"
 
@@ -271,6 +271,10 @@ def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pix
                  alt.Tooltip("flags:N", title="FLAGS"), alt.Tooltip("tesela:Q", title="tesela HEALPix")]
     ).add_params(sel)
     mdf = pd.DataFrame(marks)
+    # White under-stroke: a dark marker (A is drawn in the ink of its curve) stays visible on any sky.
+    under = alt.Chart(mdf).mark_point(size=150, strokeWidth=4.6, filled=False, color="#ffffff", opacity=0.9).encode(
+        x=X, y=Y, shape=alt.Shape("m:N", scale=alt.Scale(domain=["objetivo", "A", "B"],
+                                                         range=["cross", "diamond", "square"]), legend=None))
     symbols = alt.Chart(mdf).mark_point(size=150, strokeWidth=2.2, filled=False).encode(
         x=X, y=Y, shape=alt.Shape("m:N", scale=alt.Scale(domain=["objetivo", "A", "B"],
                                                          range=["cross", "diamond", "square"]), legend=None),
@@ -283,7 +287,7 @@ def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pix
                                         strokeWidth=4, strokeJoin="round").encode(x=X, y=Y, text="letra:N")
     text = alt.Chart(letters).mark_text(dx=14, dy=-13, fontSize=15, fontWeight="bold", color=INK).encode(
         x=X, y=Y, text="letra:N")
-    return alt.layer(bg, lines, pts, symbols, halo, text).properties(
+    return alt.layer(bg, lines, pts, under, symbols, halo, text).properties(
         width="container", height=size, autosize=alt.AutoSizeParams(type="fit", contains="padding"))
 
 
@@ -291,7 +295,7 @@ QUANTITIES = {
     "flux": ("flujo_mjy", "Flujo en apertura (mJy)"),
     "pixel": ("pixel_mjysr", "Brillo del píxel (MJy/sr)"),
 }
-SERIES_B = "#eb6834"                         # second spectrum (comparison point B)
+SERIES_B = "#c06a2b"                         # second spectrum (comparison point B)
 FOCUS = "#c4411c"                            # selection accent of the interface
 CAUTION = "OVERFLOW/OUTLIER en la apertura"
 Y_AXIS_EXTENT = 62                           # same left margin in the spectrum and in the A−B / A/B panel

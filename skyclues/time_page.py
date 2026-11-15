@@ -213,11 +213,17 @@ def run_search(inp: dict, refresh: bool) -> dict | None:
 
 def pending(inp: dict, sci: bool) -> None:
     """The region has not been searched yet in this session (for instance, opened from a link)."""
+    if not sci:
+        theme.hero("time", "Tiempo · observaciones en fechas distintas", "¿Ha cambiado algo en esta zona del cielo?",
+                   "SPHEREx observa el mismo cielo varias veces. SkyClues busca esas imágenes reales, las ordena por "
+                   "fecha y las prepara para compararlas: podrás reproducirlas como una secuencia, alternar dos fechas "
+                   "y comprobar si algo se movió.")
     theme.region_strip(inp["label"], inp["ra"], inp["dec"], inp["fov"])
     st.html(('<div class="sc-empty"><b>Aún no se han buscado observaciones de esta región.</b><br>La búsqueda consulta '
             'el archivo NASA/IPAC IRSA y descarga los recortes FITS necesarios: suele tardar de 1 a 2 minutos. '
             'Puede seguir navegando mientras tanto.</div>') if sci else
-            '<div class="sc-empty">Busca imágenes de esta zona tomadas en distintas fechas. Puede tardar unos minutos.</div>')
+            '<div class="sc-empty"><b>Aún no hemos buscado imágenes de esta zona.</b> La búsqueda consulta el archivo '
+            'de la NASA y puede tardar uno o dos minutos.</div>')
     with st.container(horizontal=True, vertical_alignment="center"):
         st.button("Buscar observaciones", type="primary", key="time_search", on_click=_request_search,
                   disabled=not opt("dets"))
@@ -341,8 +347,16 @@ def render(level: str) -> None:
             ("Detector", f"D{det}", f"{config.BANDS_UM[det][0]}–{config.BANDS_UM[det][1]} µm")])
     else:
         theme.facts([
-            ("Fechas disponibles", str(seq.n), ""),
-            ("De la primera a la última", f"{m['span_days']:.0f} días", "")])
+            ("Fechas observadas", str(seq.n), "imágenes reales de SPHEREx"),
+            ("De la primera a la última", f"{m['span_days']:.0f} días", ""),
+            ("Mismo color infrarrojo", f"{f0.lambda_target_um:.2f} µm", "para que el brillo sea comparable")])
+        theme.reading_guide([
+            ("Qué estás viendo", "La misma zona del cielo fotografiada en fechas distintas, una imagen por fecha. No "
+                                 "hay imágenes inventadas entre medias."),
+            ("Cómo compararlas", "«Reproducir» las muestra en orden; «Blink» alterna dos fechas para que un cambio "
+                                 "salte a la vista."),
+            ("¿Algo se mueve?", "Un parpadeo no basta: la pestaña «Movimiento» lo mide con estrellas fijas de "
+                                "referencia y te dice si se confirma.")])
         st.caption({"sc-ok": "Imágenes preparadas para comparar entre fechas.",
                     "sc-warn": "Las fechas se pueden comparar, con avisos: consulte «Calidad» antes de sacar conclusiones.",
                     "sc-fail": "Estas fechas no cumplen los criterios para compararse: consulte «Calidad»."}[status_cls])

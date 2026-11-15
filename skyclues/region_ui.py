@@ -23,11 +23,24 @@ from .astrometry import Astrometry
 _HERE = Path(__file__).parent
 _ARROW = ('<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3.5 9h11M10 4.5 14.5 9 '
           '10 13.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+# Decorative glyphs of the two explorers (pictograms of "several dates" and "light by wavelength"; never data).
+_FRAMES = ('<svg class="rg-glyph" width="58" height="40" viewBox="0 0 58 40" fill="none" aria-hidden="true">'
+           '<rect x="1" y="9" width="16" height="22" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".35"/>'
+           '<rect x="20" y="6" width="17" height="28" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".6"/>'
+           '<rect x="40" y="3" width="17" height="34" rx="3" stroke="currentColor" stroke-width="1.6"/>'
+           '<circle cx="8" cy="22" r="1.8" fill="#e3734a" opacity=".45"/><circle cx="28.5" cy="19" r="2" fill="#e3734a" '
+           'opacity=".7"/><circle cx="49" cy="15" r="2.3" fill="#e3734a"/></svg>')
+_WAVE = ('<svg class="rg-glyph" width="58" height="40" viewBox="0 0 58 40" fill="none" aria-hidden="true">'
+         '<defs><linearGradient id="rg-ir" x1="0" x2="1"><stop offset="0" stop-color="#7a2a1e" stop-opacity=".15"/>'
+         '<stop offset=".55" stop-color="#c06a2b" stop-opacity=".35"/><stop offset="1" stop-color="#e0a24a" stop-opacity=".45"/>'
+         '</linearGradient></defs><rect x="1" y="30" width="56" height="7" rx="2" fill="url(#rg-ir)"/>'
+         '<path d="M2 25c5 0 6-7 11-7s5 5 10 5 6-19 11-19 5 15 10 15 4 2 12 2" stroke="currentColor" stroke-width="1.7" '
+         'stroke-linecap="round" stroke-linejoin="round"/></svg>')
 _HTML = f"""
 <div class="sc-region" data-level="simple">
   <div class="rg-panel">
-    <div class="rg-field">
-      <label for="rg-q">Objeto <span>nombre o catálogo</span></label>
+    <div class="rg-field rg-search">
+      <label for="rg-q">Buscar un objeto <span>nombre o catálogo</span></label>
       <div class="rg-combo">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.6"
           stroke="currentColor" stroke-width="1.5"/><path d="m10 10 3.4 3.4" stroke="currentColor" stroke-width="1.5"
@@ -40,6 +53,10 @@ _HTML = f"""
       <p class="rg-object" role="status" aria-live="polite"></p>
       <div class="rg-notes"></div>
     </div>
+    <div class="rg-group">
+    <p class="rg-label rg-grouptitle">Posición en el cielo <span class="rg-sci">ICRS · grados</span></p>
+    <p class="rg-help rg-simple">Ascensión recta (RA) y declinación (Dec) son la «longitud» y la «latitud» del cielo.
+      Se rellenan solas al buscar o al mover el mapa; también puedes escribirlas.</p>
     <div class="rg-coords">
       <div class="rg-field">
         <label for="rg-ra">RA <span>grados · ICRS</span></label>
@@ -54,8 +71,10 @@ _HTML = f"""
         <span class="rg-sexa rg-sexa-dec" id="rg-dec-sexa"></span><span class="rg-err" role="alert"></span>
       </div>
     </div>
-    <div class="rg-field">
-      <label for="rg-fov">Campo de visión <span>diámetro en el cielo</span></label>
+    </div>
+    <div class="rg-field rg-group">
+      <label for="rg-fov"><b class="rg-simple">Tamaño de la región</b><b class="rg-sci">Campo de visión</b>
+        <span>diámetro · minutos de arco</span></label>
       <div class="rg-fovrow">
         <input id="rg-fov" type="range" aria-label="Campo de visión en minutos de arco">
         <div class="rg-fovbox"><input id="rg-fovn" class="rg-num" type="text" inputmode="decimal" autocomplete="off"
@@ -66,12 +85,16 @@ _HTML = f"""
     </div>
   </div>
   <div class="rg-actions">
-    <button type="button" class="rg-cta rg-primary" data-view="time"><b>Ver en el tiempo</b>
-      <small>Observaciones reales de fechas distintas</small>{_ARROW}</button>
-    <button type="button" class="rg-cta" data-view="spectrum"><b>Explorar el espectro</b>
-      <small>La misma región en 102 canales infrarrojos</small>{_ARROW}</button>
+    <p class="rg-label rg-actions-title">Investiga esta zona</p>
+    <button type="button" class="rg-cta rg-time" data-view="time">{_FRAMES}<b>Ver en el tiempo</b>
+      <small>Imágenes reales de distintas fechas: ¿algo cambia o se mueve?</small>{_ARROW}</button>
+    <button type="button" class="rg-cta rg-spectrum" data-view="spectrum">{_WAVE}<b>Explorar el espectro</b>
+      <small>Su luz en 102 colores infrarrojos: ¿qué emite o absorbe?</small>{_ARROW}</button>
   </div>
   <div class="rg-mapcol">
+    <p class="rg-label rg-maptitle"><span class="rg-maptag">Mapa de referencia</span>
+      <span class="rg-simple">Arrastra para moverte por el cielo; la rueda o los botones acercan la vista sin cambiar la zona.</span>
+      <span class="rg-sci">Atlas de contexto (otras misiones): orientación y elección de centro, no datos SPHEREx.</span></p>
     <div class="rg-mapwrap">
       <div class="rg-map" role="application" aria-label="Atlas del cielo: arrastre para mover la región"></div>
       <div class="rg-tools">

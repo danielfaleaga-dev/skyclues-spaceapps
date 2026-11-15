@@ -96,8 +96,8 @@ def meaning_text(it: si.Interpretation) -> str:
         opposite = [m for m in it.others if m.status == si.OPPOSITE]
         extra = (f" En esa posición, el {opposite[0].reference.plain_name} se vería como una disminución de luz, no "
                  "como un exceso." if opposite and opposite[0].reference.nature == sr.ABSORPTION else "")
-        return (f"No coincide con ninguna de las {len(sr.REFERENCES)} referencias que SkyClues compara; eso no descarta "
-                "otras sustancias." + extra)
+        return (f"Sin coincidencias en la biblioteca actual ({len(sr.REFERENCES)} referencias). Esto no descarta otras "
+                "características físicas conocidas." + extra)
     return "SkyClues no puede interpretarlo."
 
 

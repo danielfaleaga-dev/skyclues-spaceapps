@@ -202,7 +202,9 @@ def _show(p: dict, sci: bool) -> None:
                 _controls(p)
         return
     broadband = sel["kind"] == "broadband"
-    st.html(theme.badge("Imagen mejorada", "sc-ok") + (" " + theme.badge("Banda ancha") if broadband and sci else ""))
+    st.html(theme.badge("Imagen mejorada", "sc-ok") + " " + (
+        theme.badge("Banda ancha" if sci else "Colores infrarrojos mezclados", "sc-warn") if broadband else
+        theme.badge("Mismo canal" if sci else "Mismo color infrarrojo")))
     st.image(p["png"][not sci], width="stretch")
     g, pn, det = m["gain"], m["pixel_noise_mjysr"], m["detections"]
     lam = sel["lambda_range_um"]

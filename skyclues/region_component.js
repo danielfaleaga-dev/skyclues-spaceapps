@@ -97,13 +97,13 @@ export default function (c) {
     $('#rg-fov').style.setProperty('--fill', `${((am - D().fov_min * 60) / ((D().fov_max - D().fov_min) * 60)) * 100}%`);
     const sx = Math.round(fov * 3600 / D().spherex_px), cube = Math.round(fov * 3600 / D().cube_px);
     $('.rg-fovhint').textContent = D().level === 'simple'
-      ? 'El círculo naranja marca la zona que vas a explorar.'
+      ? 'Desliza para abarcar más o menos cielo. El círculo naranja del mapa marca la zona que vas a explorar.'
       : `${fmtArcmin(fov)}′ = ${fov.toFixed(4)}° de diámetro · ≈ ${sx} px SPHEREx (${D().spherex_px}″) · ≈ ${cube} px del cubo (${D().cube_px}″)`;
     chip();
     identity();
   }
   function chip() {
-    let t = `Campo ${fmtArcmin(S.cur.fov)}′`;
+    let t = `${D().level === 'simple' ? 'Zona' : 'Campo'} ${fmtArcmin(S.cur.fov)}′`;
     if (S.aladin) {
       const v = S.aladin.getFoV()[0];
       t += ` · vista ${v >= 1 ? v.toFixed(2) + '°' : (v * 60).toFixed(1) + '′'}`;
@@ -292,7 +292,7 @@ export default function (c) {
   function layerInfo(id) {
     const L = D().layers.find((l) => l.id === id) || D().layers[0];
     $('.rg-layerinfo').textContent = D().level === 'simple'
-      ? `${L.label} · imagen de referencia, de otra misión.`
+      ? `Mapa de referencia: ${L.label}, de otra misión y otra época. No son datos SPHEREx: esos se abren en Tiempo y Espectro.`
       : `${L.mission} · ${L.product} · ${L.bands} · ${L.epoch}. Mapa de contexto servido por NASA/IPAC IRSA; no son datos SPHEREx.`;
     return L;
   }
