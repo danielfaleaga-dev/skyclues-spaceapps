@@ -1,0 +1,42 @@
+{
+ "R: canal 88 = plano 87, λ 4.500 µm de la tabla del FITS": {
+  "ok": true,
+  "detalle": null
+ },
+ "R: los píxeles de la composición son los del plano 87 leído por separado (sin remuestreo)": {
+  "ok": true,
+  "detalle": null
+ },
+ "G: canal 47 = plano 46, λ 2.189 µm de la tabla del FITS": {
+  "ok": true,
+  "detalle": null
+ },
+ "G: los píxeles de la composición son los del plano 46 leído por separado (sin remuestreo)": {
+  "ok": true,
+  "detalle": null
+ },
+ "B: canal 21 = plano 20, λ 1.195 µm de la tabla del FITS": {
+  "ok": true,
+  "detalle": null
+ },
+ "B: los píxeles de la composición son los del plano 20 leído por separado (sin remuestreo)": {
+  "ok": true,
+  "detalle": null
+ },
+ "Intercambiar R y B intercambia exactamente los canales de color mostrados": {
+  "ok": true,
+  "detalle": null
+ },
+ "El canal 51 (sin datos en DR1) se rechaza antes de leer": {
+  "ok": true,
+  "detalle": "ValueError"
+ },
+ "Sin dato en algún canal → NaN en los tres (nunca color parcial)": {
+  "ok": true,
+  "detalle": null
+ },
+ "La composición no suma ni promedia canales: provenance sin 'promedio'/'suma'": {
+  "ok": true,
+  "detalle": null
+ }
+}

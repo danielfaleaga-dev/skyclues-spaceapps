@@ -1,0 +1,18 @@
+{
+ "motion_eps_ind_b_d3.json": {
+  "saved_outcome": "MOTION_MEASURED",
+  "no_gaia_outcome": "INSUFFICIENT_EVIDENCE",
+  "no_gaia_has_displacement": false,
+  "reasons": [
+   "Gaia DR3 no disponible: sin estrellas estacionarias no se pueden registrar las imágenes ni controlar falsos positivos."
+  ]
+ },
+ "motion_wise0855_d6.json": {
+  "saved_outcome": "MOTION_MEASURED",
+  "no_gaia_outcome": "INSUFFICIENT_EVIDENCE",
+  "no_gaia_has_displacement": false,
+  "reasons": [
+   "Gaia DR3 no disponible: sin estrellas estacionarias no se pueden registrar las imágenes ni controlar falsos positivos."
+  ]
+ }
+}
