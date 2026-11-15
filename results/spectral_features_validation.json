@@ -1,0 +1,1337 @@
+{
+ "metodo": {
+  "metodo": "skyclues-features 1.0 (2026-11-14)",
+  "canales_entorno_por_lado": 3,
+  "grado_del_continuo": 2,
+  "intervalos_de_prueba_canales": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "umbral_visible": 5.0,
+  "umbral_cuantificable": 7.0,
+  "contraste_relativo_minimo": 0.01,
+  "continuo": "polinomio local en ln(valor)–ln(λ) si el entorno es positivo; en valor–λ si no",
+  "relacion_denominador_minimo": 3.0,
+  "cambio_de_cobertura": 2.0,
+  "suavizado": "ninguno",
+  "nota": "Umbrales descriptivos sobre una dispersión de referencia; no son incertidumbres fotométricas ni significación estadística."
+ },
+ "tutorial_url": "https://caltech-ipac.github.io/irsa-tutorials/spherex-hipscube/",
+ "posiciones_icrs_deg": {
+  "M101_A_nucleo": [
+   210.802429,
+   54.34875
+  ],
+  "M101_B_NGC5461": [
+   210.923546,
+   54.319916
+  ],
+  "tutorial_IRSA": [
+   60.8109955,
+   51.3404038
+  ]
+ },
+ "radios_px": [
+  2.0,
+  4.0,
+  7.0
+ ],
+ "limitaciones": [
+  "Espectros exploratorios del cubo combinado: sin incertidumbres ni corrección de apertura.",
+  "Las clases de las características son criterios descriptivos, no detecciones estadísticas.",
+  "La coincidencia de un pico con una longitud de onda marcada en el tutorial no identifica una molécula ni una línea: esa identificación no forma parte de esta fase."
+ ],
+ "rendimiento": {
+  "extraccion_A_en_frio": {
+   "segundos": 11.89803160000156,
+   "requests": 10,
+   "bytes_network": 7636974,
+   "bytes_cache": 0
+  },
+  "extraccion_B_tras_A": {
+   "segundos": 10.382098699999915,
+   "requests": 6,
+   "bytes_network": 7347438,
+   "bytes_cache": 0
+  },
+  "repeticion_B_desde_cache": {
+   "segundos": 3.790984999999637,
+   "requests": 0,
+   "bytes_network": 0,
+   "bytes_cache": 7311360
+  },
+  "memoria_python_pico_bytes": 12771001,
+  "nota": "B se lee de las mismas teselas ya abiertas; sus filas son otras, así que se piden por rangos (no se descarga ninguna tesela completa). Una repetición no hace ninguna petición."
+ },
+ "m101": {
+  "separacion_arcsec": 274.59937128252733,
+  "avisos": [],
+  "unidad": "mJy",
+  "teselas": {
+   "A": [
+    "Norder5/Npix2858"
+   ],
+   "B": [
+    "Norder5/Npix2858"
+   ]
+  },
+  "apertura_efectiva_px": {
+   "A": 12.559999999999999,
+   "B": 12.68
+  },
+  "canales_medidos": {
+   "A": 100,
+   "B": 100
+  },
+  "resumen_comparacion": {
+   "n_canales": 102,
+   "n_ambos": 100,
+   "n_solo_a": 0,
+   "n_solo_b": 0,
+   "n_ninguno": 2,
+   "n_relacion": 99,
+   "filtro_estabilidad": true,
+   "identicos": false,
+   "diferencia_mediana": 77.2317590750686,
+   "diferencia_min": 10.343380690077066,
+   "diferencia_max": 175.20159505400753,
+   "fraccion_a_mayor": 1.0,
+   "relacion_mediana": 8.249991898340843,
+   "relacion_dispersion": 7.44770417141379,
+   "canales_apartados": []
+  },
+  "recalculo_numpy": {
+   "canales_con_ambos": 100,
+   "canales_con_relacion": 99,
+   "diferencia_identica": true,
+   "relacion_identica": true
+  },
+  "produccion_frente_a_photutils": {
+   "A": {
+    "canales": 100,
+    "mediana_relativa": 0.016179778587448616,
+    "mediana_abs_relativa": 0.016179778587448616,
+    "max_abs_relativa": 0.25411584956106775
+   },
+   "B": {
+    "canales": 100,
+    "mediana_relativa": 0.08086824590473471,
+    "mediana_abs_relativa": 0.08119159168896425,
+    "max_abs_relativa": 0.18270252980994978
+   }
+  },
+  "diferencia_A_menos_B": {
+   "mediana_produccion_mjy": 77.2317590750686,
+   "mediana_photutils_mjy": 76.49536020297151,
+   "mediana_abs_desacuerdo_mjy": 0.8837761318393831,
+   "causa_del_desacuerdo": "círculo sobre el cielo con 5×5 submuestras (producción) frente a círculo en coordenadas de píxel con solapamiento exacto (Photutils); mismo fondo y fórmula."
+  },
+  "caracteristicas": {
+   "A": [],
+   "B": [
+    {
+     "klass": "visible",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 6.7 veces la dispersión de referencia, entre 5 y 7."
+     ],
+     "limitations": [
+      "El intervalo y su entorno abarcan los detectores D1, D2: calibración y resolución distintas pueden producir un escalón.",
+      "Valores ≤ 0 en el entorno: continuo ajustado sobre los valores, no sobre sus logaritmos; menos fiable si el espectro tiene mucha pendiente.",
+      "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico.",
+      "Continuo ≤ 0: no se calcula el contraste relativo.",
+      "Característica ancha: si se extiende más allá del intervalo, el entorno la incluye y el contraste queda subestimado."
+     ],
+     "canal": 11,
+     "canal_lo": 11,
+     "canal_hi": 11,
+     "trial_lo": 7,
+     "trial_hi": 15,
+     "lam": 0.9549999833106995,
+     "lam_lo": 0.9419999718666077,
+     "lam_hi": 0.9670000076293945,
+     "n_channels": 1,
+     "width": "estrecha",
+     "value": 24.760929950871468,
+     "continuum": -1.7389446663268233,
+     "contrast": 26.49987461719829,
+     "relative": null,
+     "ratio": 6.7142938546481234,
+     "ref": 2.5467747431306957,
+     "ref_local": 2.5467747431306957,
+     "ref_detector": 1.657691737164992,
+     "ref_background": 1.0799956445873165,
+     "env_left": [
+      4,
+      5,
+      6
+     ],
+     "env_right": [
+      16,
+      19,
+      20
+     ],
+     "detectors": [
+      1,
+      2
+     ],
+     "nhits_feature": 6.0,
+     "nhits_env": 6.5,
+     "label": "Visible",
+     "polyfit_independiente": {
+      "continuo": -1.7389446663266312,
+      "contraste": 26.4998746171981,
+      "relativo": null
+     },
+     "sobre_fotometria_photutils": {
+      "continuo": -2.0297936330877064,
+      "contraste": 25.831772679536154,
+      "relativo": null
+     },
+     "marcas_del_tutorial_en_el_intervalo": []
+    },
+    {
+     "klass": "visible",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 5.4 veces la dispersión de referencia, entre 5 y 7."
+     ],
+     "limitations": [
+      "El intervalo y su entorno abarcan los detectores D1, D2: calibración y resolución distintas pueden producir un escalón.",
+      "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+     ],
+     "canal": 17,
+     "canal_lo": 17,
+     "canal_hi": 17,
+     "trial_lo": 16,
+     "trial_hi": 18,
+     "lam": 1.1019999980926514,
+     "lam_lo": 1.0859999656677246,
+     "lam_hi": 1.1160000562667847,
+     "n_channels": 1,
+     "width": "estrecha",
+     "value": 28.144575575185627,
+     "continuum": 8.317961528646517,
+     "contrast": 19.82661404653911,
+     "relative": 2.383590496091806,
+     "ratio": 5.438848040588223,
+     "ref": 2.8001999558940125,
+     "ref_local": 0.12089843718425589,
+     "ref_detector": 1.657691737164992,
+     "ref_background": 2.8001999558940125,
+     "env_left": [
+      13,
+      14,
+      15
+     ],
+     "env_right": [
+      19,
+      20,
+      21
+     ],
+     "detectors": [
+      1,
+      2
+     ],
+     "nhits_feature": 7.0,
+     "nhits_env": 9.0,
+     "label": "Visible",
+     "polyfit_independiente": {
+      "continuo": 8.317961528646531,
+      "contraste": 19.826614046539095,
+      "relativo": 2.3835904960918004
+     },
+     "sobre_fotometria_photutils": {
+      "continuo": 7.749869953050196,
+      "contraste": 19.164605762971362,
+      "relativo": 2.4728938522934247
+     },
+     "marcas_del_tutorial_en_el_intervalo": []
+    },
+    {
+     "klass": "cuantificable",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 7.6 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+     ],
+     "limitations": [],
+     "canal": 40,
+     "canal_lo": 40,
+     "canal_hi": 41,
+     "trial_lo": 39,
+     "trial_hi": 41,
+     "lam": 1.8609999418258667,
+     "lam_lo": 1.8380000591278076,
+     "lam_hi": 1.9279999732971191,
+     "n_channels": 2,
+     "width": "estrecha",
+     "value": 25.61985010024718,
+     "continuum": 11.20525740136271,
+     "contrast": 14.414592698884471,
+     "relative": 1.2864133488920533,
+     "ratio": 7.560596029156383,
+     "ref": 1.413249268303059,
+     "ref_local": 1.413249268303059,
+     "ref_detector": 1.230442679549879,
+     "ref_background": 1.394054463401138,
+     "env_left": [
+      36,
+      37,
+      38
+     ],
+     "env_right": [
+      42,
+      43,
+      44
+     ],
+     "detectors": [
+      3
+     ],
+     "nhits_feature": 6.0,
+     "nhits_env": 6.0,
+     "label": "Cuantificable",
+     "polyfit_independiente": {
+      "continuo": 11.20525740136273,
+      "contraste": 14.414592698884451,
+      "relativo": 1.2864133488920495
+     },
+     "sobre_fotometria_photutils": {
+      "continuo": 10.28884013274239,
+      "contraste": 13.898036044775306,
+      "relativo": 1.3507874420701025
+     },
+     "marcas_del_tutorial_en_el_intervalo": [
+      "Paα"
+     ]
+    },
+    {
+     "klass": "cuantificable",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 14.0 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+     ],
+     "limitations": [
+      "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+     ],
+     "canal": 63,
+     "canal_lo": 63,
+     "canal_hi": 63,
+     "trial_lo": 61,
+     "trial_hi": 65,
+     "lam": 3.2929999828338623,
+     "lam_lo": 3.242000102996826,
+     "lam_hi": 3.3420000076293945,
+     "n_channels": 1,
+     "width": "estrecha",
+     "value": 40.34309792055566,
+     "continuum": 13.848443717669003,
+     "contrast": 26.494654202886654,
+     "relative": 1.9131864015219673,
+     "ratio": 13.95074612760251,
+     "ref": 1.2685175632819612,
+     "ref_local": 1.0824859566205838,
+     "ref_detector": 1.2685175632819612,
+     "ref_background": 1.2078578996902327,
+     "env_left": [
+      58,
+      59,
+      60
+     ],
+     "env_right": [
+      66,
+      67,
+      68
+     ],
+     "detectors": [
+      4
+     ],
+     "nhits_feature": 5.0,
+     "nhits_env": 6.5,
+     "label": "Cuantificable",
+     "polyfit_independiente": {
+      "continuo": 13.848443717669022,
+      "contraste": 26.494654202886636,
+      "relativo": 1.9131864015219633
+     },
+     "sobre_fotometria_photutils": {
+      "continuo": 12.81521084127928,
+      "contraste": 24.082869878997847,
+      "relativo": 1.879241018916687
+     },
+     "marcas_del_tutorial_en_el_intervalo": [
+      "PAH 3.3"
+     ]
+    },
+    {
+     "klass": "cuantificable",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 22.9 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+     ],
+     "limitations": [],
+     "canal": 76,
+     "canal_lo": 75,
+     "canal_hi": 76,
+     "trial_lo": 75,
+     "trial_hi": 77,
+     "lam": 4.076000213623047,
+     "lam_lo": 4.019999980926514,
+     "lam_hi": 4.09499979019165,
+     "n_channels": 2,
+     "width": "estrecha",
+     "value": 42.10329541854327,
+     "continuum": 15.051922192843318,
+     "contrast": 27.05137322569995,
+     "relative": 1.7972038972246327,
+     "ratio": 22.894020766849767,
+     "ref": 0.8771401355957632,
+     "ref_local": 0.8771401355957632,
+     "ref_detector": 0.8010940077022297,
+     "ref_background": 0.6973204001970059,
+     "env_left": [
+      72,
+      73,
+      74
+     ],
+     "env_right": [
+      78,
+      79,
+      80
+     ],
+     "detectors": [
+      5
+     ],
+     "nhits_feature": 5.0,
+     "nhits_env": 8.0,
+     "label": "Cuantificable",
+     "polyfit_independiente": {
+      "continuo": 15.051922192842982,
+      "contraste": 27.05137322570029,
+      "relativo": 1.7972038972246953
+     },
+     "sobre_fotometria_photutils": {
+      "continuo": 13.895910252209443,
+      "contraste": 26.184800442002032,
+      "relativo": 1.884353019467628
+     },
+     "marcas_del_tutorial_en_el_intervalo": [
+      "Brα"
+     ]
+    },
+    {
+     "klass": "cuantificable",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 9.7 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+     ],
+     "limitations": [],
+     "canal": 93,
+     "canal_lo": 92,
+     "canal_hi": 93,
+     "trial_lo": 92,
+     "trial_hi": 94,
+     "lam": 4.669000148773193,
+     "lam_lo": 4.614999771118164,
+     "lam_hi": 4.688000202178955,
+     "n_channels": 2,
+     "width": "estrecha",
+     "value": 29.437069139908072,
+     "continuum": 16.728153955444682,
+     "contrast": 12.70891518446339,
+     "relative": 0.759732079123225,
+     "ratio": 9.733325032323583,
+     "ref": 0.96619062254423,
+     "ref_local": 0.9420369813565792,
+     "ref_detector": 0.96619062254423,
+     "ref_background": 0.5562319247259585,
+     "env_left": [
+      89,
+      90,
+      91
+     ],
+     "env_right": [
+      95,
+      96,
+      97
+     ],
+     "detectors": [
+      6
+     ],
+     "nhits_feature": 5.0,
+     "nhits_env": 7.0,
+     "label": "Cuantificable",
+     "polyfit_independiente": {
+      "continuo": 16.728153955447965,
+      "contraste": 12.708915184460107,
+      "relativo": 0.7597320791228798
+     },
+     "sobre_fotometria_photutils": {
+      "continuo": 15.404246630711604,
+      "contraste": 12.338748002743063,
+      "relativo": 0.8009965237860561
+     },
+     "marcas_del_tutorial_en_el_intervalo": [
+      "CO"
+     ]
+    }
+   ]
+  },
+  "oscilaciones_no_señaladas": {
+   "A": 44,
+   "B": 42
+  },
+  "inspeccion_3.3um": {
+   "A": {
+    "canal_que_contiene_3.30um": 63,
+    "clase": "sin_caracteristica",
+    "tipo": "pico",
+    "canal_extremo": 63,
+    "lambda_um": 3.2929999828338623,
+    "intervalo_um": [
+     3.242000102996826,
+     3.3420000076293945
+    ],
+    "valor": 76.48003259787738,
+    "continuo": 73.65548131191807,
+    "contraste": 2.8245512859593163,
+    "relativo": 0.03834814783163029,
+    "contraste_sobre_dispersion": 0.5529269986259748,
+    "motivos": [
+     "Contraste de 0.6 veces la dispersión de referencia, por debajo de 5: fluctuación que no se etiqueta."
+    ],
+    "limitaciones": [
+     "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+    ],
+    "canales_vecinos": [
+     {
+      "canal": 59,
+      "lambda_um": 2.9509999752044678,
+      "valor": 78.2533343098446,
+      "nhits": 5.0,
+      "precaucion": false
+     },
+     {
+      "canal": 60,
+      "lambda_um": 3.0329999923706055,
+      "valor": 77.88746020002158,
+      "nhits": 6.0,
+      "precaucion": false
+     },
+     {
+      "canal": 61,
+      "lambda_um": 3.118000030517578,
+      "valor": 74.29098180412691,
+      "nhits": 6.0,
+      "precaucion": false
+     },
+     {
+      "canal": 62,
+      "lambda_um": 3.2039999961853027,
+      "valor": 72.57138898369993,
+      "nhits": 6.0,
+      "precaucion": false
+     },
+     {
+      "canal": 63,
+      "lambda_um": 3.2929999828338623,
+      "valor": 76.48003259787738,
+      "nhits": 7.0,
+      "precaucion": false
+     },
+     {
+      "canal": 64,
+      "lambda_um": 3.382999897003174,
+      "valor": 77.86814845669298,
+      "nhits": 6.0,
+      "precaucion": false
+     },
+     {
+      "canal": 65,
+      "lambda_um": 3.4760000705718994,
+      "valor": 67.36189596487641,
+      "nhits": 4.0,
+      "precaucion": false
+     },
+     {
+      "canal": 66,
+      "lambda_um": 3.569999933242798,
+      "valor": 69.6586899956363,
+      "nhits": 7.0,
+      "precaucion": false
+     },
+     {
+      "canal": 67,
+      "lambda_um": 3.6670000553131104,
+      "valor": 68.76953390526947,
+      "nhits": 5.0,
+      "precaucion": false
+     }
+    ]
+   },
+   "B": {
+    "canal_que_contiene_3.30um": 63,
+    "clase": "cuantificable",
+    "tipo": "pico",
+    "canal_extremo": 63,
+    "lambda_um": 3.2929999828338623,
+    "intervalo_um": [
+     3.242000102996826,
+     3.3420000076293945
+    ],
+    "valor": 40.34309792055566,
+    "continuo": 13.848443717669003,
+    "contraste": 26.494654202886654,
+    "relativo": 1.9131864015219673,
+    "contraste_sobre_dispersion": 13.95074612760251,
+    "motivos": [
+     "Contraste de 14.0 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+    ],
+    "limitaciones": [
+     "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+    ],
+    "canales_vecinos": [
+     {
+      "canal": 59,
+      "lambda_um": 2.9509999752044678,
+      "valor": 9.406843779548893,
+      "nhits": 6.0,
+      "precaucion": false
+     },
+     {
+      "canal": 60,
+      "lambda_um": 3.0329999923706055,
+      "valor": 11.208423662176719,
+      "nhits": 7.0,
+      "precaucion": false
+     },
+     {
+      "canal": 61,
+      "lambda_um": 3.118000030517578,
+      "valor": 10.046483454860484,
+      "nhits": 5.0,
+      "precaucion": false
+     },
+     {
+      "canal": 62,
+      "lambda_um": 3.2039999961853027,
+      "valor": 12.124864705448894,
+      "nhits": 5.0,
+      "precaucion": false
+     },
+     {
+      "canal": 63,
+      "lambda_um": 3.2929999828338623,
+      "valor": 40.34309792055566,
+      "nhits": 6.0,
+      "precaucion": false
+     },
+     {
+      "canal": 64,
+      "lambda_um": 3.382999897003174,
+      "valor": 26.9004803695826,
+      "nhits": 6.0,
+      "precaucion": false
+     },
+     {
+      "canal": 65,
+      "lambda_um": 3.4760000705718994,
+      "valor": 21.988199683130723,
+      "nhits": 3.0,
+      "precaucion": false
+     },
+     {
+      "canal": 66,
+      "lambda_um": 3.569999933242798,
+      "valor": 16.436231860995097,
+      "nhits": 6.0,
+      "precaucion": false
+     },
+     {
+      "canal": 67,
+      "lambda_um": 3.6670000553131104,
+      "valor": 14.176860575230869,
+      "nhits": 7.0,
+      "precaucion": false
+     }
+    ]
+   }
+  },
+  "mismo_intervalo_en_A": {
+   "clase": "sin_caracteristica",
+   "contraste": 5.2328984449587495,
+   "relativo": 0.07204351116177578,
+   "contraste_sobre_dispersion": 1.1820745580512464
+  }
+ },
+ "tutorial": {
+  "apertura_2_4_7_px": {
+   "inspeccion_3.3um": {
+    "canal_que_contiene_3.30um": 63,
+    "clase": "visible",
+    "tipo": "pico",
+    "canal_extremo": 63,
+    "lambda_um": 3.2929999828338623,
+    "intervalo_um": [
+     3.242000102996826,
+     3.3420000076293945
+    ],
+    "valor": 355.7450638297251,
+    "continuo": 95.2460327044551,
+    "contraste": 260.49903112527,
+    "relativo": 2.7350118816348896,
+    "contraste_sobre_dispersion": 5.906618044511394,
+    "motivos": [
+     "Contraste de 5.9 veces la dispersión de referencia, entre 5 y 7."
+    ],
+    "limitaciones": [
+     "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+    ],
+    "canales_vecinos": [
+     {
+      "canal": 59,
+      "lambda_um": 2.9509999752044678,
+      "valor": 61.956545207489015,
+      "nhits": 4.0,
+      "precaucion": false
+     },
+     {
+      "canal": 60,
+      "lambda_um": 3.0329999923706055,
+      "valor": 67.93425509386446,
+      "nhits": 7.0,
+      "precaucion": false
+     },
+     {
+      "canal": 61,
+      "lambda_um": 3.118000030517578,
+      "valor": 45.55661910200165,
+      "nhits": 6.0,
+      "precaucion": false
+     },
+     {
+      "canal": 62,
+      "lambda_um": 3.2039999961853027,
+      "valor": 108.52195170419044,
+      "nhits": 11.0,
+      "precaucion": false
+     },
+     {
+      "canal": 63,
+      "lambda_um": 3.2929999828338623,
+      "valor": 355.7450638297251,
+      "nhits": 5.0,
+      "precaucion": false
+     },
+     {
+      "canal": 64,
+      "lambda_um": 3.382999897003174,
+      "valor": 209.6372156703027,
+      "nhits": 6.0,
+      "precaucion": false
+     },
+     {
+      "canal": 65,
+      "lambda_um": 3.4760000705718994,
+      "valor": 182.46576763165788,
+      "nhits": 6.0,
+      "precaucion": false
+     },
+     {
+      "canal": 66,
+      "lambda_um": 3.569999933242798,
+      "valor": 113.08425243231257,
+      "nhits": 7.0,
+      "precaucion": false
+     },
+     {
+      "canal": 67,
+      "lambda_um": 3.6670000553131104,
+      "valor": 82.26245057757384,
+      "nhits": 11.0,
+      "precaucion": false
+     }
+    ]
+   },
+   "caracteristicas": [
+    {
+     "klass": "cuantificable",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 7.4 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+     ],
+     "limitations": [
+      "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+     ],
+     "canal": 40,
+     "canal_lo": 40,
+     "canal_hi": 40,
+     "trial_lo": 40,
+     "trial_hi": 40,
+     "lam": 1.8609999418258667,
+     "lam_lo": 1.8380000591278076,
+     "lam_hi": 1.8839999437332153,
+     "n_channels": 1,
+     "width": "estrecha",
+     "value": 250.39822945346575,
+     "continuum": 64.99900097472344,
+     "contrast": 185.39922847874232,
+     "relative": 2.852339662125571,
+     "ratio": 7.377191614469361,
+     "ref": 20.497337028775387,
+     "ref_local": 15.42336371760085,
+     "ref_detector": 13.366486245891824,
+     "ref_background": 20.497337028775387,
+     "env_left": [
+      37,
+      38,
+      39
+     ],
+     "env_right": [
+      41,
+      42,
+      43
+     ],
+     "detectors": [
+      3
+     ],
+     "nhits_feature": 7.0,
+     "nhits_env": 7.5,
+     "label": "Cuantificable",
+     "polyfit_independiente": {
+      "continuo": 64.99900097472246,
+      "contraste": 185.39922847874328,
+      "relativo": 2.8523396621256287
+     },
+     "marcas_del_tutorial_en_el_intervalo": [
+      "Paα"
+     ]
+    },
+    {
+     "klass": "visible",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 5.9 veces la dispersión de referencia, entre 5 y 7."
+     ],
+     "limitations": [
+      "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+     ],
+     "canal": 63,
+     "canal_lo": 63,
+     "canal_hi": 63,
+     "trial_lo": 61,
+     "trial_hi": 65,
+     "lam": 3.2929999828338623,
+     "lam_lo": 3.242000102996826,
+     "lam_hi": 3.3420000076293945,
+     "n_channels": 1,
+     "width": "estrecha",
+     "value": 355.7450638297251,
+     "continuum": 95.2460327044551,
+     "contrast": 260.49903112527,
+     "relative": 2.7350118816348896,
+     "ratio": 5.906618044511394,
+     "ref": 29.457974990317492,
+     "ref_local": 11.749610886742015,
+     "ref_detector": 24.657062775310877,
+     "ref_background": 29.457974990317492,
+     "env_left": [
+      58,
+      59,
+      60
+     ],
+     "env_right": [
+      66,
+      67,
+      68
+     ],
+     "detectors": [
+      4
+     ],
+     "nhits_feature": 6.0,
+     "nhits_env": 9.0,
+     "label": "Visible",
+     "polyfit_independiente": {
+      "continuo": 95.24603270445333,
+      "contraste": 260.49903112527176,
+      "relativo": 2.7350118816349593
+     },
+     "marcas_del_tutorial_en_el_intervalo": [
+      "PAH 3.3"
+     ]
+    }
+   ]
+  },
+  "apertura_5_15_20_px": {
+   "inspeccion_3.3um": {
+    "canal_que_contiene_3.30um": 63,
+    "clase": "cuantificable",
+    "tipo": "pico",
+    "canal_extremo": 63,
+    "lambda_um": 3.2929999828338623,
+    "intervalo_um": [
+     3.242000102996826,
+     3.3420000076293945
+    ],
+    "valor": 2191.653190762703,
+    "continuo": 658.4897020210376,
+    "contraste": 1533.1634887416656,
+    "relativo": 2.3283029089689298,
+    "contraste_sobre_dispersion": 9.972693677174119,
+    "motivos": [
+     "Contraste de 10.0 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+    ],
+    "limitaciones": [
+     "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+    ],
+    "canales_vecinos": [
+     {
+      "canal": 59,
+      "lambda_um": 2.9509999752044678,
+      "valor": 509.1338630243897,
+      "nhits": 3.0,
+      "precaucion": false
+     },
+     {
+      "canal": 60,
+      "lambda_um": 3.0329999923706055,
+      "valor": 594.3558125098502,
+      "nhits": 5.0,
+      "precaucion": false
+     },
+     {
+      "canal": 61,
+      "lambda_um": 3.118000030517578,
+      "valor": 495.78071231682696,
+      "nhits": 4.0,
+      "precaucion": false
+     },
+     {
+      "canal": 62,
+      "lambda_um": 3.2039999961853027,
+      "valor": 739.7676915896508,
+      "nhits": 10.0,
+      "precaucion": false
+     },
+     {
+      "canal": 63,
+      "lambda_um": 3.2929999828338623,
+      "valor": 2191.653190762703,
+      "nhits": 3.0,
+      "precaucion": false
+     },
+     {
+      "canal": 64,
+      "lambda_um": 3.382999897003174,
+      "valor": 1293.4976367492652,
+      "nhits": 4.0,
+      "precaucion": false
+     },
+     {
+      "canal": 65,
+      "lambda_um": 3.4760000705718994,
+      "valor": 1123.0387928125908,
+      "nhits": 5.0,
+      "precaucion": false
+     },
+     {
+      "canal": 66,
+      "lambda_um": 3.569999933242798,
+      "valor": 783.317899238324,
+      "nhits": 4.0,
+      "precaucion": false
+     },
+     {
+      "canal": 67,
+      "lambda_um": 3.6670000553131104,
+      "valor": 665.0068499324734,
+      "nhits": 8.0,
+      "precaucion": false
+     }
+    ]
+   },
+   "caracteristicas": [
+    {
+     "klass": "cuantificable",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 27.7 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+     ],
+     "limitations": [
+      "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+     ],
+     "canal": 11,
+     "canal_lo": 11,
+     "canal_hi": 11,
+     "trial_lo": 9,
+     "trial_hi": 13,
+     "lam": 0.9549999833106995,
+     "lam_lo": 0.9419999718666077,
+     "lam_hi": 0.9670000076293945,
+     "n_channels": 1,
+     "width": "estrecha",
+     "value": 1051.7884361799101,
+     "continuum": 112.36672631081356,
+     "contrast": 939.4217098690966,
+     "relative": 8.360319293013806,
+     "ratio": 27.69546759857457,
+     "ref": 22.60180372404118,
+     "ref_local": 22.60180372404118,
+     "ref_detector": 5.72126815501343,
+     "ref_background": 9.1376101809762,
+     "env_left": [
+      6,
+      7,
+      8
+     ],
+     "env_right": [
+      14,
+      15,
+      16
+     ],
+     "detectors": [
+      1
+     ],
+     "nhits_feature": 4.0,
+     "nhits_env": 4.5,
+     "label": "Cuantificable",
+     "polyfit_independiente": {
+      "continuo": 112.36672631081396,
+      "contraste": 939.4217098690962,
+      "relativo": 8.360319293013772
+     },
+     "marcas_del_tutorial_en_el_intervalo": []
+    },
+    {
+     "klass": "visible",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 18.0 veces la dispersión de referencia, pero hay condiciones que impiden caracterizarla con fiabilidad."
+     ],
+     "limitations": [
+      "El intervalo y su entorno abarcan los detectores D1, D2: calibración y resolución distintas pueden producir un escalón.",
+      "He I 1.083 µm del resplandor atmosférico: el mosaico presenta rayado documentado en este canal; un pico aquí puede ser instrumental."
+     ],
+     "canal": 17,
+     "canal_lo": 16,
+     "canal_hi": 17,
+     "trial_lo": 16,
+     "trial_hi": 18,
+     "lam": 1.1019999980926514,
+     "lam_lo": 1.0609999895095825,
+     "lam_hi": 1.1160000562667847,
+     "n_channels": 2,
+     "width": "estrecha",
+     "value": 475.6086891198095,
+     "continuum": 206.8765065276814,
+     "contrast": 268.7321825921281,
+     "relative": 1.2989980694408623,
+     "ratio": 17.99976228071967,
+     "ref": 13.170259174889535,
+     "ref_local": 13.170259174889535,
+     "ref_detector": 9.648155536759209,
+     "ref_background": 7.528464133107819,
+     "env_left": [
+      8,
+      14,
+      15
+     ],
+     "env_right": [
+      19,
+      20,
+      21
+     ],
+     "detectors": [
+      1,
+      2
+     ],
+     "nhits_feature": 8.0,
+     "nhits_env": 6.5,
+     "label": "Visible",
+     "polyfit_independiente": {
+      "continuo": 206.8765065276816,
+      "contraste": 268.7321825921279,
+      "relativo": 1.29899806944086
+     },
+     "marcas_del_tutorial_en_el_intervalo": []
+    },
+    {
+     "klass": "cuantificable",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 11.1 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+     ],
+     "limitations": [
+      "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+     ],
+     "canal": 24,
+     "canal_lo": 24,
+     "canal_hi": 24,
+     "trial_lo": 23,
+     "trial_hi": 25,
+     "lam": 1.284000039100647,
+     "lam_lo": 1.2669999599456787,
+     "lam_hi": 1.2999999523162842,
+     "n_channels": 1,
+     "width": "estrecha",
+     "value": 756.6808367431145,
+     "continuum": 283.05496487581894,
+     "contrast": 473.62587186729553,
+     "relative": 1.673264668136393,
+     "ratio": 11.071131783044713,
+     "ref": 31.85841634141623,
+     "ref_local": 10.219377153390868,
+     "ref_detector": 31.85841634141623,
+     "ref_background": 9.007369676627876,
+     "env_left": [
+      20,
+      21,
+      22
+     ],
+     "env_right": [
+      26,
+      27,
+      28
+     ],
+     "detectors": [
+      2
+     ],
+     "nhits_feature": 9.0,
+     "nhits_env": 6.5,
+     "label": "Cuantificable",
+     "polyfit_independiente": {
+      "continuo": 283.054964875818,
+      "contraste": 473.6258718672965,
+      "relativo": 1.673264668136402
+     },
+     "marcas_del_tutorial_en_el_intervalo": [
+      "Paβ"
+     ]
+    },
+    {
+     "klass": "cuantificable",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 17.4 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+     ],
+     "limitations": [],
+     "canal": 41,
+     "canal_lo": 40,
+     "canal_hi": 41,
+     "trial_lo": 39,
+     "trial_hi": 43,
+     "lam": 1.9049999713897705,
+     "lam_lo": 1.8380000591278076,
+     "lam_hi": 1.9279999732971191,
+     "n_channels": 2,
+     "width": "estrecha",
+     "value": 1708.4448286738088,
+     "continuum": 489.41269779654397,
+     "contrast": 1219.032130877265,
+     "relative": 2.490806095480658,
+     "ratio": 17.427097705360342,
+     "ref": 46.70812150950031,
+     "ref_local": 45.83892165625236,
+     "ref_detector": 46.70812150950031,
+     "ref_background": 18.366829942137805,
+     "env_left": [
+      36,
+      37,
+      38
+     ],
+     "env_right": [
+      44,
+      45,
+      46
+     ],
+     "detectors": [
+      3
+     ],
+     "nhits_feature": 6.0,
+     "nhits_env": 6.5,
+     "label": "Cuantificable",
+     "polyfit_independiente": {
+      "continuo": 489.41269779654704,
+      "contraste": 1219.0321308772618,
+      "relativo": 2.490806095480636
+     },
+     "marcas_del_tutorial_en_el_intervalo": [
+      "Paα"
+     ]
+    },
+    {
+     "klass": "cuantificable",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 10.0 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+     ],
+     "limitations": [
+      "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+     ],
+     "canal": 63,
+     "canal_lo": 63,
+     "canal_hi": 63,
+     "trial_lo": 61,
+     "trial_hi": 65,
+     "lam": 3.2929999828338623,
+     "lam_lo": 3.242000102996826,
+     "lam_hi": 3.3420000076293945,
+     "n_channels": 1,
+     "width": "estrecha",
+     "value": 2191.653190762703,
+     "continuum": 658.4897020210376,
+     "contrast": 1533.1634887416656,
+     "relative": 2.3283029089689298,
+     "ratio": 9.972693677174119,
+     "ref": 102.68609851390887,
+     "ref_local": 67.59630473278996,
+     "ref_detector": 102.68609851390887,
+     "ref_background": 20.931061727357417,
+     "env_left": [
+      58,
+      59,
+      60
+     ],
+     "env_right": [
+      66,
+      67,
+      68
+     ],
+     "detectors": [
+      4
+     ],
+     "nhits_feature": 4.0,
+     "nhits_env": 6.5,
+     "label": "Cuantificable",
+     "polyfit_independiente": {
+      "continuo": 658.4897020210346,
+      "contraste": 1533.1634887416685,
+      "relativo": 2.3283029089689444
+     },
+     "marcas_del_tutorial_en_el_intervalo": [
+      "PAH 3.3"
+     ]
+    },
+    {
+     "klass": "cuantificable",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 58.3 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+     ],
+     "limitations": [
+      "Un solo canal: cada canal equivale a un elemento de resolución, así que no se distingue de un valor atípico del mosaico."
+     ],
+     "canal": 75,
+     "canal_lo": 75,
+     "canal_hi": 75,
+     "trial_lo": 74,
+     "trial_hi": 76,
+     "lam": 4.039999961853027,
+     "lam_lo": 4.019999980926514,
+     "lam_hi": 4.059000015258789,
+     "n_channels": 1,
+     "width": "estrecha",
+     "value": 3963.53671018299,
+     "continuum": 633.8768235196965,
+     "contrast": 3329.659886663294,
+     "relative": 5.25285002246155,
+     "ratio": 58.323801096812716,
+     "ref": 42.34662234046161,
+     "ref_local": 29.85457819671675,
+     "ref_detector": 42.34662234046161,
+     "ref_background": 35.224372007666204,
+     "env_left": [
+      71,
+      72,
+      73
+     ],
+     "env_right": [
+      77,
+      78,
+      79
+     ],
+     "detectors": [
+      5
+     ],
+     "nhits_feature": 10.0,
+     "nhits_env": 7.0,
+     "label": "Cuantificable",
+     "polyfit_independiente": {
+      "continuo": 633.8768235196104,
+      "contraste": 3329.65988666338,
+      "relativo": 5.2528500224623995
+     },
+     "marcas_del_tutorial_en_el_intervalo": [
+      "Brα"
+     ]
+    },
+    {
+     "klass": "cuantificable",
+     "kind": "pico",
+     "reasons": [
+      "Contraste de 55.3 veces la dispersión de referencia (criterio 7), con entorno válido a ambos lados."
+     ],
+     "limitations": [],
+     "canal": 93,
+     "canal_lo": 92,
+     "canal_hi": 93,
+     "trial_lo": 92,
+     "trial_hi": 94,
+     "lam": 4.669000148773193,
+     "lam_lo": 4.614999771118164,
+     "lam_hi": 4.688000202178955,
+     "n_channels": 2,
+     "width": "estrecha",
+     "value": 1991.8162510656703,
+     "continuum": 711.1895994540295,
+     "contrast": 1280.6266516116407,
+     "relative": 1.8006824798826646,
+     "ratio": 55.346732492379566,
+     "ref": 17.121669611022455,
+     "ref_local": 8.60580743772352,
+     "ref_detector": 9.227090164271917,
+     "ref_background": 17.121669611022455,
+     "env_left": [
+      89,
+      90,
+      91
+     ],
+     "env_right": [
+      95,
+      96,
+      97
+     ],
+     "detectors": [
+      6
+     ],
+     "nhits_feature": 7.0,
+     "nhits_env": 7.0,
+     "label": "Cuantificable",
+     "polyfit_independiente": {
+      "continuo": 711.1895994540225,
+      "contraste": 1280.6266516116477,
+      "relativo": 1.8006824798826921
+     },
+     "marcas_del_tutorial_en_el_intervalo": [
+      "CO"
+     ]
+    }
+   ]
+  },
+  "fotometria_del_tutorial_5_40_60_px": {
+   "canal": 63,
+   "flujo_mjy": 2548.417546889742,
+   "continuo_polyfit_mjy": 1135.5791945238764,
+   "contraste_mjy": 1412.8383523658656,
+   "relativo": 1.2441566023567718,
+   "nota": "Fotometría independiente con los radios del tutorial (fuera del límite de la aplicación, 20 px). El contraste difiere del de la apertura de 5/15/20 px porque el anillo de fondo es otro."
+  }
+ },
+ "io_validacion_total": {
+  "requests": 0,
+  "bytes_network": 0,
+  "bytes_cache": 60788736
+ }
+}

@@ -154,7 +154,8 @@ def _where(f: sf.Feature) -> str:
     if f.lam is None:
         return f"canales {f.trial_lo}–{f.trial_hi}" if f.trial_lo != f.trial_hi else f"canal {f.trial_lo}"
     ch = f"canal {f.canal_lo}" if f.canal_lo == f.canal_hi else f"canales {f.canal_lo}–{f.canal_hi}"
-    return f"{f.lam:.3f} µm ({ch})"
+    # The eyebrow is set in capitals: the unit keeps its case (µm must never read as MM).
+    return f'{f.lam:.3f}&nbsp;<span style="text-transform:none">µm</span> ({ch})'
 
 
 def _science_rows(fs: dict) -> pd.DataFrame:
@@ -163,17 +164,19 @@ def _science_rows(fs: dict) -> pd.DataFrame:
             return [f.label, "—", "—", "—", f"{f.trial_lo}–{f.trial_hi}", "—", "—", "—", "—", "—", "—", "—", "—", "—"]
         refs = " · ".join(f"{n} {_num(v)}" for n, v in (("entorno", f.ref_local), ("detector", f.ref_detector),
                                                          ("fondo", f.ref_background)) if v is not None)
-        return [f.label, f"{f.kind} · {f.width}" if f.kind else "—", f"{f.lam:.3f} (centroide {f.lam_centroid:.3f})",
-                f"{f.lam_lo:.3f}–{f.lam_hi:.3f} ({f.width_um:.3f})",
-                f"{f.canal_lo}–{f.canal_hi} de {f.trial_lo}–{f.trial_hi}", _num(f.value, f.unit),
+        labelled = f.klass in (sf.QUANTIFIABLE, sf.VISIBLE)
+        return [f.label, f"{f.kind} · {f.width}" if f.kind and labelled else "—",
+                f"{f.lam:.3f} (centroide {f.lam_centroid:.3f})", f"{f.lam_lo:.3f}–{f.lam_hi:.3f} ({f.width_um:.3f})",
+                f"{f.canal_lo}–{f.canal_hi} · {f.trial_lo}–{f.trial_hi}", _num(f.value, f.unit),
                 _num(f.continuum, f.unit), _num(f.contrast, f.unit, signed=True),
                 "—" if f.relative is None else f"{f.relative:+.1%}",
                 "> 1000" if abs(f.ratio) > 1000 else f"{abs(f.ratio):.1f}", f"{_num(f.ref, f.unit)} ({refs})",
                 f"{f.env_left[0]}–{f.env_left[-1]} y {f.env_right[0]}–{f.env_right[-1]}",
                 ", ".join(f"D{d}" for d in f.detectors),
                 "—" if f.nhits_feature is None else f"{f.nhits_feature:.0f} / {f.nhits_env:.0f}"]
-    names = ["Clase", "Tipo", "λ central (µm)", "Intervalo a media altura (µm)", "Canales (media altura de excluidos)",
-             "Valor en el extremo", "Continuo local", "Contraste", "Contraste relativo",
+    names = ["Clase", "Tipo", "λ del extremo (µm)", "Intervalo a media altura (µm)",
+             "Canales: a media altura · fuera del ajuste", "Valor en el extremo", "Continuo local", "Contraste",
+             "Contraste relativo",
              "Contraste / dispersión de referencia", "Dispersión de referencia", "Canales del entorno", "Detectores",
              "NHITS característica / entorno"]
     return pd.DataFrame({"Magnitud": names, **{f"Espectro {k}": col(f) for k, f in fs.items()}})
@@ -207,7 +210,9 @@ def render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, ex
     focus = None
     if found:
         ref = max(found.values(), key=lambda f: (RANK[f.klass], abs(f.ratio or 0.0)))
-        focus = (float(sa.lam_min[sa.index(ref.trial_lo)]), float(sa.lam_max[sa.index(ref.trial_hi)]))
+        # The band drawn is the interval reported for the feature (half height); without one, what was selected.
+        focus = ((ref.lam_lo, ref.lam_hi) if ref.lam_lo is not None and ref.klass in (sf.QUANTIFIABLE, sf.VISIBLE)
+                 else (float(sa.lam_min[sa.index(ref.trial_lo)]), float(sa.lam_max[sa.index(ref.trial_hi)])))
 
     st.altair_chart(sv.spectrum_chart(spec_a, quantity, selected_channel=channel_number, other=spec_b,
                                       features=fa + fb, focus=focus, interactive=True),
@@ -240,7 +245,8 @@ def render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, ex
         if sci:
             st.html("".join(f'<p style="margin:.1rem 0">Espectro {k}: {theme.badge(f.label, BADGE[f.klass])} '
                             f'<span class="sc-muted">{sf.CLASS_MEANING[f.klass]}.</span></p>' for k, f in found.items()))
-            st.dataframe(_science_rows(found), hide_index=True, width="stretch")
+            rows = _science_rows(found)
+            st.dataframe(rows, hide_index=True, width="stretch", height=35 * (len(rows) + 1) + 3)
             for k, f in found.items():
                 notes = f.reasons + f.limitations
                 if notes:
