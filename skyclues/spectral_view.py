@@ -160,10 +160,17 @@ def _circle(e0: float, n0: float, r_arcsec: float, label: str, k: int = 120) -> 
 
 
 def field_chart(png: bytes, info: dict, pixels: pd.DataFrame, cmap: sc.ChannelMap, target=None, pick=None,
-                aperture: sc.Aperture | None = None, pixel_arcsec: float = 12.9, size: int = 470):
+                aperture: sc.Aperture | None = None, pixel_arcsec: float = 12.9, size: int = 470, pick_b=None):
     """Altair chart: the PNG as background, invisible native-pixel points for hover/click,
-    the field circle, the target (+) and the extraction position with its aperture/annulus."""
+    the field circle, the target (+) and the extraction position with its aperture/annulus.
+
+    With ``pick_b`` (a second position to compare) both positions are drawn in the colour of their
+    spectrum (A, B), labelled, each with the same aperture and annulus.
+    """
     import altair as alt
+
+    if pick_b is not None and pick is not None and aperture is not None:
+        return _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pixel_arcsec, size)
 
     R = info["half_arcsec"]
     xs = alt.Scale(domain=[-R, R], reverse=True, nice=False, zero=False)
@@ -221,27 +228,91 @@ def field_chart(png: bytes, info: dict, pixels: pd.DataFrame, cmap: sc.ChannelMa
                                          autosize=alt.AutoSizeParams(type="fit", contains="padding"))
 
 
+def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pixel_arcsec, size):
+    """Field with the two compared positions. Same geometry and click behaviour as ``field_chart``."""
+    import altair as alt
+
+    R = info["half_arcsec"]
+    xs = alt.Scale(domain=[-R, R], reverse=True, nice=False, zero=False)
+    ys = alt.Scale(domain=alt.ExprRef(expr=f"[-{R}*height/width, {R}*height/width]"), nice=False, zero=False)
+    tx, ty = "Desplazamiento al este (″) · este a la izquierda", "Desplazamiento al norte (″)"
+    X = alt.X("este:Q", scale=xs, title=tx)
+    Y = alt.Y("norte:Q", scale=ys, title=ty)
+    uri = "data:image/png;base64," + base64.b64encode(png).decode()
+    bg = alt.Chart(pd.DataFrame({"e1": [R], "e2": [-R], "n1": [-R], "n2": [R], "url": [uri]})).mark_image(
+        aspect=False).encode(x=alt.X("e1:Q", scale=xs, title=tx), x2="e2:Q",
+                             y=alt.Y("n1:Q", scale=ys, title=ty), y2="n2:Q", url="url:N")
+    frame = frame_for(cmap)
+    curves = [_circle(0.0, 0.0, cmap.field_deg / 2 * 3600, "campo de visión").assign(trazo="campo")]
+    marks = []
+    if target is not None:
+        e, n = offsets_arcsec(frame, *target)
+        marks.append({"este": float(e), "norte": float(n), "m": "objetivo", "letra": "", "nota": "objetivo"})
+    for letter, pos, role in (("A", pick, "posición del espectro"), ("B", pick_b, "punto de comparación")):
+        e0, n0 = (float(v) for v in offsets_arcsec(frame, *pos))
+        curves += [_circle(e0, n0, aperture.r_ap * pixel_arcsec, f"apertura {letter}").assign(trazo="continuo"),
+                   _circle(e0, n0, aperture.r_in * pixel_arcsec, f"anillo {letter}").assign(trazo="anillo"),
+                   _circle(e0, n0, aperture.r_out * pixel_arcsec, f"anillo {letter} (ext.)").assign(trazo="anillo")]
+        marks.append({"este": e0, "norte": n0, "m": letter, "letra": letter, "nota": f"{letter} · {role}"})
+    names = ["campo de visión"] + [f"{k} {s}" for s in "AB" for k in ("apertura", "anillo")] + [
+        f"anillo {s} (ext.)" for s in "AB"]
+    colour = {"campo de visión": "#1f5fbf", **{n: (SERIES if " A" in n else SERIES_B) for n in names[1:]}}
+    lines = alt.Chart(pd.concat(curves, ignore_index=True)).mark_line(strokeWidth=1.5, clip=True).encode(
+        x=X, y=Y, order="orden:Q", detail="curva:N",
+        color=alt.Color("curva:N", scale=alt.Scale(domain=names, range=[colour[n] for n in names]), legend=None),
+        strokeDash=alt.StrokeDash("trazo:N", scale=alt.Scale(domain=["continuo", "anillo", "campo"],
+                                                              range=[[1, 0], [3, 3], [5, 4]]), legend=None))
+    sel = alt.selection_point(name="pick", on="click", nearest=True, fields=["ra", "dec"], empty=False)
+    px = max(4.0, size * pixel_arcsec / (2 * R))
+    pts = alt.Chart(pixels).mark_square(size=px * px, opacity=0.001).encode(
+        x=X, y=Y,
+        tooltip=[alt.Tooltip("ra:Q", title="RA (°)", format=".5f"), alt.Tooltip("dec:Q", title="Dec (°)", format="+.5f"),
+                 alt.Tooltip("valor:Q", title="valor (MJy/sr)", format=".4g"), alt.Tooltip("nhits:Q", title="NHITS"),
+                 alt.Tooltip("flags:N", title="FLAGS"), alt.Tooltip("tesela:Q", title="tesela HEALPix")]
+    ).add_params(sel)
+    mdf = pd.DataFrame(marks)
+    symbols = alt.Chart(mdf).mark_point(size=150, strokeWidth=2.2, filled=False).encode(
+        x=X, y=Y, shape=alt.Shape("m:N", scale=alt.Scale(domain=["objetivo", "A", "B"],
+                                                         range=["cross", "diamond", "square"]), legend=None),
+        color=alt.Color("m:N", scale=alt.Scale(domain=["objetivo", "A", "B"],
+                                               range=["#1f5fbf", SERIES, SERIES_B]), legend=None),
+        tooltip=[alt.Tooltip("nota:N", title="marca")])
+    letters = mdf[mdf.letra != ""]
+    # Identity is never colour alone: each position carries its letter (ink on a white halo).
+    halo = alt.Chart(letters).mark_text(dx=14, dy=-13, fontSize=15, fontWeight="bold", stroke="#ffffff",
+                                        strokeWidth=4, strokeJoin="round").encode(x=X, y=Y, text="letra:N")
+    text = alt.Chart(letters).mark_text(dx=14, dy=-13, fontSize=15, fontWeight="bold", color=INK).encode(
+        x=X, y=Y, text="letra:N")
+    return alt.layer(bg, lines, pts, symbols, halo, text).properties(
+        width="container", height=size, autosize=alt.AutoSizeParams(type="fit", contains="padding"))
+
+
 QUANTITIES = {
     "flux": ("flujo_mjy", "Flujo en apertura (mJy)"),
     "pixel": ("pixel_mjysr", "Brillo del píxel (MJy/sr)"),
 }
+SERIES_B = "#eb6834"                         # second spectrum (comparison point B)
+FOCUS = "#c4411c"                            # selection accent of the interface
+CAUTION = "OVERFLOW/OUTLIER en la apertura"
+Y_AXIS_EXTENT = 62                           # same left margin in the spectrum and in the A−B / A/B panel
+X_DOMAIN = [0.70, 5.05]
+GLYPHS = {("pico", True): "▼", ("pico", False): "▽", ("valle", True): "▲", ("valle", False): "△"}
 
 
-def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: int | None = None,
-                   width: int = 760, height: int = 320):
-    """One point per real channel; no line, no smoothing; channels without a value marked on the axis."""
+def _series_frame(spec: sc.Spectrum, quantity: str, label: str) -> pd.DataFrame:
+    df = spec.table()
+    df["valor"] = df[QUANTITIES[quantity][0]]
+    df["serie"] = label
+    df["contorno"] = np.where(df["precaucion"], CAUTION, "sin precaución")
+    if quantity == "pixel":
+        df["estado"] = np.where(df["valor"].isna() & (df["status"] != "blank"), "píxel sin datos (NHITS = 0)",
+                                df["estado"])
+    return df
+
+
+def _detector_bands(df: pd.DataFrame, xsc):
     import altair as alt
 
-    col, title = QUANTITIES[quantity]
-    df = spec.table()
-    df["valor"] = df[col]
-    df["contorno"] = np.where(df["precaucion"], "OVERFLOW/OUTLIER en la apertura", "sin precaución")
-    ok = df[df["valor"].notna()].copy()
-    missing = df[df["valor"].isna()].copy()
-    if quantity == "pixel":
-        missing["estado"] = np.where(missing["status"] == "blank", missing["estado"], "píxel sin datos (NHITS = 0)")
-    xsc = alt.Scale(domain=[0.70, 5.05], nice=False, zero=False)
-    X = alt.X("lambda_um:Q", scale=xsc, title="Longitud de onda (µm)")
     bands = pd.DataFrame([{"d": f"D{d}", "a": float(df[df.detector == d].lambda_min_um.min()),
                            "b": float(df[df.detector == d].lambda_max_um.max()), "par": d % 2} for d in range(1, 7)])
     band = alt.Chart(bands).mark_rect(opacity=1.0).encode(
@@ -249,6 +320,47 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
         color=alt.Color("par:N", scale=alt.Scale(domain=[0, 1], range=["#ffffff", BAND_FILL]), legend=None))
     band_lbl = alt.Chart(bands.assign(m=lambda t: (t.a + t.b) / 2)).mark_text(
         color=INK_2, fontSize=11, baseline="top").encode(x=alt.X("m:Q", scale=xsc), y=alt.value(4), text="d:N")
+    return band, band_lbl
+
+
+def _focus_layer(focus, xsc):
+    import altair as alt
+
+    return alt.Chart(pd.DataFrame({"a": [float(focus[0])], "b": [float(focus[1])]})).mark_rect(
+        color=FOCUS, opacity=0.12, stroke=FOCUS, strokeWidth=1, strokeOpacity=0.55).encode(
+        x=alt.X("a:Q", scale=xsc), x2="b:Q")
+
+
+def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: int | None = None,
+                   width: int = 760, height: int = 320, *, other: sc.Spectrum | None = None, features=None,
+                   focus=None, interactive: bool = False):
+    """One point per real channel; no line, no smoothing; channels without a value marked on the axis.
+
+    Optional, all on the same axes: ``other`` = a second spectrum (B) to compare with ``spec`` (A);
+    ``features`` = peaks and valleys to mark (``spectral_features.Feature``: solid glyph = quantifiable,
+    hollow = visible); ``focus`` = (λ_min, λ_max) of the interval under inspection; ``interactive`` =
+    click a point (selection "canal") or drag an interval (selection "intervalo").
+    """
+    import altair as alt
+
+    title = QUANTITIES[quantity][1]
+    df = _series_frame(spec, quantity, "A")
+    frames = [df] + ([_series_frame(other, quantity, "B")] if other is not None else [])
+    two = len(frames) == 2
+    allrows = pd.concat(frames, ignore_index=True)
+    ok = allrows[allrows["valor"].notna()].copy()
+    if two:
+        gone = allrows[allrows["valor"].isna()]
+        missing = gone.groupby(["canal", "lambda_um"], as_index=False).agg(
+            estado=("estado", lambda s: ""), serie=("serie", lambda s: " y ".join(sorted(s))))
+        why = {(r.canal, r.serie): r.estado for r in gone.itertuples()}
+        missing["estado"] = [" · ".join(f"{s}: {why[(c, s)]}" for s in ser.split(" y "))
+                             for c, ser in zip(missing.canal, missing.serie)]
+    else:
+        missing = df[df["valor"].isna()].copy()
+    xsc = alt.Scale(domain=X_DOMAIN, nice=False, zero=False)
+    X = alt.X("lambda_um:Q", scale=xsc, title="Longitud de onda (µm)")
+    band, band_lbl = _detector_bands(df, xsc)
     zero = alt.Chart(pd.DataFrame({"y": [0.0]})).mark_rule(color=MUTED, strokeDash=[3, 3]).encode(y="y:Q")
     tip = [alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
            alt.Tooltip("detector:Q"), alt.Tooltip("subcanal:Q"),
@@ -256,27 +368,124 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
            alt.Tooltip("fondo_mjysr:Q", title="fondo del anillo (MJy/sr)", format=".4g"),
            alt.Tooltip("nhits_min_apertura:Q", title="NHITS mín. en apertura"),
            alt.Tooltip("flags_apertura:N", title="FLAGS en apertura"), alt.Tooltip("estado:N")]
-    Y = alt.Y("valor:Q", title=title, scale=alt.Scale(zero=False, nice=True))
-    bars = alt.Chart(ok).mark_rule(color=SERIES, strokeWidth=1.2, opacity=0.6).encode(
-        x=alt.X("lambda_min_um:Q", scale=xsc), x2="lambda_max_um:Q", y=Y)
-    pts = alt.Chart(ok).mark_point(size=64, strokeWidth=1.6).encode(
-        x=X, y=Y, color=alt.value(SERIES),
-        fill=alt.Fill("contorno:N", scale=alt.Scale(domain=["sin precaución", "OVERFLOW/OUTLIER en la apertura"],
-                                                    range=[SERIES, "#ffffff"]),
-                      legend=alt.Legend(title=None, orient="bottom", labelLimit=400)),
-        tooltip=tip)
+    axis = alt.Axis(minExtent=Y_AXIS_EXTENT, maxExtent=Y_AXIS_EXTENT) if two else alt.Axis()
+    Y = alt.Y("valor:Q", title=title, scale=alt.Scale(zero=False, nice=True), axis=axis)
+    by_series = alt.Scale(domain=["A", "B"], range=[SERIES, SERIES_B])
+    if two:
+        ok["relleno"] = np.where(ok["contorno"] == CAUTION, CAUTION, ok["serie"])
+        bars = alt.Chart(ok).mark_rule(strokeWidth=1.2, opacity=0.6).encode(
+            x=alt.X("lambda_min_um:Q", scale=xsc), x2="lambda_max_um:Q", y=Y,
+            color=alt.Color("serie:N", scale=by_series, legend=None))
+        pts = alt.Chart(ok).mark_point(size=64, strokeWidth=1.6).encode(
+            x=X, y=Y,
+            color=alt.Color("serie:N", scale=by_series, legend=alt.Legend(title=None, orient="bottom")),
+            shape=alt.Shape("serie:N", scale=alt.Scale(domain=["A", "B"], range=["circle", "square"]),
+                            legend=alt.Legend(title=None, orient="bottom")),
+            fill=alt.Fill("relleno:N", scale=alt.Scale(domain=["A", "B", CAUTION], range=[SERIES, SERIES_B, "#ffffff"]),
+                          legend=alt.Legend(title=None, orient="bottom", values=[CAUTION], labelLimit=400,
+                                            symbolStrokeColor=INK_2)),
+            tooltip=[alt.Tooltip("serie:N", title="espectro")] + tip)
+    else:
+        bars = alt.Chart(ok).mark_rule(color=SERIES, strokeWidth=1.2, opacity=0.6).encode(
+            x=alt.X("lambda_min_um:Q", scale=xsc), x2="lambda_max_um:Q", y=Y)
+        pts = alt.Chart(ok).mark_point(size=64, strokeWidth=1.6).encode(
+            x=X, y=Y, color=alt.value(SERIES),
+            fill=alt.Fill("contorno:N", scale=alt.Scale(domain=["sin precaución", CAUTION], range=[SERIES, "#ffffff"]),
+                          legend=alt.Legend(title=None, orient="bottom", labelLimit=400)),
+            tooltip=tip)
+    if interactive:
+        pts = pts.add_params(
+            alt.selection_point(name="canal", on="click", nearest=True, fields=["canal", "serie"], empty=False),
+            alt.selection_interval(name="intervalo", encodings=["x"]))
     miss = alt.Chart(missing).mark_tick(color=MASK_COLOR, thickness=2, size=14).encode(
-        x=X, y=alt.value(height - 7),
+        x=X, y=alt.value(alt.ExprRef(expr="height - 7")),   # on the axis of the plot area, whatever the legend
         tooltip=[alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
                  alt.Tooltip("estado:N")])
-    layers = [band, band_lbl, zero, bars, pts, miss]
+    layers = [band, band_lbl, zero]
+    if focus is not None:
+        layers.append(_focus_layer(focus, xsc))
     if selected_channel is not None:
         lam = float(df.loc[df.canal == selected_channel, "lambda_um"].iloc[0])
-        layers.insert(3, alt.Chart(pd.DataFrame({"x": [lam]})).mark_rule(color=INK_2, strokeDash=[2, 2]).encode(
+        layers.append(alt.Chart(pd.DataFrame({"x": [lam]})).mark_rule(color=INK_2, strokeDash=[2, 2]).encode(
             x=alt.X("x:Q", scale=xsc)))
+    layers += [bars, pts, miss]
+    marks = [f for f in (features or []) if f.kind in ("pico", "valle") and f.value is not None]
+    if marks:
+        fdf = pd.DataFrame([{
+            "lambda_um": f.lam, "valor": f.value, "serie": f.serie, "tipo": f.kind,
+            "glifo": GLYPHS[(f.kind, f.klass == "cuantificable")],
+            "nota": f"{f.kind.capitalize()} · {f.label.lower()}", "canal": f.canal, "contraste": f.contrast,
+            "relativo": f.relative} for f in marks])
+        ftip = [alt.Tooltip("nota:N", title="característica"), alt.Tooltip("serie:N", title="espectro"),
+                alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
+                alt.Tooltip("contraste:Q", title="contraste respecto al entorno", format=".4g"),
+                alt.Tooltip("relativo:Q", title="contraste relativo", format="+.1%")]
+        for kind, dy in (("pico", -15), ("valle", 16)):
+            part = fdf[fdf.tipo == kind]
+            if len(part):
+                layers.append(alt.Chart(part).mark_text(dy=dy, fontSize=13, baseline="middle").encode(
+                    x=X, y=Y, text="glifo:N", tooltip=ftip,
+                    color=alt.Color("serie:N", scale=by_series, legend=None) if two else alt.value(SERIES)))
+    if two:
+        ends = ok.sort_values("lambda_um").groupby("serie", as_index=False).last()
+        layers.append(alt.Chart(ends).mark_text(dx=9, align="left", fontSize=12, fontWeight="bold", color=INK).encode(
+            x=X, y=Y, text="serie:N"))
+    chart = alt.layer(*layers).properties(
+        width="container", height=height, autosize=alt.AutoSizeParams(type="fit", contains="padding"))
+    if two:
+        chart = chart.properties(padding={"left": 5, "right": 18, "top": 5, "bottom": 5})
+    return chart.resolve_scale(color="independent", fill="independent", shape="independent")
+
+
+def derived_chart(rows: list[dict], kind: str, unit: str, focus=None, selected_channel: int | None = None,
+                  height: int = 170):
+    """A − B (``kind`` = "diferencia") or A / B ("relacion") per channel, on the wavelength axis of the
+    spectrum above. Channels where the operation is not defined are marked on the axis with the reason:
+    pink = A or B has no value, grey = the ratio is outside its domain. Nothing is interpolated."""
+    import altair as alt
+
+    if kind not in ("diferencia", "relacion"):
+        raise ValueError("kind debe ser 'diferencia' o 'relacion'")
+    df = pd.DataFrame(rows)
+    df["valor"] = df[kind]
+    df["motivo"] = np.where(df["a"].isna() | df["b"].isna(),
+                            "A: " + df["estado_a"] + " · B: " + df["estado_b"], df["estado_relacion"])
+    df["contorno"] = np.where(df["precaucion"], CAUTION, "sin precaución")
+    ok, gone = df[df["valor"].notna()], df[df["valor"].isna()]
+    title = f"A − B ({unit})" if kind == "diferencia" else "A / B (adimensional)"
+    xsc = alt.Scale(domain=X_DOMAIN, nice=False, zero=False)
+    X = alt.X("lambda_um:Q", scale=xsc, title="Longitud de onda (µm)")
+    Y = alt.Y("valor:Q", title=title, scale=alt.Scale(zero=False, nice=True),
+              axis=alt.Axis(minExtent=Y_AXIS_EXTENT, maxExtent=Y_AXIS_EXTENT))
+    band, _ = _detector_bands(df, xsc)
+    ref = alt.Chart(pd.DataFrame({"y": [0.0 if kind == "diferencia" else 1.0]})).mark_rule(
+        color=MUTED, strokeDash=[3, 3]).encode(y="y:Q")
+    layers = [band, ref]
+    if focus is not None:
+        layers.append(_focus_layer(focus, xsc))
+    if selected_channel is not None:
+        lam = float(df.loc[df.canal == selected_channel, "lambda_um"].iloc[0])
+        layers.append(alt.Chart(pd.DataFrame({"x": [lam]})).mark_rule(color=INK_2, strokeDash=[2, 2]).encode(
+            x=alt.X("x:Q", scale=xsc)))
+    tip = [alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
+           alt.Tooltip("a:Q", title=f"A ({unit})", format=".4g"), alt.Tooltip("b:Q", title=f"B ({unit})", format=".4g"),
+           alt.Tooltip("valor:Q", title=title, format=".4g"), alt.Tooltip("motivo:N", title="estado")]
+    layers.append(alt.Chart(ok).mark_rule(color=INK_2, strokeWidth=1.2, opacity=0.5).encode(
+        x=alt.X("lambda_min_um:Q", scale=xsc), x2="lambda_max_um:Q", y=Y))
+    layers.append(alt.Chart(ok).mark_point(size=46, strokeWidth=1.5, color=INK_2).encode(
+        x=X, y=Y, fill=alt.Fill("contorno:N", scale=alt.Scale(domain=["sin precaución", CAUTION],
+                                                            range=[INK_2, "#ffffff"]), legend=None), tooltip=tip))
+    for part, colour in ((gone[gone["a"].isna() | gone["b"].isna()], MASK_COLOR),
+                         (gone[gone["a"].notna() & gone["b"].notna()], MUTED)):
+        if len(part):
+            layers.append(alt.Chart(part).mark_tick(color=colour, thickness=2, size=12).encode(
+                x=X, y=alt.value(alt.ExprRef(expr="height - 6")),
+                tooltip=[alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
+                         alt.Tooltip("motivo:N", title="sin valor")]))
     return alt.layer(*layers).properties(
-        width="container", height=height, autosize=alt.AutoSizeParams(type="fit", contains="padding")
-    ).resolve_scale(color="independent")
+        width="container", height=height, autosize=alt.AutoSizeParams(type="fit", contains="padding"),
+        padding={"left": 5, "right": 18, "top": 5, "bottom": 5}).resolve_scale(color="independent",
+                                                                                 fill="independent")
 
 
 @render.serialized

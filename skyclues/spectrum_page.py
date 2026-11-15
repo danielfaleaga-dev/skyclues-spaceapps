@@ -13,7 +13,7 @@ import json
 import pandas as pd
 import streamlit as st
 
-from . import archive, config, multiband_page, navigation, reference_page, release_ui, theme
+from . import archive, config, multiband_page, navigation, reference_page, release_ui, spectrum_analysis, theme
 from . import spectral_cube as sc
 from . import spectral_view as sv
 from .astrometry import Astrometry
@@ -97,8 +97,10 @@ def _set_pick_from_chart() -> None:
     except (KeyError, TypeError):
         return
     if pts:
-        st.session_state["sx_pick_ra"] = float(pts[0]["ra"])
-        st.session_state["sx_pick_dec"] = float(pts[0]["dec"])
+        ra, dec = float(pts[0]["ra"]), float(pts[0]["dec"])
+        if spectrum_analysis.place_click(st.session_state, ra, dec):    # the click placed the comparison point B
+            return
+        st.session_state["sx_pick_ra"], st.session_state["sx_pick_dec"] = ra, dec
 
 
 def _step_channel(delta: int, numbers: list[int]) -> None:
@@ -288,11 +290,13 @@ def render(level: str) -> None:
                              state.get("sx_rout", defaults[2]))
         tile0 = cmap.patches[0].tile
         target = (expected_ra, expected_dec) if epoch_info.get("propagated") else (ra_c, dec_c)
+        pick_b = spectrum_analysis.point_b(region_key)      # second position, only if the user placed one
         chart = sv.field_chart(png, info, pixels, cmap, target=target, pick=pick, aperture=ap_now,
-                               pixel_arcsec=tile0.pixel_scale_arcsec)
+                               pixel_arcsec=tile0.pixel_scale_arcsec, pick_b=pick_b)
         st.altair_chart(chart, on_select=_set_pick_from_chart, selection_mode="pick", key="sx_field",
                         width="stretch")
         st.image(sv.colorbar_png(info))
+        spectrum_analysis.point_controls(sci, region_key)
         if sci:
             st.caption(
                 "Geometría WCS: cada píxel nativo del cubo (12.9″) se dibuja en su posición, con su valor original, sin "
@@ -346,7 +350,8 @@ def render(level: str) -> None:
         if sci:
             r_ap, r_in, r_out = measure_controls()
         else:
-            st.markdown('El rombo naranja marca el punto elegido.')
+            st.markdown('El rombo naranja marca el punto elegido.' if pick_b is None else
+                        'El rombo azul (A) y el cuadrado naranja (B) marcan los dos puntos.')
             r_ap = state.get('sx_rap', multiband_page.kept('sx_rap', defaults[0]))
             r_in, r_out = state.get('sx_ann', multiband_page.kept('sx_ann', defaults[1:]))
         state["sx_rin"], state["sx_rout"] = r_in, r_out
@@ -358,7 +363,10 @@ def render(level: str) -> None:
     params_now = (round(state["sx_pick_ra"], 6), round(state["sx_pick_dec"], 6), r_ap, r_in, r_out)
     if go or state.get("sx_spec_params") is None:
         state["sx_spec_params"] = params_now
-    st.markdown("### Espectro exploratorio de una posición" if sci else "### La luz del punto elegido")
+    if pick_b is None:
+        st.markdown("### Espectro exploratorio de una posición" if sci else "### La luz del punto elegido")
+    else:
+        st.markdown("### Espectros exploratorios de dos posiciones" if sci else "### La luz de los dos puntos")
     sp = state["sx_spec_params"]
     if sp != params_now:
         st.caption("La posición o la apertura han cambiado: pulse «Obtener el espectro en esta posición» para "
@@ -374,7 +382,10 @@ def render(level: str) -> None:
     qlabel = (st.radio("Magnitud representada", list(QUANTITY_LABELS), horizontal=True, key="sx_quantity") if sci else
               state.get('sx_quantity', next(iter(QUANTITY_LABELS))))
     quantity = QUANTITY_LABELS[qlabel]
-    st.altair_chart(sv.spectrum_chart(spec, quantity, selected_channel=ch.number), width="stretch")
+    # The plot, the second spectrum (same aperture and annulus as A, never tuned per position), A − B, A / B
+    # and the peaks and valleys: all on these axes.
+    spectrum_analysis.render(spec, quantity, ch.number, sci, region_key,
+                             lambda ra, dec: cached_spectrum(round(ra, 6), round(dec, 6), *sp[2:]), _show_error)
     n_missing = sum(r["status"] != "ok" for r in spec.rows)
     if sci:
         st.caption(
