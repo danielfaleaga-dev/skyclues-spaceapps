@@ -2,6 +2,13 @@
 
 Última actualización: relevo de Claude Code B del 15-11-2026 sobre `redesign/unified-region` (detector no sideral). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md); las reglas visuales obligatorias están en [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md). La primera sección prevalece sobre el historial conservado debajo.
 
+## Espectro: inspector A/B y validación ciega en NGC 7023 — 15-11-2026 (Claude Code A, rama `feature/spectrum-compare`, sin integrar)
+
+- **Inspector A/B** (`74cfd6b`): el tipo y el centro solo se muestran para características clasificadas, con «Intervalo examinado» común a A y B; las unidades quedan protegidas en mayúsculas (`theme.unit`); las notas de los gráficos de Espectro se ven a opacidad completa. Sin cambios en los algoritmos. Detalle en `SPECTRUM_COMPARE_REPORT.md`.
+- **Validación ciega NGC 7023:** protocolo, resultados congelados, comparación y dictamen («RECUPERACIÓN PARCIAL») en `results/blind_ngc7023/`. Aprendizaje para futuras pruebas:
+  - la regla morfológica debe excluir fuentes puntuales catalogadas;
+  - la fotometría con anillo local reduce la sensibilidad a la emisión extensa.
+
 ## Movimiento medido de objetos conocidos — 15-11-2026 (Claude Code B)
 
 Actividad `SKYCLUES_NONSIDEREAL_CODEX_RECOVERY_02`. Local, sin push ni despliegue. No se tocó `SkyClues-spectra` (Claude Code A).
