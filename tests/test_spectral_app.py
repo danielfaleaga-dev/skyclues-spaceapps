@@ -7,6 +7,45 @@ from test_spectral_offline import cube  # shared synthetic FITS fixture, explici
 
 APP=str(Path(__file__).resolve().parents[1]/'app.py')
 
+
+def test_simple_level_preserves_hidden_measurement_controls(app_cube):
+    at=spectral_app(app_cube)
+    at.slider(key='sx_rap').set_value(3.0).run()
+    at.radio(key='sx_quantity').set_value(list(page.QUANTITY_LABELS)[1]).run()
+    at.radio(key='sx_layer').set_value(list(page.LAYERS)[1]).run()
+    at.button(key='sx_extract').click().run()
+    original=at.session_state['sx_spec_params']
+    region=at.session_state['sx_region_key']
+    at.button_group(key='level').set_value('Sencillo').run()
+    assert not at.exception
+    assert at.session_state['sx_spec_params']==original
+    assert at.session_state['sx_region_key']==region
+    assert not any(s.key=='sx_rap' for s in at.slider)
+    assert not any(r.key in ('sx_layer','sx_quantity') for r in at.radio)
+    assert not any('Método y limitaciones' in x.label or 'Tabla del espectro' in x.label for x in at.expander)
+    at.button_group(key='level').set_value('Científico').run()
+    assert not at.exception
+    assert at.slider(key='sx_rap').value==3.0
+    assert at.radio(key='sx_quantity').value==list(page.QUANTITY_LABELS)[1]
+    assert at.radio(key='sx_layer').value==list(page.LAYERS)[1]
+    assert at.session_state['sx_spec_params']==original
+
+
+def test_simple_rgb_preserves_channels_and_contrast(app_cube):
+    from skyclues import multiband_page
+    at=spectral_app(app_cube)
+    at.button_group(key='sx_mode').set_value(multiband_page.MODES[1]).run()
+    at.radio(key='mb_stretch').set_value(list(multiband_page.STRETCH_LABELS)[1]).run()
+    channels=[at.selectbox(key='mb_'+r).value for r in ('R','G','B')]
+    at.button_group(key='level').set_value('Sencillo').run()
+    assert not at.exception
+    assert not any('Procedencia' in x.label for x in at.expander)
+    assert [at.selectbox(key='mb_'+r).value for r in ('R','G','B')]==channels
+    at.button_group(key='level').set_value('Científico').run()
+    assert not at.exception
+    assert at.radio(key='mb_stretch').value==list(multiband_page.STRETCH_LABELS)[1]
+    assert [at.selectbox(key='mb_'+r).value for r in ('R','G','B')]==channels
+
 @pytest.fixture
 def app_cube(cube,monkeypatch):
     # Time reference files remain read-only; synthetic byte cache is isolated by cube.
@@ -22,6 +61,7 @@ def app_cube(cube,monkeypatch):
 def spectral_app(cube,channel=63):
     at=AppTest.from_file(APP,default_timeout=30)
     at.query_params={'explorer':'espectral','ra':str(cube.centre[0]),'dec':str(cube.centre[1]),'fov':'.1','canal':str(channel)}
+    at.session_state['level']='Científico'
     at.run()
     assert not at.exception
     return at
@@ -43,11 +83,11 @@ def test_url_channels_pick_extraction_and_return(app_cube):
     at.button(key='sx_extract').click().run()
     assert not at.exception
     assert at.session_state['sx_spec_params'][0]==round(app_cube.centre[0]+.001,6)
-    at.button(key='sx_to_time').click().run()
+    at.button_group(key='nav').set_value('Tiempo').run()
     assert not at.exception
-    assert at.number_input(key='ra_in').value==pytest.approx(key[0],abs=1e-6)
-    assert at.number_input(key='dec_in').value==pytest.approx(key[1],abs=1e-6)
-    assert at.radio(key='fov_preset').value=='6′'
+    assert at.session_state['region']['ra']==pytest.approx(key[0],abs=1e-6)
+    assert at.session_state['region']['dec']==pytest.approx(key[1],abs=1e-6)
+    assert at.session_state['region']['fov']==.1
     assert not any(m.label=='Épocas' for m in at.metric)
 
 
@@ -55,19 +95,21 @@ def test_time_transfer_keeps_wise_region_not_expected_marker(app_cube,monkeypatc
     monkeypatch.setattr(page,'cached_epoch',lambda _: (app_cube.centre[0],app_cube.centre[1],
         {'propagated':True,'mjd_mid':60000,'date_mid':'2023-02-25','date_beg':'2023-01-01',
          'date_end':'2023-05-01','motion_over_inputs_arcsec':3}))
-    at=AppTest.from_file(APP,default_timeout=30).run()
+    at=AppTest.from_file(APP,default_timeout=30)
+    at.session_state['level']='Científico'
+    at.run()
     stem=next(s for s in config.VALIDATED_EXAMPLES if 'wise' in s)
     at.button(key='example_'+stem).click().run()
     assert not at.exception
-    shared=at.session_state['shared_region'].copy()
-    at.button(key='to_spectrum').click().run()
+    shared=at.session_state['region'].copy()
+    at.button_group(key='nav').set_value('Espectro').run()
     assert not at.exception
     assert at.session_state['sx_region_key']==(round(shared['ra'],6),round(shared['dec'],6),shared['fov'])
-    text=' '.join(md.value for md in at.markdown)
+    text=' '.join(str(x.proto) for x in at if hasattr(x, 'proto'))
     assert 'no es una época efectiva' in text and 'no una detección' in text
-    at.button(key='sx_to_time').click().run()
+    at.button_group(key='nav').set_value('Tiempo').run()
     assert not at.exception
-    assert at.number_input(key='ra_in').value==pytest.approx(shared['ra'],abs=1e-6)
+    assert at.session_state['region']['ra']==pytest.approx(shared['ra'],abs=1e-6)
     assert 'report' not in at.session_state
 
 
@@ -90,7 +132,7 @@ def test_invalid_spectral_url_never_reads_cube(app_cube,monkeypatch,query):
     at.query_params={'explorer':'espectral',**query}
     at.run()
     assert not at.exception
-    assert any('URL no válidos' in e.value for e in at.error)
+    assert any('no válid' in e.value for e in at.error)
 
 
 def test_click_callback_uses_native_pixel_coordinates(app_cube,monkeypatch):

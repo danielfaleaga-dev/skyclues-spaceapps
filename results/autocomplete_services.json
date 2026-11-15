@@ -1,0 +1,786 @@
+{
+  "utc": "2026-11-15T01:15:08.950970+00:00",
+  "queries": {
+    "ngc": {
+      "results": [
+        {
+          "id": "NGC     1",
+          "label": "NGC 1",
+          "type": "GiP",
+          "aliases": [
+            "NGC     1",
+            "NGC     1"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC     2",
+          "label": "NGC 2",
+          "type": "GiP",
+          "aliases": [
+            "NGC     2",
+            "NGC     2"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC     3",
+          "label": "NGC 3",
+          "type": "AG?",
+          "aliases": [
+            "NGC     3",
+            "NGC     3"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC     4",
+          "label": "NGC 4",
+          "type": "G",
+          "aliases": [
+            "NGC     4",
+            "NGC     4"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC     5",
+          "label": "NGC 5",
+          "type": "AG?",
+          "aliases": [
+            "NGC     5",
+            "NGC     5"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC     7",
+          "label": "NGC 7",
+          "type": "EmG",
+          "aliases": [
+            "NGC     7",
+            "NGC     7"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC     8",
+          "label": "NGC 8",
+          "type": "**",
+          "aliases": [
+            "NGC     8",
+            "NGC     8"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC     9",
+          "label": "NGC 9",
+          "type": "EmG",
+          "aliases": [
+            "NGC     9",
+            "NGC     9"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC    10",
+          "label": "NGC 10",
+          "type": "EmG",
+          "aliases": [
+            "NGC    10",
+            "NGC    10"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC    11",
+          "label": "NGC 11",
+          "type": "AG?",
+          "aliases": [
+            "NGC    11",
+            "NGC    11"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC    12",
+          "label": "NGC 12",
+          "type": "AG?",
+          "aliases": [
+            "NGC    12",
+            "NGC    12"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC    13",
+          "label": "NGC 13",
+          "type": "GiG",
+          "aliases": [
+            "NGC    13",
+            "NGC    13"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        }
+      ],
+      "message": ""
+    },
+    "NGC8": {
+      "results": [
+        {
+          "id": "NGC     8",
+          "label": "NGC 8",
+          "type": "**",
+          "aliases": [
+            "NGC     8",
+            "NGC     8"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC   812",
+          "label": "NGC 812",
+          "type": "AG?",
+          "aliases": [
+            "NGC   812",
+            "NGC   812"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC   833",
+          "label": "NGC 833",
+          "type": "Sy2",
+          "aliases": [
+            "NGC   833",
+            "NGC   833"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC   835",
+          "label": "NGC 835",
+          "type": "Sy2",
+          "aliases": [
+            "NGC   835",
+            "NGC   835"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC   839",
+          "label": "NGC 839",
+          "type": "EmG",
+          "aliases": [
+            "NGC   839",
+            "NGC   839"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC   891A",
+          "label": "NGC 891A",
+          "type": "?",
+          "aliases": [
+            "NGC   891A",
+            "NGC   891A"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC   891B",
+          "label": "NGC 891B",
+          "type": "?",
+          "aliases": [
+            "NGC   891B",
+            "NGC   891B"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        }
+      ],
+      "message": "https://simbad.harvard.edu/simbad/sim-tap"
+    },
+    "M": {
+      "results": [
+        {
+          "id": "M   1",
+          "label": "M 1",
+          "type": "SNR",
+          "aliases": [
+            "M   1",
+            "M   1"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "M   2",
+          "label": "M 2",
+          "type": "GlC",
+          "aliases": [
+            "M   2",
+            "M   2"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "M   3",
+          "label": "M 3",
+          "type": "GlC",
+          "aliases": [
+            "M   3",
+            "M   3"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "M   4",
+          "label": "M 4",
+          "type": "GlC",
+          "aliases": [
+            "M   4",
+            "M   4"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "M   5",
+          "label": "M 5",
+          "type": "GlC",
+          "aliases": [
+            "M   5",
+            "M   5"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC  6405",
+          "label": "M 6",
+          "type": "OpC",
+          "aliases": [
+            "NGC  6405",
+            "M   6"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC  6475",
+          "label": "M 7",
+          "type": "OpC",
+          "aliases": [
+            "NGC  6475",
+            "M   7"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "M   8",
+          "label": "M 8",
+          "type": "OpC",
+          "aliases": [
+            "M   8",
+            "M   8"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "M   9",
+          "label": "M 9",
+          "type": "GlC",
+          "aliases": [
+            "M   9",
+            "M   9"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "M  10",
+          "label": "M 10",
+          "type": "GlC",
+          "aliases": [
+            "M  10",
+            "M  10"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC  6705",
+          "label": "M 11",
+          "type": "OpC",
+          "aliases": [
+            "NGC  6705",
+            "M  11"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "M  12",
+          "label": "M 12",
+          "type": "GlC",
+          "aliases": [
+            "M  12",
+            "M  12"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        }
+      ],
+      "message": ""
+    },
+    "M13": {
+      "results": [
+        {
+          "id": "M  13",
+          "label": "M 13",
+          "type": "GlC",
+          "aliases": [
+            "M  13",
+            "M  13",
+            "M  13"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        }
+      ],
+      "message": "https://simbad.harvard.edu/simbad/sim-tap"
+    },
+    "IC": {
+      "results": [
+        {
+          "id": "IC    2",
+          "label": "IC 2",
+          "type": "G",
+          "aliases": [
+            "IC    2",
+            "IC    2"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "IC    3",
+          "label": "IC 3",
+          "type": "Sy1",
+          "aliases": [
+            "IC    3",
+            "IC    3"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "IC    4",
+          "label": "IC 4",
+          "type": "GiG",
+          "aliases": [
+            "IC    4",
+            "IC    4"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "IC    5",
+          "label": "IC 5",
+          "type": "GiG",
+          "aliases": [
+            "IC    5",
+            "IC    5"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "IC    6",
+          "label": "IC 6",
+          "type": "EmG",
+          "aliases": [
+            "IC    6",
+            "IC    6"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "IC    7",
+          "label": "IC 7",
+          "type": "GiG",
+          "aliases": [
+            "IC    7",
+            "IC    7"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "IC    8",
+          "label": "IC 8",
+          "type": "Sy1",
+          "aliases": [
+            "IC    8",
+            "IC    8"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "IC    9",
+          "label": "IC 9",
+          "type": "Sy2",
+          "aliases": [
+            "IC    9",
+            "IC    9"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "IC   10",
+          "label": "IC 10",
+          "type": "rG",
+          "aliases": [
+            "IC   10",
+            "IC   10"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "IC   11",
+          "label": "IC 11",
+          "type": "ISM",
+          "aliases": [
+            "IC   11",
+            "IC   11"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "IC   12",
+          "label": "IC 12",
+          "type": "EmG",
+          "aliases": [
+            "IC   12",
+            "IC   12"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "IC   13",
+          "label": "IC 13",
+          "type": "AG?",
+          "aliases": [
+            "IC   13",
+            "IC   13"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        }
+      ],
+      "message": ""
+    },
+    "atlas": {
+      "results": [
+        {
+          "id": "JPL:1004083",
+          "label": "3I/ATLAS (C/2025 N1)",
+          "type": "Cometa",
+          "aliases": [
+            "C/2025 N1",
+            "3I",
+            "K25N010"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:615",
+          "label": "Atlas",
+          "type": "Satélite natural",
+          "aliases": [
+            "SXV"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:1003534",
+          "label": "ATLAS (427P)",
+          "type": "Cometa",
+          "aliases": [
+            "427P",
+            "2021 L6",
+            "2017 S5",
+            "4000427"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:1003971",
+          "label": "ATLAS (478P)",
+          "type": "Cometa",
+          "aliases": [
+            "478P",
+            "2023 Y3",
+            "2017 BQ100",
+            "4000478",
+            "3768242"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:1003635",
+          "label": "ATLAS (490P)",
+          "type": "Cometa",
+          "aliases": [
+            "490P",
+            "2024 C6",
+            "2019 M2",
+            "4000490"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:1003428",
+          "label": "ATLAS (C/2015 X7)",
+          "type": "Cometa",
+          "aliases": [
+            "C/2015 X7",
+            "K15X070"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:1003502",
+          "label": "ATLAS (C/2017 D3)",
+          "type": "Cometa",
+          "aliases": [
+            "C/2017 D3",
+            "K17D030"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:1003521",
+          "label": "ATLAS (C/2017 K4)",
+          "type": "Cometa",
+          "aliases": [
+            "C/2017 K4",
+            "K17K040"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:1003524",
+          "label": "ATLAS (C/2017 M4)",
+          "type": "Cometa",
+          "aliases": [
+            "C/2017 M4",
+            "K17M040"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:1003543",
+          "label": "ATLAS (C/2017 T3)",
+          "type": "Cometa",
+          "aliases": [
+            "C/2017 T3",
+            "K17T030"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:1003556",
+          "label": "ATLAS (C/2018 A3)",
+          "type": "Cometa",
+          "aliases": [
+            "C/2018 A3",
+            "K18A030"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:1003564",
+          "label": "ATLAS (C/2018 E1)",
+          "type": "Cometa",
+          "aliases": [
+            "C/2018 E1",
+            "K18E010"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "SN 2024abre",
+          "label": "ATLAS 24qlq",
+          "type": "SN*",
+          "aliases": [
+            "SN 2024abre",
+            "ATLAS 24qlq"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "SN 2024adhq",
+          "label": "ATLAS 24qzt",
+          "type": "SN*",
+          "aliases": [
+            "SN 2024adhq",
+            "ATLAS 24qzt"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "ATLAS 18mrg",
+          "label": "ATLAS 18mrg",
+          "type": "ev",
+          "aliases": [
+            "ATLAS 18mrg",
+            "ATLAS 18mrg"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "SN 2018bae",
+          "label": "ATLAS 18nnp",
+          "type": "SN*",
+          "aliases": [
+            "SN 2018bae",
+            "ATLAS 18nnp"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "SN 2018bbr",
+          "label": "ATLAS 18nts",
+          "type": "SN*",
+          "aliases": [
+            "SN 2018bbr",
+            "ATLAS 18nts"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "SN 2018bbs",
+          "label": "ATLAS 18ntu",
+          "type": "SN*",
+          "aliases": [
+            "SN 2018bbs",
+            "ATLAS 18ntu"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "SN 2019lsu",
+          "label": "ATLAS 19psi",
+          "type": "SN*",
+          "aliases": [
+            "SN 2019lsu",
+            "ATLAS 19psi"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "SN 2024adpb",
+          "label": "ATLAS 24ret",
+          "type": "SN*",
+          "aliases": [
+            "SN 2024adpb",
+            "ATLAS 24ret"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "SN 2024adtg",
+          "label": "ATLAS 24rtf",
+          "type": "SN*",
+          "aliases": [
+            "SN 2024adtg",
+            "ATLAS 24rtf"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "SN 2024agkj",
+          "label": "ATLAS 25agh",
+          "type": "SN*",
+          "aliases": [
+            "SN 2024agkj",
+            "ATLAS 25agh"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "SN 2019lwe",
+          "label": "ATLAS 19qee",
+          "type": "SN*",
+          "aliases": [
+            "SN 2019lwe",
+            "ATLAS 19qee"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "SN 2025eqe",
+          "label": "ATLAS 25cwk",
+          "type": "SN*",
+          "aliases": [
+            "SN 2025eqe",
+            "ATLAS 25cwk"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        }
+      ],
+      "message": ""
+    },
+    "3I/ATLAS": {
+      "results": [
+        {
+          "id": "JPL:1004083",
+          "label": "3I/ATLAS (C/2025 N1)",
+          "type": "Cometa",
+          "aliases": [
+            "C/2025 N1",
+            "3I",
+            "K25N010"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "message": ""
+    },
+    "NGC891": {
+      "results": [
+        {
+          "id": "NGC   891",
+          "label": "NGC 891",
+          "type": "H2G",
+          "aliases": [
+            "NGC   891",
+            "NGC   891",
+            "NGC   891"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC   891A",
+          "label": "NGC 891A",
+          "type": "?",
+          "aliases": [
+            "NGC   891A",
+            "NGC   891A"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC   891B",
+          "label": "NGC 891B",
+          "type": "?",
+          "aliases": [
+            "NGC   891B",
+            "NGC   891B"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        },
+        {
+          "id": "NGC   891l",
+          "label": "NGC 891l",
+          "type": "?",
+          "aliases": [
+            "NGC   891l",
+            "NGC   891l"
+          ],
+          "source": "https://simbad.harvard.edu/simbad/sim-tap"
+        }
+      ],
+      "message": "https://simbad.harvard.edu/simbad/sim-tap"
+    }
+  },
+  "exact_checks_utc": "2026-11-15T01:18:50.631618+00:00"
+}

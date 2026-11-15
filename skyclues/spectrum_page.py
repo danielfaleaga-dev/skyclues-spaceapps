@@ -82,6 +82,9 @@ def error_message(err: Exception) -> str:
 
 
 def _show_error(err: Exception, what: str) -> None:
+    if not theme.scientific():
+        st.error(f'{what}. Inténtalo de nuevo; el modo Científico muestra los detalles.')
+        return
     st.error(f"{what}: {error_message(err)}")
     with st.expander("Detalle técnico"):
         st.code(f"{type(err).__name__}: {err}", language=None)
@@ -152,9 +155,16 @@ def render(level: str) -> None:
     sci = level == "scientific"
     state, params = st.session_state, st.query_params
     region = navigation.get_region(state, params)
-    for e in state.pop("region_errors", []):
+    errors = state.pop("region_errors", [])
+    for e in errors:
         st.error(e)
+    if errors:
+        return
     inp = navigation.explorer_inputs(region)
+    if region.get("gaia"):
+        st.caption("Fuente seleccionada en Gaia DR3: coordenadas de catálogo ICRS, J2016.0. La posición calculada para el cubo no confirma una detección SPHEREx." if sci else "Fuente de catálogo; no confirma una detección SPHEREx.")
+    if region.get("solar"):
+        st.info("Cuerpo móvil: este cubo combina muchas fechas. Se muestra el cielo en una coordenada fija; no es un espectro identificado del objeto ni una detección." if sci else "Esta imagen muestra la zona del cielo, no un espectro identificado del objeto móvil.")
     multiband_page.restore(("sx_mode", "sx_channel"))
     try:
         ra_c, dec_c = validate_coordinates(inp["ra"], inp["dec"])
@@ -167,7 +177,8 @@ def render(level: str) -> None:
     epoch_info = {"propagated": False}
     if astro is not None and astro.has_proper_motion:
         try:
-            expected_ra, expected_dec, epoch_info = cached_epoch(json.dumps(astro.to_dict(), sort_keys=True))
+            with st.spinner("Consultando la época del cubo y calculando la posición esperada…", show_time=True):
+                expected_ra, expected_dec, epoch_info = cached_epoch(json.dumps(astro.to_dict(), sort_keys=True))
             # A saved sequence keeps its exact centre; a named object is centred on its expected position.
             if inp["follow"]:
                 ra_c, dec_c = expected_ra, expected_dec
@@ -175,7 +186,8 @@ def render(level: str) -> None:
             _show_error(err, "No se pudo leer la cabecera de la tesela")
             return
     try:
-        channels = channel_list(ra_c, dec_c)
+        with theme.loading("Abriendo la región y leyendo los canales disponibles en IRSA…" if sci else "Preparando esta zona del cielo…", "spectrum_region"):
+            channels = channel_list(ra_c, dec_c)
     except Exception as err:  # noqa: BLE001
         theme.region_strip(inp["label"], ra_c, dec_c, fov)
         _show_error(err, "No se pudo leer la tabla de canales del cubo")
@@ -201,17 +213,15 @@ def render(level: str) -> None:
     state["sx_canal"] = int(state["sx_channel"])
     navigation.write_url(params, {"ra": ra_c, "dec": dec_c, "fov": fov}, "spectrum", state["sx_canal"])
 
-    theme.region_strip(inp["label"], ra_c, dec_c, fov, _region_extra(epoch_info, inp["follow"]))
-    theme.note(
-        "<b>Producto combinado, no temporal.</b> " + (
+    theme.region_strip(inp["label"], ra_c, dec_c, fov, _region_extra(epoch_info, inp["follow"]) if sci else '')
+    theme.note(("<b>Producto combinado, no temporal.</b> " +
             "Cada imagen es un canal del cubo DR1: el promedio de muchas exposiciones de fechas distintas (sin luz "
             "zodiacal), en píxeles de 12.9″. Sirve para ver cómo cambia el cielo con la longitud de onda; no muestra "
-            "cambios en el tiempo (para eso, «Tiempo» usa observaciones individuales de 6.15″/px)." if sci else
-            "Aquí se ve la misma región en 102 «colores» infrarrojos. Cada imagen promedia muchas fechas, así que no "
-            "muestra cambios en el tiempo: para eso está «Tiempo»."))
+            "cambios en el tiempo (para eso, «Tiempo» usa observaciones individuales de 6.15″/px).") if sci else
+            "Explora esta zona en distintos colores infrarrojos. Para comparar fechas, abre «Tiempo».")
     if epoch_info.get("warning"):
         st.warning(epoch_info["warning"] + f" Época de referencia: {astro.epoch_jyear:.2f}. No es una detección.")
-    if epoch_info.get("propagated") and "mjd_mid" in epoch_info:
+    if epoch_info.get("propagated") and "mjd_mid" in epoch_info and sci:
         mv = epoch_info["motion_over_inputs_arcsec"]
         theme.note(
             f"<b>Objetivo en movimiento: {astro.name}</b> ({astro.total_pm_arcsec_yr:.2f}″/año). "
@@ -220,10 +230,12 @@ def render(level: str) -> None:
             f"({epoch_info['date_mid']}; entradas del {epoch_info['date_beg']} al {epoch_info['date_end']}). "
             f"Durante ese intervalo el objeto se desplaza {mv:.1f}″ ({mv / 12.883:.2f} píxeles del cubo): en el "
             "promedio puede aparecer alargado. La cruz es un cálculo, no una detección.")
+    elif epoch_info.get('propagated') and not sci:
+        st.caption('La cruz marca una posición calculada, no una detección.')
 
     # ---------------------------------------------------------------- display mode
-    view_mode = st.radio("Modo de visualización", multiband_page.MODES, horizontal=True, key="sx_mode",
-                         label_visibility="collapsed",
+    view_mode = st.segmented_control("Imagen infrarroja", multiband_page.MODES, required=True, default=multiband_page.MODES[0], key="sx_mode",
+                         label_visibility="visible",
                          help="«Composición multibanda» combina tres canales reales en falso color (R, G, B) con el "
                               "mismo centro y campo. Puede volver a «Un canal» en cualquier momento.")
     if view_mode == multiband_page.MODES[1]:
@@ -231,12 +243,13 @@ def render(level: str) -> None:
         state.pop("sx_channel", None)       # given back from the stored channel on return
         target = (expected_ra, expected_dec) if epoch_info.get("propagated") else (ra_c, dec_c)
         multiband_page.render_section(ra_c, dec_c, fov, channels, target, cached_map, _show_error)
-        st.caption("El espectro exploratorio se obtiene en el modo «Un canal»; al volver se conservan la región, el "
-                   "canal y la posición elegidos.")
+        st.caption("Vuelve a «Un canal» para explorar el espectro de un punto.")
         _footer(ra_c, dec_c, fov, state["sx_canal"])
         return
     multiband_page.stash(multiband_page.STATE_KEYS)
     multiband_page.restore(SINGLE_STATE_KEYS)
+    if not sci:
+        multiband_page.stash(SINGLE_STATE_KEYS + SINGLE_SLIDER_KEYS)
     # Streamlit drops the value of a widget that was not drawn in a run: a missing pick position is
     # rebuilt even when the region did not change (regression of 2ec4881, fixed in a2a6881).
     if "sx_pick_ra" not in state or "sx_pick_dec" not in state:
@@ -244,7 +257,7 @@ def render(level: str) -> None:
         state["sx_spec_params"] = None
 
     # ---------------------------------------------------------------- channel selector
-    theme.eyebrow("Canal espectral · longitud de onda creciente")
+    theme.eyebrow("Canal espectral · longitud de onda creciente" if sci else "Elige un color infrarrojo")
     b1, mid, b2 = st.columns([1, 14, 1], vertical_alignment="center")
     b1.button("◀", key="sx_prev", on_click=_step_channel, args=(-1, numbers), help="Canal anterior (λ menor)")
     b2.button("▶", key="sx_next", on_click=_step_channel, args=(1, numbers), help="Canal siguiente (λ mayor)")
@@ -257,8 +270,12 @@ def render(level: str) -> None:
     left, right = st.columns([1.25, 1], gap="large")
     defaults = config.CUBE_APERTURE_DEFAULT_PX
     with left:
-        layer = LAYERS[st.radio("Capa", list(LAYERS), horizontal=True, key="sx_layer")]
-        with st.spinner(f"Leyendo el canal {ch.number} del cubo en IRSA…"):
+        layer_label = (st.radio("Capa", list(LAYERS), horizontal=True, key="sx_layer") if sci else
+                       state.get('sx_layer', next(iter(LAYERS))))
+        layer = LAYERS[layer_label]
+        if not sci and layer == 'nhits':
+            st.caption('Mostrando cobertura; puedes cambiar a brillo en «Científico».')
+        with theme.loading(f"Leyendo el canal {ch.number} del cubo en IRSA…" if sci else "Preparando la imagen…", "spectrum_image"):
             try:
                 cmap = cached_map(ra_c, dec_c, fov, ch.plane)
                 png, info = cached_png(ra_c, dec_c, fov, ch.plane, layer)
@@ -267,7 +284,7 @@ def render(level: str) -> None:
                 _show_error(err, f"No se pudo leer el canal {ch.number}")
                 return
         pick = (state["sx_pick_ra"], state["sx_pick_dec"])
-        ap_now = sc.Aperture(state.get("sx_rap", defaults[0]), state.get("sx_rin", defaults[1]),
+        ap_now = sc.Aperture(state.get("sx_rap", multiband_page.kept('sx_rap', defaults[0])), state.get("sx_rin", defaults[1]),
                              state.get("sx_rout", defaults[2]))
         tile0 = cmap.patches[0].tile
         target = (expected_ra, expected_dec) if epoch_info.get("propagated") else (ra_c, dec_c)
@@ -283,20 +300,19 @@ def render(level: str) -> None:
                 f"{info['npix']} píxeles, {info['screen_arcsec_per_px']:.1f}″/px; su tamaño en pantalla se adapta al visor). "
                 f"Escala de visualización propia de cada canal "
                 f"({'percentiles 1–99.5 del campo, asinh' if layer == 'image' else 'lineal'}); compare intensidades entre "
-                "canales con el espectro. Rosa: sin datos (NaN, NHITS = 0). Gris claro: fuera de la región leída. "
+                "canales con el espectro. Rosa/morado: valor no finito o NHITS = 0 (sin dato utilizable); no significa cielo oscuro. Gris claro: fuera de la región leída. "
                 "Cruz azul: objetivo; rombo ámbar: posición del espectro, con su apertura y su anillo de fondo. "
                 "Pase el cursor para ver el valor de cada píxel; haga clic para elegir la posición del espectro.")
         else:
-            st.caption("Imagen real de este canal, sin retoques: cada cuadrado es un píxel del cubo. Rosa: sin datos. "
-                       "Cruz azul: centro de la región. Rombo ámbar: dónde se mide el espectro; haga clic en la imagen "
-                       "para moverlo. El contraste se ajusta en cada canal: para comparar brillos use el espectro.")
+            st.markdown("Pulsa la imagen para elegir un punto. **Rosa: sin datos.**")
 
     with right:
         if ch.blank:
-            st.warning(f"**Canal {ch.number} sin datos en DR1.** {ch.wavelength_um:.3f} µm, D{ch.detector} subcanal "
+            st.warning((f"**Canal {ch.number} sin datos en DR1.** {ch.wavelength_um:.3f} µm, D{ch.detector} subcanal "
                        f"{ch.subchannel}: canal contiguo al divisor dicroico. La documentación oficial lo publica "
                        f"vacío (todo NaN, NHITS = 0; cabecera BLANKCH = '{tile0.header('PRIMARY').get('BLANKCH')}') "
-                       "para conservar la numeración. SkyClues no lo rellena ni lo interpola.")
+                       "para conservar la numeración. SkyClues no lo rellena ni lo interpola.") if sci else
+                       f"El canal {ch.number} no tiene datos. Elige otro color infrarrojo.")
         s = cmap.summary()
         if sci:
             theme.facts([
@@ -330,9 +346,9 @@ def render(level: str) -> None:
         if sci:
             r_ap, r_in, r_out = measure_controls()
         else:
-            st.caption(f"RA {pick[0]:.5f}°, Dec {pick[1]:+.5f}°. Haga clic en la imagen para elegir otro punto.")
-            with st.expander("Ajustar posición y apertura"):
-                r_ap, r_in, r_out = measure_controls()
+            st.markdown('El rombo naranja marca el punto elegido.')
+            r_ap = state.get('sx_rap', multiband_page.kept('sx_rap', defaults[0]))
+            r_in, r_out = state.get('sx_ann', multiband_page.kept('sx_ann', defaults[1:]))
         state["sx_rin"], state["sx_rout"] = r_in, r_out
         go = st.button("Obtener el espectro en esta posición", type="primary", key="sx_extract")
 
@@ -342,7 +358,7 @@ def render(level: str) -> None:
     params_now = (round(state["sx_pick_ra"], 6), round(state["sx_pick_dec"], 6), r_ap, r_in, r_out)
     if go or state.get("sx_spec_params") is None:
         state["sx_spec_params"] = params_now
-    st.markdown("### Espectro exploratorio de una posición")
+    st.markdown("### Espectro exploratorio de una posición" if sci else "### La luz del punto elegido")
     sp = state["sx_spec_params"]
     if sp != params_now:
         st.caption("La posición o la apertura han cambiado: pulse «Obtener el espectro en esta posición» para "
@@ -350,12 +366,13 @@ def render(level: str) -> None:
     try:
         validate_coordinates(sp[0], sp[1])
         sc.Aperture(*sp[2:]).validate()
-        with st.spinner("Leyendo los 102 canales alrededor de la posición (solo las filas necesarias)…"):
+        with theme.loading("Leyendo los 102 canales alrededor de la posición…" if sci else "Preparando el espectro de este punto…", "spectrum_plot"):
             spec = cached_spectrum(*sp)
     except Exception as err:  # noqa: BLE001
         _show_error(err, "No se pudo obtener el espectro")
         return
-    qlabel = st.radio("Magnitud representada", list(QUANTITY_LABELS), horizontal=True, key="sx_quantity")
+    qlabel = (st.radio("Magnitud representada", list(QUANTITY_LABELS), horizontal=True, key="sx_quantity") if sci else
+              state.get('sx_quantity', next(iter(QUANTITY_LABELS))))
     quantity = QUANTITY_LABELS[qlabel]
     st.altair_chart(sv.spectrum_chart(spec, quantity, selected_channel=ch.number), width="stretch")
     n_missing = sum(r["status"] != "ok" for r in spec.rows)
@@ -369,9 +386,12 @@ def render(level: str) -> None:
         with st.expander("Cómo leer este gráfico"):
             theme.reading_guide(reading_guide(quantity, sci))
     else:
-        st.caption(f"{spec.n_measured} de 102 canales con valor; {n_missing} sin datos (marcas rosas). Un punto por "
-                   "canal real, sin curva ni puntos inventados. La línea discontinua marca el canal de la imagen.")
-        theme.reading_guide(reading_guide(quantity, sci))
+        st.markdown('Cuanto más alto el punto, más luz en ese color infrarrojo. **Marcas rosas: sin datos.**')
+        st.caption('Vista orientativa: los picos por sí solos no identifican materiales.')
+        if spec.warnings:
+            st.warning('Hay datos limitados en esta posición. El modo Científico muestra los detalles.')
+        _footer(ra_c, dec_c, fov, state['sx_canal'])
+        return
     for w in spec.warnings:
         st.warning(w)
     method = (
@@ -446,7 +466,8 @@ def render(level: str) -> None:
 
 def _footer(ra: float, dec: float, fov: float, canal: int) -> None:
     st.html('<div style="height:.6rem"></div>')
-    reference_page.render(ra, dec, fov, key="spectrum_ref")
+    if theme.scientific():
+        reference_page.render(ra, dec, fov, key="spectrum_ref")
     release_ui.share(ra, dec, fov, "espectral", canal)
     st.caption("Datos: NASA/IPAC IRSA · SPHEREx DR1 All-Sky spectral cube (doi:10.26131/IRSA679), leído por rangos de "
-               "bytes de los FITS oficiales (sin descargar teselas completas).")
+               "bytes de los FITS oficiales (sin descargar teselas completas)." if theme.scientific() else 'Datos: SPHEREx · NASA/IPAC IRSA.')

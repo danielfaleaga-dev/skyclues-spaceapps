@@ -1,0 +1,922 @@
+{
+  "utc": "2026-11-14T23:56:37.021809+00:00",
+  "catalogues": {
+    "M1": {
+      "astrometry": {
+        "name": "M   1",
+        "ra_deg": 83.6324,
+        "dec_deg": 22.0174,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": null,
+        "pmdec_masyr": null,
+        "parallax_mas": null,
+        "rv_kms": null,
+        "source": "SIMBAD (simbad.harvard.edu, 2026-11-14); refs: 2022A&A...661A..38P"
+      },
+      "warnings": [
+        "Sin movimiento propio en el catálogo: se usa la posición de catálogo para todas las fechas (correcto para objetos lejanos; incorrecto si el objeto se mueve)."
+      ]
+    },
+    "Messier 13": {
+      "astrometry": {
+        "name": "M  13",
+        "ra_deg": 250.42347499999994,
+        "dec_deg": 36.46131944444445,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": -3.18,
+        "pmdec_masyr": -2.56,
+        "parallax_mas": 0.127,
+        "rv_kms": -244.4,
+        "source": "SIMBAD (simbad.harvard.edu, 2026-11-14); refs: 2006AJ....131.1163S, 2019MNRAS.482.5138B, 2021MNRAS.505.5978V"
+      },
+      "warnings": []
+    },
+    "M31": {
+      "astrometry": {
+        "name": "M  31",
+        "ra_deg": 10.684708333333333,
+        "dec_deg": 41.268750000000004,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": null,
+        "pmdec_masyr": null,
+        "parallax_mas": null,
+        "rv_kms": -300,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2006AJ....131.1163S"
+      },
+      "warnings": [
+        "Sin movimiento propio en el catálogo: se usa la posición de catálogo para todas las fechas (correcto para objetos lejanos; incorrecto si el objeto se mueve)."
+      ]
+    },
+    "M42": {
+      "astrometry": {
+        "name": "M  42",
+        "ra_deg": 83.8201,
+        "dec_deg": -5.3876,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": 1.67,
+        "pmdec_masyr": -0.3,
+        "parallax_mas": null,
+        "rv_kms": 27.8,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2022A&A...661A..38P"
+      },
+      "warnings": [
+        "Sin paralaje: la posición se propaga solo con el movimiento propio (sin efecto de paralaje anual)."
+      ]
+    },
+    "M57": {
+      "astrometry": {
+        "name": "M  57",
+        "ra_deg": 283.39623652463,
+        "dec_deg": 33.029134246539996,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": 1.645,
+        "pmdec_masyr": 2.472,
+        "parallax_mas": 1.2696,
+        "rv_kms": -19.1,
+        "source": "SIMBAD (simbad.harvard.edu, 2026-11-14); refs: 2020yCat.1350....0G"
+      },
+      "warnings": []
+    },
+    "M101": {
+      "astrometry": {
+        "name": "M 101",
+        "ra_deg": 210.80242916666668,
+        "dec_deg": 54.34875,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": null,
+        "pmdec_masyr": null,
+        "parallax_mas": null,
+        "rv_kms": 243.0330935727467,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2006AJ....131.1163S"
+      },
+      "warnings": [
+        "Sin movimiento propio en el catálogo: se usa la posición de catálogo para todas las fechas (correcto para objetos lejanos; incorrecto si el objeto se mueve)."
+      ]
+    },
+    "M110": {
+      "astrometry": {
+        "name": "M 110",
+        "ra_deg": 10.09190514583,
+        "dec_deg": 41.68541867226,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": -1.705,
+        "pmdec_masyr": -0.672,
+        "parallax_mas": null,
+        "rv_kms": -246.0,
+        "source": "SIMBAD (simbad.harvard.edu, 2026-11-14); refs: 2020yCat.1350....0G"
+      },
+      "warnings": [
+        "Sin paralaje: la posición se propaga solo con el movimiento propio (sin efecto de paralaje anual)."
+      ]
+    },
+    "M102": {
+      "error": "M102 tiene una identificación histórica ambigua: seleccione NGC 5866 o M101 explícitamente."
+    },
+    "NGC224": {
+      "astrometry": {
+        "name": "M  31",
+        "ra_deg": 10.684708333333333,
+        "dec_deg": 41.268750000000004,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": null,
+        "pmdec_masyr": null,
+        "parallax_mas": null,
+        "rv_kms": -300,
+        "source": "https://simbad.harvard.edu/simbad/sim-tap; 2026-11-14T19:25:13.875383+00:00; 2006AJ....131.1163S"
+      },
+      "warnings": [
+        "Sin movimiento propio en el catálogo: se usa la posición de catálogo para todas las fechas (correcto para objetos lejanos; incorrecto si el objeto se mueve)."
+      ]
+    },
+    "NGC 891": {
+      "astrometry": {
+        "name": "NGC   891",
+        "ra_deg": 35.6371125,
+        "dec_deg": 42.34831944444444,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": null,
+        "pmdec_masyr": null,
+        "parallax_mas": null,
+        "rv_kms": 528.0,
+        "source": "SIMBAD (simbad.harvard.edu, 2026-11-14); refs: 2006AJ....131.1163S"
+      },
+      "warnings": [
+        "Sin movimiento propio en el catálogo: se usa la posición de catálogo para todas las fechas (correcto para objetos lejanos; incorrecto si el objeto se mueve)."
+      ]
+    },
+    "NGC7000": {
+      "astrometry": {
+        "name": "NGC  7000",
+        "ra_deg": 314.6958333333333,
+        "dec_deg": 44.330000000000005,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": null,
+        "pmdec_masyr": null,
+        "parallax_mas": null,
+        "rv_kms": null,
+        "source": "SIMBAD (simbad.harvard.edu, 2026-11-14); refs: —"
+      },
+      "warnings": [
+        "Sin movimiento propio en el catálogo: se usa la posición de catálogo para todas las fechas (correcto para objetos lejanos; incorrecto si el objeto se mueve)."
+      ]
+    },
+    "IC1396": {
+      "astrometry": {
+        "name": "IC 1396",
+        "ra_deg": 324.745,
+        "dec_deg": 57.51388888888888,
+        "epoch_jyear": 2000.0,
+        "pmra_masyr": -2.355,
+        "pmdec_masyr": -4.495,
+        "parallax_mas": 1.066,
+        "rv_kms": -18.621,
+        "source": "SIMBAD (simbad.harvard.edu, 2026-11-14); refs: 2020A&A...633A..99C, 2021A&A...647A..19T"
+      },
+      "warnings": []
+    },
+    "skyCluesThisObjectDoesNotExist824921": {
+      "error": "SIMBAD no conoce el objeto «skyCluesThisObjectDoesNotExist824921»"
+    }
+  },
+  "solar": {
+    "Marte": {
+      "identities": [
+        {
+          "id": "JPL:499",
+          "name": "Mars",
+          "type": "planet",
+          "spkid": "499",
+          "pdes": null,
+          "aliases": [],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:499",
+          "name": "Mars",
+          "type": "planet",
+          "spkid": "499",
+          "pdes": null,
+          "aliases": [],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 147.664239323,
+        "dec": 15.070103557,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:56:53.092300+00:00",
+        "kind": "ephemeris"
+      }
+    },
+    "Júpiter": {
+      "identities": [
+        {
+          "id": "JPL:599",
+          "name": "Jupiter",
+          "type": "planet",
+          "spkid": "599",
+          "pdes": null,
+          "aliases": [],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:599",
+          "name": "Jupiter",
+          "type": "planet",
+          "spkid": "599",
+          "pdes": null,
+          "aliases": [],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 147.886958892,
+        "dec": 13.760809131,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:56:54.920893+00:00",
+        "kind": "ephemeris"
+      }
+    },
+    "Europa": {
+      "identities": [
+        {
+          "id": "JPL:502",
+          "name": "Europa",
+          "type": "natural satellite",
+          "spkid": "502",
+          "pdes": null,
+          "aliases": [
+            "JII"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:20000052",
+          "name": "52 Europa",
+          "type": "asteroid (integrated barycenter)",
+          "spkid": "20000052",
+          "pdes": "A858 CA",
+          "aliases": [
+            "1948 LA",
+            "2000052",
+            "I58C00A"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:502",
+          "name": "Europa",
+          "type": "natural satellite",
+          "spkid": "502",
+          "pdes": null,
+          "aliases": [
+            "JII"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 147.840518215,
+        "dec": 13.778752361,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:56:56.726494+00:00",
+        "kind": "ephemeris"
+      }
+    },
+    "Titán": {
+      "identities": [
+        {
+          "id": "JPL:606",
+          "name": "Titan",
+          "type": "natural satellite",
+          "spkid": "606",
+          "pdes": null,
+          "aliases": [
+            "SVI"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:606",
+          "name": "Titan",
+          "type": "natural satellite",
+          "spkid": "606",
+          "pdes": null,
+          "aliases": [
+            "SVI"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 8.49870125,
+        "dec": 0.806102028,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:56:58.528079+00:00",
+        "kind": "ephemeris"
+      }
+    },
+    "Ceres": {
+      "identities": [
+        {
+          "id": "JPL:2000001",
+          "name": "Ceres",
+          "type": "other",
+          "spkid": "2000001",
+          "pdes": null,
+          "aliases": [],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:20000001",
+          "name": "1 Ceres",
+          "type": "asteroid (integrated barycenter)",
+          "spkid": "20000001",
+          "pdes": "A801 AA",
+          "aliases": [
+            "1943 XB",
+            "A899 OF",
+            "2000001",
+            "I01A00A"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:2000001",
+          "name": "Ceres",
+          "type": "other",
+          "spkid": "2000001",
+          "pdes": null,
+          "aliases": [],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 115.832880094,
+        "dec": 24.713140801,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:57:00.490436+00:00",
+        "kind": "ephemeris"
+      }
+    },
+    "Vesta": {
+      "identities": [
+        {
+          "id": "JPL:2000004",
+          "name": "Vesta",
+          "type": "other",
+          "spkid": "2000004",
+          "pdes": null,
+          "aliases": [],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:20000004",
+          "name": "4 Vesta",
+          "type": "asteroid (integrated barycenter)",
+          "spkid": "20000004",
+          "pdes": "A807 FA",
+          "aliases": [
+            "2000004",
+            "I07F00A"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:2000004",
+          "name": "Vesta",
+          "type": "other",
+          "spkid": "2000004",
+          "pdes": null,
+          "aliases": [],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 16.077886424,
+        "dec": -4.53106476,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:57:02.425320+00:00",
+        "kind": "ephemeris"
+      }
+    },
+    "Plutón": {
+      "identities": [
+        {
+          "id": "JPL:999",
+          "name": "Pluto",
+          "type": "planet",
+          "spkid": "999",
+          "pdes": "134340",
+          "aliases": [],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:20134340",
+          "name": "134340 Pluto",
+          "type": "asteroid (integrated barycenter)",
+          "spkid": "20134340",
+          "pdes": "1930 BM",
+          "aliases": [
+            "2134340",
+            "J30B00M"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:999",
+          "name": "Pluto",
+          "type": "planet",
+          "spkid": "999",
+          "pdes": "134340",
+          "aliases": [],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 306.250344726,
+        "dec": -23.65521432,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:57:04.183711+00:00",
+        "kind": "ephemeris"
+      }
+    },
+    "Bennu": {
+      "identities": [
+        {
+          "id": "JPL:2101955",
+          "name": "101955 Bennu (1999 RQ36)",
+          "type": "other",
+          "spkid": "2101955",
+          "pdes": null,
+          "aliases": [
+            "3022034",
+            "J99R36Q"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:20101955",
+          "name": "101955 Bennu",
+          "type": "asteroid (integrated barycenter)",
+          "spkid": "20101955",
+          "pdes": "1999 RQ36",
+          "aliases": [
+            "50022057",
+            "3022034",
+            "2101955",
+            "J99R36Q"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:2101955",
+          "name": "101955 Bennu (1999 RQ36)",
+          "type": "other",
+          "spkid": "2101955",
+          "pdes": null,
+          "aliases": [
+            "3022034",
+            "J99R36Q"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 248.220823623,
+        "dec": -25.547657144,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:57:06.974898+00:00",
+        "kind": "ephemeris"
+      }
+    },
+    "Apophis": {
+      "identities": [
+        {
+          "id": "JPL:20099942",
+          "name": "99942 Apophis",
+          "type": "asteroid (integrated barycenter)",
+          "spkid": "20099942",
+          "pdes": "2004 MN4",
+          "aliases": [
+            "50264249",
+            "3264226",
+            "2099942",
+            "K04M04N"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:20099942",
+          "name": "99942 Apophis",
+          "type": "asteroid (integrated barycenter)",
+          "spkid": "20099942",
+          "pdes": "2004 MN4",
+          "aliases": [
+            "50264249",
+            "3264226",
+            "2099942",
+            "K04M04N"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 267.327496858,
+        "dec": -21.62909325,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:58:18.430442+00:00",
+        "kind": "ephemeris",
+        "command": "DES=20099942;"
+      }
+    },
+    "Halley": {
+      "identities": [
+        {
+          "id": "JPL:1000036",
+          "name": "Halley",
+          "type": "comet (integrated barycenter)",
+          "spkid": "1000036",
+          "pdes": "1P",
+          "aliases": [
+            "1982 U1",
+            "1909 R1",
+            "1835 P1",
+            "1758 Y1",
+            "1682 Q1",
+            "1607 S1",
+            "1531 P1",
+            "1456 K1",
+            "1378 S1",
+            "1301 R1",
+            "1222 R1",
+            "1145 G1",
+            "1066 G1",
+            "989",
+            "989 N1",
+            "912",
+            "912 J1",
+            "837",
+            "837 F1",
+            "760",
+            "760 K1",
+            "684",
+            "684 R1",
+            "66",
+            "607",
+            "607 H1",
+            "530",
+            "530 Q1",
+            "451",
+            "451 L1",
+            "374",
+            "374 E1",
+            "295",
+            "295 J1",
+            "218",
+            "218 H1",
+            "1986 III",
+            "1982i",
+            "1910 II",
+            "1909c",
+            "1835 III",
+            "1759 I",
+            "1682",
+            "1607",
+            "1531",
+            "1456",
+            "141",
+            "141 F1",
+            "1378",
+            "1301",
+            "1222",
+            "1145",
+            "1066",
+            "66 B1",
+            "-11 Q1",
+            "-86 Q1",
+            "-163 U1",
+            "-86",
+            "-239 K1",
+            "-239",
+            "-163",
+            "-11",
+            "4000001"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        {
+          "id": "JPL:20002688",
+          "name": "2688 Halley",
+          "type": "asteroid (integrated barycenter)",
+          "spkid": "20002688",
+          "pdes": "1982 HG1",
+          "aliases": [
+            "1978 UO",
+            "1978 TE9",
+            "1978 SH6",
+            "1955 QN1",
+            "2002688",
+            "J82H01G"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:1000036",
+          "name": "Halley",
+          "type": "comet (integrated barycenter)",
+          "spkid": "1000036",
+          "pdes": "1P",
+          "aliases": [
+            "1982 U1",
+            "1909 R1",
+            "1835 P1",
+            "1758 Y1",
+            "1682 Q1",
+            "1607 S1",
+            "1531 P1",
+            "1456 K1",
+            "1378 S1",
+            "1301 R1",
+            "1222 R1",
+            "1145 G1",
+            "1066 G1",
+            "989",
+            "989 N1",
+            "912",
+            "912 J1",
+            "837",
+            "837 F1",
+            "760",
+            "760 K1",
+            "684",
+            "684 R1",
+            "66",
+            "607",
+            "607 H1",
+            "530",
+            "530 Q1",
+            "451",
+            "451 L1",
+            "374",
+            "374 E1",
+            "295",
+            "295 J1",
+            "218",
+            "218 H1",
+            "1986 III",
+            "1982i",
+            "1910 II",
+            "1909c",
+            "1835 III",
+            "1759 I",
+            "1682",
+            "1607",
+            "1531",
+            "1456",
+            "141",
+            "141 F1",
+            "1378",
+            "1301",
+            "1222",
+            "1145",
+            "1066",
+            "66 B1",
+            "-11 Q1",
+            "-86 Q1",
+            "-163 U1",
+            "-86",
+            "-239 K1",
+            "-239",
+            "-163",
+            "-11",
+            "4000001"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 125.0681794,
+        "dec": 2.612458749,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:58:20.444297+00:00",
+        "kind": "ephemeris",
+        "command": "DES=1P;CAP"
+      }
+    },
+    "67P": {
+      "identities": [
+        {
+          "id": "JPL:1000012",
+          "name": "Churyumov-Gerasimenko",
+          "type": "comet (integrated barycenter)",
+          "spkid": "1000012",
+          "pdes": "67P",
+          "aliases": [
+            "1975 P1",
+            "1969 R1",
+            "1989 VI",
+            "1988i",
+            "1982f",
+            "1982 VIII",
+            "1976 VII",
+            "1975i",
+            "1969h",
+            "1969 IV",
+            "4000067"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:1000012",
+          "name": "Churyumov-Gerasimenko",
+          "type": "comet (integrated barycenter)",
+          "spkid": "1000012",
+          "pdes": "67P",
+          "aliases": [
+            "1975 P1",
+            "1969 R1",
+            "1989 VI",
+            "1988i",
+            "1982f",
+            "1982 VIII",
+            "1976 VII",
+            "1975i",
+            "1969h",
+            "1969 IV",
+            "4000067"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 264.747461739,
+        "dec": -26.072524842,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:58:22.294606+00:00",
+        "kind": "ephemeris",
+        "command": "DES=67P;CAP"
+      }
+    },
+    "3I/ATLAS": {
+      "identities": [
+        {
+          "id": "JPL:1004083",
+          "name": "ATLAS (C/2025 N1)",
+          "type": "comet (integrated barycenter)",
+          "spkid": "1004083",
+          "pdes": "C/2025 N1",
+          "aliases": [
+            "3I",
+            "K25N010"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:1004083",
+          "name": "ATLAS (C/2025 N1)",
+          "type": "comet (integrated barycenter)",
+          "spkid": "1004083",
+          "pdes": "C/2025 N1",
+          "aliases": [
+            "3I",
+            "K25N010"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 106.045096283,
+        "dec": 19.302757399,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:58:24.059352+00:00",
+        "kind": "ephemeris",
+        "command": "DES=C/2025 N1;CAP"
+      }
+    },
+    "C/2025 N1 (ATLAS)": {
+      "identities": [
+        {
+          "id": "JPL:1004083",
+          "name": "ATLAS (C/2025 N1)",
+          "type": "comet (integrated barycenter)",
+          "spkid": "1004083",
+          "pdes": "C/2025 N1",
+          "aliases": [
+            "3I",
+            "K25N010"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        }
+      ],
+      "position": {
+        "identity": {
+          "id": "JPL:1004083",
+          "name": "ATLAS (C/2025 N1)",
+          "type": "comet (integrated barycenter)",
+          "spkid": "1004083",
+          "pdes": "C/2025 N1",
+          "aliases": [
+            "3I",
+            "K25N010"
+          ],
+          "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+        },
+        "ra": 106.045096283,
+        "dec": 19.302757399,
+        "utc": "2026-11-14T12:00:00.000",
+        "observer": "500@399",
+        "observer_label": "geocentro terrestre",
+        "frame": "ICRF astrométrico",
+        "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+        "retrieved_utc": "2026-11-14T23:58:25.791235+00:00",
+        "kind": "ephemeris",
+        "command": "DES=C/2025 N1;CAP"
+      }
+    }
+  },
+  "3I_table": {
+    "count": 259,
+    "columns": [
+      "dataproduct_subtype",
+      "calib_level",
+      "obs_id",
+      "obs_title",
+      "spherex_detector",
+      "obs_creator_did",
+      "s_ra",
+      "s_dec",
+      "comet_ra",
+      "comet_dec",
+      "t_min",
+      "t_max",
+      "t_exptime",
+      "em_min",
+      "em_max",
+      "s_region",
+      "dataproduct_type",
+      "access_format",
+      "access_estsize",
+      "access_url",
+      "spherex_uuid",
+      "facility_name",
+      "instrument_name",
+      "obs_collection",
+      "target_name",
+      "target_moving"
+    ],
+    "mjd_min": 60888.333439688,
+    "mjd_max": 61024.000738756,
+    "collections": [
+      "spherex_qr2"
+    ]
+  }
+}

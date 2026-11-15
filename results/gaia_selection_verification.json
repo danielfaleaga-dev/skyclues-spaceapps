@@ -1,0 +1,31 @@
+{
+  "source": {
+    "source_id": "6828226663169972736",
+    "ra": 323.1753958943283,
+    "dec": -21.789512486045215,
+    "ref_epoch": 2016.0,
+    "pmra": null,
+    "pmdec": null,
+    "parallax": null,
+    "radial_velocity": null,
+    "phot_g_mean_mag": 20.277699,
+    "ruwe": null,
+    "ra_error": 1.5904343,
+    "dec_error": 1.2955158,
+    "pmra_error": null,
+    "pmdec_error": null,
+    "parallax_error": null
+  },
+  "field": {
+    "ra": 323.20193,
+    "dec": -21.785755,
+    "fov": 0.1,
+    "sha256": "2b0fac2b2c412d2fbf708a1a0177b7bea2d98c0d940068d769bd6063bd44cd69",
+    "retrieved_utc": "2026-11-15T00:21:48.973140+00:00"
+  },
+  "browser_coordinates": [
+    323.175396,
+    -21.789512
+  ],
+  "browser_fov_arcmin": 6.0
+}

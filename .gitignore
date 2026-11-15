@@ -15,3 +15,6 @@ data/cache/
 Thumbs.db
 .vscode/
 .idea/
+
+# Local recovery bundle and diagnostic runs
+data/recovery/

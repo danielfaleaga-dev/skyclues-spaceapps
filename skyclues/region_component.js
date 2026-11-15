@@ -12,8 +12,15 @@ export default function (c) {
   const root = c.parentElement;
   const $ = (sel) => root.querySelector(sel);
   let S = root.__skyRegion;
+  // Streamlit can replace component HTML after a code update while retaining the root.
+  // The old Aladin instance then belongs to a detached map: rebuild instead of painting it.
+  if (S && S.mapElement !== $('.rg-map')) {
+    clearTimeout(S.flushTimer); clearTimeout(S.queryTimer); clearTimeout(S.nameTick); clearTimeout(S.unlock);
+    if (S.resize) S.resize.disconnect();
+    S = null;
+  }
   const first = !S;
-  if (first) S = root.__skyRegion = { rev: null, cur: null, lock: false, gaiaKey: null, active: -1, items: [] };
+  if (first) S = root.__skyRegion = { rev: null, cur: null, lock: false, gaiaKey: null, active: -1, items: [], mapElement: $('.rg-map') };
   S.api = c;
   S.data = c.data;
   const D = () => S.data;
@@ -90,7 +97,7 @@ export default function (c) {
     $('#rg-fov').style.setProperty('--fill', `${((am - D().fov_min * 60) / ((D().fov_max - D().fov_min) * 60)) * 100}%`);
     const sx = Math.round(fov * 3600 / D().spherex_px), cube = Math.round(fov * 3600 / D().cube_px);
     $('.rg-fovhint').textContent = D().level === 'simple'
-      ? `Es el trozo de cielo que se estudiará: un círculo de ${fmtArcmin(fov)}′ de diámetro (la Luna llena mide unos 30′).`
+      ? 'El círculo naranja marca la zona que vas a explorar.'
       : `${fmtArcmin(fov)}′ = ${fov.toFixed(4)}° de diámetro · ≈ ${sx} px SPHEREx (${D().spherex_px}″) · ≈ ${cube} px del cubo (${D().cube_px}″)`;
     chip();
     identity();
@@ -113,12 +120,24 @@ export default function (c) {
     const o = D().object, line = $('.rg-object'), notes = $('.rg-notes');
     const on = o && o.anchor && sepArcsec(S.cur, { ra: o.anchor[0], dec: o.anchor[1] }) <= D().anchor_arcsec;
     line.classList.toggle('rg-err-text', false);
-    if (S.resolving) { line.textContent = `Buscando «${S.resolving}»…`; notes.replaceChildren(); return; }
+    line.dataset.loading = String(!!S.resolving);
+    if (S.resolving) {
+      const seconds = Math.floor((Date.now() - (S.searchStarted || Date.now())) / 1000);
+      line.textContent = `Buscando «${S.resolving}»…` + (seconds ? ` · ${seconds} s` : '');
+      notes.replaceChildren();
+      if (seconds >= 15) {const p = document.createElement('p'); p.textContent = 'El catálogo está tardando en responder. El mapa sigue disponible.'; notes.append(p);}
+      clearTimeout(S.nameTick);
+      S.nameTick = setTimeout(() => {if (root.isConnected !== false && S.resolving) identity();}, 1000);
+      return;
+    }
+    clearTimeout(S.nameTick);
     if (D().notice) { line.textContent = D().notice; line.classList.add('rg-err-text'); notes.replaceChildren(); return; }
     if (on) {
       line.innerHTML = '';
-      const b = document.createElement('b'); b.textContent = o.name; line.append(b, document.createTextNode(o.detail ? ` · ${o.detail}` : ''));
-      notes.replaceChildren(...(o.notes || []).map((n) => { const p = document.createElement('p'); p.textContent = n; return p; }));
+      const detail = D().level === 'simple' ? o.short_detail : o.detail;
+      const b = document.createElement('b'); b.textContent = o.name; line.append(b, document.createTextNode(detail ? ` · ${detail}` : ''));
+      const visibleNotes = D().level === 'simple' ? o.short_notes : o.notes;
+      notes.replaceChildren(...(visibleNotes || []).map((n) => { const p = document.createElement('p'); p.textContent = n; return p; }));
     } else {
       line.textContent = o && o.name ? `Región libre (el centro ya no está sobre ${o.name}).` : 'Región libre, definida por sus coordenadas.';
       notes.replaceChildren();
@@ -159,15 +178,20 @@ export default function (c) {
   function frame() { if (S.aladin) zoomTo(Math.max(S.cur.fov * 2.5, 0.05)); }
   function goto(ra, dec, animate) {
     if (!S.aladin) return;
+    // A new coordinate edit can arrive before the previous 200 ms animation ends.
+    // Stop it even for a distant, instantaneous move, so it cannot restore an old centre.
+    clearTimeout(S.unlock);
+    if (typeof S.aladin.stopAnimation === 'function') S.aladin.stopAnimation();
+    const move = S.moveId = (S.moveId || 0) + 1;
     const [vra, vdec] = S.aladin.getRaDec();
     const far = sepArcsec({ ra: vra, dec: vdec }, { ra, dec }) / 3600 > 6 * S.aladin.getFoV()[0];
-    const done = () => { S.lock = false; drawCircle(); chip(); };
+    const done = () => { if (move === S.moveId) { S.lock = false; drawCircle(); chip(); } };
+    const finish = () => { if (move === S.moveId) { S.aladin.gotoRaDec(ra, dec); done(); } };
     S.lock = true;
     drawCircle();
     if (animate && !reduced() && !far && typeof S.aladin.animateToRaDec === 'function') {
-      clearTimeout(S.unlock);
-      S.aladin.animateToRaDec(ra, dec, 0.2, () => { S.aladin.gotoRaDec(ra, dec); done(); });
-      S.unlock = setTimeout(() => { if (S.lock) { S.aladin.gotoRaDec(ra, dec); done(); } }, 600);   // safety net
+      S.aladin.animateToRaDec(ra, dec, 0.2, finish);
+      S.unlock = setTimeout(() => { if (S.lock) finish(); }, 600);   // safety net
     } else {
       S.aladin.gotoRaDec(ra, dec);
       done();
@@ -178,18 +202,20 @@ export default function (c) {
     const [ra0, dec] = S.aladin.getRaDec(), ra = normRa(ra0);
     if (sepArcsec({ ra, dec }, S.cur) < 0.001) { chip(); return; }      // redraw nudge, not a move
     S.cur = { ...S.cur, ra, dec };
-    drawCircle(); paint(); flush();
+    drawCircle(); paint(); gaiaStatus(); flush();
   }
 
   // ---------------------------------------------------------------- changes made in the fields
   function setCentre(ra, dec, skip) {
+    // Blurring an unchanged input must not lock the map while the user starts dragging it.
+    if (sepArcsec(S.cur, {ra: normRa(ra), dec}) < 1e-6) { paint(skip); flush(); return; }
     S.cur = { ...S.cur, ra: normRa(ra), dec };
-    paint(skip); goto(S.cur.ra, S.cur.dec, true); flush();
+    paint(skip); goto(S.cur.ra, S.cur.dec, true); gaiaStatus(); flush();
   }
   function setFov(arcmin, skip) {
     const lo = D().fov_min * 60, hi = D().fov_max * 60;
     S.cur = { ...S.cur, fov: fovDeg(Math.min(hi, Math.max(lo, arcmin))) };
-    paint(skip); tweenCircle(); keepVisible(); flush();
+    paint(skip); tweenCircle(); keepVisible(); gaiaStatus(); flush();
   }
   function coordField(input, parse, which, msg) {
     let timer;
@@ -212,25 +238,38 @@ export default function (c) {
   // ---------------------------------------------------------------- object search
   const norm = (s) => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
     .replace(/\b(m|ngc|ic|hd|hip)\s*(?=\d)/g, '$1 ').replace(/\s+/g, ' ').trim();
+  const canSuggest = q => q.length >= 3 || /^(m|messier|ngc|ic|hd|hip)\s*\d*$/.test(q);
   function suggestions() {
     const input = $('#rg-q'), list = $('#rg-list'), q = norm(input.value);
+    const searchStatus = $('.rg-search-status');
+    searchStatus.hidden = true;
     S.items = [];
-    if (q && document.activeElement === input) {
-      const local = D().local.filter((x) => [x.id, ...x.aliases].some((a) => norm(a).includes(q))).slice(0, 6);
-      const remote = norm(D().remote_query || '') === q ? D().remote : [];
+    if (q && document.activeElement === input && S.suggesting !== false) {
+      const local = D().local.filter((x) => [x.id, ...x.aliases].some((a) => norm(a).includes(q))).slice(0, 6)
+        .map(x => ({...x, label: [x.id, ...x.aliases].find(a => norm(a).startsWith(q)) || x.id}));
+      const current = norm(D().remote_query || '') === q;
+      const remote = current ? D().remote : [];
       const seen = new Set();
-      for (const it of [...local, ...remote]) { if (!seen.has(it.id)) { seen.add(it.id); S.items.push(it); } }
-      S.items = S.items.slice(0, 9);
+      for (const it of [...remote, ...local]) { if (!seen.has(norm(it.id))) { seen.add(norm(it.id)); S.items.push(it); } }
+      S.items = S.items.slice(0, 12);
+      if (canSuggest(q) && !S.resolving) {
+        const loading = !current || D().search_state === 'loading';
+        searchStatus.dataset.loading = String(loading);
+        searchStatus.textContent = loading ? 'Buscando sugerencias en los catálogos…'
+          : D().search_message || (S.items.length ? 'Afina el nombre para ver más coincidencias.' : 'Sin sugerencias. Pulsa Intro para buscar el nombre completo.');
+        searchStatus.hidden = false;
+      }
     }
     list.replaceChildren(...S.items.map((it, i) => {
       const li = document.createElement('li');
       li.id = `rg-opt-${i}`; li.setAttribute('role', 'option'); li.setAttribute('aria-selected', i === S.active ? 'true' : 'false');
-      const a = document.createElement('span'); a.className = 'rg-opt-name'; a.textContent = it.id;
+      const a = document.createElement('span'); a.className = 'rg-opt-name'; a.textContent = it.label || it.id;
       const b = document.createElement('span'); b.className = 'rg-opt-meta';
-      const alias = (it.aliases || []).filter((x) => x !== it.id).slice(0, 3).join(', ');
+      const alias = [...new Set((it.aliases || []).map(x => x.replace(/\s+/g, ' ').trim()))]
+        .filter(x => norm(x) !== norm(it.label || it.id)).slice(0, 3).join(', ');
       b.textContent = [it.type, alias].filter(Boolean).join(' · ');
       li.append(a, b);
-      li.addEventListener('mousedown', (e) => { e.preventDefault(); pick(it.id); });
+      li.addEventListener('mousedown', (e) => { e.preventDefault(); pick(it.id, it.label); });
       return li;
     }));
     list.hidden = S.items.length === 0;
@@ -238,41 +277,92 @@ export default function (c) {
     if (S.active >= 0 && S.active < S.items.length) input.setAttribute('aria-activedescendant', `rg-opt-${S.active}`);
     else input.removeAttribute('aria-activedescendant');
   }
-  function pick(name) {
+  function pick(name, label) {
     const text = String(name).trim();
     if (!text) return;
     clearTimeout(S.queryTimer);
-    $('#rg-q').value = text; S.active = -1; S.resolving = text;
+    $('#rg-q').value = label || text; S.active = -1; S.resolving = label || text; S.searchStarted = Date.now(); S.suggesting = false;
+    $('.rg-search-status').hidden = true;
     $('#rg-list').hidden = true; $('#rg-q').setAttribute('aria-expanded', 'false');
     identity();
     S.api.setTriggerValue('pick', { name: text, n: Date.now() });
   }
 
   // ---------------------------------------------------------------- layers and overlays
-  function setLayer(id) {
+  function layerInfo(id) {
     const L = D().layers.find((l) => l.id === id) || D().layers[0];
-    $('#rg-layer').value = L.id;
     $('.rg-layerinfo').textContent = D().level === 'simple'
-      ? `Mapa de contexto: ${L.label}. Es una imagen de otra misión (${L.epoch}), no de SPHEREx.`
+      ? `${L.label} · imagen de referencia, de otra misión.`
       : `${L.mission} · ${L.product} · ${L.bands} · ${L.epoch}. Mapa de contexto servido por NASA/IPAC IRSA; no son datos SPHEREx.`;
+    return L;
+  }
+  function setLayer(id) {
+    const L = layerInfo(id);
+    $('#rg-layer').value = L.id;
     if (!S.aladin) return;
     try {
       S.aladin.setImageSurvey(S.aladin.newImageSurvey(L.url, { name: L.label, imgFormat: L.format }));
     } catch (e) { status(`No se pudo cargar ${L.label}: ${e.message || e}`, true); }
   }
-  function status(text, bad) { const el = $('.rg-status'); el.textContent = text || ''; el.classList.toggle('rg-err-text', !!bad); el.hidden = !text; }
+  function status(text, bad) { const el = $('.rg-status'); $('.rg-map-message').textContent = text || ''; el.classList.toggle('rg-err-text', !!bad); el.dataset.loading = String(!!text && !bad); el.hidden = !text; }
   function overlays() {
     if (!S.aladin) return;
     const o = D().object, mk = o && o.anchor ? JSON.stringify([o.name, o.anchor]) : null;
     if (mk !== S.markerKey) {
       S.markerKey = mk; S.marker.removeAll();
-      if (o && o.anchor) S.marker.addSources([S.A.marker(o.anchor[0], o.anchor[1], { popupTitle: o.name, popupDesc: o.marker_note || '' })]);
+      if (o && o.anchor) S.marker.addSources([o.gaia_source_id
+        ? S.A.source(o.anchor[0], o.anchor[1], {name: o.name})
+        : S.A.marker(o.anchor[0], o.anchor[1], { popupTitle: o.name, popupDesc: o.marker_note || '' })]);
     }
     if (S.gaiaKey !== D().gaia_key) {
       S.gaiaKey = D().gaia_key; S.gaia.removeAll();
-      if (D().gaia && D().gaia.length) { S.gaia.addSources(D().gaia.map((s) => S.A.source(s.ra, s.dec, s))); S.gaia.show(); }
+      if (D().gaia && D().gaia.length) S.gaia.addSources(D().gaia.map((s) => S.A.source(s.ra, s.dec, s)));
     }
     $('.rg-gaiainfo').textContent = D().gaia_note || '';
+    constellationVisibility();
+    gaiaStatus();
+  }
+
+  function gaiaCurrent() {
+    const r = D().gaia_region;
+    return r && Math.abs(S.cur.fov - r.fov) < 1e-9 && sepArcsec(S.cur, r) < 0.002;
+  }
+  function gaiaStatus() {
+    const on = $('#rg-gaia').checked, current = gaiaCurrent();
+    if (S.gaia) S.gaia[on && current && D().gaia_status === 'ready' ? 'show' : 'hide']();
+    const el = $('.rg-gaia-status');
+    // Stale responses must never paint over a newer local drag, even before Python hears it.
+    const state = on && current ? D().gaia_status : 'off';
+    const empty = state === 'ready' && !(D().gaia || []).length;
+    el.hidden = !(state === 'loading' || state === 'error' || empty);
+    el.dataset.state = state;
+    $('.rg-gaia-message').textContent = state === 'loading' ? 'Consultando fuentes Gaia DR3…'
+      : state === 'error' ? 'Gaia DR3 no disponible.' : empty ? 'No se encontraron fuentes Gaia DR3 en este campo.' : '';
+    $('.rg-gaia-retry').hidden = state !== 'error';
+    $('.rg-gaiainfo').textContent = on && current ? (D().level === 'simple' ? D().gaia_note_simple : D().gaia_note) || '' : '';
+  }
+  function pickGaia(source) {
+    if (!gaiaCurrent() || !$('#rg-gaia').checked || D().gaia_status !== 'ready') return;
+    const sid = source.data.source_id;
+    if (typeof sid !== 'string') return; // Gaia's 64-bit identifiers must never pass through Number.
+    clearTimeout(S.flushTimer); clearTimeout(S.queryTimer);
+    S.cur = {...S.cur, ra: source.ra, dec: source.dec}; S.sentKey = keyOf(S.cur);
+    $('#rg-q').value = `Gaia DR3 ${sid}`; $('#rg-list').hidden = true;
+    $('#rg-q').setAttribute('aria-expanded', 'false'); S.active = -1;
+    S.resolving = `Gaia DR3 ${sid}`; S.searchStarted = Date.now();
+    paint(); goto(source.ra, source.dec, false);
+    S.api.setTriggerValue('gaia_pick', {source_id: sid, key: D().gaia_key, fov: S.cur.fov, n: Date.now()});
+  }
+
+  function constellationVisibility() {
+    if (!S.constLines) return;
+    const on = !!D().constellations_on, wide = S.aladin.getFoV()[0] >= 3;
+    S.constLines[on && wide ? 'show' : 'hide']();
+    S.constNames[on && wide ? 'show' : 'hide']();
+    $('#rg-constellations').checked = on;
+    $('.rg-constinfo').textContent = on ? (wide
+      ? (D().level === 'simple' ? 'Constelaciones para orientarte; el círculo naranja sigue marcando tu campo.' : 'Figuras tradicionales de 88 constelaciones · no son límites IAU. El círculo naranja sigue siendo el campo científico.')
+      : 'Constelaciones ocultas en campos pequeños. Pulse Orientación para ampliar solo la vista.') : '';
   }
 
   // ---------------------------------------------------------------- applying data from Python
@@ -294,7 +384,9 @@ export default function (c) {
     if (d.notice || (d.pick_done && d.pick_done === S.pickSeen)) S.resolving = null;
     S.pickSeen = d.pick_done;
     $('#rg-gaia').checked = !!d.gaia_on;
+    layerInfo($('#rg-layer').value || d.layer);
     paint(); suggestions(); overlays();
+
   }
 
   // ---------------------------------------------------------------- first mount
@@ -320,12 +412,12 @@ export default function (c) {
 
     const q = $('#rg-q');
     q.addEventListener('input', () => {
-      S.active = -1; suggestions();
+      S.active = -1; S.suggesting = true; suggestions();
       clearTimeout(S.queryTimer);
       S.queryTimer = setTimeout(() => S.api.setStateValue('query', q.value), 550);
     });
     q.addEventListener('focus', suggestions);
-    q.addEventListener('blur', () => { $('#rg-list').hidden = true; q.setAttribute('aria-expanded', 'false'); });
+    q.addEventListener('blur', () => { $('#rg-list').hidden = true; $('.rg-search-status').hidden = true; q.setAttribute('aria-expanded', 'false'); });
     q.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         if (!S.items.length) return;
@@ -333,13 +425,16 @@ export default function (c) {
         S.active = (S.active + (e.key === 'ArrowDown' ? 1 : -1) + S.items.length + (S.active < 0 && e.key === 'ArrowUp' ? 1 : 0)) % S.items.length;
         suggestions();
       } else if (e.key === 'Enter') {
-        e.preventDefault(); pick(S.active >= 0 && S.items[S.active] ? S.items[S.active].id : q.value);
-      } else if (e.key === 'Escape') { S.active = -1; $('#rg-list').hidden = true; q.setAttribute('aria-expanded', 'false'); }
+        e.preventDefault(); const chosen = S.active >= 0 && S.items[S.active]; pick(chosen ? chosen.id : q.value, chosen && chosen.label);
+      } else if (e.key === 'Escape') { S.active = -1; S.suggesting = false; $('#rg-list').hidden = true; $('.rg-search-status').hidden = true; q.setAttribute('aria-expanded', 'false'); }
     });
 
     for (const L of d.layers) { const o = document.createElement('option'); o.value = L.id; o.textContent = L.label; $('#rg-layer').append(o); }
     $('#rg-layer').addEventListener('change', (e) => { setLayer(e.target.value); S.api.setStateValue('layer', e.target.value); });
-    $('#rg-gaia').addEventListener('change', (e) => S.api.setStateValue('gaia', e.target.checked));
+    $('#rg-gaia').addEventListener('change', (e) => { gaiaStatus(); S.api.setStateValue('gaia', e.target.checked); });
+    $('.rg-gaia-retry').addEventListener('click', () => S.api.setTriggerValue('gaia_retry', Date.now()));
+    $('#rg-constellations').addEventListener('change', (e) => S.api.setStateValue('constellations', e.target.checked));
+    $('.rg-wide').addEventListener('click', () => zoomTo(60));
     $('.rg-frame').addEventListener('click', frame);
     for (const b of root.querySelectorAll('.rg-cta')) {
       b.addEventListener('click', () => {
@@ -357,6 +452,7 @@ export default function (c) {
     }, 20000);
     import(d.aladin).then(async ({ default: A }) => {
       await A.init;
+      if (root.isConnected === false || root.__skyRegion !== S) return;
       S.A = A;
       S.aladin = A.aladin($('.rg-map'), {
         target: `${S.cur.ra} ${S.cur.dec}`, fov: Math.max(S.cur.fov * 2.5, 0.05), cooFrame: 'ICRSd', survey: [],
@@ -371,6 +467,17 @@ export default function (c) {
       S.ring = A.graphicOverlay({ color: '#ff8a3d', lineWidth: 2 }); S.aladin.addOverlay(S.ring);
       S.marker = A.catalog({ name: 'Objeto buscado', color: '#ffffff', sourceSize: 14 }); S.aladin.addCatalog(S.marker);
       S.gaia = A.catalog({ name: 'Gaia DR3 (J2016.0)', color: '#7fd6ff', shape: 'circle', sourceSize: 8 }); S.aladin.addCatalog(S.gaia);
+      S.gaiaHits = [];
+      S.aladin.on('objectClicked', (source) => {
+        if (source && source.catalog === S.gaia) S.gaiaHits.push(source);
+      });
+      S.constLines = A.graphicOverlay({name: 'Figuras tradicionales (no límites IAU)', color: '#91aab9', lineWidth: 1});
+      S.aladin.addOverlay(S.constLines);
+      for (const c of D().constellations) for (const line of c.lines) S.constLines.add(A.polyline(line));
+      S.constNames = A.catalog({name: 'Constelaciones', color: '#c4d1d9', sourceSize: 0,
+        displayLabel: true, labelColumn: 'name', labelColor: '#c4d1d9', labelFont: '12px sans-serif'});
+      S.aladin.addCatalog(S.constNames);
+      S.constNames.addSources(D().constellations.map(c => A.source(c.label[0], c.label[1], {name: c.name})));
       // Aladin redraws overlays only on a view change: nudge it when the box is resized.
       S.resize = new ResizeObserver(() => {
         if (!S.aladin || S.lock) return;
@@ -378,8 +485,16 @@ export default function (c) {
       });
       S.resize.observe($('.rg-map'));
       S.aladin.on('positionChanged', onMapMove);
-      S.aladin.on('zoomChanged', () => { chip(); });
-      S.aladin.on('click', (e) => { if (e && e.ra !== undefined && !e.isDragging) setCentre(e.ra, e.dec); });
+      S.aladin.on('zoomChanged', () => { chip(); constellationVisibility(); });
+      S.aladin.on('click', (e) => {
+        const hits = S.gaiaHits.splice(0);
+        if (!e || e.ra === undefined || e.isDragging) return;
+        if (hits.length) {
+          const distance = s => {const p = S.aladin.world2pix(s.ra, s.dec); return p ? (p[0]-e.x)**2+(p[1]-e.y)**2 : Infinity;};
+          hits.sort((a,b) => distance(a)-distance(b));
+          pickGaia(hits[0]);
+        } else setCentre(e.ra, e.dec);
+      });
       clearTimeout(slow);
       status('');
       setLayer($('#rg-layer').value);
@@ -391,7 +506,13 @@ export default function (c) {
       clearTimeout(slow);
       status(`No se pudo iniciar el atlas (${e.message || e}). El nombre, las coordenadas y el campo funcionan igualmente.`, true);
     });
-    return () => { clearTimeout(S.flushTimer); clearTimeout(S.queryTimer); if (S.resize) S.resize.disconnect(); };
+    // v2 also calls cleanup when data changes: retain handlers while the root is mounted.
+    return () => {
+      if (root.isConnected === false) {
+        clearTimeout(S.flushTimer); clearTimeout(S.queryTimer); clearTimeout(S.nameTick); clearTimeout(S.unlock);
+        if (S.resize) S.resize.disconnect();
+      }
+    };
   }
   apply();
 }

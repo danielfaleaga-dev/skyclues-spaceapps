@@ -1,6 +1,20 @@
 # SkyClues — estado del proyecto
 
-Última actualización: 14-11-2026, Claude Code A: Atlas astronómico e investigación «Buscar algo que se mueve» en la rama `feature/atlas-motion` (publicada en GitHub; `main` sin cambios). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md). Las secciones anteriores conservadas más abajo son antecedentes; la primera sección prevalece sobre sus pendientes.
+Última actualización: continuidad de Codex iniciada el 14-11-2026, sobre `redesign/unified-region`, base `6acf0e8` de Claude B. El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md); las reglas visuales obligatorias están en [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md). La primera sección prevalece sobre el historial conservado debajo.
+
+## Continuidad unificada: catálogos, Gaia y presentación
+
+- Se conserva el rediseño de Claude B. No hay segunda aplicación, cambios en motores científicos, push ni despliegue. Respaldos originales intactos y bundle adicional verificado en `data/recovery/`.
+- **Catálogos:** buscador único con Messier completo por resolución dinámica, M102 explícitamente ambiguo, NGC/IC y JPL Lookup/Horizons para cuerpos del Sistema Solar. Los casos requeridos se consultaron contra servicios reales; evidencia en `results/continuity_services.json`. 3I/ATLAS incluye metadatos oficiales de 259 exposiciones QR2 y sus posiciones históricas, sin convertirlos en detecciones ni ampliar el motor DR1/QR3 a QR2.
+- **Autocompletado corregido tras la captura del usuario:** el desplegable ya consulta SIMBAD con mayúsculas/espacios válidos e incluye JPL. `ngc` muestra resultados NGC reales; `atlas` incluye 3I/ATLAS y distingue el satélite y los otros cometas. Consultas en segundo plano, caché, mensajes de actividad y resultados acotados. Verificación en navegador y `results/autocomplete_services.json`; 175 pruebas de catálogos/Gaia/búsqueda satisfactorias tras la corrección.
+- **Gaia:** clic exacto en source_id, nombre y RA/Dec sincronizados, FOV conservado e identidad persistente entre exploradores. Alias solo por coincidencia comprobada del identificador. Consulta en segundo plano, caché, estados vacío/error/reintento y descarte de respuestas de regiones anteriores.
+- **Atlas:** 88 constelaciones; zoom de orientación independiente del FOV. Se corrigieron animaciones obsoletas al editar coordenadas y el mapa vacío tras sustituirse su DOM durante una actualización de código.
+- **Presentación:** vidrio esmerilado en la carga de Gaia, con el cielo visible y desenfocado, sin fondo gris uniforme ni bloqueo del mapa. Tarjetas de actividad para productos principales, esperas compactas para acciones secundarias y sin porcentajes inventados. Reproductor integrado en la paleta.
+- **Sencillo:** menos texto técnico en Región, Tiempo, Movimiento, Espectro y RGB. Científico conserva los controles avanzados, tablas, métodos y procedencia. Los parámetros ocultos conservan sus valores al cambiar de nivel.
+- **Verificación:** 442 pruebas completas satisfactorias antes del último ajuste de presentación; después 130 de las áreas afectadas y una regresión final de 194 de búsqueda/Gaia/Tiempo. Tras los últimos ajustes visuales, 33 pruebas RGB y 19 del reproductor satisfactorias. Son ejecuciones distintas, no cifras acumulables. Casos de fallo/lentitud/caché simulados de forma controlada; servicios y recorridos normales verificados también en navegador real. Detalle y límites en [`CONTINUITY_REPORT.md`](CONTINUITY_REPORT.md).
+- Aplicación local del usuario: `http://127.0.0.1:8507`. El puerto 8508 se usa solo para comprobaciones temporales del mismo árbol de trabajo.
+
+Antes de continuar: leer AGENTS.md y DESIGN_SYSTEM.md. No restaurar la arquitectura antigua de tres selectores de localización que describe el historial siguiente. Conservar la distinción catálogo/predicción/observación.
 
 ## Atlas astronómico e investigación «Buscar algo que se mueve» (14-11-2026)
 

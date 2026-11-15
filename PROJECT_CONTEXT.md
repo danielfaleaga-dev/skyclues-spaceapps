@@ -1,6 +1,6 @@
 # SkyClues — contexto estable del proyecto
 
-Referencia de entrada para cualquier agente. Recoge lo que **no cambia** de una sesión a otra. El estado de avance está en [`PROJECT_STATE.md`](PROJECT_STATE.md).
+Referencia de entrada para cualquier agente. Recoge lo que **no cambia** de una sesión a otra. El estado de avance está en [`PROJECT_STATE.md`](PROJECT_STATE.md). Antes de modificar la interfaz es obligatorio leer [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md), según [`AGENTS.md`](AGENTS.md) y petición del usuario.
 
 ## Qué es
 
@@ -19,7 +19,7 @@ Aplicación web de ciencia ciudadana para el desafío **Planet X and SPHEREx** d
 | Datos | NASA/IPAC IRSA. Búsqueda por SIA2 (`https://irsa.ipac.caltech.edu/SIA`) en las colecciones `spherex_dr1` y `spherex_qr3` (también existen `_deep` y `spherex_dr1_cube`). Recortes IBE: `<access_url>?center=ra,dec&size=deg`. |
 | Repositorio | Único y canónico: `github.com/danielfaleaga-dev/SkyClues`. No se cambia su visibilidad, no se despliega y no se envía nada a NASA sin autorización del usuario. |
 | Genealogía | El código se escribe desde cero durante el evento. **No se copia código, cachés ni resultados de SkyCluesLab** (el prototipo previo). Sus lecciones científicas sí se aplican. |
-| Identidad visual | Tema claro: fondos blancos, superficies gris claro, texto oscuro, sans serif, acentos azules discretos. El visor científico es el protagonista. Nada de estética de neón ni página promocional. |
+| Identidad visual | Diseño unificado de Claude B: blanco, tinta casi negra, líneas finas y acento terracota. Newsreader para títulos, IBM Plex Sans para interfaz e IBM Plex Mono para cifras. Detalles y cargas en DESIGN_SYSTEM.md. El visor científico es el protagonista. |
 
 ## Integridad científica (no negociable)
 
@@ -44,7 +44,9 @@ Aplicación web de ciencia ciudadana para el desafío **Planet X and SPHEREx** d
 - **Spectrum Explorer** implementado: selector de canal, IMAGE/NHITS, selección por clic o coordenadas, extracción exploratoria de posición, CSV con procedencia y transferencia de regiones. Las pruebas y limitaciones concretas están en STATE.
 - **Composición multibanda RGB** en Spectrum Explorer: tres canales auténticos del cubo DR1 en falso color, normalización por canal identificada y máscara común; solo visualización, sin combinación fotométrica ni restas.
 - **Buscador, enlaces y actualización**: autocompletado (índice local verificado + SIMBAD), enlaces `ra/dec/fov/explorer/canal`, «Actualizar observaciones» bajo demanda (SIA2, sin vigilancia) e identificación del cubo publicado. Detalle en `RELEASE_READINESS.md`.
-- **Localizar región: Por nombre | Coordenadas | Atlas.** Un único estado común (`ra/dec/fov` en la URL + `sky_region`) alimenta Time y Spectrum Explorer. El Atlas (Aladin Lite 3.8.1, HiPS oficiales de IRSA: 2MASS, AllWISE, DSS2; Gaia DR3 de la región) sirve para orientarse y elegir centro y FOV; no es un tercer explorador ni muestra datos SPHEREx, y no se infiere movimiento de diferencias entre misiones.
+- **Región unificada:** nombre, coordenadas, FOV y Atlas comparten una sola pantalla y el estado `region` de `navigation.py` (compatibilidad `sky_region`, URL `ra/dec/fov`). La navegación es Región / Tiempo / Espectro. El Atlas (Aladin Lite 3.8.1, HiPS de IRSA: 2MASS, AllWISE, DSS2; Gaia DR3 seleccionable y constelaciones) sirve para orientarse y elegir centro; no es un tercer explorador ni muestra observaciones SPHEREx. El zoom no cambia el FOV científico.
+- **Buscador universal:** Messier M1–M110 mediante SIMBAD (M102 ambiguo), NGC/IC y nombres equivalentes; Sistema Solar mediante JPL Lookup/Horizons, con fecha y observador explícitos. No hay botones por catálogo ni descargas masivas. Gaia usa los registros ya recuperados; un alias opcional no sustituye su source_id. La selección no demuestra una detección SPHEREx.
+- **Dos niveles:** Sencillo prioriza imagen, acción y resultado; Científico conserva parámetros, métodos, tablas y procedencia. Cambiar de nivel no reinicia ajustes ni cambia cálculos.
 - **«Buscar algo que se mueve»** (pestaña de Time Explorer, `skyclues/motion.py`): medición astrométrica de una fuente elegida por el usuario en imágenes L2 originales (ePSF oficial, registro con estrellas Gaia estacionarias, ajuste conjunto por temporada, control estacionario). Resultados: Movimiento medido, Evidencia insuficiente, Observaciones incompatibles, Datos insuficientes. Una predicción de catálogo nunca es una detección.
 - Terminar y validar funcionalidades antes del refinamiento visual final.
 - **Referencias Gaia/WISE implementadas**: fragmento común en Time y Spectrum, mismo centro/FOV. Gaia DR3 desde ESA (máximo 500 fuentes, selección circular en J2016.0); AllWISE W1/W2 HiPS desde IRSA en Aladin Lite 3.8.1. Capas independientes, sin modificar imágenes ni FITS SPHEREx. Gaia de catálogo y posiciones calculadas se distinguen; estas últimas usan solo movimiento propio angular y no constituyen astrometría aparente de precisión. No hay asociaciones automáticas ni comparación fotométrica entre misiones. Límites y validación en STATE y README.

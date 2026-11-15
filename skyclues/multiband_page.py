@@ -11,7 +11,7 @@ import json
 
 import streamlit as st
 
-from . import config
+from . import config, theme
 from . import multiband as mb
 from . import multiband_view as mv
 from . import spectral_cube as sc
@@ -77,6 +77,7 @@ def clear_caches() -> None:
 
 def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel], target, map_fn, show_error) -> None:
     """Channel selectors, composition, per-channel panels, warnings and provenance."""
+    sci = theme.scientific()
     ok = mb.selectable(channels)
     by_number = {c.number: c for c in channels}
     numbers = [c.number for c in ok]
@@ -86,11 +87,12 @@ def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel]
         if st.session_state.get(ROLE_KEYS[r]) not in numbers:
             st.session_state[ROLE_KEYS[r]] = defaults[r]
 
-    st.markdown("### Composición multibanda · falso color")
-    st.markdown(
+    st.markdown("### Composición multibanda · falso color" if sci else "### Imagen en color")
+    st.markdown((
         '<div class="sc-note"><b>Convención de visualización, no color real.</b> Tres canales infrarrojos del cubo '
         '(0.75–5.0 µm, invisibles para el ojo) se asignan a rojo, verde y azul. Los valores son los del FITS, sin '
-        'modificar; solo cambia su representación. Los canales 51 y 52 (sin datos en DR1) no pueden elegirse.</div>',
+        'modificar; solo cambia su representación. Los canales 51 y 52 (sin datos en DR1) no pueden elegirse.</div>') if sci else
+        'Tres colores representan luz infrarroja invisible al ojo: es **falso color**.',
         unsafe_allow_html=True)
     cols = st.columns(3)
     for col, r in zip(cols, mb.ROLES):
@@ -99,9 +101,12 @@ def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel]
                          format_func=lambda n: f"Canal {n} · {by_number[n].wavelength_um:.3f} µm",
                          help="Solo canales con datos en DR1. Convención habitual: R = λ más larga, B = λ más corta.")
             c = by_number[st.session_state[ROLE_KEYS[r]]]
-            st.caption(f"λ {c.wavelength_um:.3f} µm · ancho {c.bandwidth_um:.3f} µm "
-                       f"({c.wl_min_um:.3f}–{c.wl_max_um:.3f}) · D{c.detector} subcanal {c.subchannel}")
-    mode = STRETCH_LABELS[st.radio("Escala de visualización", list(STRETCH_LABELS), horizontal=True, key="mb_stretch",
+            if sci:
+                st.caption(f"λ {c.wavelength_um:.3f} µm · ancho {c.bandwidth_um:.3f} µm "
+                           f"({c.wl_min_um:.3f}–{c.wl_max_um:.3f}) · D{c.detector} subcanal {c.subchannel}")
+    # Stable labels keep the browser's radio selection intact when changing detail level.
+    mode = STRETCH_LABELS[st.radio("Contraste", list(STRETCH_LABELS), horizontal=True, key="mb_stretch",
+                                   format_func=lambda x: 'Resaltar cada color' if STRETCH_LABELS[x] == 'independiente' else 'Mismo contraste',
                                    help="Independiente: cada canal con su propio contraste (los colores no reflejan "
                                         "cocientes de brillo). Común: mismos límites en MJy/sr para los tres.")]
     chosen = tuple(int(st.session_state[ROLE_KEYS[r]]) for r in mb.ROLES)
@@ -111,7 +116,7 @@ def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel]
         st.error(f"Selección no válida: {err}. No se ha leído nada del cubo.")
         return
     key = (ra, dec, fov, chosen, mode)
-    with st.spinner("Leyendo los tres canales del cubo en IRSA (solo las filas del campo)…"):
+    with theme.loading("Combinando los tres colores infrarrojos…", "rgb"):
         try:
             comp = cached_composite(*key, channels, map_fn)
             png, info = cached_png(*key, comp)
@@ -127,14 +132,27 @@ def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel]
     with left:
         st.altair_chart(mv.composite_chart(png, info, pixels, comp, target=target), width="stretch",
                         key="mb_field")
-        st.caption(
+        st.caption((
             "Geometría WCS exacta: cada píxel nativo (12.9″) en su posición, sin remuestreo; norte arriba, este a la "
-            "izquierda. Color solo donde los tres canales tienen datos. Rosa con rayado blanco: sin datos en al "
-            "menos un canal (nunca un color parcial). Punteado gris: fuera de la región leída. Círculo discontinuo: "
-            "campo de visión; cruz: objetivo. Pase el cursor para ver los valores originales (MJy/sr) de cada canal.")
+            "izquierda. Color solo donde los tres canales tienen datos. Rosa/morado con rayado blanco: valor no finito o NHITS = 0 en al "
+            "menos un canal (nunca un color parcial). Un tono morado sin rayado puede ser falso color válido; negro puede ser brillo bajo válido. Punteado gris: fuera de la región leída. Círculo discontinuo: "
+            "campo de visión; cruz: objetivo. Pase el cursor para ver los valores originales (MJy/sr) de cada canal.") if sci else
+            'Rosa con rayado: faltan datos. Morado sin rayado puede ser un color válido; negro puede ser una zona tenue.')
     with right:
-        st.dataframe(mv.assignment_table(comp), hide_index=True, width="stretch")
         cov = comp.coverage
+        if not sci:
+            theme.facts([('Zona con datos', f"{cov['fraccion_tres_canales']:.0%}", 'en los tres colores')])
+            st.markdown('Cambia los canales de arriba para explorar otras combinaciones.')
+            if cov['fraccion_tres_canales'] < mb.COVERAGE_WARN_FRACTION:
+                st.warning('Solo parte de esta zona tiene datos en los tres colores. Prueba otros canales.')
+            if comp.stretch.degenerate:
+                st.info('Algún color es uniforme porque no cambia de brillo en esta zona.')
+            if any(mb.striping_lines(c) for c in comp.channels.values()):
+                st.warning('Estos canales pueden mostrar rayas producidas por el instrumento.')
+            if any('OVERFLOW' in w for w in comp.warnings):
+                st.warning('Hay zonas demasiado brillantes para el detector; sus colores pueden ser poco fiables.')
+            return
+        st.dataframe(mv.assignment_table(comp), hide_index=True, width="stretch")
         c1, c2 = st.columns(2)
         c1.metric("Píxeles con datos en los 3 canales", f"{cov['fraccion_tres_canales']:.1%}",
                   f"{cov['tres_canales']} de {cov['n_campo']}", delta_color="off")
