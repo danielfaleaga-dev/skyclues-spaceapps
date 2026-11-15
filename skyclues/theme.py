@@ -2,11 +2,13 @@
 
 Presentation only. Nothing in this module reads or changes observations, parameters or results.
 
-Identity in one paragraph: warm grey paper, black ink, white instrument panels, black for
-actions and copper-ember for selection (the colour of the field-of-view ring on the sky). Each area
-has its own accent (Región deep copper, Tiempo graphite, Espectro light copper) and an abstract header
-motif that is never data. Headings and interface in IBM Plex Sans, every number in IBM Plex Mono.
-Styles live in ``theme.css``.
+Identity in one paragraph: a black-and-white page with ONE copper accent (``EMBER``, the colour of the
+field-of-view ring on the sky) used sparingly for selection, the active state and verdict marks. No
+greens, no blues. The page sits on a decorative "astronomical plate" (grain, a faint graticule, soft
+grey washes) that never contains stars or values. Few boxes: only the map, images, player and plots
+keep a container; everything else is text separated by hairlines. The three areas share the same
+graphite tone and are told apart by glyph and motif, not by colour. Headings and interface in IBM
+Plex Sans, every number in IBM Plex Mono. Styles live in ``theme.css``.
 The symbol is the field-of-view ring with two points in it: where something was and where it is.
 """
 from __future__ import annotations
@@ -16,10 +18,10 @@ from contextlib import contextmanager
 
 import streamlit as st
 
-INK, MUTED, FAINT, LINE, SURFACE, EMBER = "#141414", "#5a5a5a", "#8c8c8c", "#dcdad7", "#eeece9", "#c4411c"
-#: Primary action colour (black) and the three area accents (orientation, sequence, infrared light).
-PETROL, AREA = "#161616", {"region": "#8f4321", "time": "#4a4f55", "spectrum": "#c06a2b"}
-PAPER = "#f4f3f1"
+INK, MUTED, FAINT, LINE, SURFACE, EMBER = "#141414", "#5a5a5a", "#8c8c8c", "#dcdcda", "#eeeeec", "#c4411c"
+#: Primary action colour (black). The three areas share one graphite tone: glyph and motif tell them apart.
+PETROL, AREA = "#161616", {"region": "#4a4a4a", "time": "#4a4a4a", "spectrum": "#4a4a4a"}
+PAPER = "#f7f7f6"
 
 
 def unit(text: str) -> str:
@@ -61,29 +63,45 @@ ICON = {
 #: never be mistaken for observations.
 MOTIF = {
     "region": _uri("<svg xmlns='http://www.w3.org/2000/svg' width='520' height='220' viewBox='0 0 520 220' fill='none' "
-                   "stroke='#8f4321' stroke-width='1'><g opacity='.5'><ellipse cx='400' cy='110' rx='190' ry='190'/>"
+                   "stroke='#141414' stroke-width='1'><g opacity='.16'><ellipse cx='400' cy='110' rx='190' ry='190'/>"
                    "<ellipse cx='400' cy='110' rx='120' ry='190'/><ellipse cx='400' cy='110' rx='55' ry='190'/>"
                    "<path d='M400-80v380'/><path d='M210 110h380'/><path d='M222 40c110 22 246 22 356 0M222 180c110-22 246-22 356 0'/>"
-                   "</g><circle cx='400' cy='110' r='34' stroke='#c4411c' stroke-width='1.6' opacity='.8'/></svg>"),
+                   "</g><circle cx='400' cy='110' r='34' stroke='#c4411c' stroke-width='1.4' opacity='.85'/></svg>"),
     "time": _uri("<svg xmlns='http://www.w3.org/2000/svg' width='520' height='220' viewBox='0 0 520 220' fill='none'>"
-                 "<g stroke='#4a4f55' stroke-width='1.2'><rect x='190' y='62' width='72' height='96' rx='8' opacity='.18'/>"
-                 "<rect x='270' y='56' width='76' height='108' rx='8' opacity='.32'/><rect x='354' y='50' width='80' "
-                 "height='120' rx='8' opacity='.5'/><rect x='442' y='44' width='84' height='132' rx='8' opacity='.75'/></g>"
-                 "<g fill='#c4411c'><circle cx='222' cy='118' r='3' opacity='.3'/><circle cx='305' cy='108' r='3' "
-                 "opacity='.5'/><circle cx='392' cy='98' r='3.4' opacity='.75'/><circle cx='482' cy='88' r='4'/></g>"
-                 "<path d='M190 196h330' stroke='#4a4f55' stroke-dasharray='2 8' opacity='.5'/></svg>"),
+                 "<g stroke='#141414' stroke-width='1'><rect x='190' y='62' width='72' height='96' rx='2' opacity='.06'/>"
+                 "<rect x='270' y='56' width='76' height='108' rx='2' opacity='.10'/><rect x='354' y='50' width='80' "
+                 "height='120' rx='2' opacity='.16'/><rect x='442' y='44' width='84' height='132' rx='2' opacity='.24'/></g>"
+                 "<g fill='#141414'><circle cx='222' cy='118' r='2.4' opacity='.18'/><circle cx='305' cy='108' r='2.4' "
+                 "opacity='.28'/><circle cx='392' cy='98' r='2.8' opacity='.4'/></g><circle cx='482' cy='88' r='3.6' "
+                 "fill='#c4411c'/><path d='M190 196h330' stroke='#141414' stroke-dasharray='2 8' opacity='.16'/></svg>"),
     "spectrum": _uri("<svg xmlns='http://www.w3.org/2000/svg' width='520' height='220' viewBox='0 0 520 220'>"
-                     "<defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='#7a2a1e' stop-opacity='0'/>"
-                     "<stop offset='.35' stop-color='#c06a2b' stop-opacity='.22'/><stop offset='.75' stop-color='#e0a24a' "
-                     "stop-opacity='.26'/><stop offset='1' stop-color='#e0a24a' stop-opacity='.08'/></linearGradient></defs>"
-                     "<rect x='120' y='70' width='400' height='80' fill='url(#g)'/><g stroke='#7a2a1e' opacity='.28'>"
-                     "<path d='M236 64v92M262 64v92M331 64v92M342 64v92M418 64v92M470 64v92'/></g></svg>"),
+                     "<defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='#141414' stop-opacity='0'/>"
+                     "<stop offset='.5' stop-color='#141414' stop-opacity='.07'/><stop offset='1' stop-color='#141414' "
+                     "stop-opacity='.02'/></linearGradient></defs><rect x='120' y='70' width='400' height='80' "
+                     "fill='url(#g)'/><g stroke='#141414' opacity='.14'>"
+                     "<path d='M236 64v92M262 64v92M331 64v92M342 64v92M418 64v92M470 64v92'/></g>"
+                     "<path d='M418 64v92' stroke='#c4411c' opacity='.8'/></svg>"),
 }
+
+#: The "astronomical plate" behind the page: a faint celestial graticule (meridians and parallels of an
+#: imaginary sphere, no stars, no values) and film grain. Purely decorative: it never carries information.
+PLATE_ARCS = _uri(
+    "<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000' viewBox='0 0 1600 1000' fill='none' "
+    "stroke='#141414' stroke-width='1'><g opacity='.05'><circle cx='1180' cy='560' r='520'/><circle cx='1180' cy='560' r='360'/>"
+    "<circle cx='1180' cy='560' r='200'/><ellipse cx='1180' cy='560' rx='520' ry='170'/><ellipse cx='1180' cy='560' "
+    "rx='520' ry='330'/><ellipse cx='1180' cy='560' rx='170' ry='520'/><ellipse cx='1180' cy='560' rx='330' ry='520'/>"
+    "<path d='M1180 20v1080M600 560h1160'/></g><g opacity='.035'><path d='M-40 190c260 90 560 100 820 20s470-200 880-130'/>"
+    "<path d='M-40 760c320-120 640-90 900 20s500 90 760-40'/></g></svg>")
+PLATE_GRAIN = _uri(
+    "<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%' height='100%'>"
+    "<feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/>"
+    "<feColorMatrix values='0 0 0 0 .08  0 0 0 0 .08  0 0 0 0 .08  0 0 0 .55 0'/></filter>"
+    "<rect width='240' height='240' filter='url(#n)' opacity='.07'/></svg>")
 
 
 def _css() -> str:
     tokens = {"INK": INK, "MUTED": MUTED, "FAINT": FAINT, "LINE": LINE, "SURFACE": SURFACE, "EMBER": EMBER,
-              "PAPER": PAPER, "PETROL": PETROL}
+              "PAPER": PAPER, "PETROL": PETROL, "P_ARCS": PLATE_ARCS, "P_GRAIN": PLATE_GRAIN}
     for k, v in AREA.items():
         tokens[f"A_{k.upper()}"] = v
         tokens[f"I_{k.upper()}"] = ICON[k]
@@ -132,6 +150,8 @@ def note(html: str) -> None:
 
 
 def badge(text: str, kind: str = "") -> str:
+    """A state mark: plain text with a small square (never a pill). ``kind`` = "sc-ok", "sc-warn", "sc-fail"
+    or "" (neutral); it only chooses the square's treatment. The class keeps its historical name."""
     return f'<span class="sc-badge {kind}">{text}</span>'
 
 

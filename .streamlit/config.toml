@@ -1,15 +1,15 @@
-# SkyClues visual identity (see skyclues/theme.py and DESIGN_SYSTEM.md): warm grey paper, black ink and
-# actions, graphite greys and copper accents (the field-of-view ring).
+# SkyClues visual identity (see skyclues/theme.py and DESIGN_SYSTEM.md): black and white with a single copper
+# accent (the field-of-view ring); rectangular controls with small radii.
 [theme]
 base = "light"
 primaryColor = "#161616"
-backgroundColor = "#f4f3f1"
-secondaryBackgroundColor = "#eeece9"
+backgroundColor = "#f7f7f6"
+secondaryBackgroundColor = "#eeeeec"
 textColor = "#141414"
-linkColor = "#a8441c"
-borderColor = "#dcdad7"
-dataframeBorderColor = "#dcdad7"
-baseRadius = "0.55rem"
+linkColor = "#141414"
+borderColor = "#dcdcda"
+dataframeBorderColor = "#dcdcda"
+baseRadius = "0.2rem"
 showWidgetBorder = true
 baseFontSize = 15
 # Web fonts (Google Fonts) with system fallbacks: the app stays legible without network access to them.

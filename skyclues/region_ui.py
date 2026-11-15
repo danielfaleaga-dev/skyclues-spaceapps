@@ -28,14 +28,13 @@ _FRAMES = ('<svg class="rg-glyph" width="58" height="40" viewBox="0 0 58 40" fil
            '<rect x="1" y="9" width="16" height="22" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".35"/>'
            '<rect x="20" y="6" width="17" height="28" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".6"/>'
            '<rect x="40" y="3" width="17" height="34" rx="3" stroke="currentColor" stroke-width="1.6"/>'
-           '<circle cx="8" cy="22" r="1.8" fill="#e3734a" opacity=".45"/><circle cx="28.5" cy="19" r="2" fill="#e3734a" '
-           'opacity=".7"/><circle cx="49" cy="15" r="2.3" fill="#e3734a"/></svg>')
+           '<circle cx="8" cy="22" r="1.8" fill="#c4411c" opacity=".45"/><circle cx="28.5" cy="19" r="2" fill="#c4411c" '
+           'opacity=".7"/><circle cx="49" cy="15" r="2.3" fill="#c4411c"/></svg>')
 _WAVE = ('<svg class="rg-glyph" width="58" height="40" viewBox="0 0 58 40" fill="none" aria-hidden="true">'
-         '<defs><linearGradient id="rg-ir" x1="0" x2="1"><stop offset="0" stop-color="#7a2a1e" stop-opacity=".15"/>'
-         '<stop offset=".55" stop-color="#c06a2b" stop-opacity=".35"/><stop offset="1" stop-color="#e0a24a" stop-opacity=".45"/>'
-         '</linearGradient></defs><rect x="1" y="30" width="56" height="7" rx="2" fill="url(#rg-ir)"/>'
+         '<path d="M1 34h56" stroke="currentColor" stroke-width="1" opacity=".3"/>'
          '<path d="M2 25c5 0 6-7 11-7s5 5 10 5 6-19 11-19 5 15 10 15 4 2 12 2" stroke="currentColor" stroke-width="1.7" '
-         'stroke-linecap="round" stroke-linejoin="round"/></svg>')
+         'stroke-linecap="round" stroke-linejoin="round"/>'
+         '<path d="M34 3v31" stroke="#c4411c" stroke-width="1.2" stroke-dasharray="2 2"/></svg>')
 _HTML = f"""
 <div class="sc-region" data-level="simple">
   <div class="rg-panel">

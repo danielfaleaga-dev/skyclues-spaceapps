@@ -239,37 +239,38 @@ if (typeof module !== 'undefined') { module.exports = { createPlayer, shortcutAc
 
 _CSS = """
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
-:root{--ink:#14171c;--muted:#5b6470;--line:#e3e6ea;--surface:#f6f7f8;--accent:#c4411c;--mask:%(mask)s;--outside:%(outside)s;
-  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+:root{--ink:#141414;--muted:#5a5a5a;--line:#dcdcda;--rule:#c9c9c6;--surface:#eeeeec;--accent:#c4411c;--mask:%(mask)s;--outside:%(outside)s;
+  --r:3px;--ease:.22s cubic-bezier(.4,0,.2,1);--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
 *{box-sizing:border-box}
-body{margin:0;font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.45}
+body{margin:0;font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:transparent;line-height:1.45}
 .sc{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
-.stage{position:relative;border:1px solid var(--line);border-radius:8px;background:#fff;padding:6px;width:max-content;max-width:100%%}
+.stage{position:relative;border:1px solid var(--rule);border-radius:var(--r);background:#fff;padding:6px;width:max-content;max-width:100%%}
 .stage img{display:block;max-width:100%%;height:auto;image-rendering:pixelated}
-.badge{position:absolute;left:12px;top:10px;background:rgba(255,255,255,.92);border:1px solid var(--line);
-  border-radius:6px;padding:3px 8px;font-size:13px;font-weight:600}
+.badge{position:absolute;left:12px;top:10px;background:rgba(255,255,255,.9);border:0;border-left:2px solid var(--accent);
+  border-radius:0;padding:3px 8px;font-size:13px;font-weight:600}
 .badge .sub{font-weight:400;color:var(--muted)}
 .side{flex:1;min-width:280px;max-width:440px;padding:4px 0}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
 .transport{display:grid;grid-template-columns:auto 1fr auto;gap:4px}
 .transport button{white-space:nowrap;padding:8px 5px;font-size:12.5px}
-button{font:inherit;font-size:13px;font-weight:500;border:1px solid var(--line);background:#fff;color:var(--ink);
-  border-radius:6px;padding:8px 7px;cursor:pointer;transition:background .14s,border-color .14s}
-button:hover{border-color:var(--ink);background:var(--surface)}
+/* flat rectangular controls: outline by default, black fill for the primary action */
+button{font:inherit;font-size:13px;font-weight:500;border:1px solid var(--ink);background:rgba(255,255,255,.55);color:var(--ink);
+  border-radius:var(--r);padding:8px 7px;cursor:pointer;transition:background-color var(--ease),border-color var(--ease),color var(--ease)}
+button:hover{background:var(--ink);color:#fff}
 button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
-button.primary:hover{background:#30353d}
-button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+button.primary:hover{background:#000}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 input[type=range]{flex:1;min-width:90px;height:18px;accent-color:var(--accent);cursor:pointer}
-input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;margin:0;cursor:pointer}
-select{font:inherit;font-size:12.5px;color:var(--ink);border:1px solid var(--line);border-radius:5px;padding:6px;background:#fff;max-width:100%%}
+input[type=checkbox]{accent-color:var(--ink);width:14px;height:14px;margin:0;cursor:pointer}
+select{font:inherit;font-size:12.5px;color:var(--ink);border:1px solid var(--rule);border-radius:var(--r);padding:6px;background:rgba(255,255,255,.6);max-width:100%%}
 label{display:inline-flex;gap:7px;align-items:center;font-size:13px;color:var(--muted)}
-.box{border:0;border-top:1px solid var(--line);border-radius:0;padding:14px 0 4px;background:#fff;margin-top:16px}
+.box{border:0;border-top:1px solid var(--rule);border-radius:0;padding:14px 0 4px;background:transparent;margin-top:16px}
 .box h4{margin:0 0 10px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
 .table-scroll{overflow-x:auto}
 table{border-collapse:collapse;width:100%%;font-size:11px;font-family:var(--mono);font-variant-numeric:tabular-nums}
 td,th{padding:6px 5px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
 th{color:var(--muted);font-weight:500}
-tr.on{background:#fcf0eb;box-shadow:inset 2px 0 var(--accent)}
+tr.on{background:rgba(20,20,20,.05);box-shadow:inset 2px 0 var(--accent)}
 tbody tr{cursor:pointer}tbody tr:hover{background:var(--surface)}
 .legend{font-size:12px;color:var(--muted);margin-top:6px}
 .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px -1px 8px;border:1px solid #c9ced6}

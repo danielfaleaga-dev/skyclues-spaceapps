@@ -1,14 +1,24 @@
 /* SkyClues shared interface styles. Tokens such as @@INK@@ are filled in by theme.py.
-   Identity and rules: DESIGN_SYSTEM.md. Presentation only: no style here changes data or results. */
+   Identity and rules: DESIGN_SYSTEM.md. Presentation only: no style here changes data or results.
+   Black and white, ONE copper accent (--sc-ember), few boxes, rectangular controls, soft motion. */
 :root{--sc-ink:@@INK@@;--sc-muted:@@MUTED@@;--sc-faint:@@FAINT@@;--sc-line:@@LINE@@;--sc-surface:@@SURFACE@@;--sc-ember:@@EMBER@@;
-  --sc-paper:@@PAPER@@;--sc-petrol:@@PETROL@@;--sc-petrol-ink:#000000;--sc-area:@@A_REGION@@;
-  --sc-ok:#3a3a3a;--sc-ok-bg:#f3e7dd;--sc-warn:#7d5200;--sc-warn-bg:#fbf0d6;--sc-fail:#8f2118;--sc-fail-bg:#fbe8e5;
-  --sc-shadow:0 1px 2px rgba(20,20,20,.05),0 6px 20px rgba(20,20,20,.05);
+  --sc-paper:@@PAPER@@;--sc-petrol:@@PETROL@@;--sc-petrol-ink:#000000;--sc-area:@@A_REGION@@;--sc-rule:#c9c9c6;
+  --sc-r:3px;--sc-ease:.22s cubic-bezier(.4,0,.2,1);
   --sc-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
   --sc-sans:"IBM Plex Sans",system-ui,"Segoe UI",sans-serif}
 .stApp:has(.sc-flag[data-view=time]){--sc-area:@@A_TIME@@}
 .stApp:has(.sc-flag[data-view=spectrum]){--sc-area:@@A_SPECTRUM@@}
-.stApp{background:var(--sc-paper)}
+
+/* the astronomical plate: grain, a faint graticule, soft grey washes and a light vignette.
+   Decorative only: no stars and no values, so it can never be mistaken for data. */
+.stApp{background-color:var(--sc-paper);background-image:@@P_GRAIN@@,@@P_ARCS@@,
+  radial-gradient(46vw 46vw at 8% 12%,rgba(20,20,20,.055),transparent 70%),
+  radial-gradient(38vw 38vw at 92% 8%,rgba(20,20,20,.045),transparent 70%),
+  radial-gradient(52vw 52vw at 78% 96%,rgba(20,20,20,.05),transparent 70%),
+  radial-gradient(ellipse at 50% 38%,transparent 58%,rgba(20,20,20,.045) 100%);
+  background-size:240px 240px,cover,auto,auto,auto,auto;background-position:0 0,center,0 0,0 0,0 0,0 0;
+  background-repeat:repeat,no-repeat,no-repeat,no-repeat,no-repeat,no-repeat;background-attachment:fixed}
+[data-testid="stAppViewContainer"],[data-testid="stMain"]{background:transparent}
 [data-testid="stSidebar"],[data-testid="stSidebarCollapsedControl"],[data-testid="stExpandSidebarButton"]{display:none!important}
 [data-testid="stHeader"]{background:transparent;height:0;min-height:0}
 [data-testid="stToolbar"]{top:.4rem}
@@ -17,173 +27,220 @@ h1,h2,h3,h4{font-family:var(--sc-sans);font-weight:600;letter-spacing:-.022em;co
 h1{font-size:2.3rem;line-height:1.08} h2{font-size:1.55rem} h3{font-size:1.24rem;letter-spacing:-.015em} h4{font-size:1.04rem}
 [data-testid="stHeadingWithActionElements"] a{display:none}
 .sc-flag{display:none}
+a{color:var(--sc-ink);text-decoration-color:var(--sc-rule);text-underline-offset:3px;transition:text-decoration-color var(--sc-ease),color var(--sc-ease)}
+a:hover{color:var(--sc-ember);text-decoration-color:var(--sc-ember)}
 
-/* header: one instrument bar, always visible on desktop */
-.st-key-sc_header{position:sticky;top:.5rem;z-index:60;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);
-  border:1px solid var(--sc-line);border-radius:16px;padding:.45rem .6rem .45rem 1rem;margin-bottom:1rem;
-  align-items:center;row-gap:.5rem;box-shadow:var(--sc-shadow)}
+/* header: one flat instrument bar. Brand left, views centre, level switch right. A hairline, no box. */
+.st-key-sc_header{position:sticky;top:0;z-index:60;background:rgba(247,247,246,.55);backdrop-filter:blur(10px) saturate(1.05);
+  -webkit-backdrop-filter:blur(10px) saturate(1.05);border:0;border-bottom:1px solid var(--sc-rule);border-radius:0;
+  padding:.55rem .25rem .55rem .25rem;margin:0 0 1.4rem;align-items:center;row-gap:.5rem}
 .sc-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--sc-ink)}
+.sc-brand:hover{color:var(--sc-ink)}
 .sc-brand span{font-family:var(--sc-sans);font-size:1.32rem;font-weight:700;letter-spacing:-.035em;line-height:1}
 .sc-brand small{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--sc-faint);margin-left:4px;
-  padding-left:12px;border-left:1px solid var(--sc-line);line-height:1.25}
+  padding-left:12px;border-left:1px solid var(--sc-rule);line-height:1.25}
+/* views: text with a rule that grows under the active one (no pills) */
 .st-key-nav [data-testid="stButtonGroup"]{gap:.3rem}
-.st-key-level [data-testid="stButtonGroup"]{gap:0;background:var(--sc-surface);border-radius:999px;padding:3px}
-.st-key-nav button{border:0!important;background:transparent!important;border-radius:999px!important;
-  padding:.42rem .95rem .42rem .8rem!important;color:var(--sc-muted)!important;font-weight:600;
-  transition:color .16s ease,background-color .16s ease}
-.st-key-nav button::before{content:"";width:16px;height:16px;margin-right:.5rem;background:currentColor;flex:none;
+.st-key-nav [role=radiogroup]{gap:1.6rem;background:transparent}
+.st-key-nav button{position:relative;border:0!important;background:transparent!important;border-radius:0!important;
+  padding:.45rem .05rem .5rem!important;color:var(--sc-muted)!important;font-weight:500;box-shadow:none!important;
+  transition:color var(--sc-ease)}
+.st-key-nav button::before{content:"";width:15px;height:15px;margin-right:.5rem;background:currentColor;flex:none;
   -webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
-.st-key-nav button:nth-child(1){--ic:@@I_REGION@@;--a:@@A_REGION@@}
-.st-key-nav button:nth-child(2){--ic:@@I_TIME@@;--a:@@A_TIME@@}
-.st-key-nav button:nth-child(3){--ic:@@I_SPECTRUM@@;--a:@@A_SPECTRUM@@}
-.st-key-nav button:hover{color:var(--sc-ink)!important;background:var(--sc-surface)!important}
-.st-key-nav button[kind="segmented_controlActive"],.st-key-nav button[aria-checked="true"],.st-key-nav button[aria-pressed="true"]{
-  color:var(--a)!important;background:color-mix(in srgb,var(--a) 11%,white)!important;
-  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--a) 30%,white)}
-.st-key-level button{font-size:.8rem!important;padding:.28rem .85rem!important;min-height:0!important;border:0!important;
-  border-radius:999px!important;background:transparent!important;color:var(--sc-muted)!important;font-weight:600;
-  transition:background-color .16s ease,color .16s ease,box-shadow .16s ease}
-.st-key-level button[kind="segmented_controlActive"],.st-key-level button[aria-checked="true"],.st-key-level button[aria-pressed="true"]{
-  background:#fff!important;color:var(--sc-petrol)!important;box-shadow:0 1px 3px rgba(20,20,20,.16)}
+.st-key-nav button::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--sc-ink);
+  transform:scaleX(0);transform-origin:left center;transition:transform var(--sc-ease)}
+.st-key-nav button:nth-child(1){--ic:@@I_REGION@@}
+.st-key-nav button:nth-child(2){--ic:@@I_TIME@@}
+.st-key-nav button:nth-child(3){--ic:@@I_SPECTRUM@@}
+.st-key-nav button:hover{color:var(--sc-ink)!important}
+.st-key-nav button[aria-checked="true"],.st-key-nav button[aria-pressed="true"],.st-key-nav button[data-selected="true"]{
+  color:var(--sc-ink)!important;font-weight:600}
+.st-key-nav button[aria-checked="true"]::after,.st-key-nav button[aria-pressed="true"]::after,
+.st-key-nav button[data-selected="true"]::after{transform:scaleX(1)}
 .st-key-level p,.st-key-nav p{font-size:inherit}
 
-/* area header: what this screen is for, with a quiet decorative motif (never data) */
-.sc-hero{position:relative;overflow:hidden;border-radius:20px;padding:1.15rem clamp(1.1rem,3vw,2.2rem) 1.15rem;margin:0 0 1rem;
-  background:linear-gradient(110deg,#fff 0%,#fff 46%,color-mix(in srgb,var(--sc-area) 7%,white) 100%);
-  border:1px solid var(--sc-line);animation:sc-in .2s ease}
-.sc-hero::after{content:"";position:absolute;inset:0 0 0 auto;width:min(560px,55%);
+/* THE switch. One language for the level selector and every toggle: a thin track and a knob that glides
+   (.22 s). No frame around it. Off = grey, on = ink track with the copper knob. */
+.st-key-level [role=radiogroup]{display:grid;grid-template-columns:auto 34px auto;align-items:center;column-gap:.6rem;
+  background:transparent;padding:0;border:0}
+.st-key-level [role=radiogroup]::before,.st-key-level [role=radiogroup]::after{content:"";grid-column:2;grid-row:1;pointer-events:none}
+.st-key-level [role=radiogroup]::before{height:18px;border:1px solid var(--sc-ink);border-radius:9px;background:rgba(255,255,255,.5)}
+.st-key-level [role=radiogroup]::after{width:10px;height:10px;border-radius:50%;background:var(--sc-ember);margin-left:4px;
+  transform:translateX(0);transition:transform var(--sc-ease)}
+.st-key-level [role=radiogroup]:has(button:nth-of-type(2)[aria-checked="true"])::after{transform:translateX(16px)}
+.st-key-level button{position:relative;font-size:.82rem!important;padding:.3rem .1rem!important;min-height:0!important;border:0!important;
+  border-radius:0!important;background:transparent!important;color:var(--sc-faint)!important;font-weight:500;box-shadow:none!important;
+  transition:color var(--sc-ease)}
+.st-key-level button:nth-of-type(1){grid-column:1;grid-row:1}
+.st-key-level button:nth-of-type(2){grid-column:3;grid-row:1}
+.st-key-level button[aria-checked="true"],.st-key-level button[aria-pressed="true"],.st-key-level button[data-selected="true"]{
+  color:var(--sc-ink)!important;font-weight:600}
+/* the clickable area reaches over its half of the track */
+.st-key-level button:nth-of-type(1)::after,.st-key-level button:nth-of-type(2)::before{content:"";position:absolute;top:-6px;bottom:-6px;
+  width:calc(.6rem + 17px)}
+.st-key-level button:nth-of-type(1)::after{left:100%}
+.st-key-level button:nth-of-type(2)::before{right:100%}
+[data-testid="stCheckbox"] label:has(input[role=switch]){gap:.65rem;align-items:center;background:transparent;border:0;padding:.15rem 0;
+  box-shadow:none;cursor:pointer}
+[data-testid="stCheckbox"] label:has(input[role=switch])>div:first-of-type{position:relative;width:34px!important;height:18px!important;
+  min-width:34px;border-radius:9px!important;border:1px solid var(--sc-rule)!important;background:rgba(255,255,255,.5)!important;
+  box-shadow:none!important;padding:0!important;margin:0!important;transition:border-color var(--sc-ease),background-color var(--sc-ease)}
+[data-testid="stCheckbox"] label:has(input[role=switch])>div:first-of-type>div{position:absolute!important;top:3px!important;left:4px!important;
+  width:10px!important;height:10px!important;margin:0!important;border-radius:50%!important;background:var(--sc-faint)!important;
+  box-shadow:none!important;transform:translateX(0)!important;transition:transform var(--sc-ease),background-color var(--sc-ease)!important}
+[data-testid="stCheckbox"] label:has(input[role=switch]:checked)>div:first-of-type{border-color:var(--sc-ink)!important}
+[data-testid="stCheckbox"] label:has(input[role=switch]:checked)>div:first-of-type>div{background:var(--sc-ember)!important;
+  transform:translateX(16px)!important}
+[data-testid="stCheckbox"] label:has(input[role=switch]:focus-visible)>div:first-of-type{outline:2px solid var(--sc-ink);outline-offset:3px}
+[data-testid="stCheckbox"] label p{font-weight:500}
+
+/* area header: what this screen is for. Large text straight on the plate, a quiet motif at the right (never data). */
+.sc-hero{position:relative;padding:.6rem 0 1.4rem;margin:0 0 1.1rem;background:transparent;border:0;border-radius:0;
+  border-bottom:1px solid var(--sc-rule);animation:sc-in .24s ease}
+.sc-hero::after{content:"";position:absolute;inset:-.4rem 0 0 auto;width:min(560px,52%);
   background:var(--motif) right center/auto 100% no-repeat;pointer-events:none}
 .sc-hero[data-view=region]{--motif:@@M_REGION@@;--ic:@@I_REGION@@}
 .sc-hero[data-view=time]{--motif:@@M_TIME@@;--ic:@@I_TIME@@}
 .sc-hero[data-view=spectrum]{--motif:@@M_SPECTRUM@@;--ic:@@I_SPECTRUM@@}
 .sc-hero>*{position:relative;z-index:1}
-.sc-kicker{display:inline-flex;align-items:center;gap:.5rem;font-size:.74rem;font-weight:700;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--sc-area);margin:0 0 .55rem}
-.sc-kicker::before{content:"";width:15px;height:15px;background:currentColor;
+.sc-kicker{display:inline-flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--sc-muted);margin:0 0 .7rem}
+.sc-kicker::before{content:"";width:14px;height:14px;background:currentColor;
   -webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
-.sc-hero h1{margin:0;padding:0;max-width:34ch;font-size:2.05rem}
-.sc-hero .sc-lede{margin-top:.45rem;color:var(--sc-muted);font-size:1.02rem;max-width:72ch}
-.sc-steps{display:flex;flex-wrap:wrap;gap:.5rem .6rem;margin:.8rem 0 0;padding:0;list-style:none;max-width:72%}
-.sc-steps li{display:flex;align-items:center;gap:.5rem;font-size:.9rem;color:var(--sc-ink);background:rgba(255,255,255,.85);
-  border:1px solid var(--sc-line);border-radius:999px;padding:.28rem .85rem .28rem .32rem;margin:0}
-.sc-steps li b{display:inline-grid;place-items:center;width:1.5rem;height:1.5rem;border-radius:50%;flex:none;
-  background:var(--c,var(--sc-petrol));color:#fff;-webkit-mask:none}
-.sc-steps li i{width:1.5rem;height:1.5rem;border-radius:50%;flex:none;background:var(--c);position:relative}
-.sc-steps li i::after{content:"";position:absolute;inset:.32rem;background:#fff;
-  -webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
-.sc-steps li[data-v=region]{--c:@@A_REGION@@;--ic:@@I_REGION@@}
-.sc-steps li[data-v=time]{--c:@@A_TIME@@;--ic:@@I_TIME@@}
-.sc-steps li[data-v=spectrum]{--c:@@A_SPECTRUM@@;--ic:@@I_SPECTRUM@@}
+.sc-hero h1{margin:0;padding:0;max-width:24ch;font-size:clamp(2rem,3.6vw,3.1rem);font-weight:500;letter-spacing:-.035em;line-height:1.06}
+.sc-hero .sc-lede{margin-top:.8rem;color:var(--sc-muted);font-size:1.04rem;max-width:62ch}
+/* what you can do, as a numbered sequence in plain text */
+.sc-steps{display:flex;flex-wrap:wrap;gap:.35rem 2.2rem;margin:1.2rem 0 0!important;padding:0!important;padding-inline-start:0!important;
+  list-style:none;max-width:78%;counter-reset:sc-step}
+.sc-steps li{display:flex;align-items:baseline;gap:.6rem;font-size:.95rem;color:var(--sc-ink);margin:0;counter-increment:sc-step}
+.sc-steps li::before{content:counter(sc-step,decimal-leading-zero);font-family:var(--sc-mono);font-size:.75rem;color:var(--sc-faint)}
+.sc-steps li i,.sc-steps li b{display:none}
 
-/* shared pieces */
-[data-testid="stSpinner"]{border-left:3px solid var(--sc-area);padding:.6rem .85rem;background:#fff;
-  border-radius:0 10px 10px 0;color:var(--sc-ink);margin:.4rem 0}
-[data-testid="stStatusWidget"]{border:1px solid var(--sc-line);border-radius:8px;background:#fff}
+/* waiting. Quiet by default; main products get a translucent, frosted panel so the page stays visible behind it */
+[data-testid="stSpinner"]{border-left:2px solid var(--sc-ink);padding:.45rem .85rem;background:transparent;border-radius:0;
+  color:var(--sc-ink);margin:.4rem 0}
+[data-testid="stStatusWidget"]{border:1px solid var(--sc-rule);border-radius:var(--sc-r);background:rgba(255,255,255,.6);
+  backdrop-filter:blur(8px)}
 [class*="st-key-sc_loading_"] [data-testid="stSpinner"]{position:relative;isolation:isolate;min-height:215px;
   display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;text-align:center;
-  padding:28px;border:1px solid var(--sc-line);border-radius:18px;
-  background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--sc-area) 6%,white));
-  box-shadow:var(--sc-shadow);font-size:1.12rem;line-height:1.5}
-[class*="st-key-sc_loading_"] [data-testid="stSpinner"]::before{content:"";width:42px;height:42px;flex-shrink:0;
-  border:2px solid color-mix(in srgb,var(--sc-area) 18%,white);border-top-color:var(--sc-area);border-right-color:var(--sc-area);
+  padding:28px;border:1px solid rgba(20,20,20,.1);border-radius:var(--sc-r);
+  background:rgba(255,255,255,.45);backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);font-size:1.12rem;line-height:1.5}
+[class*="st-key-sc_loading_"] [data-testid="stSpinner"]::before{content:"";width:34px;height:34px;flex-shrink:0;
+  border:1.5px solid rgba(20,20,20,.14);border-top-color:var(--sc-ink);border-right-color:var(--sc-ember);
   border-radius:50%;animation:sc-loading 1s linear infinite}
-[class*="st-key-sc_loading_"] [data-testid="stSpinner"] p{font-size:1.12rem;font-weight:500;max-width:45ch}
+[class*="st-key-sc_loading_"] [data-testid="stSpinner"] p{font-size:1.08rem;font-weight:500;max-width:45ch}
 [class*="st-key-sc_loading_"] [data-testid="stSpinner"]>div{justify-content:center;width:100%}
 [class*="st-key-sc_loading_"] [data-testid="stSpinner"]>div>span{display:none}
 [class*="st-key-sc_loading_"] [data-testid="stSpinner"]>div>div{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
 [class*="st-key-sc_loading_"] [data-testid="stSpinner"]>div>div>span{font-family:var(--sc-mono);font-size:.78rem;color:var(--sc-muted)}
 @keyframes sc-loading{to{transform:rotate(360deg)}}
-.sc-eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sc-area);margin:0 0 .3rem}
+
+/* small text pieces */
+.sc-eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--sc-muted);margin:0 0 .3rem}
 .sc-unit{text-transform:none!important;letter-spacing:normal}
 /* Notes under the spectrum plots: Streamlit draws captions at 60 % opacity; here they keep the full secondary tone. */
 .st-key-sx_points [data-testid="stCaptionContainer"],.st-key-sx_analysis [data-testid="stCaptionContainer"],
 [class*="st-key-sx_notes_"] [data-testid="stCaptionContainer"]{opacity:1}
 .sc-lede{color:var(--sc-muted);font-size:1rem;max-width:68ch;margin:.1rem 0 0}
 .sc-sub{color:var(--sc-muted);font-size:.95rem}
-/* the active region inside an explorer: a context bar, not a document heading */
-.sc-strip{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem 1.6rem;padding:.75rem 1.1rem;margin:0 0 .9rem;
-  background:#fff;border:1px solid var(--sc-line);border-left:4px solid var(--sc-area);border-radius:14px;animation:sc-in .18s ease}
-.sc-strip .sc-name{font-family:var(--sc-sans);font-size:1.45rem;font-weight:700;letter-spacing:-.03em;margin-right:.2rem;
+
+/* the active region inside an explorer: one line over a rule. No card. */
+.sc-strip{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem 1.8rem;padding:.2rem 0 .85rem;margin:0 0 1rem;
+  background:transparent;border:0;border-bottom:1px solid var(--sc-rule);border-radius:0;animation:sc-in .18s ease}
+.sc-strip .sc-name{font-family:var(--sc-sans);font-size:1.45rem;font-weight:600;letter-spacing:-.03em;margin-right:.2rem;
   display:flex;flex-direction:column;line-height:1.1}
-.sc-strip .sc-name small{font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sc-area);margin-bottom:.2rem}
-.sc-strip dl{display:flex;flex-wrap:wrap;gap:.3rem 1.4rem;margin:0}
-.sc-strip dt{font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--sc-faint);font-weight:700}
+.sc-strip .sc-name small{font-size:.66rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--sc-muted);margin-bottom:.25rem}
+.sc-strip dl{display:flex;flex-wrap:wrap;gap:.3rem 1.6rem;margin:0}
+.sc-strip dt{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sc-faint);font-weight:600}
 .sc-strip dd{margin:0;font-family:var(--sc-mono);font-size:.9rem;font-variant-numeric:tabular-nums}
-.sc-badge{display:inline-flex;align-items:center;gap:7px;padding:3px 11px 3px 9px;border-radius:999px;font-size:.8rem;font-weight:600;
-  border:1px solid var(--sc-line);background:var(--sc-surface);color:var(--sc-ink);white-space:nowrap;line-height:1.35}
-.sc-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--sc-faint)}
-.sc-ok{border-color:#dfc2ac;background:var(--sc-ok-bg);color:var(--sc-ok)} .sc-ok::before{background:#c06a2b}
-.sc-warn{border-color:#ead08f;background:var(--sc-warn-bg);color:var(--sc-warn)} .sc-warn::before{background:#d39a13}
-.sc-fail{border-color:#efbcb5;background:var(--sc-fail-bg);color:var(--sc-fail)} .sc-fail::before{background:#c4372b}
-/* scientific note: what a result means or cannot mean */
-.sc-note{background:color-mix(in srgb,var(--sc-petrol) 5%,white);border:1px solid color-mix(in srgb,var(--sc-petrol) 15%,white);
-  border-left:3px solid var(--sc-petrol);border-radius:0 12px 12px 0;padding:.7rem 1rem .7rem 1.05rem;color:var(--sc-ink);
-  font-size:.93rem;margin:.6rem 0;max-width:100ch}
+
+/* a state: plain text with a small square. Never a pill, never a tinted fill.
+   neutral = hollow grey square; ok = copper; warn = hollow copper; fail = black */
+.sc-badge{display:inline-flex;align-items:center;gap:.5rem;padding:0;border:0;border-radius:0;background:transparent;
+  font-size:.88rem;font-weight:600;color:var(--sc-ink);white-space:nowrap;line-height:1.35}
+.sc-badge::before{content:"";width:8px;height:8px;flex:none;border:1.5px solid var(--sc-faint);background:transparent;border-radius:1px}
+.sc-badge+.sc-badge{margin-left:1.3rem}
+.sc-ok::before{border-color:var(--sc-ember);background:var(--sc-ember)}
+.sc-warn::before{border-color:var(--sc-ember);background:transparent}
+.sc-fail::before{border-color:var(--sc-ink);background:var(--sc-ink)}
+
+/* what a result means or cannot mean: a thin rule on the left, no fill */
+.sc-note{background:transparent;border:0;border-left:2px solid var(--sc-rule);border-radius:0;padding:.15rem 0 .15rem 1rem;
+  color:var(--sc-ink);font-size:.93rem;margin:.7rem 0;max-width:100ch}
 .sc-note b{font-weight:600}
-.sc-read{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.9rem 1.6rem;background:#fff;
-  border:1px solid var(--sc-line);border-radius:14px;padding:1rem 1.1rem;margin:.4rem 0 .8rem}
+/* reading guide: columns of text under a hairline */
+.sc-read{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.9rem 2rem;background:transparent;border:0;
+  border-top:1px solid var(--sc-rule);border-radius:0;padding:.9rem 0 .2rem;margin:.6rem 0 .9rem}
 .sc-read div{font-size:.9rem;color:var(--sc-muted)}
-.sc-read b{display:block;font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--sc-area);font-weight:700;margin-bottom:.2rem}
-/* key figures: measured values */
-.sc-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.7rem;margin:.9rem 0}
-.sc-facts div{background:#fff;border:1px solid var(--sc-line);border-radius:14px;padding:.75rem .95rem .8rem}
-.sc-facts dt{font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--sc-muted);font-weight:700}
-.sc-facts dd{margin:.25rem 0 0;font-family:var(--sc-sans);font-weight:600;font-size:1.5rem;letter-spacing:-.025em;line-height:1.15;
+.sc-read b{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sc-ink);font-weight:600;margin-bottom:.25rem}
+/* key figures: measured values in a row, each under its own hairline */
+.sc-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0 2rem;margin:.9rem 0!important;
+  padding:0!important;padding-inline-start:0!important}
+.sc-facts div{background:transparent;border:0;border-top:1px solid var(--sc-ink);border-radius:0;padding:.6rem 0 .9rem}
+.sc-facts dt{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sc-muted);font-weight:600}
+.sc-facts dd{margin:.3rem 0 0;font-family:var(--sc-sans);font-weight:500;font-size:1.65rem;letter-spacing:-.03em;line-height:1.15;
   font-variant-numeric:tabular-nums;color:var(--sc-ink)}
-.sc-facts small{display:block;font-family:var(--sc-mono);font-weight:400;font-size:.74rem;letter-spacing:0;color:var(--sc-muted);margin-top:.2rem}
-/* a scientific verdict: what was compared, what was found, what it does not mean */
-.sc-result{background:#fff;border:1px solid var(--sc-line);border-left:5px solid var(--rc,var(--sc-faint));border-radius:0 16px 16px 0;
-  padding:1rem 1.2rem;margin:.6rem 0 .9rem;max-width:100ch}
-.sc-result[data-kind=ok]{--rc:#c06a2b} .sc-result[data-kind=warn]{--rc:#d39a13} .sc-result[data-kind=fail]{--rc:#c4372b}
-.sc-result .sc-badge{margin-bottom:.5rem}
+.sc-facts small{display:block;font-family:var(--sc-mono);font-weight:400;font-size:.74rem;letter-spacing:0;color:var(--sc-muted);margin-top:.3rem}
+/* a scientific verdict: state, what was found, what it does not mean. A coloured rule only, no card. */
+.sc-result{background:transparent;border:0;border-left:2px solid var(--rc,var(--sc-rule));border-radius:0;
+  padding:.15rem 0 .2rem 1.1rem;margin:.7rem 0 1rem;max-width:100ch}
+.sc-result[data-kind=ok]{--rc:var(--sc-ember)} .sc-result[data-kind=warn]{--rc:rgba(196,65,28,.45)} .sc-result[data-kind=fail]{--rc:var(--sc-ink)}
+.sc-result .sc-badge{margin-bottom:.45rem}
 .sc-result p{margin:.3rem 0 0;color:var(--sc-ink);font-size:1rem}
 .sc-result p.sc-more{color:var(--sc-muted);font-size:.92rem}
-.sc-empty{border:1px dashed #cfcac4;background:rgba(255,255,255,.75);border-radius:14px;padding:1.6rem 1.4rem;color:var(--sc-muted);max-width:84ch}
+.sc-empty{border:0;border-left:2px dashed var(--sc-rule);background:transparent;border-radius:0;padding:.3rem 0 .3rem 1.1rem;
+  color:var(--sc-muted);max-width:84ch}
 .sc-empty b{color:var(--sc-ink)}
 
 /* Streamlit widgets in the SkyClues language */
-[data-testid="stMetricValue"]{font-family:var(--sc-sans);font-weight:600;letter-spacing:-.02em}
-[data-testid="stMetricLabel"] p{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--sc-muted);font-weight:700}
-[data-testid="stExpander"] details{border:1px solid var(--sc-line);border-radius:12px;background:#fff}
-[data-testid="stExpander"] summary{font-weight:600}
-[data-testid="stExpander"] summary:hover{color:var(--sc-area)}
-[data-testid="stTabs"] [data-baseweb="tab-list"]{gap:.35rem;border-bottom:1px solid var(--sc-line)}
-[data-testid="stTabs"] button[role="tab"]{padding:.45rem .9rem;border-radius:10px 10px 0 0;font-weight:600;color:var(--sc-muted)}
-[data-testid="stTabs"] button[role="tab"][aria-selected="true"]{color:var(--sc-area);background:#fff}
-[data-testid="stTabs"] [data-baseweb="tab-highlight"]{background:var(--sc-area)}
-.stButton button,.stDownloadButton button,.stFormSubmitButton button{border-radius:10px;font-weight:600;
-  transition:background-color .14s ease,border-color .14s ease,color .14s ease,transform .12s ease,box-shadow .14s ease}
-.stButton button[kind="primary"],.stFormSubmitButton button[kind="primary"]{background:var(--sc-petrol);border-color:var(--sc-petrol);
-  color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3)}
-.stButton button[kind="primary"]:hover{background:var(--sc-petrol-ink);border-color:var(--sc-petrol-ink)}
-.stButton button[kind="secondary"],.stDownloadButton button{background:#fff;border-color:#cfcac4}
-.stButton button[kind="secondary"]:hover,.stDownloadButton button:hover{border-color:var(--sc-petrol);color:var(--sc-petrol)}
-.stButton button:active{transform:scale(.985)}
-/* settings (switches) are not actions: a framed pill with a clear on/off state */
-[data-testid="stToggle"] label{background:#fff;border:1px solid var(--sc-line);border-radius:999px;padding:.32rem .9rem .32rem .45rem}
-[data-testid="stToggle"] label:has(input:checked){border-color:color-mix(in srgb,var(--sc-petrol) 45%,white);
-  background:color-mix(in srgb,var(--sc-petrol) 7%,white)}
-[data-testid="stToggle"] label p,[data-testid="stCheckbox"] label p{font-weight:600}
+[data-testid="stMetricValue"]{font-family:var(--sc-sans);font-weight:500;letter-spacing:-.02em}
+[data-testid="stMetricLabel"] p{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sc-muted);font-weight:600}
+/* expanders: only a hairline above and below */
+[data-testid="stExpander"] details{border:0;border-top:1px solid var(--sc-rule);border-bottom:1px solid var(--sc-rule);
+  border-radius:0;background:transparent}
+[data-testid="stExpander"] summary{font-weight:500;transition:color var(--sc-ease)}
+[data-testid="stExpander"] summary:hover{color:var(--sc-ember)}
+/* tabs: text over a hairline, the active one underlined in ink */
+[data-testid="stTabs"] [role=tablist]{gap:1.6rem;border-bottom:1px solid var(--sc-rule)}
+[data-testid="stTabs"] [role=tab]{padding:.5rem .05rem;border-radius:0;font-weight:500;color:var(--sc-muted);background:transparent;
+  transition:color var(--sc-ease)}
+[data-testid="stTabs"] [role=tab]:hover{color:var(--sc-ink)}
+[data-testid="stTabs"] [role=tab][aria-selected="true"]{color:var(--sc-ink);font-weight:600;background:transparent}
+[data-testid="stTabs"] .react-aria-SelectionIndicator,[data-testid="stTabs"] [data-baseweb="tab-highlight"]{background:var(--sc-ink);
+  height:2px;transition:all var(--sc-ease)}
+/* buttons: rectangular, flat. Primary = black fill; secondary = 1 px outline. No gradients, no shadows. */
+.stButton button,.stDownloadButton button,.stFormSubmitButton button{border-radius:var(--sc-r);font-weight:500;box-shadow:none;
+  transition:background-color var(--sc-ease),border-color var(--sc-ease),color var(--sc-ease)}
+.stButton button[kind="primary"],.stFormSubmitButton button[kind="primary"]{background:var(--sc-petrol);border:1px solid var(--sc-petrol);color:#fff}
+.stButton button[kind="primary"]:hover{background:#000;border-color:#000;color:#fff}
+.stButton button[kind="secondary"],.stDownloadButton button{background:rgba(255,255,255,.55);border:1px solid var(--sc-ink);color:var(--sc-ink)}
+.stButton button[kind="secondary"]:hover,.stDownloadButton button:hover{background:var(--sc-ink);color:#fff;border-color:var(--sc-ink)}
+.stButton button:focus-visible,.stDownloadButton button:focus-visible{outline:2px solid var(--sc-ink);outline-offset:3px}
 [data-testid="stCaptionContainer"]{color:var(--sc-muted)}
-[data-testid="stAlert"]{border-radius:12px}
-[data-testid="stElementContainer"] iframe{border-radius:12px}
-[data-testid="stDataFrame"]{border-radius:10px;overflow:hidden}
+/* notices: no blue and no green; a thin rule and plain text */
+[data-testid="stAlert"]{border-radius:0;background:transparent!important;border:0;border-left:2px solid var(--sc-faint);color:var(--sc-ink)}
+[data-testid="stAlert"] *{color:var(--sc-ink)}
+[data-testid="stElementContainer"] iframe{border-radius:var(--sc-r)}
+[data-testid="stDataFrame"]{border-radius:var(--sc-r);overflow:hidden}
 @keyframes sc-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .sc-view{animation:sc-in .2s ease}
 @media (max-width:900px){
-  .sc-hero::after{width:70%;opacity:.45}
+  .sc-hero::after{width:70%;opacity:.4}
   .sc-steps{max-width:none}
 }
 @media (max-width:760px){
   .block-container,[data-testid="stMainBlockContainer"]{padding-left:.75rem;padding-right:.75rem}
-  .st-key-sc_header{position:relative;top:0;border-radius:14px;padding:.5rem .6rem}
+  .st-key-sc_header{position:relative;top:0;padding:.5rem .1rem;margin-bottom:1rem;background:transparent;backdrop-filter:none;
+    -webkit-backdrop-filter:none}
   .sc-brand small{display:none}
-  .st-key-nav button{padding:.38rem .62rem .38rem .55rem!important}
+  .st-key-nav [role=radiogroup]{gap:1rem}
   .st-key-nav button::before{margin-right:.35rem}
   h1{font-size:1.75rem}
-  .sc-hero{padding:1.15rem 1rem 1.1rem;border-radius:16px}
-  .sc-hero::after{width:100%;opacity:.25;background-position:right top}
-  .sc-steps li{font-size:.86rem}
-  .sc-strip{padding:.65rem .8rem;gap:.35rem 1rem}
+  .sc-hero{padding:.4rem 0 1.1rem}
+  .sc-hero::after{display:none}
+  .sc-hero h1{font-size:1.9rem}
+  .sc-strip{gap:.35rem 1rem}
+  .sc-steps{gap:.3rem 1.4rem}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

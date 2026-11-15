@@ -342,7 +342,8 @@ def render(level: str) -> None:
         theme.facts([
             ("Épocas", str(seq.n), ""),
             ("Intervalo total", f"{m['span_days']:.1f} d", ""),
-            ("λ en el objetivo", f"{f0.lambda_target_um:.3f} µm", f"dispersión {m['lambda_spread_target_bw']:.2f} BW"),
+            (theme.unit("λ") + " en el objetivo", f"{f0.lambda_target_um:.3f} µm",
+             f"dispersión {m['lambda_spread_target_bw']:.2f} BW"),
             ("Cobertura común válida", f"{m['coverage_common_valid']:.1%}", ""),
             ("Detector", f"D{det}", f"{config.BANDS_UM[det][0]}–{config.BANDS_UM[det][1]} µm")])
     else:
