@@ -27,7 +27,7 @@ ALL_DETECTORS = [1, 2, 3, 4, 5, 6]
 TABS = ["Secuencia", "Movimiento", "Calidad", "Procedencia"]
 #: Display and search options. Stored apart from their widgets so that hiding the controls (Sencillo,
 #: another view) never changes them: both levels always use the same values.
-DEFAULTS = {"geometry": "exact", "subtract": True, "restrict": False, "halo": False,
+DEFAULTS = {"geometry": "exact", "subtract": True, "restrict": False, "halo": False, "enhance": False,
             "dets": ALL_DETECTORS, "max_frames": config.MAX_SEQUENCE_FRAMES}
 
 
@@ -351,30 +351,19 @@ def render(level: str) -> None:
 
     if tab_play.open:
         with tab_play:
-            if sci:
-                with st.container(horizontal=True, vertical_alignment="center"):
+            with st.container(horizontal=True, vertical_alignment="center"):
+                if sci:
                     display_options()
                     search_options()
-            geometry = opt("geometry")
-            with theme.loading("Preparando la reproducción…", "time_player"):
-                html = cached_player(report_json, bool(opt("subtract")), bool(opt("restrict")), geometry, bool(opt("halo")),
-                                     simple=not sci, presentation=player.presentation_key())
-            components.html(html, height=660, scrolling=True)
-            active = active_options_note()
-            if active and not sci:
-                st.caption('Se conservan tus ajustes de visualización del modo Científico.')
-            if sci:
-                geo_txt = ("Geometría WCS: cada píxel nativo se dibuja donde lo sitúa su WCS, con su valor original "
-                           "(sin remuestreo de valores); la rotación entre visitas se ve como píxeles inclinados. En "
-                           f"pantalla, 1 píxel ≈ {player.screen_scale_arcsec(seq):.1f}″." if geometry == "exact" else
-                           "Producto REMUESTREADO: cada época se copia a la rejilla de la época 1 por vecino más "
-                           "próximo (desplazamiento de hasta ½ píxel por eje).")
-                st.caption("Cada fotograma es una exposición SPHEREx real (sin fotogramas intermedios ni interpolación "
-                           f"temporal), con la misma escala de intensidad. {geo_txt} El tamaño en pantalla es fijo: un "
-                           "campo de visión mayor muestra más cielo, no es un zoom. Una diferencia visual no es por sí "
-                           "sola una detección de movimiento o variabilidad.")
+                st.toggle("Mejora infrarroja", key=theme.bind("enhance", False), on_change=theme.keep,
+                          args=("enhance",),
+                          help="Combina varias exposiciones reales de la misma zona para reducir el ruido y "
+                               "distinguir fuentes más débiles. No suaviza ni rellena la imagen.")
+            if opt("enhance"):
+                from . import enhance_page
+                enhance_page.render(seq, report_json, sci)
             else:
-                st.markdown('Reproduce las fechas o usa **Blink** para alternar dos imágenes. Para comprobar un posible movimiento, abre «Movimiento».')
+                _sequence_player(seq, report_json, sci)
 
     if tab_move.open:
         with tab_move:
@@ -389,6 +378,29 @@ def render(level: str) -> None:
             _provenance(seq, report, pinned is not None, sci)
 
     _footer(float(seq.ra), float(seq.dec), float(seq.field_deg), refs, sci)
+
+
+def _sequence_player(seq, report_json: str, sci: bool) -> None:
+    geometry = opt("geometry")
+    with theme.loading("Preparando la reproducción…", "time_player"):
+        html = cached_player(report_json, bool(opt("subtract")), bool(opt("restrict")), geometry, bool(opt("halo")),
+                             simple=not sci, presentation=player.presentation_key())
+    components.html(html, height=660, scrolling=True)
+    active = active_options_note()
+    if active and not sci:
+        st.caption('Se conservan tus ajustes de visualización del modo Científico.')
+    if sci:
+        geo_txt = ("Geometría WCS: cada píxel nativo se dibuja donde lo sitúa su WCS, con su valor original "
+                   "(sin remuestreo de valores); la rotación entre visitas se ve como píxeles inclinados. En "
+                   f"pantalla, 1 píxel ≈ {player.screen_scale_arcsec(seq):.1f}″." if geometry == "exact" else
+                   "Producto REMUESTREADO: cada época se copia a la rejilla de la época 1 por vecino más "
+                   "próximo (desplazamiento de hasta ½ píxel por eje).")
+        st.caption("Cada fotograma es una exposición SPHEREx real (sin fotogramas intermedios ni interpolación "
+                   f"temporal), con la misma escala de intensidad. {geo_txt} El tamaño en pantalla es fijo: un "
+                   "campo de visión mayor muestra más cielo, no es un zoom. Una diferencia visual no es por sí "
+                   "sola una detección de movimiento o variabilidad.")
+    else:
+        st.markdown('Reproduce las fechas o usa **Blink** para alternar dos imágenes. Para comprobar un posible movimiento, abre «Movimiento».')
 
 
 def _download_warning(report, retrieval, n_failed) -> None:

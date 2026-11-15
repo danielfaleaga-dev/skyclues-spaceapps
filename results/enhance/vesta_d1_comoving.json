@@ -1,0 +1,251 @@
+{
+ "method": "infrared-snr 1.0 (2026-11-15)",
+ "selection": {
+  "method": "infrared-snr 1.0 (2026-11-15)",
+  "purpose": "comoving",
+  "ok": true,
+  "reason": "",
+  "rejected": [],
+  "accepted": [
+   "2025W28_1B_0220_1",
+   "2025W28_1B_0220_2",
+   "2025W28_1B_0220_3",
+   "2025W28_1B_0220_4",
+   "2025W28_1B_0255_1"
+  ],
+  "warnings": [
+   "Combinación SIGUIENDO UNA TRAYECTORIA PREVISTA: las estrellas quedan desplazadas y la posición del objeto en esta imagen la fija la efeméride. No es una medida de su posición ni de su movimiento.",
+   "Producto de BANDA ANCHA: combina longitudes de onda distintas del mismo detector. Sirve para detectar y situar fuentes; su brillo no es monocromático y no debe compararse entre fechas ni con un canal."
+  ],
+  "detector": 1,
+  "n": 5,
+  "collection": "spherex_dr1",
+  "version": "7.0.5",
+  "bunit": "MJy / sr",
+  "lambda_um": [
+   0.8251125028526631,
+   0.8448979179064433,
+   0.8646438785590966,
+   0.8854059122807637,
+   1.0998748474495084
+  ],
+  "bandwidth_um": 0.021567560980573552,
+  "lambda_range_um": [
+   0.8251125028526631,
+   1.0998748474495084
+  ],
+  "lambda_spread_centre_bw": 12.739611347074925,
+  "mjd": [
+   60864.148331861,
+   60864.149841872,
+   60864.151334117,
+   60864.152826374,
+   60864.352753006
+  ],
+  "span_days": 0.20442114500474418,
+  "psf_area_px": [
+   3.4085214898772644,
+   3.3890399416571615,
+   3.3912183530593594,
+   3.4204886135925325,
+   3.4077064597053845
+  ],
+  "psf_fwhm_arcsec": 7.530770327317724,
+  "target_outlier_pixels_used": [
+   0,
+   0,
+   0,
+   0,
+   7
+  ],
+  "nonphysical_negative_pixels": [
+   2,
+   0,
+   0,
+   1,
+   0
+  ],
+  "weighting": "frame",
+  "lambda_spread_field_bw": 13.006585138836769,
+  "kind": "broadband"
+ },
+ "identity": {
+  "id": "JPL:20000004",
+  "name": "4 Vesta",
+  "type": "asteroid (integrated barycenter)",
+  "spkid": "20000004",
+  "pdes": "A807 FA",
+  "aliases": [
+   "2000004",
+   "I07F00A"
+  ],
+  "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+ },
+ "exposures": [
+  {
+   "obs_id": "2025W28_1B_0220_1",
+   "mjd": 60864.148331861,
+   "date_utc": "2025-07-08T03:33:35.873",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W28_1B_0220_1D1_spx_l2b-v27-2026-215__cb15519a0a7981c8.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W28_1B/l2b-v27-2026-215/1/level2_2025W28_1B_0220_1D1_spx_l2b-v27-2026-215.fits?center=216.8851451,-7.8541861&size=0.25000",
+   "sha256": "5bd1d47fbdf1562e0b4e13477a405d6e5f526299262e475caf5eb8c11b734e67"
+  },
+  {
+   "obs_id": "2025W28_1B_0220_2",
+   "mjd": 60864.149841872,
+   "date_utc": "2025-07-08T03:35:46.338",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W28_1B_0220_2D1_spx_l2b-v27-2026-215__47b7eddae9591a40.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W28_1B/l2b-v27-2026-215/1/level2_2025W28_1B_0220_2D1_spx_l2b-v27-2026-215.fits?center=216.8853901,-7.8541551&size=0.25000",
+   "sha256": "d35f00111f97fc52ea1816f18cbc6f1a5184049e7dc692d82d5dcbc33a1e937e"
+  },
+  {
+   "obs_id": "2025W28_1B_0220_3",
+   "mjd": 60864.151334117,
+   "date_utc": "2025-07-08T03:37:55.268",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W28_1B_0220_3D1_spx_l2b-v27-2026-215__2cee4cbfe4ccd7df.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W28_1B/l2b-v27-2026-215/1/level2_2025W28_1B_0220_3D1_spx_l2b-v27-2026-215.fits?center=216.8856198,-7.8541213&size=0.25000",
+   "sha256": "93e0a2803d9ba9f27ab00643ef9ad89c4bc69840c45d3de413aae60cca00af2d"
+  },
+  {
+   "obs_id": "2025W28_1B_0220_4",
+   "mjd": 60864.152826374,
+   "date_utc": "2025-07-08T03:40:04.199",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W28_1B_0220_4D1_spx_l2b-v27-2026-215__c16a83ee0c31ce68.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W28_1B/l2b-v27-2026-215/1/level2_2025W28_1B_0220_4D1_spx_l2b-v27-2026-215.fits?center=216.8858367,-7.8540889&size=0.25000",
+   "sha256": "1c1180614aa61a042db8c38e8bd03dd511fd1aab89eb7b464cff45af71134fa4"
+  },
+  {
+   "obs_id": "2025W28_1B_0255_1",
+   "mjd": 60864.352753006,
+   "date_utc": "2025-07-08T08:27:57.860",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W28_1B_0255_1D1_spx_l2b-v27-2026-215__c3a9a5a4dd4bc16c.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W28_1B/l2b-v27-2026-215/1/level2_2025W28_1B_0255_1D1_spx_l2b-v27-2026-215.fits?center=216.9137661,-7.8818639&size=0.25000",
+   "sha256": "5e13f5c21c9cfee4ebc9121d2b2794e9bb7cd7f5fe5cb299e73bc6385cd01d25"
+  }
+ ],
+ "predictions_deg": [
+  [
+   216.88514506093375,
+   -7.854186130662976
+  ],
+  [
+   216.885390050087,
+   -7.854155072844716
+  ],
+  [
+   216.885619758229,
+   -7.854121267164372
+  ],
+  [
+   216.88583674532174,
+   -7.854088902380345
+  ],
+  [
+   216.91376609438356,
+   -7.881863879669005
+  ]
+ ],
+ "failures": [],
+ "centre": null,
+ "displaced_track_controls": [
+  {
+   "offset_arcsec": [
+    0,
+    90
+   ],
+   "snr": -2.3892411907019695,
+   "single_exposure_fraction": 0.4661867890351945
+  },
+  {
+   "offset_arcsec": [
+    -120,
+    0
+   ],
+   "snr": 1.745641743533312,
+   "single_exposure_fraction": 0.9408780972951428
+  },
+  {
+   "offset_arcsec": [
+    75,
+    -75
+   ],
+   "snr": 0.45558659753272496,
+   "single_exposure_fraction": 0.4619831691971085
+  }
+ ],
+ "noise": {
+  "null_scale": 1.584081254762578,
+  "null_pixels": 2341,
+  "scale": 1.584081254762578,
+  "single_scale": 1.170424154148025,
+  "single_pairs": [
+   1.2720530550945028,
+   1.068795253201547
+  ],
+  "single": 1.170424154148025,
+  "null_scale_all_pixels": 1.7550375533119176,
+  "note": "Dispersión robusta de la imagen nula (mitad A − mitad B)/2 dividida por su error formal, en los píxeles sin fuente brillante: 1 = las varianzas oficiales describen el ruido real. «single_scale» es la misma prueba con diferencias de dos exposiciones individuales. Los errores publicados de la combinación y de cada exposición se multiplican por su factor cuando es mayor que 1; nunca se reducen."
+ },
+ "note": "La efeméride fija el centro de esta imagen. No es una medida de posición ni de movimiento; el detector no sideral (results/moving/*) no la usa.",
+ "summary": {
+  "label": "vesta_d1_comoving",
+  "title": "4 Vesta · D1 · siguiendo la efeméride",
+  "role": "Objeto móvil · siguiendo la efeméride",
+  "n_exposures": 5,
+  "detector": 1,
+  "kind": "broadband",
+  "lambda_range_um": [
+   0.8251,
+   1.0999
+  ],
+  "span_days": 0.204,
+  "target_outlier_pixels_used": [
+   0,
+   0,
+   0,
+   0,
+   7
+  ],
+  "saturated_core_pixels": [
+   4,
+   4,
+   2,
+   3,
+   4
+  ],
+  "displaced_track_snr": [
+   -2.4,
+   1.7,
+   0.5
+  ],
+  "accepted": false,
+  "reasons": [
+   "No evaluable: el núcleo del objeto no tiene píxeles válidos en la combinación (saturación con desbordamiento en 5 de 5 exposiciones). Combinar no recupera la información perdida por saturación."
+  ]
+ }
+}

@@ -1,0 +1,369 @@
+{
+ "method": "infrared-snr 1.0 (2026-11-15)",
+ "selection": {
+  "method": "infrared-snr 1.0 (2026-11-15)",
+  "purpose": "comoving",
+  "ok": true,
+  "reason": "",
+  "rejected": [],
+  "accepted": [
+   "2025W28_2A_0475_3",
+   "2025W28_2A_0475_4",
+   "2025W28_2A_0487_1",
+   "2025W28_2A_0487_2",
+   "2025W28_2A_0545_3",
+   "2025W28_2A_0545_4",
+   "2025W29_1A_0031_1",
+   "2025W29_1A_0031_2"
+  ],
+  "warnings": [
+   "Combinación SIGUIENDO UNA TRAYECTORIA PREVISTA: las estrellas quedan desplazadas y la posición del objeto en esta imagen la fija la efeméride. No es una medida de su posición ni de su movimiento.",
+   "Producto de BANDA ANCHA: combina longitudes de onda distintas del mismo detector. Sirve para detectar y situar fuentes; su brillo no es monocromático y no debe compararse entre fechas ni con un canal."
+  ],
+  "detector": 1,
+  "n": 8,
+  "collection": "spherex_dr1",
+  "version": "7.0.5",
+  "bunit": "MJy / sr",
+  "lambda_um": [
+   0.7461232235054931,
+   0.763540065604785,
+   0.7809308922130389,
+   0.7995379048207777,
+   0.8966328372360104,
+   0.9179207458215601,
+   0.9358294313066696,
+   0.9577753216676739
+  ],
+  "bandwidth_um": 0.021163751503914828,
+  "lambda_range_um": [
+   0.7461232235054931,
+   0.9577753216676739
+  ],
+  "lambda_spread_centre_bw": 10.00068906134292,
+  "mjd": [
+   60869.109262312,
+   60869.110754557,
+   60869.173784557,
+   60869.175276814,
+   60869.516896617,
+   60869.518388863,
+   60870.124954951,
+   60870.126447219
+  ],
+  "span_days": 1.0171849070029566,
+  "psf_area_px": [
+   3.304488956050924,
+   3.2763819046113944,
+   3.3405935751226563,
+   3.336465736037269,
+   3.3498016630997705,
+   3.3826946303119825,
+   3.4489154578848393,
+   3.4538978746581277
+  ],
+  "psf_fwhm_arcsec": 7.530770327317724,
+  "target_outlier_pixels_used": [
+   14,
+   12,
+   16,
+   21,
+   9,
+   16,
+   20,
+   21
+  ],
+  "nonphysical_negative_pixels": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "weighting": "frame",
+  "lambda_spread_field_bw": 11.378761322635667,
+  "kind": "broadband"
+ },
+ "identity": {
+  "id": "JPL:20000003",
+  "name": "3 Juno",
+  "type": "asteroid (integrated barycenter)",
+  "spkid": "20000003",
+  "pdes": "A804 RA",
+  "aliases": [
+   "2000003",
+   "I04R00A"
+  ],
+  "source": "https://ssd.jpl.nasa.gov/api/horizons_lookup.api"
+ },
+ "exposures": [
+  {
+   "obs_id": "2025W28_2A_0475_3",
+   "mjd": 60869.109262312,
+   "date_utc": "2025-07-13T02:37:20.264",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W28_2A_0475_3D1_spx_l2b-v27-2026-216__e18ad4376874d5e4.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W28_2A/l2b-v27-2026-216/1/level2_2025W28_2A_0475_3D1_spx_l2b-v27-2026-216.fits?center=227.6834070,-2.3164684&size=0.25000",
+   "sha256": "78669045d186a7097d6311d1529dad4f18ef7e3f227918a1dfc509dc1851d3be"
+  },
+  {
+   "obs_id": "2025W28_2A_0475_4",
+   "mjd": 60869.110754557,
+   "date_utc": "2025-07-13T02:39:29.194",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W28_2A_0475_4D1_spx_l2b-v27-2026-216__3c636138bb027a18.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W28_2A/l2b-v27-2026-216/1/level2_2025W28_2A_0475_4D1_spx_l2b-v27-2026-216.fits?center=227.6834046,-2.3164233&size=0.25000",
+   "sha256": "fc05904d5f39e286a32df210ac75075f2ebdb3a7d8f0ef642412357e2dab1286"
+  },
+  {
+   "obs_id": "2025W28_2A_0487_1",
+   "mjd": 60869.173784557,
+   "date_utc": "2025-07-13T04:10:14.986",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W28_2A_0487_1D1_spx_l2b-v27-2026-216__48bfee7030698039.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W28_2A/l2b-v27-2026-216/1/level2_2025W28_2A_0487_1D1_spx_l2b-v27-2026-216.fits?center=227.6829565,-2.3204836&size=0.25000",
+   "sha256": "6e754ffb1f28b3e1bb1d36edc28cdf35e31a8309e206edeade74b04ebef5fe1c"
+  },
+  {
+   "obs_id": "2025W28_2A_0487_2",
+   "mjd": 60869.175276814,
+   "date_utc": "2025-07-13T04:12:23.917",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W28_2A_0487_2D1_spx_l2b-v27-2026-216__c67443c39aa3e3de.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W28_2A/l2b-v27-2026-216/1/level2_2025W28_2A_0487_2D1_spx_l2b-v27-2026-216.fits?center=227.6829740,-2.3204405&size=0.25000",
+   "sha256": "398336fff633251a6590b6166917bf81c292ff1244dd4dcd62a9080117cdf2ef"
+  },
+  {
+   "obs_id": "2025W28_2A_0545_3",
+   "mjd": 60869.516896617,
+   "date_utc": "2025-07-13T12:24:19.868",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W28_2A_0545_3D1_spx_l2b-v27-2026-216__004e30d77c80e99e.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W28_2A/l2b-v27-2026-216/1/level2_2025W28_2A_0545_3D1_spx_l2b-v27-2026-216.fits?center=227.6812030,-2.3400527&size=0.25000",
+   "sha256": "2ccc5ca6f1283dd085037a86eada4cd21e2228963728e1280e2653a92d16f0db"
+  },
+  {
+   "obs_id": "2025W28_2A_0545_4",
+   "mjd": 60869.518388863,
+   "date_utc": "2025-07-13T12:26:28.798",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W28_2A_0545_4D1_spx_l2b-v27-2026-216__2a79006370b1caa0.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W28_2A/l2b-v27-2026-216/1/level2_2025W28_2A_0545_4D1_spx_l2b-v27-2026-216.fits?center=227.6812034,-2.3400088&size=0.25000",
+   "sha256": "ea8376e5ebd0f14ce476107a37243ea91b54ed0d013c89f41ea9256e3f03616d"
+  },
+  {
+   "obs_id": "2025W29_1A_0031_1",
+   "mjd": 60870.124954951,
+   "date_utc": "2025-07-14T02:59:56.108",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W29_1A_0031_1D1_spx_l2b-v27-2026-217__71469181a8f33b2e.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W29_1A/l2b-v27-2026-217/1/level2_2025W29_1A_0031_1D1_spx_l2b-v27-2026-217.fits?center=227.6793501,-2.3759896&size=0.25000",
+   "sha256": "a81c4ceb4925676536bcab4b322d2a372dee3c69b96d0c20862f1d12d6b1c0e3"
+  },
+  {
+   "obs_id": "2025W29_1A_0031_2",
+   "mjd": 60870.126447219,
+   "date_utc": "2025-07-14T03:02:05.040",
+   "detector": 1,
+   "collection": "spherex_dr1",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2025W29_1A_0031_2D1_spx_l2b-v27-2026-217__f85ca85f4297d2f0.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W29_1A/l2b-v27-2026-217/1/level2_2025W29_1A_0031_2D1_spx_l2b-v27-2026-217.fits?center=227.6793732,-2.3759489&size=0.25000",
+   "sha256": "fb56e470da698f760067894d80d4dcb4072d7871e62da7ecea2eb9b5dbe018e9"
+  }
+ ],
+ "predictions_deg": [
+  [
+   227.6834069755305,
+   -2.3164683976856986
+  ],
+  [
+   227.68340464930722,
+   -2.3164232751505835
+  ],
+  [
+   227.68295654373244,
+   -2.32048359216646
+  ],
+  [
+   227.6829739591516,
+   -2.3204405455038177
+  ],
+  [
+   227.68120300498427,
+   -2.3400527013796033
+  ],
+  [
+   227.6812034458119,
+   -2.3400088100562075
+  ],
+  [
+   227.67935007742452,
+   -2.375989555605668
+  ],
+  [
+   227.6793732429097,
+   -2.3759488535571
+  ]
+ ],
+ "failures": [],
+ "centre": {
+  "x": 30.0,
+  "y": 30.0,
+  "ra": 227.6834069755305,
+  "dec": -2.3164683976856963,
+  "flux_mjy": 167.09395540807833,
+  "flux_err_mjy": 0.33711296097041615,
+  "snr": 495.6616171833924,
+  "snr_single": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   354.36978618879374,
+   null,
+   null
+  ],
+  "snr_single_median": 354.36978618879374,
+  "snr_single_best": 354.36978618879374,
+  "snr_reference": null,
+  "snr_best_exposure": null,
+  "gain": 1.3987129730053345,
+  "gain_vs_best": null,
+  "gain_ideal": 1.0,
+  "n_measured": 1,
+  "flux_ratio_to_single_mean": 1.0146795560995765,
+  "single_scatter_chi2": 0.0,
+  "single_exposure_fraction": 1.0
+ },
+ "displaced_track_controls": [
+  {
+   "offset_arcsec": [
+    0,
+    90
+   ],
+   "snr": -7.32098441022151,
+   "single_exposure_fraction": 0.6802093915533035
+  },
+  {
+   "offset_arcsec": [
+    -120,
+    0
+   ],
+   "snr": -4.911728122969117,
+   "single_exposure_fraction": 0.2725381851523982
+  },
+  {
+   "offset_arcsec": [
+    75,
+    -75
+   ],
+   "snr": -6.492244173818832,
+   "single_exposure_fraction": 0.6928617321812053
+  }
+ ],
+ "noise": {
+  "null_scale": 1.1562856858957358,
+  "null_pixels": 2370,
+  "scale": 1.1562856858957358,
+  "single_scale": 1.0852529994420366,
+  "single_pairs": [
+   1.1186810888365633,
+   1.0256885110371516,
+   1.1122236151377587,
+   1.0582823837463144
+  ],
+  "single": 1.0852529994420366,
+  "null_scale_all_pixels": 1.3254706424369056,
+  "note": "Dispersión robusta de la imagen nula (mitad A − mitad B)/2 dividida por su error formal, en los píxeles sin fuente brillante: 1 = las varianzas oficiales describen el ruido real. «single_scale» es la misma prueba con diferencias de dos exposiciones individuales. Los errores publicados de la combinación y de cada exposición se multiplican por su factor cuando es mayor que 1; nunca se reducen."
+ },
+ "note": "La efeméride fija el centro de esta imagen. No es una medida de posición ni de movimiento; el detector no sideral (results/moving/*) no la usa.",
+ "summary": {
+  "label": "juno_d1_comoving",
+  "title": "3 Juno · D1 · julio de 2025 · siguiendo la efeméride",
+  "role": "Objeto móvil · siguiendo la efeméride",
+  "n_exposures": 8,
+  "detector": 1,
+  "kind": "broadband",
+  "lambda_range_um": [
+   0.7461,
+   0.9578
+  ],
+  "span_days": 1.017,
+  "target_outlier_pixels_used": [
+   14,
+   12,
+   16,
+   21,
+   9,
+   16,
+   20,
+   21
+  ],
+  "saturated_core_pixels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   1,
+   1
+  ],
+  "displaced_track_snr": [
+   -7.3,
+   -4.9,
+   -6.5
+  ],
+  "target_snr_combined": 495.7,
+  "target_snr_single": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   354.4,
+   null,
+   null
+  ],
+  "sqrt_n": 2.83,
+  "accepted": false,
+  "reasons": [
+   "No representativo: solo 1 de 8 exposiciones tienen el núcleo del objeto sin píxeles saturados (7 con desbordamiento). El objeto ya tiene S/N 354 en una exposición: combinar no aporta nada medible y no recupera la saturación. Controles con la trayectoria desplazada: S/N -7.3, -4.9, -6.5."
+  ]
+ }
+}

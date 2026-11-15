@@ -66,6 +66,17 @@ No aplicar una pantalla opaca a absolutamente todo. Decisión explícita del usu
 - Sencillo conserva el estado, fechas y avisos esenciales de confusión/cobertura. Científico añade λ, detector, calibración, fondo, máscaras, controles, originales y reporte. Las advertencias de la misma selección se agrupan, no se convierten en múltiples paneles permanentes.
 - Cargas con `theme.loading`, fases reales y sin porcentajes inventados. Cachés de análisis/render incluyen la versión del código dependiente para evitar resultados obsoletos después de cambios de implementación. Conservar filtros, fechas y resultados al cambiar de nivel o navegar.
 
+## Mejora infrarroja: Time Explorer
+
+Propuesta por el usuario (actividad `SKYCLUES_SPHEREX_INFRARED_SNR_ENHANCEMENT_01`). No es un explorador ni una pestaña: es un interruptor **«Mejora infrarroja»** en la pestaña «Secuencia», junto a las opciones existentes y visible en los dos niveles. Apagado, la secuencia y el reproductor quedan exactamente como estaban.
+
+- Encendido, el área del reproductor muestra dos imágenes con la misma rejilla y la **misma escala de brillo**: «Una exposición» y «Combinación · N exposiciones». Rosa = sin dato válido, como en el resto de la aplicación. Los círculos terracota señalan las fuentes que solo se detectan en la combinación.
+- Un único selector **«Qué combinar»**: las fechas de la secuencia (mismo canal; inmediato) o las exposiciones próximas a una de sus fechas (mismo detector, ±7 días; banda ancha; requiere pulsar «Buscar y combinar»). No añadir controles de método, pesos ni umbrales.
+- Cuatro estados, con `theme.badge`: *Disponible*, *Procesando* (`theme.loading`, sin porcentajes), **Imagen mejorada** y **No disponible para estas observaciones**, siempre con el motivo. Una combinación que no supera sus controles nunca se presenta como mejora; en Científico su imagen queda en un desplegable de diagnóstico.
+- Sencillo: tres cifras (imágenes combinadas, mejora de la señal, puntos distinguibles) y dos frases llanas; avisa de que una imagen de banda ancha no sirve para comparar brillo. Científico: exposiciones, detector y λ, intervalo, ganancia S/N medida, ruido por píxel, tabla de exposiciones con procedencia, controles (imagen nula, resolución, posiciones, flujo) e informe JSON.
+- La cifra del objetivo solo aparece cuando es débil en una exposición (S/N < 30): en fuentes brillantes no describe la mejora.
+- El nivel no cambia el producto: ambos leen la misma combinación en caché. La opción y la selección se conservan al cambiar de nivel o navegar. La imagen combinada no interviene en «Movimiento».
+
 ## Implementación y comprobación
 
 Puntos compartidos: `theme.py`, `region_component.css`, `region_component.js`, `player.py`. Reutilizar antes de crear variantes. Los iframes necesitan estilos propios coherentes porque no heredan el tema.

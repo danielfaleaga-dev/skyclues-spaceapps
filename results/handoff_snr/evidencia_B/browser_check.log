@@ -1,0 +1,25 @@
+m101_sequence_opened -> True
+m101_sequence_seconds -> 0.0
+m101_sci_text -> [True, True, True, True]
+m101_sci_overflow_px -> 0
+m101_simple_text -> [True, True, True, True]
+m101_narrow_overflow_px -> 0
+m101_player_back -> True
+m101_state_kept_after_navigation -> True
+Traceback (most recent call last):
+  File "C:\Users\danie\AppData\Local\Temp/claude/11d729346c74b092/12065896-ccff-4a14-bfa5-9a05d71ef4b8/scratchpad/browser_check.py", line 212, in <module>
+    asyncio.run(main())
+  File "C:\Users\danie\AppData\Local\Python\pythoncore-3.11-64\Lib\asyncio\runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\danie\AppData\Local\Python\pythoncore-3.11-64\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\danie\AppData\Local\Python\pythoncore-3.11-64\Lib\asyncio\base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\danie\AppData\Local\Temp/claude/11d729346c74b092/12065896-ccff-4a14-bfa5-9a05d71ef4b8/scratchpad/browser_check.py", line 162, in main
+    await p.click(DEEPEST("Exposiciones próximas al 2026-05-22"), "option nearby")
+  File "C:\Users\danie\AppData\Local\Temp/claude/11d729346c74b092/12065896-ccff-4a14-bfa5-9a05d71ef4b8/scratchpad/browser_check.py", line 58, in click
+    raise RuntimeError("not found: " + (what or finder))
+RuntimeError: not found: option nearby

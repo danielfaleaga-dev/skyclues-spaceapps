@@ -34,6 +34,16 @@ Pestaña de Time Explorer. Elija la fuente (objetivo del catálogo, fuente detec
 .venv\Scripts\python scripts\investigate_motion.py --object "eps Ind B" --detector 3 --name motion_eps_ind_b_d3
 ```
 
+## Mejora infrarroja
+
+En Time Explorer, pestaña «Secuencia», el interruptor **Mejora infrarroja** combina varias exposiciones reales de SPHEREx del mismo detector para reducir el ruido y distinguir fuentes más débiles. «Qué combinar» ofrece las fechas de la secuencia (misma longitud de onda) o las exposiciones tomadas hasta 7 días antes o después de una de ellas (banda ancha del detector; se descargan de IRSA al pulsar el botón). La pantalla muestra una exposición junto a la combinación, con la misma escala, y la ganancia de señal/ruido **medida** en las fuentes del campo. No es un filtro: no se interpola, rellena ni suaviza nada, y si la combinación no supera sus controles se indica «No disponible para estas observaciones» con el motivo.
+
+Método, resultados con datos reales (M101, WISE 0855−0714, 3I/ATLAS, Juno, Vesta) y límites: [`INFRARED_SNR_REPORT.md`](INFRARED_SNR_REPORT.md). Reproducción:
+
+```
+python scripts/validate_enhance.py
+```
+
 ## Referencias Gaia y AllWISE
 
 En ambos exploradores, abra **Referencias astronómicas · Gaia / WISE** y active el visor. Conserva el centro ICRS y el FOV del explorador; no tiene navegación independiente. **Consultar Gaia DR3** recupera hasta 500 fuentes del archivo ESA (círculo del FOV en J2016.0, orden por magnitud G). Puede pulsar un marcador o elegir su identificador para ver parámetros y unidades. Gaia, posiciones calculadas y AllWISE tienen interruptores independientes dentro del visor; no reconstruyen la imagen SPHEREx. La consulta y la época se actualizan dentro de un fragmento Streamlit.

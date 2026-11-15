@@ -1,0 +1,581 @@
+{
+ "method": "infrared-snr 1.0 (2026-11-15)",
+ "selection": {
+  "method": "infrared-snr 1.0 (2026-11-15)",
+  "purpose": "deep",
+  "ok": true,
+  "reason": "",
+  "rejected": [],
+  "accepted": [
+   "2026W20_2A_0464_1",
+   "2026W21_2A_0081_1",
+   "2026W25_2A_0170_1",
+   "2026W26_1A_0178_1"
+  ],
+  "warnings": [],
+  "detector": 2,
+  "n": 4,
+  "collection": "spherex_qr3",
+  "version": "7.0.5",
+  "bunit": "MJy / sr",
+  "lambda_um": [
+   1.4201994425388356,
+   1.415133808448378,
+   1.415087430156776,
+   1.420580919587076
+  ],
+  "bandwidth_um": 0.03426958585717644,
+  "lambda_range_um": [
+   1.415087430156776,
+   1.420580919587076
+  ],
+  "lambda_spread_centre_bw": 0.16030218320101575,
+  "mjd": [
+   61177.454662208,
+   61182.004334534,
+   61210.319179974,
+   61213.848966999
+  ],
+  "span_days": 36.39430479099974,
+  "psf_area_px": [
+   3.365127990933709,
+   3.2962468449065483,
+   3.2962468449065483,
+   3.365127990933709
+  ],
+  "psf_fwhm_arcsec": 7.46070125580342,
+  "nonphysical_negative_pixels": [
+   0,
+   1,
+   0,
+   0
+  ],
+  "weighting": "frame",
+  "lambda_spread_field_bw": 0.2374987092436767,
+  "kind": "monochromatic"
+ },
+ "exposures": [
+  {
+   "obs_id": "2026W20_2A_0464_1",
+   "mjd": 61177.454662208,
+   "date_utc": "2026-05-17T10:54:42.815",
+   "detector": 2,
+   "collection": "spherex_qr3",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2026W20_2A_0464_1D2_spx_l2b-v27-2026-267__cc3f41f3583f2ea1.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W20_2A/l2b-v27-2026-267/2/level2_2026W20_2A_0464_1D2_spx_l2b-v27-2026-267.fits?center=210.8024290,54.3487500&size=0.10000",
+   "sha256": "614a67e5f0d4695e70b05a74b113bd8235350b9b203e7660ce1b808c278ffa59"
+  },
+  {
+   "obs_id": "2026W21_2A_0081_1",
+   "mjd": 61182.004334534,
+   "date_utc": "2026-05-22T00:06:14.504",
+   "detector": 2,
+   "collection": "spherex_qr3",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2026W21_2A_0081_1D2_spx_l2b-v27-2026-268__01611a3585201642.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W21_2A/l2b-v27-2026-268/2/level2_2026W21_2A_0081_1D2_spx_l2b-v27-2026-268.fits?center=210.8024290,54.3487500&size=0.10000",
+   "sha256": "aeea59a3a7a35a6bfe6ff39106cbd792a5b0f922f26610ceb8bd45814b5d94e2"
+  },
+  {
+   "obs_id": "2026W25_2A_0170_1",
+   "mjd": 61210.319179974,
+   "date_utc": "2026-06-19T07:39:37.150",
+   "detector": 2,
+   "collection": "spherex_qr3",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2026W25_2A_0170_1D2_spx_l2b-v27-2026-273__2401df0c7178fc07.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W25_2A/l2b-v27-2026-273/2/level2_2026W25_2A_0170_1D2_spx_l2b-v27-2026-273.fits?center=210.8024290,54.3487500&size=0.10000",
+   "sha256": "a8242ff75bc07a6fda52a3b3297ef978c672ff2faf1c5e7d3f5eefdce7c1b112"
+  },
+  {
+   "obs_id": "2026W26_1A_0178_1",
+   "mjd": 61213.848966999,
+   "date_utc": "2026-06-22T20:22:30.749",
+   "detector": 2,
+   "collection": "spherex_qr3",
+   "version": "7.0.5",
+   "exptime_s": 113.5826,
+   "bunit": "MJy / sr",
+   "file": "level2_2026W26_1A_0178_1D2_spx_l2b-v27-2026-273__6a1fc0e82e131a4b.fits",
+   "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W26_1A/l2b-v27-2026-273/2/level2_2026W26_1A_0178_1D2_spx_l2b-v27-2026-273.fits?center=210.8024290,54.3487500&size=0.10000",
+   "sha256": "b5d23c2dd6ffde97237a11076ef3f90850a19fc2978b64e5a4f1433a86b7e8da"
+  }
+ ],
+ "sky_constants_mjysr": [
+  -7.823295891284943e-05,
+  0.00047755055129528046,
+  0.0027781780809164047,
+  -0.0031774956732988358
+ ],
+ "weights_relative": [
+  1.0,
+  0.9973925179669769,
+  0.9963130975202983,
+  0.998044059240856
+ ],
+ "reference_exposure": "2026W26_1A_0178_1",
+ "best_exposure": "2026W20_2A_0464_1",
+ "grid": {
+  "oversample": 1,
+  "pixel_arcsec": 6.15,
+  "shape": [
+   59,
+   59
+  ],
+  "note": "rejilla nativa de la exposición de referencia"
+ },
+ "metrics": {
+  "method": "infrared-snr 1.0 (2026-11-15)",
+  "kind": "monochromatic",
+  "n_exposures": 4,
+  "pixel_noise_mjysr": {
+   "single_median": 0.03948944808451009,
+   "single": [
+    0.039444369017537034,
+    0.03949589504611474,
+    0.03951728447470426,
+    0.039483001122905446
+   ],
+   "reference": 0.039483001122905446,
+   "best_single": 0.039444369017537034,
+   "combined": 0.02082404235519975,
+   "ratio": 1.8963392126721064,
+   "ratio_vs_best": 1.894174452045705,
+   "ideal_ratio": 2.0
+  },
+  "noise_calibration": {
+   "null_scale": 1.2413955012924718,
+   "null_pixels": 2007,
+   "scale": 1.2413955012924718,
+   "single_scale": 1.1878104813777202,
+   "single_pairs": [
+    1.2060255521620797,
+    1.1695954105933604
+   ],
+   "single": 1.1878104813777202,
+   "null_scale_all_pixels": 1.3092105630425326,
+   "note": "Dispersión robusta de la imagen nula (mitad A − mitad B)/2 dividida por su error formal, en los píxeles sin fuente brillante: 1 = las varianzas oficiales describen el ruido real. «single_scale» es la misma prueba con diferencias de dos exposiciones individuales. Los errores publicados de la combinación y de cada exposición se multiplican por su factor cuando es mayor que 1; nunca se reducen."
+  },
+  "contributions": {
+   "median": 4.0,
+   "min": 2,
+   "max": 4,
+   "field_fraction_valid": 1.0,
+   "field_fraction_all": 0.9385867554568997
+  },
+  "detections": {
+   "threshold": 5.0,
+   "combined": 7,
+   "single": [
+    7,
+    6,
+    7,
+    8
+   ],
+   "single_median": 7.0,
+   "reference": 8,
+   "new_in_combined": 0,
+   "single_exposure_only": 0,
+   "null_image": 6,
+   "null_image_elsewhere": 0,
+   "null_image_at_sources": 6,
+   "null_image_single_exposure": 0,
+   "null_image_spurious": 0,
+   "negative_image": 0
+  },
+  "gain": {
+   "n_sources": 7,
+   "median": 1.8845990343943506,
+   "p16": 1.794467648855168,
+   "p84": 1.9353898802734477,
+   "ideal_median": 1.9717205258524027,
+   "vs_best_exposure_median": 1.8655475558210943,
+   "vs_best_exposure_n": 7,
+   "sqrt_n": 2.0
+  },
+  "photometry": {
+   "n_sources": 5,
+   "flux_ratio_median": 1.000220847938419,
+   "flux_ratio_scatter": null,
+   "single_scatter_chi2_median": 1.110754813063586
+  },
+  "resolution": {
+   "n_sources": 5,
+   "area_combined_px": 6.897979554640531,
+   "area_single_px": 5.427815308879521,
+   "area_ratio": 1.1868577045533781,
+   "width_ratio": 1.089429990661804
+  },
+  "astrometry": {
+   "n_sources": 5,
+   "median_shift_arcsec": [
+    0.2540879399332269,
+    0.08261900402075195
+   ],
+   "rms_shift_arcsec": 0.4460217133010005,
+   "note": "Centroide en la combinación menos la media de los centroides de las exposiciones individuales en la misma rejilla."
+  },
+  "registration": {
+   "checked": true,
+   "frames": [
+    {
+     "obs_id": "2026W20_2A_0464_1",
+     "n_sources": 4,
+     "shift_arcsec": [
+      -0.08482530813495112,
+      0.06530364651042089
+     ],
+     "shift_px": 0.017406653411637146,
+     "scatter_arcsec": 0.39372167866605523,
+     "error_arcsec": 0.19686083933302762
+    },
+    {
+     "obs_id": "2026W21_2A_0081_1",
+     "n_sources": 4,
+     "shift_arcsec": [
+      0.07922708587637797,
+      0.022969123308729696
+     ],
+     "shift_px": 0.01341292106532538,
+     "scatter_arcsec": 1.3259901030985743,
+     "error_arcsec": 0.6629950515492872
+    },
+    {
+     "obs_id": "2026W25_2A_0170_1",
+     "n_sources": 3,
+     "shift_arcsec": [
+      0.17472589695566182,
+      -0.2855572820195964
+     ],
+     "shift_px": 0.05443442501317921,
+     "scatter_arcsec": 0.8779541095752147,
+     "error_arcsec": 0.5068870414993885
+    },
+    {
+     "obs_id": "2026W26_1A_0178_1",
+     "reference": true,
+     "n_sources": null,
+     "shift_arcsec": [
+      0.0,
+      0.0
+     ]
+    }
+   ],
+   "n_verified": 3,
+   "max_shift_arcsec": 0.33477171383105214,
+   "rms_shift_arcsec": 0.2084358504761612,
+   "note": "Desplazamiento mediano de fuentes compactas comunes (ajuste ePSF, máscara estricta) respecto a la exposición de referencia. No se aplica ninguna corrección.",
+   "placement_rms_arcsec": 0.6760195679049713,
+   "placement_max_arcsec": 1.6479518433197697,
+   "placement_note": "Desplazamiento medio ponderado entre el centro de cada píxel de la combinación y los centros de los píxeles nativos copiados en él (vecino más próximo). Es el error de registro propio del producto: una posición medida en la imagen combinada lo hereda si no se corrige."
+  }
+ },
+ "sources": [
+  {
+   "x": 23,
+   "y": 17,
+   "significance": 46.201571486682454,
+   "ra": 210.81133761597587,
+   "dec": 54.37049174067304,
+   "significance_single": [
+    44.030587308509176,
+    36.25256316721468,
+    37.818455397843714,
+    45.192335969469234
+   ],
+   "detected_in_single": 4,
+   "n_contributions": 4,
+   "dominance": 0.2550839221016294,
+   "single_exposure_only": false,
+   "flux_mjy": 23.35038059292694,
+   "flux_err_mjy": 0.11878444906978249,
+   "snr": 196.57775723831708,
+   "snr_single": [
+    105.3726862255174,
+    96.16126467426686,
+    103.24225377044928,
+    106.24881791345358
+   ],
+   "snr_single_median": 104.30746999798333,
+   "snr_single_best": 106.24881791345358,
+   "snr_reference": 106.24881791345358,
+   "snr_best_exposure": 105.3726862255174,
+   "gain": 1.8845990343943506,
+   "gain_vs_best": 1.8655475558210943,
+   "gain_ideal": 1.9717205258524027,
+   "flux_ratio_to_single_mean": 0.9997650781508087,
+   "single_scatter_chi2": 15.259069845526454,
+   "single_exposure_fraction": 0.2668865425966626,
+   "catalogue_arcsec": 1.5210238940963325
+  },
+  {
+   "x": 29,
+   "y": 29,
+   "significance": 43.50125165213127,
+   "ra": 210.8017219527694,
+   "dec": 54.34846033837643,
+   "significance_single": [
+    42.08401720732631,
+    35.04086900161149,
+    38.08904714635746,
+    43.658810361762654
+   ],
+   "detected_in_single": 4,
+   "n_contributions": 4,
+   "dominance": 0.2552825216041473,
+   "single_exposure_only": false,
+   "flux_mjy": 48.891925926572526,
+   "flux_err_mjy": 0.1696448541575095,
+   "snr": 288.2016443668727,
+   "snr_single": [
+    152.63247536219603,
+    146.443525192069,
+    151.2107503779529,
+    152.10163795711716
+   ],
+   "snr_single_median": 151.65619416753503,
+   "snr_single_best": 152.63247536219603,
+   "snr_reference": 152.10163795711716,
+   "snr_best_exposure": 152.63247536219603,
+   "gain": 1.9003618411292553,
+   "gain_vs_best": 1.8882065804342867,
+   "gain_ideal": 1.9862959979441324,
+   "flux_ratio_to_single_mean": 1.000220847938419,
+   "single_scatter_chi2": 12.691038902581946,
+   "single_exposure_fraction": 0.256735339840048,
+   "catalogue_arcsec": 1.8978106458627655
+  },
+  {
+   "x": 8,
+   "y": 9,
+   "significance": 14.953931817611993,
+   "ra": 210.79312730003872,
+   "dec": 54.3972366144814,
+   "significance_single": [
+    16.12495573560578,
+    11.75443241527062,
+    null,
+    17.081039320826918
+   ],
+   "detected_in_single": 3,
+   "n_contributions": 3,
+   "dominance": 0.30257859143471794,
+   "single_exposure_only": false,
+   "flux_mjy": 4.379779674526938,
+   "flux_err_mjy": 0.06584583156379076,
+   "snr": 66.51567108365627,
+   "snr_single": [
+    36.179547509466296,
+    38.249247656798204,
+    null,
+    37.01220014760407
+   ],
+   "snr_single_median": 37.01220014760407,
+   "snr_single_best": 38.249247656798204,
+   "snr_reference": 37.01220014760407,
+   "snr_best_exposure": 36.179547509466296,
+   "gain": 1.7971282663119952,
+   "gain_vs_best": 1.838488197406355,
+   "gain_ideal": 1.738814295814963,
+   "flux_ratio_to_single_mean": 0.9738822281373987,
+   "single_scatter_chi2": 0.9115414011530946,
+   "single_exposure_fraction": 0.3532234972946558,
+   "catalogue_arcsec": 1.3585881445831236
+  },
+  {
+   "x": 36,
+   "y": 24,
+   "significance": 9.155345651159601,
+   "ra": 210.82696893022634,
+   "dec": 54.34722123901436,
+   "significance_single": [
+    8.811303314187645,
+    4.636116347612402,
+    10.913771024690996,
+    8.236259358315248
+   ],
+   "detected_in_single": 3,
+   "n_contributions": 4,
+   "dominance": 0.26034099995165016,
+   "single_exposure_only": false,
+   "flux_mjy": 1.5588582125459731,
+   "flux_err_mjy": 0.08748654172229565,
+   "snr": 17.818263036321426,
+   "snr_single": [
+    9.377339330756888,
+    10.413098084637529,
+    8.42399873293106,
+    9.037226492269495
+   ],
+   "snr_single_median": 9.207282911513191,
+   "snr_single_best": 10.413098084637529,
+   "snr_reference": 9.037226492269495,
+   "snr_best_exposure": 9.377339330756888,
+   "gain": 1.9352357484356961,
+   "gain_vs_best": 1.9001405844277188,
+   "gain_ideal": 2.0290029119115136,
+   "flux_ratio_to_single_mean": 0.9998492679025599,
+   "single_scatter_chi2": 0.6627241177891603,
+   "single_exposure_fraction": 0.31069309541664153,
+   "catalogue_arcsec": 2.5881391400564975
+  },
+  {
+   "x": 48,
+   "y": 51,
+   "significance": 7.63260837521673,
+   "ra": 210.80198770187002,
+   "dec": 54.29929048662824,
+   "significance_single": [
+    7.038268240153679,
+    5.029429399031274,
+    7.259551131339723,
+    7.883709518938376
+   ],
+   "detected_in_single": 4,
+   "n_contributions": 4,
+   "dominance": 0.2672825804076631,
+   "single_exposure_only": false,
+   "flux_mjy": 2.3955481551384845,
+   "flux_err_mjy": 0.05967802759173558,
+   "snr": 40.14120861243457,
+   "snr_single": [
+    20.758978118344157,
+    20.113657565682075,
+    22.38167772479944,
+    20.643152153893983
+   ],
+   "snr_single_median": 20.70106513611907,
+   "snr_single_best": 22.38167772479944,
+   "snr_reference": 20.643152153893983,
+   "snr_best_exposure": 20.758978118344157,
+   "gain": 1.9390890443794835,
+   "gain_vs_best": 1.9336794125218932,
+   "gain_ideal": 2.0280606624434894,
+   "flux_ratio_to_single_mean": 1.0002512352957775,
+   "single_scatter_chi2": 1.110754813063586,
+   "single_exposure_fraction": 0.28420911987864017,
+   "catalogue_arcsec": 2.2711516340397733
+  },
+  {
+   "x": 31,
+   "y": 3,
+   "significance": 5.986156664116057,
+   "ra": 210.85612715515518,
+   "dec": 54.37973734526544,
+   "significance_single": [
+    3.807810249691858,
+    1.7643983007813617,
+    9.420076489269652,
+    5.621687307882245
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 4,
+   "dominance": 0.31053568149556193,
+   "single_exposure_only": false,
+   "flux_mjy": 1.8534430468942351,
+   "flux_err_mjy": 0.06472914258109116,
+   "snr": 28.633826634923903,
+   "snr_single": [
+    16.699718549103096,
+    null,
+    16.54548385424954,
+    16.288399062621192
+   ],
+   "snr_single_median": 16.54548385424954,
+   "snr_single_best": 16.699718549103096,
+   "snr_reference": 16.288399062621192,
+   "snr_best_exposure": 16.699718549103096,
+   "gain": 1.7306128298913177,
+   "gain_vs_best": 1.7146292945435155,
+   "gain_ideal": 1.7285531294322058,
+   "flux_ratio_to_single_mean": 0.9151069027607119,
+   "single_scatter_chi2": 0.7935086076203572,
+   "single_exposure_fraction": 0.3409525114751175,
+   "catalogue_arcsec": 4.2934312307869025
+  },
+  {
+   "x": 24,
+   "y": 45,
+   "significance": 5.932570537581748,
+   "ra": 210.75984931731733,
+   "dec": 54.333330072523765,
+   "significance_single": [
+    5.625454253184679,
+    null,
+    4.922401216272804,
+    5.061702775940131
+   ],
+   "detected_in_single": 2,
+   "n_contributions": 4,
+   "dominance": 0.27330283594867,
+   "single_exposure_only": false,
+   "flux_mjy": 3.261533136999969,
+   "flux_err_mjy": 0.08075521995682239,
+   "snr": 40.38789243275941,
+   "snr_single": [
+    22.460280456673075,
+    null,
+    21.957598698553255,
+    20.411140585346434
+   ],
+   "snr_single_median": 21.957598698553255,
+   "snr_single_best": 22.460280456673075,
+   "snr_reference": 20.411140585346434,
+   "snr_best_exposure": 22.460280456673075,
+   "gain": 1.8393583463851395,
+   "gain_vs_best": 1.7981918129058776,
+   "gain_ideal": 1.7059930812058566,
+   "flux_ratio_to_single_mean": 1.0244947023278923,
+   "single_scatter_chi2": 0.7157428147230299,
+   "single_exposure_fraction": 0.35950599061869537,
+   "catalogue_arcsec": 4.944070902713
+  }
+ ],
+ "verdict": {
+  "accepted": true,
+  "reasons": [
+   "Ganancia S/N mediana 1.88 en 7 fuentes (1.87 frente a la mejor exposición), sin detecciones espurias en la imagen nula por encima del control y sin degradación material de resolución, posiciones ni flujos."
+  ]
+ },
+ "case": {
+  "label": "m101_sequence",
+  "title": "M101 · secuencia de Time Explorer (mismo canal)",
+  "sequence": "sequence_m101.json",
+  "catalogue": "2mass",
+  "role": "Campo estacionario · monocromático",
+  "ra": 210.802429,
+  "dec": 54.34875,
+  "fov": 0.1
+ },
+ "selection_rule": {
+  "rule": "fotogramas de results/sequence_m101.json (criterios S1–S9 de Time Explorer)"
+ },
+ "repeatability": null,
+ "catalogue_crossmatch": {
+  "catalogue": "2mass",
+  "n_catalogue": 30,
+  "radius_arcsec": 6.15,
+  "all": {
+   "n": 7,
+   "matched": 7
+  },
+  "new_in_combined": {
+   "n": 0,
+   "matched": 0
+  },
+  "seen_in_single": {
+   "n": 7,
+   "matched": 7
+  },
+  "chance_fraction": 0.0,
+  "note": "Coincidencia = fuente del catálogo a menos de un píxel nativo. «chance_fraction»: la misma prueba con las detecciones desplazadas 40″ en cuatro direcciones (coincidencias casuales)."
+ },
+ "astrometry_vs_catalogue": null
+}
