@@ -1,0 +1,691 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="629" time="808.143" timestamp="2026-11-15T15:41:59.008149-05:00" hostname="Daniel"><testcase classname="tests.test_app" name="test_reference_sequence_view_renders_with_player" time="2.042" /><testcase classname="tests.test_app" name="test_every_saved_result_renders" time="5.926" /><testcase classname="tests.test_app" name="test_validated_example_buttons_open_the_examples" time="0.810" /><testcase classname="tests.test_app" name="test_display_options_and_levels_do_not_change_the_science" time="2.469" /><testcase classname="tests.test_app" name="test_irsa_failure_shows_a_clear_message_and_no_partial_data[transient-no est\xe1 disponible temporalmente]" time="0.257" /><testcase classname="tests.test_app" name="test_irsa_failure_shows_a_clear_message_and_no_partial_data[permanent-rechaz\xf3 la solicitud]" time="0.236" /><testcase classname="tests.test_app" name="test_invalid_url_parameters_are_reported_and_never_queried[ra=nan&amp;dec=10]" time="0.176" /><testcase classname="tests.test_app" name="test_invalid_url_parameters_are_reported_and_never_queried[ra=400&amp;dec=-95]" time="0.164" /><testcase classname="tests.test_app" name="test_invalid_url_parameters_are_reported_and_never_queried[ra=abc&amp;dec=1]" time="0.185" /><testcase classname="tests.test_app" name="test_invalid_url_parameters_are_reported_and_never_queried[ra=10&amp;dec=10&amp;fov=9]" time="0.184" /><testcase classname="tests.test_app" name="test_partial_download_is_reported" time="1.209" /><testcase classname="tests.test_app" name="test_moving_target_is_shown_as_a_calculated_position" time="0.222" /><testcase classname="tests.test_app" name="test_field_of_view_is_applied_to_the_search" time="0.286" /><testcase classname="tests.test_atlas" name="test_layers_identify_mission_product_and_are_official_hips" time="0.001" /><testcase classname="tests.test_atlas" name="test_object_position_now_uses_catalogue_motion" time="0.029" /><testcase classname="tests.test_atlas" name="test_region_from_url_and_single_source_of_truth" time="0.001" /><testcase classname="tests.test_atlas" name="test_set_region_rejects_invalid_regions[360-0-0.1]" time="0.001" /><testcase classname="tests.test_atlas" name="test_set_region_rejects_invalid_regions[10-91-0.1]" time="0.001" /><testcase classname="tests.test_atlas" name="test_set_region_rejects_invalid_regions[10-0-0.6]" time="0.001" /><testcase classname="tests.test_atlas" name="test_set_region_rejects_invalid_regions[10-0-0.01]" time="0.001" /><testcase classname="tests.test_atlas" name="test_set_region_rejects_invalid_regions[nan-0-0.1]" time="0.001" /><testcase classname="tests.test_atlas" name="test_bad_link_reports_errors_without_clamping" time="0.001" /><testcase classname="tests.test_atlas" name="test_named_object_retained_on_zoom_removed_on_drag" time="0.008" /><testcase classname="tests.test_atlas" name="test_unified_component_and_gaia_outage" time="0.177" /><testcase classname="tests.test_atlas" name="test_component_open_is_one_region_without_confirmation[time]" time="0.002" /><testcase classname="tests.test_atlas" name="test_component_open_is_one_region_without_confirmation[spectrum]" time="0.001" /><testcase classname="tests.test_atlas" name="test_rejected_component_event_preserves_region" time="0.001" /><testcase classname="tests.test_audit_live" name="test_wise_example_is_centred_on_the_propagated_position" time="0.142" /><testcase classname="tests.test_audit_live" name="test_old_wise_example_is_annotated_and_still_contains_the_target" time="0.277" /><testcase classname="tests.test_audit_live" name="test_deliberate_spectral_mismatch_is_rejected[0.4-warn-warn]" time="0.234" /><testcase classname="tests.test_audit_live" name="test_deliberate_spectral_mismatch_is_rejected[0.65-fail-fail]" time="0.013" /><testcase classname="tests.test_audit_live" name="test_deliberate_spectral_mismatch_is_rejected[15.43-fail-fail]" time="0.013" /><testcase classname="tests.test_audit_live" name="test_mixing_detectors_far_apart_in_wavelength_is_rejected" time="0.375" /><testcase classname="tests.test_audit_live" name="test_stored_options_with_spread_above_warning_are_marked_failed" time="0.002" /><testcase classname="tests.test_audit_live" name="test_finast_is_enforced[0-pass]" time="0.012" /><testcase classname="tests.test_audit_live" name="test_finast_is_enforced[1-warn]" time="0.012" /><testcase classname="tests.test_audit_live" name="test_finast_is_enforced[2-fail]" time="0.012" /><testcase classname="tests.test_audit_live" name="test_finast_is_enforced[5-fail]" time="0.012" /><testcase classname="tests.test_audit_live" name="test_real_cutout_truncated_is_rejected" time="0.032" /><testcase classname="tests.test_audit_live" name="test_real_headers_get_satellite_halo_from_the_documentation" time="0.001" /><testcase classname="tests.test_audit_live" name="test_fits_files_untouched_after_the_tests" time="0.032" /><testcase classname="tests.test_audit_live" name="test_screen_scale_is_reported" time="0.002" /><testcase classname="tests.test_audit_offline" name="test_challenge_coordinates_are_the_wise_era_position_not_j2000" time="0.614" /><testcase classname="tests.test_audit_offline" name="test_propagation_matches_proper_motion_times_elapsed_time[astro0-211.7]" time="0.007" /><testcase classname="tests.test_audit_offline" name="test_propagation_matches_proper_motion_times_elapsed_time[astro1-270.4]" time="0.007" /><testcase classname="tests.test_audit_offline" name="test_propagation_matches_proper_motion_times_elapsed_time[astro2-121.6]" time="0.007" /><testcase classname="tests.test_audit_offline" name="test_parallax_is_applied_with_the_right_amplitude" time="0.262" /><testcase classname="tests.test_audit_offline" name="test_static_target_and_missing_parameter_warnings" time="0.014" /><testcase classname="tests.test_audit_offline" name="test_search_is_centred_on_the_position_at_the_observation_epoch" time="0.024" /><testcase classname="tests.test_audit_offline" name="test_spectral_mismatch_above_warning_threshold_is_rejected" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_finast_two_or_more_or_missing_is_rejected" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_satellite_halo_from_documentation_when_header_stops_at_bit_28" time="0.002" /><testcase classname="tests.test_audit_offline" name="test_undefined_active_bits_are_masked_and_reported" time="0.002" /><testcase classname="tests.test_audit_offline" name="test_header_definitions_win_and_conflicts_are_recorded" time="0.002" /><testcase classname="tests.test_audit_offline" name="test_transient_errors_are_retried_with_backoff_and_no_final_sleep" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_permanent_http_errors_fail_at_once[400]" time="0.002" /><testcase classname="tests.test_audit_offline" name="test_permanent_http_errors_fail_at_once[401]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_permanent_http_errors_fail_at_once[403]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_permanent_http_errors_fail_at_once[404]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_permanent_http_errors_fail_at_once[410]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_timeouts_retry_after_cap_and_deadline" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_capabilities_502_but_direct_query_works" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_direct_query_failures_keep_their_classification" time="0.002" /><testcase classname="tests.test_audit_offline" name="test_error_classification" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_truncated_or_incomplete_fits_is_rejected" time="0.026" /><testcase classname="tests.test_audit_offline" name="test_partial_download_is_never_cached" time="0.048" /><testcase classname="tests.test_audit_offline" name="test_corrupt_cache_file_is_quarantined_and_downloaded_again" time="0.049" /><testcase classname="tests.test_audit_offline" name="test_corrupt_reference_file_is_never_modified" time="0.033" /><testcase classname="tests.test_audit_offline" name="test_redownload_replaces_a_mismatching_cache_copy" time="0.055" /><testcase classname="tests.test_audit_offline" name="test_failed_cutouts_are_counted_and_classified" time="0.002" /><testcase classname="tests.test_audit_offline" name="test_invalid_coordinates_are_rejected_not_clamped[nan-0_0]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_invalid_coordinates_are_rejected_not_clamped[nan-0_1]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_invalid_coordinates_are_rejected_not_clamped[0-inf]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_invalid_coordinates_are_rejected_not_clamped[400-0]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_invalid_coordinates_are_rejected_not_clamped[360-0]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_invalid_coordinates_are_rejected_not_clamped[-0.1-0]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_invalid_coordinates_are_rejected_not_clamped[10--95]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_invalid_coordinates_are_rejected_not_clamped[10-90.5]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_invalid_coordinates_are_rejected_not_clamped[abc-0]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_invalid_coordinates_are_rejected_not_clamped[None-None]" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_valid_coordinate_edges_and_fov_validation" time="0.001" /><testcase classname="tests.test_audit_offline" name="test_find_sequence_rejects_invalid_input_before_any_query" time="0.001" /><testcase classname="tests.test_autocomplete" name="test_simbad_padded_identifier_query[ngc-ident.id LIKE 'NGC %']" time="0.001" /><testcase classname="tests.test_autocomplete" name="test_simbad_padded_identifier_query[NGC8-ident.id LIKE 'NGC     8%']" time="0.002" /><testcase classname="tests.test_autocomplete" name="test_simbad_padded_identifier_query[M13-ident.id LIKE 'M  13%']" time="0.001" /><testcase classname="tests.test_autocomplete" name="test_simbad_padded_identifier_query[Messier 13-ident.id LIKE 'M  13%']" time="0.001" /><testcase classname="tests.test_autocomplete" name="test_simbad_padded_identifier_query[ic1-ident.id LIKE 'IC    1%']" time="0.001" /><testcase classname="tests.test_autocomplete" name="test_short_catalogue_prefixes_are_searchable" time="0.001" /><testcase classname="tests.test_autocomplete" name="test_atlas_suggestions_include_interstellar_identity_beyond_first_twelve" time="0.001" /><testcase classname="tests.test_autocomplete" name="test_universal_suggestions_query_jpl_but_catalogue_prefix_does_not" time="0.002" /><testcase classname="tests.test_autocomplete" name="test_partial_failure_preserves_jpl_choices" time="0.001" /><testcase classname="tests.test_autocomplete" name="test_click_solar_suggestion_resolves_exact_id_and_preserves_field" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[1]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[2]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[3]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[4]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[5]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[6]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[7]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[8]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[9]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[10]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[11]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[12]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[13]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[14]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[15]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[16]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[17]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[18]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[19]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[20]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[21]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[22]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[23]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[24]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[25]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[26]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[27]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[28]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[29]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[30]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[31]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[32]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[33]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[34]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[35]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[36]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[37]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[38]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[39]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[40]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[41]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[42]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[43]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[44]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[45]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[46]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[47]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[48]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[49]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[50]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[51]" time="0.002" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[52]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[53]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[54]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[55]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[56]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[57]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[58]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[59]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[60]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[61]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[62]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[63]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[64]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[65]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[66]" time="0.002" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[67]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[68]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[69]" time="0.002" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[70]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[71]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[72]" time="0.002" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[73]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[74]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[75]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[76]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[77]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[78]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[79]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[80]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[81]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[82]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[83]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[84]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[85]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[86]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[87]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[88]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[89]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[90]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[91]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[92]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[93]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[94]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[95]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[96]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[97]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[98]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[99]" time="0.002" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[100]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[101]" time="0.002" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[102]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[103]" time="0.002" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[104]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[105]" time="0.002" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[106]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[107]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[108]" time="0.002" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[109]" time="0.001" /><testcase classname="tests.test_continuity" name="test_complete_messier_range_is_dynamic[110]" time="0.002" /><testcase classname="tests.test_continuity" name="test_catalogue_canonical_names[NGC224-NGC 224]" time="0.002" /><testcase classname="tests.test_continuity" name="test_catalogue_canonical_names[ic1396-IC 1396]" time="0.002" /><testcase classname="tests.test_continuity" name="test_catalogue_canonical_names[m001-M 1]" time="0.001" /><testcase classname="tests.test_continuity" name="test_constellation_coverage_and_coordinates" time="0.004" /><testcase classname="tests.test_continuity" name="test_horizons_contract_and_solar_region" time="0.003" /><testcase classname="tests.test_continuity" name="test_lookup_aliases_deduction_and_no_spacecraft" time="0.001" /><testcase classname="tests.test_continuity" name="test_ephemeris_rejects_missing_ambiguous_or_invalid_data[no table]" time="0.002" /><testcase classname="tests.test_continuity" name="test_ephemeris_rejects_missing_ambiguous_or_invalid_data[$$SOE\nnow,,,nan,20\n$$EOE]" time="0.002" /><testcase classname="tests.test_continuity" name="test_ephemeris_rejects_missing_ambiguous_or_invalid_data[$$SOE\nnow,,,400,20\n$$EOE]" time="0.003" /><testcase classname="tests.test_continuity" name="test_network_outage_is_explicit" time="0.002" /><testcase classname="tests.test_enhance" name="test_aligned_images_gain_is_sqrt_n_and_flux_is_preserved" time="0.545" /><testcase classname="tests.test_enhance" name="test_shifted_and_rotated_images_are_registered_through_their_wcs" time="0.546" /><testcase classname="tests.test_enhance" name="test_registration_error_rejects_the_exposure_instead_of_shifting_the_stack" time="0.238" /><testcase classname="tests.test_enhance" name="test_different_variances_weight_and_propagate_exactly" time="0.512" /><testcase classname="tests.test_enhance" name="test_no_gain_is_rejected" time="0.351" /><testcase classname="tests.test_enhance" name="test_frame_weights_do_not_bias_bright_sources_when_variance_follows_the_signal" time="1.461" /><testcase classname="tests.test_enhance" name="test_invalid_pixels_never_become_signal" time="0.185" /><testcase classname="tests.test_enhance" name="test_partial_coverage_is_propagated_and_tiny_overlap_is_rejected" time="0.345" /><testcase classname="tests.test_enhance" name="test_saturation_is_not_recovered_by_stacking" time="0.467" /><testcase classname="tests.test_enhance" name="test_nonphysical_negatives_are_removed_but_bright_single_values_are_kept" time="0.249" /><testcase classname="tests.test_enhance" name="test_psf_incompatible_exposure_is_rejected" time="0.168" /><testcase classname="tests.test_enhance" name="test_spectral_differences_change_the_product_not_the_method" time="0.261" /><testcase classname="tests.test_enhance" name="test_detectors_and_calibrations_are_never_mixed" time="0.123" /><testcase classname="tests.test_enhance" name="test_temporal_differences_and_a_moving_target" time="0.109" /><testcase classname="tests.test_enhance" name="test_faint_sources_become_detectable_without_false_detections" time="1.006" /><testcase classname="tests.test_enhance" name="test_pure_noise_produces_no_sources[3]" time="0.532" /><testcase classname="tests.test_enhance" name="test_pure_noise_produces_no_sources[11]" time="0.547" /><testcase classname="tests.test_enhance" name="test_pure_noise_produces_no_sources[27]" time="0.528" /><testcase classname="tests.test_enhance" name="test_signal_from_one_exposure_is_labelled_not_counted_as_a_deep_source" time="0.619" /><testcase classname="tests.test_enhance" name="test_moving_source_needs_a_comoving_stack_and_a_wrong_track_shows_nothing" time="0.637" /><testcase classname="tests.test_enhance" name="test_outlier_flag_is_ignored_only_inside_the_moving_target_aperture" time="0.556" /><testcase classname="tests.test_enhance" name="test_oversampled_grid_errors_account_for_correlated_pixels" time="2.215" /><testcase classname="tests.test_enhance" name="test_null_image_calibrates_underestimated_variances" time="0.311" /><testcase classname="tests.test_enhance" name="test_exposure_adapter_reads_sequence_and_moving_frames" time="0.003" /><testcase classname="tests.test_enhance" name="test_hot_pixel_with_a_masked_neighbour_cannot_pass_as_a_new_source" time="0.598" /><testcase classname="tests.test_enhance_app" name="test_toggle_shows_the_combined_image_and_returns_to_the_sequence" time="7.603" /><testcase classname="tests.test_enhance_app" name="test_both_levels_show_the_same_product" time="0.337" /><testcase classname="tests.test_enhance_app" name="test_moving_target_sequence_is_not_combined_across_a_year" time="0.331" /><testcase classname="tests.test_enhance_app" name="test_nearby_route_states_available_processing_result" time="13.387" /><testcase classname="tests.test_enhance_app" name="test_new_peaks_are_not_called_sources_when_the_null_image_has_as_many" time="7.073" /><testcase classname="tests.test_enhance_app" name="test_choice_of_dates_does_not_travel_to_another_region" time="0.365" /><testcase classname="tests.test_enhance_app" name="test_nearby_route_reports_too_few_exposures_and_archive_failures" time="0.840" /><testcase classname="tests.test_enhance_app" name="test_rejected_combination_is_not_presented_as_an_improvement" time="7.602" /><testcase classname="tests.test_examples_offline" name="test_validated_example_opens_offline[sequence_m101]" time="0.226" /><testcase classname="tests.test_examples_offline" name="test_validated_example_opens_offline[sequence_wise0855_pm]" time="0.121" /><testcase classname="tests.test_gaia_atlas" name="test_slow_empty_cache_failure_retry_and_old_result" time="0.002" /><testcase classname="tests.test_gaia_atlas" name="test_exact_source_selection_without_remote_resolution" time="0.001" /><testcase classname="tests.test_gaia_atlas" name="test_unknown_or_stale_id_does_not_select[change0]" time="0.001" /><testcase classname="tests.test_gaia_atlas" name="test_unknown_or_stale_id_does_not_select[change1]" time="0.001" /><testcase classname="tests.test_gaia_atlas" name="test_unknown_or_stale_id_does_not_select[change2]" time="0.001" /><testcase classname="tests.test_gaia_atlas" name="test_actual_component_selection_loading_and_stale_responses" time="0.120" /><testcase classname="tests.test_gaia_atlas" name="test_gaia_identity_survives_both_explorers" time="2.715" /><testcase classname="tests.test_live" name="test_sia2_query_returns_spherex_images" time="26.556" /><testcase classname="tests.test_live" name="test_downloaded_files_match_report_checksums" time="0.116" /><testcase classname="tests.test_live" name="test_fits_structure_units_and_wcs" time="0.002" /><testcase classname="tests.test_live" name="test_s_region_corner_convention_matches_fits_wcs" time="57.172" /><testcase classname="tests.test_live" name="test_metadata_wavelength_estimate_agrees_with_fits" time="0.001" /><testcase classname="tests.test_live" name="test_wave_table_from_range_request_equals_cutout_table" time="0.014" /><testcase classname="tests.test_live" name="test_selected_pair_is_admissible_from_fits" time="0.005" /><testcase classname="tests.test_live" name="test_pair_are_distinct_observations" time="0.001" /><testcase classname="tests.test_live" name="test_masks_are_applied_and_visible" time="0.003" /><testcase classname="tests.test_live" name="test_original_fits_untouched_by_processing" time="0.013" /><testcase classname="tests.test_live" name="test_target_inside_both_footprints" time="0.004" /><testcase classname="tests.test_motion" name="test_psf_is_the_official_epsf_and_normalised" time="0.005" /><testcase classname="tests.test_motion" name="test_known_synthetic_shift_is_measured" time="15.805" /><testcase classname="tests.test_motion" name="test_stationary_target_is_never_reported_as_motion[0]" time="14.051" /><testcase classname="tests.test_motion" name="test_stationary_target_is_never_reported_as_motion[1]" time="13.376" /><testcase classname="tests.test_motion" name="test_stationary_target_is_never_reported_as_motion[2]" time="13.017" /><testcase classname="tests.test_motion" name="test_stationary_target_is_never_reported_as_motion[3]" time="12.833" /><testcase classname="tests.test_motion" name="test_stationary_target_is_never_reported_as_motion[4]" time="13.657" /><testcase classname="tests.test_motion" name="test_stationary_target_is_never_reported_as_motion[5]" time="15.507" /><testcase classname="tests.test_motion" name="test_errors_are_honest_pulls" time="125.506" /><testcase classname="tests.test_motion" name="test_registration_removes_wcs_errors" time="17.614" /><testcase classname="tests.test_motion" name="test_wcs_errors_beyond_reference_tolerance_degrade_conservatively" time="22.057" /><testcase classname="tests.test_motion" name="test_without_gaia_no_measurement_is_claimed" time="0.821" /><testcase classname="tests.test_motion" name="test_faint_source_is_measured_with_larger_but_honest_errors" time="14.471" /><testcase classname="tests.test_motion" name="test_source_below_detection_threshold_is_never_measured" time="9.793" /><testcase classname="tests.test_motion" name="test_single_season_is_insufficient_data" time="0.299" /><testcase classname="tests.test_motion" name="test_one_image_is_insufficient_data" time="0.081" /><testcase classname="tests.test_motion" name="test_mixed_detectors_are_incompatible" time="0.345" /><testcase classname="tests.test_motion" name="test_saturated_core_is_reported" time="17.232" /><testcase classname="tests.test_motion" name="test_catalogue_prediction_never_changes_the_decision" time="32.067" /><testcase classname="tests.test_motion" name="test_invalid_inputs" time="0.001" /><testcase classname="tests.test_motion" name="test_season_grouping" time="0.001" /><testcase classname="tests.test_motion" name="test_select_epochs_longest_baseline" time="0.003" /><testcase classname="tests.test_motion" name="test_reference_fits_untouched" time="0.006" /><testcase classname="tests.test_motion" name="test_failed_season_is_reported_with_its_reason" time="0.169" /><testcase classname="tests.test_motion_app" name="test_saved_investigations_are_real_reports_only" time="0.104" /><testcase classname="tests.test_motion_app" name="test_motion_tab_renders_and_gaia_outage_is_explained" time="0.757" /><testcase classname="tests.test_motion_app" name="test_real_eps_ind_b_d3_reproduces_from_cached_originals" time="9.490"><failure message="skyclues.references.ReferenceError: Gaia DR3 no disponible: ConnectTimeout. Puede reintentar; WISE es independiente.">self = &lt;HTTPSConnection(host='gea.esac.esa.int', port=443) at 0x29d64b97810&gt;
+
+    def _new_conn(self) -&gt; socket.socket:
+        """Establish a socket connection and set nodelay settings on it.
+    
+        :return: New socket connection.
+        """
+        try:
+&gt;           sock = connection.create_connection(
+                (self._dns_host, self.port),
+                self.timeout,
+                source_address=self.source_address,
+                socket_options=self.socket_options,
+            )
+
+..\SkyClues\.venv\Lib\site-packages\urllib3\connection.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\SkyClues\.venv\Lib\site-packages\urllib3\util\connection.py:85: in create_connection
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+address = ('gea.esac.esa.int', 443), timeout = 8, source_address = None
+socket_options = [(6, 1, 1)]
+
+    def create_connection(
+        address: tuple[str, int],
+        timeout: _TYPE_TIMEOUT = _DEFAULT_TIMEOUT,
+        source_address: tuple[str, int] | None = None,
+        socket_options: _TYPE_SOCKET_OPTIONS | None = None,
+    ) -&gt; socket.socket:
+        """Connect to *address* and return the socket object.
+    
+        Convenience function.  Connect to *address* (a 2-tuple ``(host,
+        port)``) and return the socket object.  Passing the optional
+        *timeout* parameter will set the timeout on the socket instance
+        before attempting to connect.  If no *timeout* is supplied, the
+        global default timeout setting returned by :func:`socket.getdefaulttimeout`
+        is used.  If *source_address* is set it must be a tuple of (host, port)
+        for the socket to bind as a source address before making the connection.
+        An host of '' or port 0 tells the OS to use the default.
+        """
+    
+        host, port = address
+        if host.startswith("["):
+            host = host.strip("[]")
+        err = None
+    
+        # Using the value from allowed_gai_family() in the context of getaddrinfo lets
+        # us select whether to work with IPv4 DNS records, IPv6 records, or both.
+        # The original create_connection function always returns all records.
+        family = allowed_gai_family()
+    
+        try:
+            host.encode("idna")
+        except UnicodeError:
+            raise LocationParseError(f"'{host}', label empty or too long") from None
+    
+        for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+            af, socktype, proto, canonname, sa = res
+            sock = None
+            try:
+                sock = socket.socket(af, socktype, proto)
+    
+                # If provided, set socket level options before connecting.
+                _set_socket_options(sock, socket_options)
+    
+                if timeout is not _DEFAULT_TIMEOUT:
+                    sock.settimeout(timeout)
+                if source_address:
+                    sock.bind(source_address)
+&gt;               sock.connect(sa)
+E               TimeoutError: timed out
+
+..\SkyClues\.venv\Lib\site-packages\urllib3\util\connection.py:73: TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;urllib3.connectionpool.HTTPSConnectionPool object at 0x0000029D64AEB090&gt;
+method = 'GET'
+url = '/tap-server/tap/sync?REQUEST=doQuery&amp;LANG=ADQL&amp;FORMAT=csv&amp;QUERY=SELECT+TOP+501+source_id%2Cra%2Cdec%2Cref_epoch%2Cpmr...RCLE%28%27ICRS%27%2C331.0961295349%2C-56.8005476636%2C0.1000000000%29%29+ORDER+BY+phot_g_mean_mag+ASC%2C+source_id+ASC'
+body = None
+headers = {'User-Agent': 'SkyClues/0.1 (NASA Space Apps 2026 prototype; astropy/pyvo)', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'}
+retries = Retry(total=0, connect=None, read=False, redirect=None, status=None)
+redirect = False, assert_same_host = False
+timeout = Timeout(connect=8, read=25, total=None), pool_timeout = None
+release_conn = False, chunked = False, body_pos = None, preload_content = False
+decode_content = False, response_kw = {}
+
+    def urlopen(  # type: ignore[override]
+        self,
+        method: str,
+        url: str,
+        body: _TYPE_BODY | None = None,
+        headers: typing.Mapping[str, str] | None = None,
+        retries: Retry | bool | int | None = None,
+        redirect: bool = True,
+        assert_same_host: bool = True,
+        timeout: _TYPE_TIMEOUT = _DEFAULT_TIMEOUT,
+        pool_timeout: int | None = None,
+        release_conn: bool | None = None,
+        chunked: bool = False,
+        body_pos: _TYPE_BODY_POSITION | None = None,
+        preload_content: bool = True,
+        decode_content: bool = True,
+        **response_kw: typing.Any,
+    ) -&gt; BaseHTTPResponse:
+        """
+        Get a connection from the pool and perform an HTTP request. This is the
+        lowest level call for making a request, so you'll need to specify all
+        the raw details.
+    
+        .. note::
+    
+           More commonly, it's appropriate to use a convenience method
+           such as :meth:`request`.
+    
+        .. note::
+    
+           `release_conn` will only behave as expected if
+           `preload_content=False` because we want to make
+           `preload_content=False` the default behaviour someday soon without
+           breaking backwards compatibility.
+    
+        :param method:
+            HTTP request method (such as GET, POST, PUT, etc.)
+    
+        :param url:
+            The URL to perform the request on.
+    
+        :param body:
+            Data to send in the request body, either :class:`str`, :class:`bytes`,
+            an iterable of :class:`str`/:class:`bytes`, or a file-like object.
+    
+        :param headers:
+            Dictionary of custom headers to send, such as User-Agent,
+            If-None-Match, etc. If None, pool headers are used. If provided,
+            these headers completely replace any pool-specific headers.
+    
+        :param retries:
+            Configure the number of retries to allow before raising a
+            :class:`~urllib3.exceptions.MaxRetryError` exception.
+    
+            If ``None`` (default) will retry 3 times, see ``Retry.DEFAULT``. Pass a
+            :class:`~urllib3.util.retry.Retry` object for fine-grained control
+            over different types of retries.
+            Pass an integer number to retry connection errors that many times,
+            but no other types of errors. Pass zero to never retry.
+    
+            If ``False``, then retries are disabled and any exception is raised
+            immediately. Also, instead of raising a MaxRetryError on redirects,
+            the redirect response will be returned.
+    
+        :type retries: :class:`~urllib3.util.retry.Retry`, False, or an int.
+    
+        :param redirect:
+            If True, automatically handle redirects (status codes 301, 302,
+            303, 307, 308). Each redirect counts as a retry. Disabling retries
+            will disable redirect, too.
+    
+        :param assert_same_host:
+            If ``True``, will make sure that the host of the pool requests is
+            consistent else will raise HostChangedError. When ``False``, you can
+            use the pool on an HTTP proxy and request foreign hosts.
+    
+        :param timeout:
+            If specified, overrides the default timeout for this one
+            request. It may be a float (in seconds) or an instance of
+            :class:`urllib3.util.Timeout`.
+    
+        :param pool_timeout:
+            If set and the pool is set to block=True, then this method will
+            block for ``pool_timeout`` seconds and raise EmptyPoolError if no
+            connection is available within the time period.
+    
+        :param bool preload_content:
+            If True, the response's body will be preloaded into memory.
+    
+        :param bool decode_content:
+            If True, will attempt to decode the body based on the
+            'content-encoding' header.
+    
+        :param release_conn:
+            If False, then the urlopen call will not release the connection
+            back into the pool once a response is received (but will release if
+            you read the entire contents of the response such as when
+            `preload_content=True`). This is useful if you're not preloading
+            the response's content immediately. You will need to call
+            ``r.release_conn()`` on the response ``r`` to return the connection
+            back into the pool. If None, it takes the value of ``preload_content``
+            which defaults to ``True``.
+    
+        :param bool chunked:
+            If True, urllib3 will send the body using chunked transfer
+            encoding. Otherwise, urllib3 will send the body using the standard
+            content-length form. Defaults to False.
+    
+        :param int body_pos:
+            Position to seek to in file-like body in the event of a retry or
+            redirect. Typically this won't need to be set because urllib3 will
+            auto-populate the value when needed.
+        """
+        # Ensure that the URL we're connecting to is properly encoded
+        if url.startswith("/"):
+            # URLs starting with / are inherently schemeless.
+            url = to_str(_encode_target(url))
+            destination_scheme = None
+        else:
+            parsed_url = parse_url(url)
+            destination_scheme = parsed_url.scheme
+            url = to_str(parsed_url._replace(fragment=None).url)
+    
+        if headers is None:
+            headers = self.headers
+    
+        if not isinstance(retries, Retry):
+            retries = Retry.from_int(retries, redirect=redirect, default=self.retries)
+    
+        if release_conn is None:
+            release_conn = preload_content
+    
+        # Check host
+        if assert_same_host and not self.is_same_host(url):
+            raise HostChangedError(self, url, retries)
+    
+        conn = None
+    
+        # Track whether `conn` needs to be released before
+        # returning/raising/recursing. Update this variable if necessary, and
+        # leave `release_conn` constant throughout the function. That way, if
+        # the function recurses, the original value of `release_conn` will be
+        # passed down into the recursive call, and its value will be respected.
+        #
+        # See issue #651 [1] for details.
+        #
+        # [1] &lt;https://github.com/urllib3/urllib3/issues/651&gt;
+        release_this_conn = release_conn
+    
+        http_tunnel_required = connection_requires_http_tunnel(
+            self.proxy, self.proxy_config, destination_scheme
+        )
+    
+        # Merge the proxy headers. Only done when not using HTTP CONNECT. We
+        # have to copy the headers dict so we can safely change it without those
+        # changes being reflected in anyone else's copy.
+        if not http_tunnel_required:
+            headers = headers.copy()  # type: ignore[attr-defined]
+            headers.update(self.proxy_headers)  # type: ignore[union-attr]
+    
+        # Must keep the exception bound to a separate variable or else Python 3
+        # complains about UnboundLocalError.
+        err = None
+    
+        # Keep track of whether we cleanly exited the except block. This
+        # ensures we do proper cleanup in finally.
+        clean_exit = False
+    
+        # Rewind body position, if needed. Record current position
+        # for future rewinds in the event of a redirect/retry.
+        body_pos = set_file_position(body, body_pos)
+    
+        timeout_obj = self._get_timeout(timeout)
+        try:
+            # Request a connection from the queue.
+            conn = self._get_conn(timeout=pool_timeout)
+            conn.timeout = timeout_obj.connect_timeout  # type: ignore[assignment]
+    
+            # Is this a closed/new connection that requires CONNECT tunnelling?
+            if self.proxy is not None and http_tunnel_required and conn.is_closed:
+                try:
+                    self._prepare_proxy(conn)
+                except (BaseSSLError, OSError, SocketTimeout) as e:
+                    self._raise_timeout(
+                        err=e, url=self.proxy.url, timeout_value=conn.timeout
+                    )
+                    raise
+    
+            # If we're going to release the connection in ``finally:``, then
+            # the response doesn't need to know about the connection. Otherwise
+            # it will also try to release it and we'll have a double-release
+            # mess.
+            response_conn = conn if not release_conn else None
+    
+            # Make the request on the HTTPConnection object
+&gt;           response = self._make_request(
+                conn,
+                method,
+                url,
+                timeout=timeout_obj,
+                body=body,
+                headers=headers,
+                chunked=chunked,
+                retries=retries,
+                response_conn=response_conn,
+                preload_content=preload_content,
+                decode_content=decode_content,
+                **response_kw,
+            )
+
+..\SkyClues\.venv\Lib\site-packages\urllib3\connectionpool.py:793: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\SkyClues\.venv\Lib\site-packages\urllib3\connectionpool.py:494: in _make_request
+    raise new_e
+..\SkyClues\.venv\Lib\site-packages\urllib3\connectionpool.py:470: in _make_request
+    self._validate_conn(conn)
+..\SkyClues\.venv\Lib\site-packages\urllib3\connectionpool.py:1125: in _validate_conn
+    conn.connect()
+..\SkyClues\.venv\Lib\site-packages\urllib3\connection.py:827: in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;HTTPSConnection(host='gea.esac.esa.int', port=443) at 0x29d64b97810&gt;
+
+    def _new_conn(self) -&gt; socket.socket:
+        """Establish a socket connection and set nodelay settings on it.
+    
+        :return: New socket connection.
+        """
+        try:
+            sock = connection.create_connection(
+                (self._dns_host, self.port),
+                self.timeout,
+                source_address=self.source_address,
+                socket_options=self.socket_options,
+            )
+        except socket.gaierror as e:
+            raise NameResolutionError(self.host, self, e) from e
+        except SocketTimeout as e:
+&gt;           raise ConnectTimeoutError(
+                self,
+                f"Connection to {self.host} timed out. (connect timeout={self.timeout})",
+            ) from e
+E           urllib3.exceptions.ConnectTimeoutError: (&lt;HTTPSConnection(host='gea.esac.esa.int', port=443) at 0x29d64b97810&gt;, 'Connection to gea.esac.esa.int timed out. (connect timeout=8)')
+
+..\SkyClues\.venv\Lib\site-packages\urllib3\connection.py:248: ConnectTimeoutError
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;requests.adapters.HTTPAdapter object at 0x0000029D629A4050&gt;
+request = &lt;PreparedRequest [GET]&gt;, stream = True, timeout = (8, 25)
+verify = True, cert = None, proxies = OrderedDict()
+
+    def send(
+        self,
+        request: PreparedRequest,
+        stream: bool = False,
+        timeout: _t.TimeoutType = None,
+        verify: _t.VerifyType = True,
+        cert: _t.CertType = None,
+        proxies: dict[str, str] | None = None,
+    ) -&gt; Response:
+        """Sends PreparedRequest object. Returns Response object.
+    
+        :param request: The :class:`PreparedRequest &lt;PreparedRequest&gt;` being sent.
+        :param stream: (optional) Whether to stream the request content.
+        :param timeout: (optional) How long to wait for the server to send
+            data before giving up, as a float, or a :ref:`(connect timeout,
+            read timeout) &lt;timeouts&gt;` tuple.
+        :type timeout: float or tuple or urllib3 Timeout object
+        :param verify: (optional) Either a boolean, in which case it controls whether
+            we verify the server's TLS certificate, or a string, in which case it
+            must be a path to a CA bundle to use
+        :param cert: (optional) Any user-provided SSL certificate to be trusted.
+        :param proxies: (optional) The proxies dictionary to apply to the request.
+        :rtype: requests.Response
+        """
+    
+        assert _is_prepared(request)
+    
+        try:
+            conn = self.get_connection_with_tls_context(
+                request, verify, proxies=proxies, cert=cert
+            )
+        except LocationValueError as e:
+            raise InvalidURL(e, request=request)
+    
+        self.cert_verify(conn, request.url, verify, cert)
+        url = self.request_url(request, proxies)
+        self.add_headers(
+            request,
+            stream=stream,
+            timeout=timeout,
+            verify=verify,
+            cert=cert,
+            proxies=proxies,
+        )
+    
+        chunked = not (request.body is None or "Content-Length" in request.headers)
+    
+        if isinstance(timeout, tuple):
+            try:
+                connect, read = timeout
+                resolved_timeout = TimeoutSauce(connect=connect, read=read)
+            except ValueError:
+                raise ValueError(
+                    f"Invalid timeout {timeout}. Pass a (connect, read) timeout tuple, "
+                    f"or a single float to set both timeouts to the same value."
+                )
+        elif isinstance(timeout, TimeoutSauce):
+            resolved_timeout = timeout
+        else:
+            resolved_timeout = TimeoutSauce(connect=timeout, read=timeout)
+    
+        try:
+&gt;           resp = conn.urlopen(
+                method=request.method,
+                url=url,
+                body=request.body,  # type: ignore[arg-type]  # urllib3 stubs don't accept Iterable[bytes | str]
+                headers=request.headers,  # type: ignore[arg-type]  # urllib3#3072
+                redirect=False,
+                assert_same_host=False,
+                preload_content=False,
+                decode_content=False,
+                retries=self.max_retries,
+                timeout=resolved_timeout,
+                chunked=chunked,
+            )
+
+..\SkyClues\.venv\Lib\site-packages\requests\adapters.py:696: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\SkyClues\.venv\Lib\site-packages\urllib3\connectionpool.py:847: in urlopen
+    retries = retries.increment(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = Retry(total=0, connect=None, read=False, redirect=None, status=None)
+method = 'GET'
+url = '/tap-server/tap/sync?REQUEST=doQuery&amp;LANG=ADQL&amp;FORMAT=csv&amp;QUERY=SELECT+TOP+501+source_id%2Cra%2Cdec%2Cref_epoch%2Cpmr...RCLE%28%27ICRS%27%2C331.0961295349%2C-56.8005476636%2C0.1000000000%29%29+ORDER+BY+phot_g_mean_mag+ASC%2C+source_id+ASC'
+response = None
+error = ConnectTimeoutError(&lt;HTTPSConnection(host='gea.esac.esa.int', port=443) at 0x29d64b97810&gt;, 'Connection to gea.esac.esa.int timed out. (connect timeout=8)')
+_pool = &lt;urllib3.connectionpool.HTTPSConnectionPool object at 0x0000029D64AEB090&gt;
+_stacktrace = &lt;traceback object at 0x0000029D62B93A00&gt;
+
+    def increment(
+        self,
+        method: str | None = None,
+        url: str | None = None,
+        response: BaseHTTPResponse | None = None,
+        error: Exception | None = None,
+        _pool: ConnectionPool | None = None,
+        _stacktrace: TracebackType | None = None,
+    ) -&gt; Self:
+        """Return a new Retry object with incremented retry counters.
+    
+        :param response: A response object, or None, if the server did not
+            return a response.
+        :type response: :class:`~urllib3.response.BaseHTTPResponse`
+        :param Exception error: An error encountered during the request, or
+            None if the response was received successfully.
+    
+        :return: A new ``Retry`` object.
+        """
+        if self.total is False and error:
+            # Disabled, indicate to re-raise the error.
+            raise reraise(type(error), error, _stacktrace)
+    
+        total = self.total
+        if total is not None:
+            total -= 1
+    
+        connect = self.connect
+        read = self.read
+        redirect = self.redirect
+        status_count = self.status
+        other = self.other
+        cause = "unknown"
+        status = None
+        redirect_location = None
+    
+        if error and self._is_connection_error(error):
+            # Connect retry?
+            if connect is False:
+                raise reraise(type(error), error, _stacktrace)
+            elif connect is not None:
+                connect -= 1
+    
+        elif error and self._is_read_error(error):
+            # Read retry?
+            if read is False or method is None or not self._is_method_retryable(method):
+                raise reraise(type(error), error, _stacktrace)
+            elif read is not None:
+                read -= 1
+    
+        elif error:
+            # Other retry?
+            if other is not None:
+                other -= 1
+    
+        elif response and response.get_redirect_location():
+            # Redirect retry?
+            if redirect is not None:
+                redirect -= 1
+            cause = "too many redirects"
+            response_redirect_location = response.get_redirect_location()
+            if response_redirect_location:
+                redirect_location = response_redirect_location
+            status = response.status
+    
+        else:
+            # Incrementing because of a server error like a 500 in
+            # status_forcelist and the given method is in the allowed_methods
+            cause = ResponseError.GENERIC_ERROR
+            if response and response.status:
+                if status_count is not None:
+                    status_count -= 1
+                cause = ResponseError.SPECIFIC_ERROR.format(status_code=response.status)
+                status = response.status
+    
+        history = self.history + (
+            RequestHistory(method, url, error, status, redirect_location),
+        )
+    
+        new_retry = self.new(
+            total=total,
+            connect=connect,
+            read=read,
+            redirect=redirect,
+            status=status_count,
+            other=other,
+            history=history,
+        )
+    
+        if new_retry.is_exhausted():
+            reason = error or ResponseError(cause)
+&gt;           raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='gea.esac.esa.int', port=443): Max retries exceeded with url: /tap-server/tap/sync?REQUEST=doQuery&amp;LANG=ADQL&amp;FORMAT=csv&amp;QUERY=SELECT+TOP+501+source_id%2Cra%2Cdec%2Cref_epoch%2Cpmra%2Cpmdec%2Cparallax%2Cradial_velocity%2Cphot_g_mean_mag%2Cruwe%2Cra_error%2Cdec_error%2Cpmra_error%2Cpmdec_error%2Cparallax_error+FROM+gaiadr3.gaia_source+WHERE+1%3DCONTAINS%28POINT%28%27ICRS%27%2Cra%2Cdec%29%2CCIRCLE%28%27ICRS%27%2C331.0961295349%2C-56.8005476636%2C0.1000000000%29%29+ORDER+BY+phot_g_mean_mag+ASC%2C+source_id+ASC (Caused by ConnectTimeoutError(&lt;HTTPSConnection(host='gea.esac.esa.int', port=443) at 0x29d64b97810&gt;, 'Connection to gea.esac.esa.int timed out. (connect timeout=8)'))
+
+..\SkyClues\.venv\Lib\site-packages\urllib3\util\retry.py:555: MaxRetryError
+
+During handling of the above exception, another exception occurred:
+
+ra = 331.09612953493854, dec = -56.80054766361134, fov = 0.2, limit = 500
+
+    def fetch_gaia(ra: float, dec: float, fov: float, limit: int = MAX_SOURCES) -&gt; dict:
+        query = gaia_query(ra, dec, fov, limit)
+        try:
+            # A single bounded request. Retrying is an explicit UI action; no long hidden waits.
+&gt;           with requests.get(GAIA_TAP, params={"REQUEST": "doQuery", "LANG": "ADQL", "FORMAT": "csv",
+                              "QUERY": query}, headers=HTTP_HEADERS, timeout=(8, 25), stream=True) as response:
+
+skyclues\references.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\SkyClues\.venv\Lib\site-packages\requests\api.py:87: in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\SkyClues\.venv\Lib\site-packages\requests\api.py:71: in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\SkyClues\.venv\Lib\site-packages\requests\sessions.py:651: in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\SkyClues\.venv\Lib\site-packages\requests\sessions.py:784: in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;requests.adapters.HTTPAdapter object at 0x0000029D629A4050&gt;
+request = &lt;PreparedRequest [GET]&gt;, stream = True, timeout = (8, 25)
+verify = True, cert = None, proxies = OrderedDict()
+
+    def send(
+        self,
+        request: PreparedRequest,
+        stream: bool = False,
+        timeout: _t.TimeoutType = None,
+        verify: _t.VerifyType = True,
+        cert: _t.CertType = None,
+        proxies: dict[str, str] | None = None,
+    ) -&gt; Response:
+        """Sends PreparedRequest object. Returns Response object.
+    
+        :param request: The :class:`PreparedRequest &lt;PreparedRequest&gt;` being sent.
+        :param stream: (optional) Whether to stream the request content.
+        :param timeout: (optional) How long to wait for the server to send
+            data before giving up, as a float, or a :ref:`(connect timeout,
+            read timeout) &lt;timeouts&gt;` tuple.
+        :type timeout: float or tuple or urllib3 Timeout object
+        :param verify: (optional) Either a boolean, in which case it controls whether
+            we verify the server's TLS certificate, or a string, in which case it
+            must be a path to a CA bundle to use
+        :param cert: (optional) Any user-provided SSL certificate to be trusted.
+        :param proxies: (optional) The proxies dictionary to apply to the request.
+        :rtype: requests.Response
+        """
+    
+        assert _is_prepared(request)
+    
+        try:
+            conn = self.get_connection_with_tls_context(
+                request, verify, proxies=proxies, cert=cert
+            )
+        except LocationValueError as e:
+            raise InvalidURL(e, request=request)
+    
+        self.cert_verify(conn, request.url, verify, cert)
+        url = self.request_url(request, proxies)
+        self.add_headers(
+            request,
+            stream=stream,
+            timeout=timeout,
+            verify=verify,
+            cert=cert,
+            proxies=proxies,
+        )
+    
+        chunked = not (request.body is None or "Content-Length" in request.headers)
+    
+        if isinstance(timeout, tuple):
+            try:
+                connect, read = timeout
+                resolved_timeout = TimeoutSauce(connect=connect, read=read)
+            except ValueError:
+                raise ValueError(
+                    f"Invalid timeout {timeout}. Pass a (connect, read) timeout tuple, "
+                    f"or a single float to set both timeouts to the same value."
+                )
+        elif isinstance(timeout, TimeoutSauce):
+            resolved_timeout = timeout
+        else:
+            resolved_timeout = TimeoutSauce(connect=timeout, read=timeout)
+    
+        try:
+            resp = conn.urlopen(
+                method=request.method,
+                url=url,
+                body=request.body,  # type: ignore[arg-type]  # urllib3 stubs don't accept Iterable[bytes | str]
+                headers=request.headers,  # type: ignore[arg-type]  # urllib3#3072
+                redirect=False,
+                assert_same_host=False,
+                preload_content=False,
+                decode_content=False,
+                retries=self.max_retries,
+                timeout=resolved_timeout,
+                chunked=chunked,
+            )
+    
+        except (ProtocolError, OSError) as err:
+            raise ConnectionError(err, request=request)
+    
+        except MaxRetryError as e:
+            if isinstance(e.reason, ConnectTimeoutError):
+                # TODO: Remove this in 3.0.0: see #2811
+                if not isinstance(e.reason, NewConnectionError):
+&gt;                   raise ConnectTimeout(e, request=request)
+E                   requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='gea.esac.esa.int', port=443): Max retries exceeded with url: /tap-server/tap/sync?REQUEST=doQuery&amp;LANG=ADQL&amp;FORMAT=csv&amp;QUERY=SELECT+TOP+501+source_id%2Cra%2Cdec%2Cref_epoch%2Cpmra%2Cpmdec%2Cparallax%2Cradial_velocity%2Cphot_g_mean_mag%2Cruwe%2Cra_error%2Cdec_error%2Cpmra_error%2Cpmdec_error%2Cparallax_error+FROM+gaiadr3.gaia_source+WHERE+1%3DCONTAINS%28POINT%28%27ICRS%27%2Cra%2Cdec%29%2CCIRCLE%28%27ICRS%27%2C331.0961295349%2C-56.8005476636%2C0.1000000000%29%29+ORDER+BY+phot_g_mean_mag+ASC%2C+source_id+ASC (Caused by ConnectTimeoutError(&lt;HTTPSConnection(host='gea.esac.esa.int', port=443) at 0x29d64b97810&gt;, 'Connection to gea.esac.esa.int timed out. (connect timeout=8)'))
+
+..\SkyClues\.venv\Lib\site-packages\requests\adapters.py:717: ConnectTimeout
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.mark.network
+    def test_real_eps_ind_b_d3_reproduces_from_cached_originals():
+        """REAL data: the 12 cached SPHEREx cutouts of results/motion_eps_ind_b_d3.json and a new Gaia
+        DR3 query reproduce the saved measurement (files are read-only; SHA-256 must match)."""
+        from skyclues import archive, fitsdata
+        from skyclues.astrometry import Astrometry
+        saved = json.loads((config.RESULTS_DIR / "motion_eps_ind_b_d3.json").read_text(encoding="utf-8"))
+        urls = [f["cutout_url"] for f in saved["files"]]
+        got = archive.fetch_many(urls)
+        frames = []
+        for f, u in zip(saved["files"], urls):
+            assert archive.sha256(got[u]) == f["sha256"]
+            frames.append(motion.MotionFrame(fitsdata.load(got[u]), {"collection": f["collection"]}, u, got[u], f["sha256"]))
+        c = saved["cutout_centre"]
+&gt;       gaia = references.fetch_gaia(c["ra"], c["dec"], saved["selection"]["field_deg"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_motion_app.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ra = 331.09612953493854, dec = -56.80054766361134, fov = 0.2, limit = 500
+
+    def fetch_gaia(ra: float, dec: float, fov: float, limit: int = MAX_SOURCES) -&gt; dict:
+        query = gaia_query(ra, dec, fov, limit)
+        try:
+            # A single bounded request. Retrying is an explicit UI action; no long hidden waits.
+            with requests.get(GAIA_TAP, params={"REQUEST": "doQuery", "LANG": "ADQL", "FORMAT": "csv",
+                              "QUERY": query}, headers=HTTP_HEADERS, timeout=(8, 25), stream=True) as response:
+                response.raise_for_status()
+                chunks, n = [], 0
+                for chunk in response.iter_content(65536):
+                    n += len(chunk)
+                    if n &gt; MAX_BYTES:
+                        raise ReferenceError("Gaia excedió el límite de respuesta (2 MiB).")
+                    chunks.append(chunk)
+            raw = b"".join(chunks)
+        except requests.RequestException as err:
+&gt;           raise ReferenceError(f"Gaia DR3 no disponible: {type(err).__name__}. Puede reintentar; WISE es independiente.") from err
+E           skyclues.references.ReferenceError: Gaia DR3 no disponible: ConnectTimeout. Puede reintentar; WISE es independiente.
+
+skyclues\references.py:91: ReferenceError</failure></testcase><testcase classname="tests.test_motion_app" name="test_extended_baseline_offers_images_per_season" time="0.295" /><testcase classname="tests.test_moving_app" name="test_empty_and_failure_are_different" time="0.380" /><testcase classname="tests.test_moving_app" name="test_solar_route_preserves_region_and_never_uses_fixed_field_engine" time="0.205" /><testcase classname="tests.test_moving_app" name="test_dates_survive_navigation_and_switching_levels" time="0.270" /><testcase classname="tests.test_moving_app" name="test_failed_fits_is_not_no_coverage" time="0.223" /><testcase classname="tests.test_multiband" name="test_channels_and_wavelengths_come_from_the_fits_table" time="0.104" /><testcase classname="tests.test_multiband" name="test_blank_channels_cannot_enter_a_composition[51]" time="0.035" /><testcase classname="tests.test_multiband" name="test_blank_channels_cannot_enter_a_composition[52]" time="0.040" /><testcase classname="tests.test_multiband" name="test_invalid_selections_are_refused[nums0-distintos]" time="0.043" /><testcase classname="tests.test_multiband" name="test_invalid_selections_are_refused[nums1-inexistente]" time="0.043" /><testcase classname="tests.test_multiband" name="test_invalid_selections_are_refused[nums2-exactamente]" time="0.039" /><testcase classname="tests.test_multiband" name="test_invalid_selections_are_refused[nums3-inexistente]" time="0.036" /><testcase classname="tests.test_multiband" name="test_three_planes_are_verbatim_and_never_modified" time="0.131" /><testcase classname="tests.test_multiband" name="test_alignment_verified_and_no_resampling" time="0.045" /><testcase classname="tests.test_multiband" name="test_misaligned_planes_are_refused[shift]" time="0.038" /><testcase classname="tests.test_multiband" name="test_misaligned_planes_are_refused[shape]" time="0.035" /><testcase classname="tests.test_multiband" name="test_misaligned_planes_are_refused[etag]" time="0.038" /><testcase classname="tests.test_multiband" name="test_misaligned_planes_are_refused[wcs]" time="0.041" /><testcase classname="tests.test_multiband" name="test_misaligned_planes_are_refused[centre]" time="0.033" /><testcase classname="tests.test_multiband" name="test_misaligned_planes_are_refused[patches]" time="0.032" /><testcase classname="tests.test_multiband" name="test_missing_data_in_any_channel_is_never_coloured" time="0.078" /><testcase classname="tests.test_multiband" name="test_insufficient_common_data_is_refused" time="0.041" /><testcase classname="tests.test_multiband" name="test_all_nan_channel_is_refused_not_painted" time="0.042" /><testcase classname="tests.test_multiband" name="test_each_colour_carries_its_assigned_channel" time="0.060" /><testcase classname="tests.test_multiband" name="test_stretch_is_documented_and_reproducible[independiente]" time="0.090" /><testcase classname="tests.test_multiband" name="test_stretch_is_documented_and_reproducible[comun]" time="0.084" /><testcase classname="tests.test_multiband" name="test_flat_channel_is_reported_not_amplified" time="0.040" /><testcase classname="tests.test_multiband" name="test_field_split_over_several_tiles" time="0.069" /><testcase classname="tests.test_multiband" name="test_centre_and_field_are_passed_unchanged" time="0.052" /><testcase classname="tests.test_multiband" name="test_reader_failures_propagate_without_a_composite[ArchiveTransientError]" time="0.042" /><testcase classname="tests.test_multiband" name="test_reader_failures_propagate_without_a_composite[ArchivePermanentError]" time="0.034" /><testcase classname="tests.test_multiband" name="test_reader_failures_propagate_without_a_composite[RangeNotHonoured]" time="0.034" /><testcase classname="tests.test_multiband" name="test_reader_failures_propagate_without_a_composite[FileChangedError]" time="0.033" /><testcase classname="tests.test_multiband" name="test_reader_failures_propagate_without_a_composite[CubeFormatError]" time="0.035" /><testcase classname="tests.test_multiband" name="test_switch_to_multiband_and_back_keeps_region_channel_and_pick" time="3.959" /><testcase classname="tests.test_multiband" name="test_multiband_reader_failure_is_visible_without_image" time="0.284" /><testcase classname="tests.test_multiband" name="test_insufficient_coverage_message_in_app" time="0.320" /><testcase classname="tests.test_multiband" name="test_returning_to_spectrum_explorer_with_the_same_region_keeps_working" time="1.604" /><testcase classname="tests.test_multiband_live" name="test_authentic_composite_values_alignment_and_seams[210.802429-54.34875-0.05-tiles0]" time="2.530" /><testcase classname="tests.test_multiband_live" name="test_authentic_composite_values_alignment_and_seams[213.737429-54.34875-0.1-tiles1]" time="11.427" /><testcase classname="tests.test_non_sidereal" name="test_compact_extended_and_controls" time="0.247" /><testcase classname="tests.test_non_sidereal" name="test_weak_signal_is_not_detection[4]" time="0.137" /><testcase classname="tests.test_non_sidereal" name="test_weak_signal_is_not_detection[7]" time="0.158" /><testcase classname="tests.test_non_sidereal" name="test_weak_signal_is_not_detection[12]" time="0.136" /><testcase classname="tests.test_non_sidereal" name="test_masks_nan_bad_variance_and_quality" time="0.126" /><testcase classname="tests.test_non_sidereal" name="test_partial_and_no_coverage_do_not_become_black" time="0.021" /><testcase classname="tests.test_non_sidereal" name="test_mixed_bands_and_releases_rejected[detector-5]" time="0.022" /><testcase classname="tests.test_non_sidereal" name="test_mixed_bands_and_releases_rejected[collection-OTHER]" time="0.025" /><testcase classname="tests.test_non_sidereal" name="test_mixed_bands_and_releases_rejected[version-2]" time="0.025" /><testcase classname="tests.test_non_sidereal" name="test_mixed_bands_and_releases_rejected[lambda_um-1.3]" time="0.023" /><testcase classname="tests.test_non_sidereal" name="test_stack_tracks_known_motion_and_preserves_counts" time="0.023" /><testcase classname="tests.test_non_sidereal" name="test_no_common_overlap_is_not_observed_motion" time="0.348" /><testcase classname="tests.test_non_sidereal" name="test_measured_motion_and_stationary_control" time="0.741" /><testcase classname="tests.test_non_sidereal" name="test_wcs_error_only_is_removed_by_independent_stars" time="0.316" /><testcase classname="tests.test_non_sidereal" name="test_contaminating_stationary_sources_prevent_motion_claim" time="0.420" /><testcase classname="tests.test_non_sidereal" name="test_prediction_does_not_supply_measured_displacement" time="0.288" /><testcase classname="tests.test_non_sidereal" name="test_groups_are_pairwise_compatible" time="0.024" /><testcase classname="tests.test_non_sidereal" name="test_invalid_identity_and_time_ranges" time="0.002" /><testcase classname="tests.test_non_sidereal" name="test_missing_observer_orbit_is_service_limit_not_empty_sky" time="0.002" /><testcase classname="tests.test_non_sidereal" name="test_variable_plane_background_does_not_create_signal" time="0.257" /><testcase classname="tests.test_non_sidereal" name="test_sip_nonconvergence_is_missing_coverage" time="0.001" /><testcase classname="tests.test_non_sidereal" name="test_cached_reference_keeps_each_exposure_time" time="0.015" /><testcase classname="tests.test_non_sidereal" name="test_track_ra_wrap_and_no_extrapolation_or_coarse_gap" time="0.005" /><testcase classname="tests.test_non_sidereal" name="test_fits_dates_and_identity_verified" time="0.011" /><testcase classname="tests.test_non_sidereal" name="test_joint_native_weak_signal_and_negative_tracks" time="0.373" /><testcase classname="tests.test_non_sidereal" name="test_target_flagged_as_outlier_is_still_measured_and_reported" time="0.129" /><testcase classname="tests.test_non_sidereal" name="test_strict_mask_alone_hides_an_outlier_flagged_target" time="0.028" /><testcase classname="tests.test_non_sidereal" name="test_motion_of_outlier_flagged_target_is_observed_with_strict_stars" time="0.352" /><testcase classname="tests.test_non_sidereal" name="test_positions_do_not_need_the_same_wavelength_but_stacks_do" time="0.323" /><testcase classname="tests.test_non_sidereal" name="test_different_detectors_are_not_compared_for_disappearance" time="0.362" /><testcase classname="tests.test_non_sidereal" name="test_shift_below_three_pixels_is_never_observed_motion[0]" time="0.368" /><testcase classname="tests.test_non_sidereal" name="test_shift_below_three_pixels_is_never_observed_motion[1]" time="0.417" /><testcase classname="tests.test_non_sidereal" name="test_shift_below_three_pixels_is_never_observed_motion[2]" time="0.402" /><testcase classname="tests.test_non_sidereal" name="test_faint_source_gives_no_position_and_states_why" time="0.005" /><testcase classname="tests.test_non_sidereal" name="test_single_epoch_signal_is_not_motion" time="0.351" /><testcase classname="tests.test_non_sidereal" name="test_too_few_common_stars_keeps_the_signal_as_candidate" time="0.296" /><testcase classname="tests.test_non_sidereal" name="test_misregistered_stars_block_the_claim" time="0.366" /><testcase classname="tests.test_non_sidereal" name="test_motion_groups_need_shared_sky_a_real_separation_and_one_detector" time="0.002" /><testcase classname="tests.test_non_sidereal" name="test_motion_groups_keep_both_ends_of_the_baseline_and_ignore_wavelength" time="0.001" /><testcase classname="tests.test_non_sidereal" name="test_saturated_bright_body_is_measured_from_its_wings_with_a_one_pixel_floor" time="0.379" /><testcase classname="tests.test_non_sidereal" name="test_faint_source_with_masked_core_is_not_measured" time="0.006" /><testcase classname="tests.test_non_sidereal" name="test_fixed_view_is_centred_between_both_ends_of_the_track" time="0.024" /><testcase classname="tests.test_offline" name="test_parse_s_region_drops_closing_vertex" time="0.001" /><testcase classname="tests.test_offline" name="test_homography_reproduces_tan_wcs" time="0.002" /><testcase classname="tests.test_offline" name="test_field_margin_sign" time="0.003" /><testcase classname="tests.test_offline" name="test_bilinear_lookup_exact_for_linear_tables" time="0.001" /><testcase classname="tests.test_offline" name="test_flag_classes_and_unknown_names" time="0.005" /><testcase classname="tests.test_offline" name="test_valid_mask_rules" time="0.001" /><testcase classname="tests.test_offline" name="test_rgba_marks_every_invalid_pixel_and_only_those" time="0.002" /><testcase classname="tests.test_offline" name="test_place_on_a_copies_values_without_inventing_new_ones" time="0.001" /><testcase classname="tests.test_reference_app" name="test_time_reference_region_and_gaia_outage" time="0.355" /><testcase classname="tests.test_reference_app" name="test_spectrum_reference_field_and_transfer" time="2.801" /><testcase classname="tests.test_references" name="test_ids_nulls_and_truncation" time="0.003" /><testcase classname="tests.test_references" name="test_invalid_service_payload[&lt;html&gt;offline&lt;/html&gt;]" time="0.001" /><testcase classname="tests.test_references" name="test_invalid_service_payload[]" time="0.001" /><testcase classname="tests.test_references" name="test_invalid_service_payload[source_id,ra\n1,NaN]" time="0.001" /><testcase classname="tests.test_references" name="test_reject_invalid_astrometry[change0]" time="0.001" /><testcase classname="tests.test_references" name="test_reject_invalid_astrometry[change1]" time="0.002" /><testcase classname="tests.test_references" name="test_reject_invalid_astrometry[change2]" time="0.001" /><testcase classname="tests.test_references" name="test_reject_invalid_astrometry[change3]" time="0.001" /><testcase classname="tests.test_references" name="test_invalid_query_never_calls_network[args0]" time="0.001" /><testcase classname="tests.test_references" name="test_invalid_query_never_calls_network[args1]" time="0.001" /><testcase classname="tests.test_references" name="test_invalid_query_never_calls_network[args2]" time="0.001" /><testcase classname="tests.test_references" name="test_invalid_query_never_calls_network[args3]" time="0.001" /><testcase classname="tests.test_references" name="test_invalid_query_never_calls_network[args4]" time="0.001" /><testcase classname="tests.test_references" name="test_motion_against_astropy_and_epoch_identity[359.999-0]" time="0.008" /><testcase classname="tests.test_references" name="test_motion_against_astropy_and_epoch_identity[15-89.9999]" time="0.009" /><testcase classname="tests.test_references" name="test_motion_against_astropy_and_epoch_identity[269.4485-4.7394]" time="0.009" /><testcase classname="tests.test_references" name="test_missing_motion_and_limits" time="0.001" /><testcase classname="tests.test_references" name="test_failed_gaia_is_not_empty_catalogue[404]" time="0.001" /><testcase classname="tests.test_references" name="test_failed_gaia_is_not_empty_catalogue[429]" time="0.001" /><testcase classname="tests.test_references" name="test_failed_gaia_is_not_empty_catalogue[500]" time="0.001" /><testcase classname="tests.test_references" name="test_failed_gaia_is_not_empty_catalogue[503]" time="0.001" /><testcase classname="tests.test_references" name="test_timeout_and_size_guard" time="0.003" /><testcase classname="tests.test_references" name="test_provenance_query_and_html_safety" time="0.002" /><testcase classname="tests.test_references" name="test_iframe_independent_controls_and_failures[success]" time="0.085" /><testcase classname="tests.test_references" name="test_iframe_independent_controls_and_failures[wise_error]" time="0.079" /><testcase classname="tests.test_references" name="test_iframe_independent_controls_and_failures[aladin_error]" time="0.081" /><testcase classname="tests.test_release" name="test_refresh_discovers_new_observation_and_expiry" time="0.028" /><testcase classname="tests.test_release" name="test_replacement_duplicates_and_withdrawal" time="0.012" /><testcase classname="tests.test_release" name="test_refresh_failure_never_claims_cached_is_current" time="0.019" /><testcase classname="tests.test_release" name="test_proposal_calibration_guard" time="0.004" /><testcase classname="tests.test_release" name="test_reports_do_not_overwrite" time="0.013" /><testcase classname="tests.test_release" name="test_url_rejects_bad_parameters[bad0]" time="0.001" /><testcase classname="tests.test_release" name="test_url_rejects_bad_parameters[bad1]" time="0.001" /><testcase classname="tests.test_release" name="test_url_rejects_bad_parameters[bad2]" time="0.001" /><testcase classname="tests.test_release" name="test_url_rejects_bad_parameters[bad3]" time="0.001" /><testcase classname="tests.test_release" name="test_url_rejects_bad_parameters[bad4]" time="0.001" /><testcase classname="tests.test_release" name="test_url_rejects_bad_parameters[bad5]" time="0.001" /><testcase classname="tests.test_release" name="test_url_rejects_bad_parameters[bad6]" time="0.001" /><testcase classname="tests.test_release" name="test_link_independent_sessions[temporal]" time="0.344" /><testcase classname="tests.test_release" name="test_link_independent_sessions[espectral]" time="0.001" /><testcase classname="tests.test_release" name="test_verified_aliases[Andr\xf3meda-M  31]" time="0.002" /><testcase classname="tests.test_release" name="test_verified_aliases[NGC224-M  31]" time="0.001" /><testcase classname="tests.test_release" name="test_verified_aliases[m31-M  31]" time="0.002" /><testcase classname="tests.test_release" name="test_verified_aliases[M101-M 101]" time="0.001" /><testcase classname="tests.test_release" name="test_verified_aliases[Barnard-GJ 699]" time="0.002" /><testcase classname="tests.test_release" name="test_verified_aliases[WISE 0855-WISEA J085510.74-071442.5]" time="0.001" /><testcase classname="tests.test_release" name="test_verified_aliases[Epsilon Indi-* eps Ind]" time="0.002" /><testcase classname="tests.test_release" name="test_verified_aliases[M42-M  42]" time="0.001" /><testcase classname="tests.test_release" name="test_verified_aliases[M45-Cl Melotte   22]" time="0.002" /><testcase classname="tests.test_release" name="test_verified_aliases[HD209458-HD 209458]" time="0.002" /><testcase classname="tests.test_release" name="test_search_validation[]" time="0.002" /><testcase classname="tests.test_release" name="test_search_validation[bad1]" time="0.001" /><testcase classname="tests.test_release" name="test_search_validation[HD%]" time="0.001" /><testcase classname="tests.test_release" name="test_search_validation[x; DROP]" time="0.001" /><testcase classname="tests.test_release" name="test_search_validation[&lt;script&gt;]" time="0.002" /><testcase classname="tests.test_release" name="test_search_validation[a\n]" time="0.001" /><testcase classname="tests.test_release" name="test_object_state_transfer" time="0.001" /><testcase classname="tests.test_release" name="test_remote_outage_local_remains" time="0.001" /><testcase classname="tests.test_release" name="test_collection_allowlist" time="0.001" /><testcase classname="tests.test_release" name="test_refresh_reaches_sequence_report" time="0.005" /><testcase classname="tests.test_release" name="test_retry_filename_profile" time="0.001" /><testcase classname="tests.test_release" name="test_cube_startup_rejects_unknown" time="0.002" /><testcase classname="tests.test_release" name="test_refresh_ui_requests_new_query" time="0.390" /><testcase classname="tests.test_release" name="test_suggestion_cache_success_but_not_outage" time="0.002" /><testcase classname="tests.test_robustness_live" name="test_nearest_neighbour_error_is_real_and_exact_geometry_removes_it" time="0.254" /><testcase classname="tests.test_robustness_live" name="test_native_data_are_the_original_values" time="0.002" /><testcase classname="tests.test_robustness_live" name="test_exact_rgba_masks_exactly_the_invalid_native_pixels" time="0.006" /><testcase classname="tests.test_robustness_live" name="test_halo_exploratory_marks_only_halo_pixels_and_metrics_stay_strict" time="1.543" /><testcase classname="tests.test_robustness_live" name="test_both_geometries_fixed_canvas_and_labelled" time="3.103" /><testcase classname="tests.test_robustness_live" name="test_concurrent_rendering_is_deterministic_and_leaves_no_pyplot_state" time="4.335" /><testcase classname="tests.test_robustness_live" name="test_load_sequence_reports_progress_from_local_files" time="0.238" /><testcase classname="tests.test_robustness_offline" name="test_satellite_halo_documented_and_always_masked" time="0.001" /><testcase classname="tests.test_robustness_offline" name="test_ignoring_halo_unmasks_only_pure_halo_pixels" time="0.001" /><testcase classname="tests.test_robustness_offline" name="test_caution_mask_is_halo_only" time="0.001" /><testcase classname="tests.test_robustness_offline" name="test_native_rgba_marks_caution_pixels_distinctly" time="0.002" /><testcase classname="tests.test_robustness_offline" name="test_draw_native_places_quads_at_given_corners_with_original_colours" time="0.049" /><testcase classname="tests.test_robustness_offline" name="test_fov_limits_and_invalid_input" time="0.001" /><testcase classname="tests.test_robustness_offline" name="test_atomic_write_concurrent_writers_leave_complete_file" time="0.072" /><testcase classname="tests.test_robustness_offline" name="test_fetch_downloads_each_url_once_under_concurrency" time="0.237" /><testcase classname="tests.test_robustness_offline" name="test_fetch_many_uses_local_copies_and_reports_progress" time="0.053" /><testcase classname="tests.test_robustness_offline" name="test_find_sequence_reports_every_stage" time="0.001" /><testcase classname="tests.test_sequence_live" name="test_reference_sequences_have_at_least_three_admissible_epochs[sequence_m101]" time="0.284" /><testcase classname="tests.test_sequence_live" name="test_reference_sequences_have_at_least_three_admissible_epochs[sequence_wise0855]" time="0.189" /><testcase classname="tests.test_sequence_live" name="test_reference_sequences_have_at_least_three_admissible_epochs[sequence_wise0855_mwir]" time="0.182" /><testcase classname="tests.test_sequence_live" name="test_global_spectral_compatibility_all_pairs" time="0.227" /><testcase classname="tests.test_sequence_live" name="test_common_mask_is_intersection_of_frame_masks" time="0.001" /><testcase classname="tests.test_sequence_live" name="test_frames_are_authentic_and_not_interpolated" time="0.020" /><testcase classname="tests.test_sequence_live" name="test_wcs_alignment_within_nearest_neighbour_tolerance" time="0.004" /><testcase classname="tests.test_sequence_live" name="test_pair_report_loads_as_two_frame_sequence" time="0.488" /><testcase classname="tests.test_sequence_live" name="test_player_frames_fixed_layout_and_metadata" time="0.556" /><testcase classname="tests.test_sequence_live" name="test_player_colours_masks_and_common_region" time="0.009" /><testcase classname="tests.test_sequence_live" name="test_cache_files_untouched" time="0.020" /><testcase classname="tests.test_sequence_offline" name="test_proposals_are_globally_compatible_distinct_and_chronological" time="0.003" /><testcase classname="tests.test_sequence_offline" name="test_more_epochs_do_not_beat_much_better_coverage" time="0.001" /><testcase classname="tests.test_sequence_offline" name="test_more_epochs_win_when_coverage_is_comparable" time="0.001" /><testcase classname="tests.test_sequence_offline" name="test_quality_before_quantity_and_failures_excluded" time="0.001" /><testcase classname="tests.test_sequence_offline" name="test_player_state_machine_with_node" time="0.084" /><testcase classname="tests.test_sequence_offline" name="test_keyboard_shortcuts_respect_the_focused_control" time="0.078" /><testcase classname="tests.test_spectral_app" name="test_simple_level_preserves_hidden_measurement_controls" time="5.395" /><testcase classname="tests.test_spectral_app" name="test_simple_rgb_preserves_channels_and_contrast" time="1.956" /><testcase classname="tests.test_spectral_app" name="test_url_channels_pick_extraction_and_return" time="32.267" /><testcase classname="tests.test_spectral_app" name="test_time_transfer_keeps_wise_region_not_expected_marker" time="1.149" /><testcase classname="tests.test_spectral_app" name="test_cube_errors_are_visible_without_partial_spectrum[RangeNotHonoured-lectura parcial]" time="0.275" /><testcase classname="tests.test_spectral_app" name="test_cube_errors_are_visible_without_partial_spectrum[FileChangedError-cambi\xf3]" time="0.249" /><testcase classname="tests.test_spectral_app" name="test_cube_errors_are_visible_without_partial_spectrum[CubeFormatError-estructura documentada]" time="0.308" /><testcase classname="tests.test_spectral_app" name="test_cube_errors_are_visible_without_partial_spectrum[ArchiveTransientError-temporalmente]" time="0.309" /><testcase classname="tests.test_spectral_app" name="test_cube_errors_are_visible_without_partial_spectrum[ArchivePermanentError-rechaz\xf3]" time="0.275" /><testcase classname="tests.test_spectral_app" name="test_invalid_spectral_url_never_reads_cube[query0]" time="0.247" /><testcase classname="tests.test_spectral_app" name="test_invalid_spectral_url_never_reads_cube[query1]" time="0.252" /><testcase classname="tests.test_spectral_app" name="test_invalid_spectral_url_never_reads_cube[query2]" time="0.279" /><testcase classname="tests.test_spectral_app" name="test_click_callback_uses_native_pixel_coordinates" time="0.059" /><testcase classname="tests.test_spectral_features" name="test_identical_spectra" time="0.005" /><testcase classname="tests.test_spectral_features" name="test_known_difference_and_ratio" time="0.008" /><testcase classname="tests.test_spectral_features" name="test_blank_and_missing_channels_are_never_filled" time="0.004" /><testcase classname="tests.test_spectral_features" name="test_negative_values_and_zero_never_divide" time="0.004" /><testcase classname="tests.test_spectral_features" name="test_ratio_withheld_when_denominator_is_inside_reference_scatter" time="0.005" /><testcase classname="tests.test_spectral_features" name="test_different_extractions_or_units_block_the_operations" time="0.002" /><testcase classname="tests.test_spectral_features" name="test_contamination_and_overlap_are_reported" time="0.009" /><testcase classname="tests.test_spectral_features" name="test_real_extraction_path_two_positions" time="3.523" /><testcase classname="tests.test_spectral_features" name="test_peak_and_valley_of_known_amplitude[1-pico]" time="0.177" /><testcase classname="tests.test_spectral_features" name="test_peak_and_valley_of_known_amplitude[-1-valle]" time="0.158" /><testcase classname="tests.test_spectral_features" name="test_broad_feature" time="0.164" /><testcase classname="tests.test_spectral_features" name="test_smooth_spectra_have_no_features[RJ-spectrum0]" time="0.129" /><testcase classname="tests.test_spectral_features" name="test_smooth_spectra_have_no_features[lam^-4-spectrum1]" time="0.132" /><testcase classname="tests.test_spectral_features" name="test_smooth_spectra_have_no_features[lam^+2-spectrum2]" time="0.162" /><testcase classname="tests.test_spectral_features" name="test_smooth_spectra_have_no_features[800 K-spectrum3]" time="0.312" /><testcase classname="tests.test_spectral_features" name="test_smooth_spectra_have_no_features[1500 K-spectrum4]" time="0.315" /><testcase classname="tests.test_spectral_features" name="test_smooth_spectra_have_no_features[3000 K-spectrum5]" time="0.313" /><testcase classname="tests.test_spectral_features" name="test_smooth_spectra_have_no_features[5800 K-spectrum6]" time="0.333" /><testcase classname="tests.test_spectral_features" name="test_smooth_spectra_have_no_features[plano-spectrum7]" time="0.242" /><testcase classname="tests.test_spectral_features" name="test_smooth_spectra_have_no_features[cero-spectrum8]" time="0.122" /><testcase classname="tests.test_spectral_features" name="test_local_continuum_model_error_stays_below_the_relative_floor" time="0.360" /><testcase classname="tests.test_spectral_features" name="test_strong_peak_does_not_create_false_valleys" time="0.194" /><testcase classname="tests.test_spectral_features" name="test_valley_on_a_steep_slope_is_found_although_it_is_not_a_local_minimum" time="0.211" /><testcase classname="tests.test_spectral_features" name="test_two_channel_line_is_one_feature" time="0.366" /><testcase classname="tests.test_spectral_features" name="test_pure_noise_is_rarely_labelled" time="20.560" /><testcase classname="tests.test_spectral_features" name="test_pure_noise_with_a_background_reference_is_not_labelled" time="13.210" /><testcase classname="tests.test_spectral_features" name="test_noisy_peak_is_recovered_within_its_reference_scatter[12-0.95]" time="10.937" /><testcase classname="tests.test_spectral_features" name="test_noisy_peak_is_recovered_within_its_reference_scatter[20-1.0]" time="10.781" /><testcase classname="tests.test_spectral_features" name="test_faint_fluctuation_is_not_called_quantifiable" time="8.927" /><testcase classname="tests.test_spectral_features" name="test_edges_of_the_spectral_range_are_not_evaluable" time="0.172" /><testcase classname="tests.test_spectral_features" name="test_no_reliable_continuum_next_to_channels_without_data" time="0.176" /><testcase classname="tests.test_spectral_features" name="test_feature_across_detectors_is_only_visible" time="0.196" /><testcase classname="tests.test_spectral_features" name="test_caution_flags_and_coverage_changes_cap_the_class" time="0.547" /><testcase classname="tests.test_spectral_features" name="test_documented_artefact_is_flagged_not_identified" time="0.151" /><testcase classname="tests.test_spectral_features" name="test_linear_fallback_with_non_positive_values" time="0.242" /><testcase classname="tests.test_spectral_features" name="test_manual_interval_matches_the_scan_and_wide_intervals_are_refused" time="0.465" /><testcase classname="tests.test_spectral_features" name="test_inspect_channel" time="0.304" /><testcase classname="tests.test_spectral_features" name="test_other_features_are_excluded_from_the_environment" time="0.199" /><testcase classname="tests.test_spectral_features" name="test_unlabelled_extrema_are_counted_not_labelled" time="0.154" /><testcase classname="tests.test_spectral_features" name="test_inputs_are_never_modified_and_results_are_plain_data" time="0.148" /><testcase classname="tests.test_spectral_features" name="test_invalid_inputs" time="0.001" /><testcase classname="tests.test_spectral_features_live" name="test_two_real_positions_are_extracted_identically_and_compared" time="5.229" /><testcase classname="tests.test_spectral_features_live" name="test_peak_near_3p3_um_is_quantifiable_in_b_and_absent_in_a" time="0.561" /><testcase classname="tests.test_spectral_features_live" name="test_repeated_extraction_is_reproducible_and_local" time="0.220" /><testcase classname="tests.test_spectral_interpreter" name="test_library_is_versioned_and_every_reference_has_a_verifiable_source" time="0.001" /><testcase classname="tests.test_spectral_interpreter" name="test_hydrogen_wavelengths_agree_with_the_rydberg_formula" time="0.001" /><testcase classname="tests.test_spectral_interpreter" name="test_documented_widths_are_converted_not_invented" time="0.001" /><testcase classname="tests.test_spectral_interpreter" name="test_redshift_only_inside_the_d25_isophote_of_a_curated_galaxy" time="0.001" /><testcase classname="tests.test_spectral_interpreter" name="test_quantifiable_peak_at_3p3_keeps_pah_and_pfund_delta_without_choosing" time="0.176" /><testcase classname="tests.test_spectral_interpreter" name="test_visible_peak_is_only_insufficiently_supported" time="0.147" /><testcase classname="tests.test_spectral_interpreter" name="test_single_brackett_alpha_is_one_compatible_reference" time="0.151" /><testcase classname="tests.test_spectral_interpreter" name="test_known_redshift_is_applied_and_moves_the_reference" time="0.344" /><testcase classname="tests.test_spectral_interpreter" name="test_unknown_redshift_is_never_estimated_from_a_coincidence" time="0.141" /><testcase classname="tests.test_spectral_interpreter" name="test_isolated_minimum_is_not_water_ice_and_a_broad_one_is_only_orientative" time="0.323" /><testcase classname="tests.test_spectral_interpreter" name="test_ice_wavelength_with_a_peak_is_of_the_opposite_nature" time="0.175" /><testcase classname="tests.test_spectral_interpreter" name="test_quantifiable_co2_valley_is_never_more_than_insufficient" time="0.181" /><testcase classname="tests.test_spectral_interpreter" name="test_feature_outside_the_library_has_no_compatible_reference" time="0.146" /><testcase classname="tests.test_spectral_interpreter" name="test_channels_without_data_are_not_evaluable_and_absence_is_not_concluded" time="0.313" /><testcase classname="tests.test_spectral_interpreter" name="test_step_between_detectors_is_not_a_substance" time="0.207" /><testcase classname="tests.test_spectral_interpreter" name="test_caution_in_the_environment_caps_the_verdict" time="0.193" /><testcase classname="tests.test_spectral_interpreter" name="test_spectrum_without_features_gives_nothing_to_interpret" time="0.076" /><testcase classname="tests.test_spectral_interpreter" name="test_without_the_fits_resolution_it_is_estimated_and_declared" time="0.134" /><testcase classname="tests.test_spectral_interpreter" name="test_output_is_deterministic_and_serialisable" time="0.280" /><testcase classname="tests.test_spectral_interpreter" name="test_arp220_redshift_is_applied_and_both_hypotheses_remain_unconfirmed" time="0.251" /><testcase classname="tests.test_spectral_interpreter" name="test_m51_small_redshift_and_the_aperture_is_not_the_nucleus" time="0.227" /><testcase classname="tests.test_spectral_interpreter" name="test_tw_hya_detector_step_and_flags_prevent_conclusions" time="0.283" /><testcase classname="tests.test_spectral_interpreter" name="test_ngc7027_and_m82_without_coverage_at_3p3_are_not_evaluable[results/blind_v02/T01/resultados.json]" time="0.019" /><testcase classname="tests.test_spectral_interpreter" name="test_ngc7027_and_m82_without_coverage_at_3p3_are_not_evaluable[results/blind_v02/T02/resultados.json]" time="0.146" /><testcase classname="tests.test_spectral_interpreter" name="test_m82_peak_at_4p67_is_not_co_ice" time="0.133" /><testcase classname="tests.test_spectral_interpreter" name="test_m101_ngc5461_3p3_is_compatible_but_not_confirmed" time="1.019" /><testcase classname="tests.test_spectral_interpreter_app" name="test_section_is_present_in_both_levels_and_says_nothing_without_features" time="2.393" /><testcase classname="tests.test_spectral_interpreter_app" name="test_selecting_a_feature_explains_it_in_both_levels_with_the_same_result" time="2.819" /><testcase classname="tests.test_spectral_interpreter_app" name="test_reference_marks_toggle_survives_level_changes" time="3.200" /><testcase classname="tests.test_spectral_interpreter_app" name="test_a_and_b_are_interpreted_separately" time="4.946" /><testcase classname="tests.test_spectral_interpreter_app" name="test_chart_draws_reference_marks_only_when_asked" time="1.750" /><testcase classname="tests.test_spectral_live" name="test_official_tutorial_metadata_values_and_resource_bounds" time="18.342" /><testcase classname="tests.test_spectral_offline" name="test_real_planes_metadata_and_verbatim_bytes" time="0.119" /><testcase classname="tests.test_spectral_offline" name="test_channel_changes_keep_wcs_and_region" time="0.093" /><testcase classname="tests.test_spectral_offline" name="test_injected_flux_background_and_missing_channels" time="1.348" /><testcase classname="tests.test_spectral_offline" name="test_missing_data_never_becomes_a_measurement[nan]" time="1.371" /><testcase classname="tests.test_spectral_offline" name="test_missing_data_never_becomes_a_measurement[zero_hits]" time="1.531" /><testcase classname="tests.test_spectral_offline" name="test_missing_data_never_becomes_a_measurement[background]" time="1.366" /><testcase classname="tests.test_spectral_offline" name="test_missing_data_never_becomes_a_measurement[blank_value]" time="1.530" /><testcase classname="tests.test_spectral_offline" name="test_cache_batching_limits_and_etag" time="1.832" /><testcase classname="tests.test_spectral_offline" name="test_layout_cache_memory_disk_refresh" time="0.082" /><testcase classname="tests.test_spectral_offline" name="test_damaged_same_length_cache_is_refetched" time="0.061" /><testcase classname="tests.test_spectral_offline" name="test_cache_quota_stops_new_writes" time="0.044" /><testcase classname="tests.test_spectral_offline" name="test_incompatible_fits_metadata_is_rejected[units]" time="0.053" /><testcase classname="tests.test_spectral_offline" name="test_incompatible_fits_metadata_is_rejected[scale]" time="0.044" /><testcase classname="tests.test_spectral_offline" name="test_incompatible_fits_metadata_is_rejected[channels]" time="0.041" /><testcase classname="tests.test_spectral_offline" name="test_incompatible_fits_metadata_is_rejected[shape]" time="0.043" /><testcase classname="tests.test_spectral_offline" name="test_incompatible_fits_metadata_is_rejected[blank]" time="0.047" /><testcase classname="tests.test_spectral_offline" name="test_truncated_header_does_not_loop" time="0.002" /><testcase classname="tests.test_spectral_offline" name="test_insufficient_background_is_flagged" time="1.895" /><testcase classname="tests.test_spectral_offline" name="test_subpixel_work_is_bounded[0]" time="0.054" /><testcase classname="tests.test_spectral_offline" name="test_subpixel_work_is_bounded[-1]" time="0.061" /><testcase classname="tests.test_spectral_offline" name="test_subpixel_work_is_bounded[26]" time="0.050" /><testcase classname="tests.test_spectral_offline" name="test_subpixel_work_is_bounded[2.5]" time="0.045" /><testcase classname="tests.test_spectral_offline" name="test_unexpected_status_body_is_not_read[200-RangeNotHonoured]" time="0.002" /><testcase classname="tests.test_spectral_offline" name="test_unexpected_status_body_is_not_read[404-ArchivePermanentError]" time="0.001" /><testcase classname="tests.test_spectral_offline" name="test_unexpected_status_body_is_not_read[502-ArchiveTransientError]" time="0.001" /><testcase classname="tests.test_spectral_offline" name="test_unexpected_status_body_is_not_read[429-ArchiveTransientError]" time="0.002" /><testcase classname="tests.test_spectral_offline" name="test_invalid_range_identity_rejected[headers0-FileChangedError]" time="0.001" /><testcase classname="tests.test_spectral_offline" name="test_invalid_range_identity_rejected[headers1-FileChangedError]" time="0.002" /><testcase classname="tests.test_spectral_offline" name="test_invalid_range_identity_rejected[headers2-CubeFormatError]" time="0.002" /><testcase classname="tests.test_spectral_offline" name="test_invalid_range_identity_rejected[headers3-CubeFormatError]" time="0.002" /><testcase classname="tests.test_spectral_offline" name="test_invalid_range_identity_rejected[headers4-FileChangedError]" time="0.002" /><testcase classname="tests.test_spectral_offline" name="test_invalid_range_identity_rejected[headers5-CubeFormatError]" time="0.002" /><testcase classname="tests.test_spectral_offline" name="test_invalid_range_identity_rejected[headers6-RangeNotHonoured]" time="0.001" /><testcase classname="tests.test_spectral_offline" name="test_multipart_and_single_integrity" time="0.001" /><testcase classname="tests.test_spectral_offline" name="test_retries_only_transient" time="0.001" /><testcase classname="tests.test_spectral_offline" name="test_healpix_against_independent_library" time="0.009" /><testcase classname="tests.test_spectral_offline" name="test_missing_cube_dates_keep_catalogue_epoch" time="0.002" /><testcase classname="tests.test_spectral_quality" name="test_coverage_counts_match_the_pixels_of_the_aperture" time="1.966" /><testcase classname="tests.test_spectral_quality" name="test_the_flux_and_the_existing_row_values_do_not_change" time="1.833" /><testcase classname="tests.test_spectral_quality" name="test_causes_coexist_and_are_not_exclusive_categories" time="1.715" /><testcase classname="tests.test_spectral_quality" name="test_only_empty_dr1_channels_is_not_a_loss" time="1.546" /><testcase classname="tests.test_spectral_quality" name="test_rows_without_coverage_information_do_not_break_anything" time="0.001" /><testcase classname="tests.test_spectral_quality" name="test_aperture_without_cube_pixels_is_described_not_crashed" time="0.001" /><testcase classname="tests.test_spectral_quality" name="test_plain_wording_for_the_simple_level" time="0.001" /><testcase classname="tests.test_spectral_quality" name="test_simple_level_explains_in_plain_words_and_stays_quiet_without_losses" time="2.860" /><testcase classname="tests.test_spectral_quality" name="test_page_explains_rejected_channels_in_both_levels" time="2.725" /><testcase classname="tests.test_spectral_quality" name="test_second_position_gets_its_own_diagnosis_with_a_spectrum_column" time="4.028" /><testcase classname="tests.test_spectrum_analysis_app" name="test_one_position_is_the_default_and_nothing_is_compared" time="1.881" /><testcase classname="tests.test_spectrum_analysis_app" name="test_click_places_b_only_when_b_is_the_active_point" time="0.045" /><testcase classname="tests.test_spectrum_analysis_app" name="test_second_position_is_extracted_like_a_and_can_be_removed" time="4.482" /><testcase classname="tests.test_spectrum_analysis_app" name="test_b_uses_the_aperture_of_a_never_its_own" time="6.161" /><testcase classname="tests.test_spectrum_analysis_app" name="test_selection_inspector_and_state_survive_level_mode_and_view_changes" time="34.557" /><testcase classname="tests.test_spectrum_analysis_app" name="test_interval_with_no_data_is_reported_not_filled" time="2.180" /><testcase classname="tests.test_spectrum_analysis_app" name="test_new_region_starts_with_a_single_position" time="4.618" /><testcase classname="tests.test_spectrum_analysis_app" name="test_plot_selection_callback" time="0.001" /><testcase classname="tests.test_spectrum_analysis_app" name="test_same_numbers_in_both_levels" time="1.730" /><testcase classname="tests.test_spectrum_analysis_app" name="test_an_interval_without_a_feature_is_never_given_a_type_or_a_centre" time="1.477" /><testcase classname="tests.test_spectrum_analysis_app" name="test_units_survive_the_capitals_of_labels" time="0.001" /></testsuite></testsuites>

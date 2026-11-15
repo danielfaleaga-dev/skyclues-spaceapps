@@ -2,7 +2,20 @@
 
 Última actualización: integración científica del 15-11-2026 (Claude Code A, rama `integration/science-v1`, copia `C:\Users\danie\Documents\SkyClues-integrated`). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md); las reglas visuales obligatorias están en [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md). La primera sección prevalece sobre el historial conservado debajo.
 
-## Espectro: «¿Qué podría indicar este espectro?» (intérprete físico V1) — 15-11-2026 (Claude Code A, rama `feature/spectral-physical-interpreter-v1`, sin integrar)
+## Integración científica — 15-11-2026 (Claude Code A, rama `integration/science-v1`)
+
+Dictamen **`PASS_WITH_LIMITATIONS`**. Informe: [`INTEGRATION_REPORT.md`](INTEGRATION_REPORT.md). Local, sin push ni despliegue.
+
+- **Qué reúne:** Spectrum Explorer (`f321c7c`), intérprete físico V1 (`0da1702`), mejora infrarroja S/N (`02347c6`) y detector no sideral (`d01917e`, antepasado común). Fusión en `ac85e6b`.
+- **Cómo:** sin conflictos de código; 176 archivos coinciden blob a blob con su rama de origen. Los únicos conflictos fueron `DESIGN_SYSTEM.md` y este archivo. No se cambió ningún módulo de la aplicación.
+- **Originales intactos:** `SkyClues` (Claude B, con su trabajo sin confirmar), `SkyClues-spectra`, `SkyClues-snr-A` y `SkyClues-interpreter`.
+- **Coherencia científica:** `scripts/integration_verify.py`, 15 de 15 con datos reales. El movimiento de 3I/ATLAS (165,775″ ± 2,694″) es idéntico antes y después de combinar sus exposiciones; las exposiciones no cambian (SHA-256); 102 canales con la causa de cada canal sin dato; el intérprete da veredictos, no probabilidades.
+- **Regresión global:** 628 superadas y 1 fallida, por la caída externa de ESA Gaia (`test_real_eps_ind_b_d3_reproduces_from_cached_originals`). Pruebas nuevas de integración, ejecutadas aparte: 12 superadas.
+- **Navegador** (puerto 8521, servicios reales): búsqueda, atlas, navegación entre vistas, Tiempo en vivo (Arp 220 y M101), detector no sideral (3I/ATLAS, 166″ ± 3″), S/N (activar, comparar y desactivar), clic sobre el gráfico espectral, A/B, intérprete y los dos niveles; 420 px sin desplazamiento horizontal. Capturas en `results/integration_v1/capturas/`.
+- **No comprobado:** movimiento estelar con Gaia (servicio caído), la ruta S/N de banda ancha en navegador, RGB y la consola.
+- **Sin empezar, fuera de alcance:** rediseño de Sencillo, ampliación de la biblioteca del intérprete y deslizador automático de canales.
+
+## Espectro: «¿Qué podría indicar este espectro?» (intérprete físico V1) — 15-11-2026 (Claude Code A, rama `feature/spectral-physical-interpreter-v1`)
 
 - **Qué hace:** compara cada pico o valle ya señalado por el analizador con seis referencias documentadas:
   - H₂O hielo 3,0 µm;
@@ -40,7 +53,7 @@
   - z del usuario;
   - coherencia entre rasgos del mismo espectro.
 
-## Espectro: inspector A/B y validación ciega en NGC 7023 — 15-11-2026 (Claude Code A, rama `feature/spectrum-compare`, sin integrar)
+## Espectro: inspector A/B y validación ciega en NGC 7023 — 15-11-2026 (Claude Code A, rama `feature/spectrum-compare`)
 
 - **Inspector A/B** (`74cfd6b`): el tipo y el centro solo se muestran para características clasificadas, con «Intervalo examinado» común a A y B; las unidades quedan protegidas en mayúsculas (`theme.unit`); las notas de los gráficos de Espectro se ven a opacidad completa. Sin cambios en los algoritmos. Detalle en `SPECTRUM_COMPARE_REPORT.md`.
 - **Validación ciega NGC 7023:** protocolo, resultados congelados, comparación y dictamen («RECUPERACIÓN PARCIAL») en `results/blind_ngc7023/`. Aprendizaje para futuras pruebas:
@@ -49,7 +62,7 @@
 - **Validación ciega V02:** T01 (NGC 7027), T02 (núcleo de M82) y T03 (Elias 29) resultan **NO EVALUABLE**. Las tres fuentes saturan o pierden píxeles del cubo DR1 justo donde están sus rasgos de referencia; el analizador no etiquetó nada cuantificable. Detalle en `results/blind_v02/INFORME_FINAL.md`.
 - **Diagnóstico V02 y validación ciega V03:** los canales sin valor de V02 son píxeles NaN/NHITS=0 con bandera BLOOM en el propio FITS, ampliados por la regla de apertura (sin defecto de código; \SPECTRAL_V02_DIAGNOSIS.md\). V03 ejecutó 3 de 14 candidatos que pasaron los criterios instrumentales: Arp 220 y núcleo de M51 PARCIAL (PAH 3,3 µm en el canal esperado), TW Hya NO EVALUABLE (OVERFLOW y salto entre detectores). Informe en \SPECTRAL_BLIND_V03_REPORT.md\.
 
-## Espectro: diagnóstico universal de calidad — 15-11-2026 (Claude Code A, rama `feature/spectrum-compare`, sin integrar)
+## Espectro: diagnóstico universal de calidad — 15-11-2026 (Claude Code A, rama `feature/spectrum-compare`)
 
 - **Qué hace:** explica por qué un canal no es evaluable, sin cambiar el método. La extracción (`spectral_cube.extract_spectrum`) añade a cada fila contadores `ap_*` (píxeles de la apertura, sin datos, NaN, NHITS = 0, BLOOM, OVERFLOW y peso perdido), calculados con los datos que ya leía. `spectral_quality.py` los traduce en causas coexistentes, y el inspector y una sección plegable las muestran en Sencillo y Científico.
 - **Sin cambios en resultados:** fotometría, continuo, picos y valles, umbrales, canales 51/52 y resultados congelados V01–V03. `scripts/quality_verify.py` lo comprueba con NGC 7027, M82, Elias 29 y M101 (filas antiguas idénticas con el código anterior y con los resultados congelados; contadores iguales a una lectura independiente del FITS).

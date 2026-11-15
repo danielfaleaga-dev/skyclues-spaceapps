@@ -1,0 +1,405 @@
+{
+ "metodos": {
+  "snr": "infrared-snr 1.0 (2026-11-15)",
+  "no_sideral": "non-sidereal 1.1",
+  "analizador": "skyclues-features 1.0 (2026-11-14)",
+  "interprete": "skyclues-interprete 1.0 (2026-11-15)",
+  "biblioteca": "skyclues-referencias 1.0 (2026-11-15)"
+ },
+ "superadas": 15,
+ "total": 15,
+ "comprobaciones": [
+  {
+   "comprobacion": "El código de movimiento y de secuencias no importa la mejora S/N",
+   "ok": true,
+   "detalle": [
+    "motion",
+    "motion_page",
+    "non_sidereal",
+    "moving_sources",
+    "moving_page",
+    "moving_view",
+    "sequence",
+    "player"
+   ]
+  },
+  {
+   "comprobacion": "El código de Espectro no importa el de Tiempo, Movimiento ni S/N",
+   "ok": true,
+   "detalle": [
+    "spectral_cube",
+    "spectral_features",
+    "spectral_interpreter",
+    "spectral_quality",
+    "spectral_references",
+    "spectral_view",
+    "spectrum_analysis",
+    "spectrum_interpretation",
+    "spectrum_page"
+   ]
+  },
+  {
+   "comprobacion": "La mejora S/N no importa el código de Espectro",
+   "ok": true,
+   "detalle": [
+    "enhance",
+    "enhance_page",
+    "enhance_view"
+   ]
+  },
+  {
+   "comprobacion": "3I/ATLAS D1: las exposiciones no cambian al combinarlas (SHA-256 de píxeles, varianza y banderas)",
+   "ok": true,
+   "detalle": {
+    "antes": "931615001d4cdaf8efc437c83e24ea873434a7c90e3e38d01dba9bb1b97b2e89",
+    "despues": "931615001d4cdaf8efc437c83e24ea873434a7c90e3e38d01dba9bb1b97b2e89",
+    "fallos_descarga": [],
+    "combinacion": {
+     "exposiciones": 7,
+     "aceptada": false,
+     "ganancia_mediana": 2.31858219170594,
+     "apilado_fijo": "combinado"
+    }
+   }
+  },
+  {
+   "comprobacion": "3I/ATLAS D1: el movimiento medido es idéntico antes y después de la combinación S/N",
+   "ok": true,
+   "detalle": {
+    "antes": {
+     "status": "observed",
+     "observed_motion": true,
+     "reason": "La fuente aparece en su posición en cada imagen y ha desaparecido de ella en la otra; el desplazamiento se midió en los píxeles tras registrar ambas imágenes con estrellas comunes.",
+     "positions_measured": 7,
+     "frames": 7,
+     "displacement_arcsec": 165.775,
+     "error_arcsec": 2.694,
+     "significance": 61.537,
+     "interval_hours": 1.653,
+     "rate_arcsec_per_hour": 100.262,
+     "position_angle_deg": 278.124,
+     "control_stars": 16.0,
+     "control_radius_arcsec": 0.667,
+     "measured_minus_predicted_arcsec": 2.02,
+     "snr": [
+      18.9,
+      17.4,
+      19.6,
+      18.9,
+      13.3,
+      13.8,
+      14.2
+     ],
+     "offset_from_prediction_arcsec": [
+      [
+       -0.01,
+       0.09
+      ],
+      [
+       0.22,
+       0.28
+      ],
+      [
+       -0.26,
+       0.55
+      ],
+      [
+       -0.86,
+       1.71
+      ],
+      [
+       -0.88,
+       0.22
+      ],
+      [
+       -0.72,
+       0.21
+      ],
+      [
+       -1.21,
+       1.37
+      ]
+     ],
+     "outlier_pixels_in_core": [
+      6,
+      6,
+      5,
+      4,
+      7,
+      4,
+      6
+     ]
+    },
+    "despues": {
+     "status": "observed",
+     "observed_motion": true,
+     "reason": "La fuente aparece en su posición en cada imagen y ha desaparecido de ella en la otra; el desplazamiento se midió en los píxeles tras registrar ambas imágenes con estrellas comunes.",
+     "positions_measured": 7,
+     "frames": 7,
+     "displacement_arcsec": 165.775,
+     "error_arcsec": 2.694,
+     "significance": 61.537,
+     "interval_hours": 1.653,
+     "rate_arcsec_per_hour": 100.262,
+     "position_angle_deg": 278.124,
+     "control_stars": 16.0,
+     "control_radius_arcsec": 0.667,
+     "measured_minus_predicted_arcsec": 2.02,
+     "snr": [
+      18.9,
+      17.4,
+      19.6,
+      18.9,
+      13.3,
+      13.8,
+      14.2
+     ],
+     "offset_from_prediction_arcsec": [
+      [
+       -0.01,
+       0.09
+      ],
+      [
+       0.22,
+       0.28
+      ],
+      [
+       -0.26,
+       0.55
+      ],
+      [
+       -0.86,
+       1.71
+      ],
+      [
+       -0.88,
+       0.22
+      ],
+      [
+       -0.72,
+       0.21
+      ],
+      [
+       -1.21,
+       1.37
+      ]
+     ],
+     "outlier_pixels_in_core": [
+      6,
+      6,
+      5,
+      4,
+      7,
+      4,
+      6
+     ]
+    }
+   }
+  },
+  {
+   "comprobacion": "3I/ATLAS D1: reproduce el resultado guardado del detector no sideral",
+   "ok": true,
+   "detalle": {
+    "ahora": [
+     165.775,
+     2.694
+    ],
+    "guardado": [
+     165.775,
+     2.694
+    ]
+   }
+  },
+  {
+   "comprobacion": "M101: la secuencia guardada no cambia al combinarla (píxeles, varianza, banderas y métricas)",
+   "ok": true,
+   "detalle": {
+    "exposiciones": 4,
+    "aceptada": true,
+    "ganancia_mediana": 1.8845990343943506
+   }
+  },
+  {
+   "comprobacion": "M101: «sin movimiento» antes y después de la combinación S/N",
+   "ok": true,
+   "detalle": {
+    "antes": {
+     "status": "candidate",
+     "observed_motion": false,
+     "reason": "Posiciones demasiado próximas para distinguirlas de una fuente fija.",
+     "positions_measured": 4,
+     "frames": 4,
+     "snr": [
+      9.6,
+      9.0,
+      9.7,
+      8.9
+     ],
+     "offset_from_prediction_arcsec": [
+      [
+       0.84,
+       0.19
+      ],
+      [
+       -0.35,
+       -1.5
+      ],
+      [
+       -0.2,
+       1.06
+      ],
+      [
+       1.37,
+       -0.08
+      ]
+     ],
+     "outlier_pixels_in_core": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    "despues": {
+     "status": "candidate",
+     "observed_motion": false,
+     "reason": "Posiciones demasiado próximas para distinguirlas de una fuente fija.",
+     "positions_measured": 4,
+     "frames": 4,
+     "snr": [
+      9.6,
+      9.0,
+      9.7,
+      8.9
+     ],
+     "offset_from_prediction_arcsec": [
+      [
+       0.84,
+       0.19
+      ],
+      [
+       -0.35,
+       -1.5
+      ],
+      [
+       -0.2,
+       1.06
+      ],
+      [
+       1.37,
+       -0.08
+      ]
+     ],
+     "outlier_pixels_in_core": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   }
+  },
+  {
+   "comprobacion": "M101: en la rejilla nativa, la imagen de referencia de la combinación son sus píxeles originales",
+   "ok": true,
+   "detalle": {
+    "referencia": "2026W26_1A_0178_1"
+   }
+  },
+  {
+   "comprobacion": "NGC 5461 (M101): 102 canales; los canales sin dato conservan su causa y ningún valor",
+   "ok": true,
+   "detalle": {
+    "canales": 102,
+    "estados": {
+     "ok": 100,
+     "blank": 2
+    },
+    "blank_DR1": [
+     51,
+     52
+    ],
+    "sin_dato_con_valor": []
+   }
+  },
+  {
+   "comprobacion": "NGC 5461 (M101): el intérprete da veredictos, no probabilidades ni identificaciones",
+   "ok": true,
+   "detalle": {
+    "veredictos": [
+     [
+      0.955,
+      "No evaluable"
+     ],
+     [
+      1.102,
+      "No evaluable"
+     ],
+     [
+      1.861,
+      "Ninguna referencia compatible"
+     ],
+     [
+      3.293,
+      "Varias referencias compatibles"
+     ],
+     [
+      4.076,
+      "Referencia compatible"
+     ],
+     [
+      4.669,
+      "Ninguna referencia compatible"
+     ]
+    ],
+    "claves_prohibidas": []
+   }
+  },
+  {
+   "comprobacion": "NGC 5461 (M101): una referencia sobre canales sin dato no concluye presencia ni ausencia",
+   "ok": true,
+   "detalle": {
+    "referencias_sin_cobertura": []
+   }
+  },
+  {
+   "comprobacion": "NGC 7027: 102 canales; los canales sin dato conservan su causa y ningún valor",
+   "ok": true,
+   "detalle": {
+    "canales": 102,
+    "estados": {
+     "ok": 37,
+     "no_data_aperture": 63,
+     "blank": 2
+    },
+    "blank_DR1": [
+     51,
+     52
+    ],
+    "sin_dato_con_valor": []
+   }
+  },
+  {
+   "comprobacion": "NGC 7027: el intérprete da veredictos, no probabilidades ni identificaciones",
+   "ok": true,
+   "detalle": {
+    "veredictos": [],
+    "claves_prohibidas": []
+   }
+  },
+  {
+   "comprobacion": "NGC 7027: una referencia sobre canales sin dato no concluye presencia ni ausencia",
+   "ok": true,
+   "detalle": {
+    "referencias_sin_cobertura": [
+     "h2o_hielo_3p0",
+     "pah_3p3",
+     "hi_pfund_delta",
+     "hi_brackett_alpha",
+     "co2_hielo_4p27",
+     "co_hielo_4p67"
+    ]
+   }
+  }
+ ]
+}

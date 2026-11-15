@@ -22,6 +22,14 @@ En **Composición multibanda (RGB)** se eligen tres canales del cubo para los ca
 
 Buscador con sugerencias, enlaces compartibles y actualización de observaciones: ver [`RELEASE_READINESS.md`](RELEASE_READINESS.md).
 
+### Picos, valles, comparación A/B e interpretación
+
+Debajo del gráfico, Spectrum Explorer señala picos y valles respecto a un continuo local y permite examinar cualquier punto o intervalo con un clic o arrastrando sobre el gráfico. «Punto B» añade un segundo espectro para comparar (diferencia y relación). Cada canal sin valor explica su causa: canal sin datos en DR1, píxeles sin cobertura, BLOOM u OVERFLOW.
+
+La sección **«¿Qué podría indicar este espectro?»** compara cada pico o valle con seis referencias documentadas (hielos de H₂O, CO₂ y CO, PAH de 3,3 µm e hidrógeno Pfund δ y Brackett α). Da un veredicto de compatibilidad, nunca una identificación ni una probabilidad, y dice qué impide estar seguros. Solo aplica un desplazamiento al rojo cuando es conocido y trazable.
+
+Método y límites: [`SPECTRUM_COMPARE_REPORT.md`](SPECTRUM_COMPARE_REPORT.md), [`SPECTRAL_INTERPRETER_V1_REPORT.md`](SPECTRAL_INTERPRETER_V1_REPORT.md) y las validaciones ciegas ([`SPECTRAL_BLIND_V03_REPORT.md`](SPECTRAL_BLIND_V03_REPORT.md)).
+
 ## Localizar una región: Por nombre, Coordenadas o Atlas
 
 Encima de los exploradores, **Localizar una región del cielo** ofrece tres métodos que comparten la misma región (`ra/dec/fov` de la URL) con Time Explorer y Spectrum Explorer. El **Atlas** usa Aladin Lite 3.8.1 con mapas HiPS oficiales servidos por NASA/IPAC IRSA: 2MASS, AllWISE color, W1, W2 y DSS2, cada uno con misión, producto, bandas y época. Arrastre, haga zoom, elija el diámetro (3–30′, círculo amarillo) y pulse **Seleccionar esta región**. Después, **Abrir región en Time/Spectrum Explorer** conserva las coordenadas exactas. Si la vista supera 30′, se avisa y «Ajustar al zoom» propone el máximo, sin recortar en silencio. Gaia DR3 puede superponerse para la región seleccionada. Los mapas son de otras misiones y épocas: no son datos SPHEREx ni una secuencia temporal. El HiPS combinado de SPHEREx DR1 se documenta, pero no se ofrece como capa (ver `PROJECT_STATE.md`).

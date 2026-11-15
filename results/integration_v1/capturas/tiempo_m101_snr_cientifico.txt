@@ -1,0 +1,99 @@
+Skip to main content
+SkyClues
+SPHEREX · IRSA
+
+Región
+
+Tiempo
+
+Espectro
+
+Sencillo
+
+Científico
+
+M101
+RA
+210.802429°
+DEC
++54.348750°
+CAMPO
+6.0′
+Comparable
+
+Centro del campo: posición de catálogo (sin movimiento propio).
+
+ÉPOCAS
+4
+INTERVALO TOTAL
+36.4 d
+Λ EN EL OBJETIVO
+1.420 µm
+dispersión 0.16 BW
+COBERTURA COMÚN VÁLIDA
+94.0%
+DETECTOR
+D2
+1.1–1.62 µm
+
+Secuencia
+
+Movimiento
+
+Calidad
+
+Procedencia
+
+Opciones de visualización
+
+expand_more
+
+Opciones de búsqueda
+
+expand_more
+
+Mejora infrarroja
+
+Qué combinar
+
+Imagen mejorada
+EXPOSICIONES
+4
+DETECTOR D2
+1.418 µm
+mismo canal
+INTERVALO
+36.4 d
+GANANCIA S/N
+×1.88
+mediana de 7 fuentes · √N = 2.00
+RUIDO POR PÍXEL
+0.0208
+0.0395 MJy/sr en una exposición
+Qué es esta imagen. Media ponderada por la varianza inversa de cada exposición (IMAGE − ZODI, extensión VARIANCE), con la máscara estricta y sin interpolar: cada píxel copia el valor del píxel nativo que contiene su centro. La ganancia es el cociente entre la S/N de las mismas fuentes en la combinación y en una exposición (mediana), con la misma apertura y errores propagados y contrastados con una imagen nula. Ganancia ×1.88: equivale a una sola exposición unas 4 veces más larga.
+
+Las fechas originales no se modifican: desactiva «Mejora infrarroja» para volver a la secuencia. Esta imagen no interviene en la medida de movimiento.
+
+keyboard_arrow_right
+
+Exposiciones combinadas (4)
+
+keyboard_arrow_right
+
+Controles de la combinación
+
+Descargar el informe de la combinación (JSON)
+
+keyboard_arrow_right
+
+Referencias astronómicas · Gaia / WISE
+
+keyboard_arrow_right
+
+Compartir esta región
+
+keyboard_arrow_right
+
+Resultados guardados
+
+Datos: NASA/IPAC IRSA · SPHEREx DR1 y QR3 (SIA2). Cada fotograma es una observación real; la escala de intensidad es solo de visualización.

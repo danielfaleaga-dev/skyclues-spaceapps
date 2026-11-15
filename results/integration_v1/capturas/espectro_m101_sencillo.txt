@@ -1,0 +1,151 @@
+Skip to main content
+SkyClues
+SPHEREX · IRSA
+
+Región
+
+Tiempo
+
+Espectro
+
+Sencillo
+
+Científico
+
+M101
+RA
+210.802429°
+DEC
++54.348750°
+CAMPO
+6.0′
+Explora esta zona en distintos colores infrarrojos. Para comparar fechas, abre «Tiempo».
+
+Imagen infrarroja
+
+Un canal
+
+Composición multibanda (RGB)
+
+ELIGE UN COLOR INFRARROJO
+
+◀
+
+33 · 1.592 µm
+
+1 · 0.753 µm
+
+102 · 4.988 µm
+
+▶
+
+−180
+−160
+−140
+−120
+−100
+−80
+−60
+−40
+−20
+0
+20
+40
+60
+80
+100
+120
+140
+160
+180
+Desplazamiento al este (″) · este a la izquierda
+−80
+−60
+−40
+−20
+0
+20
+40
+60
+80
+Desplazamiento al norte (″)
+
+Al pulsar la imagen eliges
+
+Punto A
+
+Punto B
+
+Pulsa la imagen para elegir un punto. Rosa: sin datos.
+
+LONGITUD DE ONDA
+1.59 µm
+canal 33 de 102
+PÍXELES CON DATOS
+100%
+del campo en este canal
+
+POSICIÓN DEL ESPECTRO
+
+El rombo naranja marca el punto elegido.
+
+Obtener el espectro en esta posición
+
+La luz del punto elegido
+0.8
+1.0
+1.2
+1.4
+1.6
+1.8
+2.0
+2.2
+2.4
+2.6
+2.8
+3.0
+3.2
+3.4
+3.6
+3.8
+4.0
+4.2
+4.4
+4.6
+4.8
+5.0
+Longitud de onda (µm)
+0
+100
+200
+50
+150
+Flujo en apertura (mJy)
+D1
+D2
+D3
+D4
+D5
+D6
+sin precaución
+OVERFLOW/OUTLIER en la apertura
+
+Para comparar con otro punto, elige «Punto B» junto a la imagen y púlsala.
+
+Pulsa un punto del gráfico, o arrastra sobre un intervalo, para examinar ese pico o valle.
+
+¿QUÉ PODRÍA INDICAR ESTE ESPECTRO?
+
+Mostrar en el gráfico dónde caen las referencias
+
+El analizador no señala picos ni valles en este espectro: no hay nada que interpretar. Eso no demuestra que falten sustancias.
+
+Cuanto más alto el punto, más luz en ese color infrarrojo. Marcas rosas: sin datos.
+
+Vista orientativa: los picos por sí solos no identifican materiales.
+
+keyboard_arrow_right
+
+Compartir esta región
+
+Datos: SPHEREx · NASA/IPAC IRSA.
