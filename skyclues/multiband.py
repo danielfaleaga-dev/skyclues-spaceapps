@@ -39,7 +39,7 @@ from . import config
 from . import spectral_cube as sc
 
 ROLES = ("R", "G", "B")
-ROLE_NAMES = {"R": "rojo", "G": "verde", "B": "azul"}
+ROLE_NAMES = {"R": "red", "G": "green", "B": "blue"}   # display names of the three roles
 #: default assignment (nearest real channel): long, middle, short wavelength.
 DEFAULT_LAMBDAS_UM = {"R": 4.5, "G": 2.2, "B": 1.2}
 PERCENTILES = (1.0, 99.5)

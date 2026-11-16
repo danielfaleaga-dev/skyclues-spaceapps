@@ -158,7 +158,7 @@ def composite_chart(png: bytes, info: dict, pixels: pd.DataFrame, comp: mb.Compo
     for r in mb.ROLES:
         tip.append(alt.Tooltip(f"{r}:Q", title=f"{r} · channel {ch[r].number} · {ch[r].wavelength_um:.3f} µm (MJy/sr)",
                                format=".4g"))
-    tip += [alt.Tooltip("cobertura:N"), alt.Tooltip("tesela:Q", title="HEALPix tile")]
+    tip += [alt.Tooltip("cobertura:N", title="coverage"), alt.Tooltip("tesela:Q", title="HEALPix tile")]
     px = max(4.0, size * comp.alignment["pixel_arcsec"] / (2 * R))
     pts = alt.Chart(pixels).mark_square(size=px * px, opacity=0.001).encode(x=X, y=Y, tooltip=tip)
     layers = [bg, lines, pts]
@@ -168,7 +168,7 @@ def composite_chart(png: bytes, info: dict, pixels: pd.DataFrame, comp: mb.Compo
         layers.append(mark.mark_point(shape="cross", size=170, strokeWidth=4, filled=False, color="#14181f",
                                       opacity=0.6).encode(x=X, y=Y))
         layers.append(mark.mark_point(shape="cross", size=140, strokeWidth=1.8, filled=False, color="#ffffff").encode(
-            x=X, y=Y, tooltip=[alt.Tooltip("m:N", title="marca")]))
+            x=X, y=Y, tooltip=[alt.Tooltip("m:N", title="mark")]))
     return alt.layer(*layers).properties(width=size, height=size)
 
 
@@ -177,7 +177,7 @@ def assignment_table(comp: mb.Composite) -> pd.DataFrame:
     rows = []
     for r in mb.ROLES:
         c = comp.channels[r]
-        rows.append({"color": f"{r} ({mb.ROLE_NAMES[r]})", "canal": c.number, "λ central (µm)": round(c.wavelength_um, 4),
+        rows.append({"colour": f"{r} ({mb.ROLE_NAMES[r]})", "channel": c.number, "central λ (µm)": round(c.wavelength_um, 4),
                      "width (µm)": round(c.bandwidth_um, 4),
                      "interval (µm)": f"{c.wl_min_um:.3f}–{c.wl_max_um:.3f}", "detector": f"D{c.detector}·{c.subchannel}",
                      "pixels with data": comp.coverage["con_datos"][r],

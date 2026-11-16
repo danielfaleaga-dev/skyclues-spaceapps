@@ -79,3 +79,21 @@ def test_presentation_only_changes_have_no_spanish_residue():
         assert marker in text, (name, marker)
     page = (root / "time_page.py").read_text(encoding="utf-8")
     assert "moves = seq.target_moves and seq.astrometry.total_pm_arcsec_yr >= MIN_PM_ARCSEC_YR" in page
+
+
+def test_multiband_labels_are_english():
+    from skyclues import multiband as mb
+
+    assert mb.ROLE_NAMES == {"R": "red", "G": "green", "B": "blue"}
+    view = (ROOT / "skyclues" / "multiband_view.py").read_text(encoding="utf-8")
+    assert '"colour":' in view and '"channel":' in view and "central λ (µm)" in view
+    page = (ROOT / "skyclues" / "multiband_page.py").read_text(encoding="utf-8")
+    assert "de {cov['n_campo']}" not in page
+
+
+def test_chart_tooltips_have_english_titles():
+    for name in ("spectral_view.py", "multiband_view.py"):
+        text = (ROOT / "skyclues" / name).read_text(encoding="utf-8")
+        for field in ('"canal:Q"', '"subcanal:Q"', '"estado:N"', '"cobertura:N"'):
+            assert f"alt.Tooltip({field})" not in text, (name, field)        # untitled: it would show the Spanish field name
+        assert 'title="marca"' not in text

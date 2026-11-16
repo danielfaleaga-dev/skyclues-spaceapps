@@ -563,7 +563,7 @@ def _provenance(seq, report: dict, is_saved: bool, sci: bool) -> None:
                      "target λ (µm)": round(s["lambda_target_um"], 4),
                      "bandwidth (µm)": round(s["bandwidth_target_um"], 4),
                      "exposure (s)": s["exptime_s"], "software": s["software_version"],
-                     "archivo": s["file_name"], "SHA-256": s["sha256"][:16] + "…"})
+                     "file": s["file_name"], "SHA-256": s["sha256"][:16] + "…"})
     df = pd.DataFrame(rows).astype(str)
     st.markdown("### Observations in this sequence")
     simple_cols = ["epoch", "mean date (UTC)"]

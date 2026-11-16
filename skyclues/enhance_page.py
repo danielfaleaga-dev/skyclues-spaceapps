@@ -327,16 +327,16 @@ def _details(p: dict) -> None:
         rows.append({"date (UTC)": str(e.image.meta.get("DATE-AVG") or "")[:16], "obs_id": e.obs_id,
                      "λ (µm)": round(sel["lambda_um"][i], 4), "relative weight": round(p["summary"]["weights_relative"][i], 2),
                      "sky (MJy/sr)": round(float(stack.offsets[i]), 4),
-                     "registration (″)": "referencia" if r.get("reference") else (
+                     "registration (″)": "reference" if r.get("reference") else (
                          f"{math.hypot(*r['shift_arcsec']):.2f} ({r['n_sources']} sources)" if "shift_arcsec" in r
                          else "unverified"),
                      "negatives discarded": sel["nonphysical_negative_pixels"][i],
-                     "archivo": e.image.meta.get("FILE"), "SHA-256": (e.sha256 or "")[:16] + "…"})
+                     "file": e.image.meta.get("FILE"), "SHA-256": (e.sha256 or "")[:16] + "…"})
     with st.expander(f"Combined exposures ({stack.n_exposures})"):
         st.dataframe(pd.DataFrame(rows).astype(str), hide_index=True, width="stretch")
         if sel["rejected"]:
-            st.markdown("**Rechazadas**")
-            st.dataframe(pd.DataFrame([{"obs_id": r["obs_id"], "motivo": r["reason"]} for r in sel["rejected"]]),
+            st.markdown("**Rejected**")
+            st.dataframe(pd.DataFrame([{"obs_id": r["obs_id"], "reason": r["reason"]} for r in sel["rejected"]]),
                          hide_index=True, width="stretch")
         st.caption(f"Collection {sel.get('collection') or '—'} · software {sel.get('version')} · {sel.get('bunit')} · "
                    f"method {enhance.METHOD}. Cutouts served by NASA/IPAC IRSA; the original FITS files are not modified.")

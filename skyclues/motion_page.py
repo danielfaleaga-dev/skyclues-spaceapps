@@ -131,18 +131,18 @@ def show_result(r: dict, key: str, simple: bool = False) -> None:
             "season": s["date_utc"], "images": s["n_images"], "detection (σ)": round(s["significance"], 1),
             "ξ (″)": round(s["xi"], 2), "σξ (″)": round(s["err_xi"], 2), "η (″)": round(s["eta"], 2),
             "ση (″)": round(s["err_eta"], 2), "registration (″)": f"{s['err_registration'][0]:.2f}/{s['err_registration'][1]:.2f}",
-            "χ² interno": None if s.get("internal_chi2_red") is None else round(s["internal_chi2_red"], 2),
+            "internal χ²": None if s.get("internal_chi2_red") is None else round(s["internal_chi2_red"], 2),
             "saturated core": "yes" if s["saturated_core"] else "no", "confusion": "yes" if s["confusion"] else "no",
-            "usada": "yes" if s.get("usable") else "no"} for s in seasons]), hide_index=True, width="stretch")
+            "used": "yes" if s.get("usable") else "no"} for s in seasons]), hide_index=True, width="stretch")
     imgs = r.get("images") or []
     if imgs:
         with st.expander(f"Original images used ({len(imgs)})"):
             st.dataframe(pd.DataFrame([{
                 "date (UTC)": (i.get("date_utc") or "")[:16], "obs_id": i.get("obs_id"),
                 "λ (µm)": None if i.get("lambda_um") is None else round(i["lambda_um"], 3),
-                "S/N": None if i.get("snr") is None else round(i["snr"], 1), "registro": i.get("registration_mode"),
+                "S/N": None if i.get("snr") is None else round(i["snr"], 1), "registration mode": i.get("registration_mode"),
                 "WCS − Gaia (″)": _pair(i.get("wcs_offset_vs_gaia_arcsec")),
-                "archivo": i.get("file"), "SHA-256": (i.get("sha256") or "")[:16] + "…"} for i in imgs]),
+                "file": i.get("file"), "SHA-256": (i.get("sha256") or "")[:16] + "…"} for i in imgs]),
                 hide_index=True, width="stretch")
             st.caption(imgs[0].get("psf_model", ""))
     ctl = r.get("control") or {}

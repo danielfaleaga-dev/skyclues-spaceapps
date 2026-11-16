@@ -60,7 +60,7 @@ def test_channels_and_wavelengths_come_from_the_fits_table(cube):
             assert (c.wl_min_um, c.wl_max_um) == (tab['WL_MIN'][n - 1], tab['WL_MAX'][n - 1])
     prov = json.loads(json.dumps(comp.provenance(), default=str))
     assert prov['canales']['R']['lambda_um'] == pytest.approx(float(tab['WAVELENGTH'][89]))
-    assert mv.assignment_table(comp)['canal'].tolist() == [90, 40, 10]
+    assert mv.assignment_table(comp)['channel'].tolist() == [90, 40, 10]
 
 
 # 2 ------------------------------------------------------------------ empty channels excluded

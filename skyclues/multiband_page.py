@@ -172,7 +172,7 @@ def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel]
         st.dataframe(mv.assignment_table(comp), hide_index=True, width="stretch")
         c1, c2 = st.columns(2)
         c1.metric("Pixels with data in all 3 channels", f"{cov['fraccion_tres_canales']:.1%}",
-                  f"{cov['tres_canales']} de {cov['n_campo']}", delta_color="off")
+                  f"{cov['tres_canales']} of {cov['n_campo']}", delta_color="off")
         c2.metric("With data in only 1–2 channels", f"{cov['parcial']}", "are shown as no data", delta_color="off")
         st.caption(
             f"Scale: asinh (a = {comp.stretch.asinh_a:g}) between percentiles {comp.stretch.percentiles[0]:g} and "

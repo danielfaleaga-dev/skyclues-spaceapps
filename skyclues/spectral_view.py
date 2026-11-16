@@ -225,7 +225,7 @@ def field_chart(png: bytes, info: dict, pixels: pd.DataFrame, cmap: sc.ChannelMa
                                                              range=["cross", "diamond"]), legend=None),
             color=alt.Color("m:N", scale=alt.Scale(domain=["objetivo", "spectrum position"],
                                                    range=["#1f5fbf", "#eda100"]), legend=None),
-            tooltip=[alt.Tooltip("m:N", title="marca")]))
+            tooltip=[alt.Tooltip("m:N", title="mark")]))
     return alt.layer(*layers).properties(width=size, height=size)
 
 
@@ -410,12 +410,12 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
     X = alt.X("lambda_um:Q", scale=xsc, title="Wavelength (µm)")
     band, band_lbl = _detector_bands(df, xsc)
     zero = alt.Chart(pd.DataFrame({"y": [0.0]})).mark_rule(color=MUTED, strokeDash=[3, 3]).encode(y="y:Q")
-    tip = [alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
-           alt.Tooltip("detector:Q"), alt.Tooltip("subcanal:Q"),
+    tip = [alt.Tooltip("canal:Q", title="channel"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
+           alt.Tooltip("detector:Q"), alt.Tooltip("subcanal:Q", title="subchannel"),
            alt.Tooltip("valor:Q", title=title, format=".4g"),
            alt.Tooltip("fondo_mjysr:Q", title="annulus background (MJy/sr)", format=".4g"),
            alt.Tooltip("nhits_min_apertura:Q", title="min. NHITS in aperture"),
-           alt.Tooltip("flags_apertura:N", title="FLAGS in aperture"), alt.Tooltip("estado:N")]
+           alt.Tooltip("flags_apertura:N", title="FLAGS in aperture"), alt.Tooltip("estado:N", title="status")]
     axis = alt.Axis(minExtent=Y_AXIS_EXTENT, maxExtent=Y_AXIS_EXTENT) if two else alt.Axis()
     Y = alt.Y("valor:Q", title=title, scale=alt.Scale(zero=False, nice=True), axis=axis)
     by_series = alt.Scale(domain=["A", "B"], range=[SERIES, SERIES_B])
@@ -447,8 +447,8 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
             alt.selection_interval(name="intervalo", encodings=["x"]))
     miss = alt.Chart(missing).mark_tick(color=MASK_COLOR, thickness=2, size=14).encode(
         x=X, y=alt.value(alt.ExprRef(expr="height - 7")),   # on the axis of the plot area, whatever the legend
-        tooltip=[alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
-                 alt.Tooltip("estado:N")])
+        tooltip=[alt.Tooltip("canal:Q", title="channel"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
+                 alt.Tooltip("estado:N", title="status")])
     layers = [band, band_lbl, zero]
     if focus is not None:
         layers.append(_focus_layer(focus, xsc))
@@ -467,7 +467,7 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
             "nota": f"{KIND_TEXT.get(f.kind, f.kind).capitalize()} · {f.label.lower()}", "canal": f.canal, "contraste": f.contrast,
             "relativo": f.relative} for f in marks])
         ftip = [alt.Tooltip("nota:N", title="feature"), alt.Tooltip("serie:N", title="espectro"),
-                alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
+                alt.Tooltip("canal:Q", title="channel"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
                 alt.Tooltip("contraste:Q", title="contrast relative to the surroundings", format=".4g"),
                 alt.Tooltip("relativo:Q", title="relative contrast", format="+.1%")]
         for kind, dy in (("pico", -15), ("valle", 16)):
@@ -517,7 +517,7 @@ def derived_chart(rows: list[dict], kind: str, unit: str, focus=None, selected_c
         lam = float(df.loc[df.canal == selected_channel, "lambda_um"].iloc[0])
         layers.append(alt.Chart(pd.DataFrame({"x": [lam]})).mark_rule(color=INK_2, strokeDash=[2, 2]).encode(
             x=alt.X("x:Q", scale=xsc)))
-    tip = [alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
+    tip = [alt.Tooltip("canal:Q", title="channel"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
            alt.Tooltip("a:Q", title=f"A ({unit})", format=".4g"), alt.Tooltip("b:Q", title=f"B ({unit})", format=".4g"),
            alt.Tooltip("valor:Q", title=title, format=".4g"), alt.Tooltip("motivo:N", title="status")]
     layers.append(alt.Chart(ok).mark_rule(color=INK_2, strokeWidth=1.2, opacity=0.5).encode(
@@ -530,7 +530,7 @@ def derived_chart(rows: list[dict], kind: str, unit: str, focus=None, selected_c
         if len(part):
             layers.append(alt.Chart(part).mark_tick(color=colour, thickness=2, size=12).encode(
                 x=X, y=alt.value(alt.ExprRef(expr="height - 6")),
-                tooltip=[alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
+                tooltip=[alt.Tooltip("canal:Q", title="channel"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
                          alt.Tooltip("motivo:N", title="no value")]))
     return alt.layer(*layers).properties(
         width="container", height=height, autosize=alt.AutoSizeParams(type="fit", contains="padding"),
