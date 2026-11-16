@@ -75,11 +75,16 @@ a:hover{color:var(--sc-ember);text-decoration-color:var(--sc-ember)}
 .st-key-level button:nth-of-type(2){grid-column:3;grid-row:1}
 .st-key-level button[aria-checked="true"],.st-key-level button[aria-pressed="true"],.st-key-level button[data-selected="true"]{
   color:var(--sc-ink)!important;font-weight:600}
-/* the clickable area reaches over its half of the track */
-.st-key-level button:nth-of-type(1)::after,.st-key-level button:nth-of-type(2)::before{content:"";position:absolute;top:-6px;bottom:-6px;
-  width:calc(.6rem + 17px)}
-.st-key-level button:nth-of-type(1)::after{left:100%}
-.st-key-level button:nth-of-type(2)::before{right:100%}
+/* a real switch: the button of the option that is NOT active spans its label AND the track, so any click on
+   the track toggles Sencillo <-> Científico. It must be the button's own box (not a pseudo-element): the
+   press handler only accepts a release inside the button's rectangle. The track and knob stay drawn by the
+   group (pointer-events:none) and the button is transparent, so nothing changes visually. */
+.st-key-level button[aria-checked="false"]{cursor:pointer;z-index:1}
+.st-key-level button[aria-checked="false"]:nth-of-type(1){grid-column:1 / 3;justify-content:flex-start;
+  padding-right:calc(34px + .6rem)!important}
+.st-key-level button[aria-checked="false"]:nth-of-type(2){grid-column:2 / 4;justify-content:flex-end;
+  padding-left:calc(34px + .6rem)!important}
+.st-key-level button[aria-checked="true"]{cursor:default}
 [data-testid="stCheckbox"] label:has(input[role=switch]){gap:.65rem;align-items:center;background:transparent;border:0;padding:.15rem 0;
   box-shadow:none;cursor:pointer}
 [data-testid="stCheckbox"] label:has(input[role=switch])>div:first-of-type{position:relative;width:34px!important;height:18px!important;
@@ -226,7 +231,7 @@ a:hover{color:var(--sc-ember);text-decoration-color:var(--sc-ember)}
 @keyframes sc-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .sc-view{animation:sc-in .2s ease}
 /* RGB composition: a fixed square chart scrolls inside its own box on narrow screens (never the page) */
-.st-key-mb_field_box{max-width:100%;overflow-x:auto;overflow-y:hidden}
+.st-key-mb_field_box,.st-key-sx_field_box{max-width:100%;overflow-x:auto;overflow-y:hidden}
 @media (max-width:900px){
   .sc-hero::after{width:70%;opacity:.4}
   .sc-steps{max-width:none}

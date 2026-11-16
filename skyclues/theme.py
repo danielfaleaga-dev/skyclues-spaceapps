@@ -124,7 +124,7 @@ def _plate_stars(seed: int = 5461) -> str:
            "<radialGradient id='c'><stop offset='0' stop-color='#141414' stop-opacity='.05'/>"
            "<stop offset='1' stop-color='#141414' stop-opacity='0'/></radialGradient></defs>"
            f"<ellipse cx='{cx}' cy='{cy}' rx='330' ry='260' fill='url(#c)'/>"
-           f"<g fill='#141414' opacity='.72'>{''.join(dots)}{''.join(bright)}</g></svg>")
+           f"<g fill='#141414' opacity='.45'>{''.join(dots)}{''.join(bright)}</g></svg>")
     return _uri(svg)
 
 

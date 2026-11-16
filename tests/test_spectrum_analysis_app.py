@@ -79,7 +79,7 @@ def test_second_position_is_extracted_like_a_and_can_be_removed(app_cube):
     assert not at.exception
     txt = text_of(at)
     assert "Espectros exploratorios de dos posiciones" in txt and "Misma extracción en ambos" in txt
-    assert f"B: RA {ra_b:.5f}°" in txt and "A: rombo azul · B: cuadrado naranja" in txt
+    assert f"B: RA {ra_b:.5f}°" in txt and "A: rombo negro · B: cuadrado cobrizo" in txt
     assert at.session_state["sx_spec_params"] == spec_a                         # A and its extraction unchanged
     assert at.button_group(key="w_sx_derived").value == "Diferencia A − B"
     at.button_group(key="w_sx_derived").set_value("Relación A / B").run()

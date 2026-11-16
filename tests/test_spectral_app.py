@@ -141,3 +141,29 @@ def test_click_callback_uses_native_pixel_coordinates(app_cube,monkeypatch):
     monkeypatch.setattr(page.st,'session_state',state)
     page._set_pick_from_chart()
     assert state['sx_pick_ra']==pick['ra'] and state['sx_pick_dec']==pick['dec']
+
+
+def test_single_channel_chart_frame_does_not_depend_on_browser_width(cube):
+    """Regression: the vertical domain was ``[-R*height/width, R*height/width]``; a chart created while
+    its column had no width got an infinite domain and drew nothing (blank image), in both the
+    single-position and the A/B charts."""
+    import json
+    import numpy as np
+    from skyclues import spectral_view as sv
+    from test_multiband import synth_map
+    yy, xx = np.mgrid[0:32, 0:32].astype(float)
+    ra, dec = cube.centre
+    cmap = synth_map(cube.tile, 10, 1 + xx + yy, ra=ra, dec=dec, fov=1.5)
+    png, info = sv.field_png(cmap, 'image')
+    pixels = sv.pixel_table(cmap)
+    R = info['half_arcsec']
+    ap = sc.Aperture(2.0, 4.0, 6.0)
+    pick_b = (ra + 0.1, dec + 0.1)
+    for kw in ({}, {'pick': (ra, dec), 'aperture': ap}, {'pick': (ra, dec), 'aperture': ap, 'pick_b': pick_b}):
+        spec = sv.field_chart(png, info, pixels, cmap, target=(ra, dec), **kw).to_dict()
+        text = json.dumps(spec)
+        assert 'height/width' not in text and '"container"' not in text
+        assert spec['width'] == spec['height']
+        domains = [enc['scale']['domain'] for layer in spec['layer'] for ch, enc in layer.get('encoding', {}).items()
+                   if ch in ('x', 'y') and 'scale' in enc]
+        assert domains and all(d == [-R, R] for d in domains)

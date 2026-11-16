@@ -174,9 +174,11 @@ def field_chart(png: bytes, info: dict, pixels: pd.DataFrame, cmap: sc.ChannelMa
 
     R = info["half_arcsec"]
     xs = alt.Scale(domain=[-R, R], reverse=True, nice=False, zero=False)
-    # Keep one angular unit equally long on both axes as the column changes width.
-    # A narrow viewport gets extra vertical context, never a stretched sky image.
-    ys = alt.Scale(domain=alt.ExprRef(expr=f"[-{R}*height/width, {R}*height/width]"), nice=False, zero=False)
+    # Square plot with the same fixed extent on both axes: one angular unit has the same length
+    # horizontally and vertically by construction. The frame never depends on the width the browser
+    # measures: a vertical domain derived from ``height/width`` became infinite (blank chart: no
+    # image, no circle, no vertical ticks) when the chart was built while its column had no width.
+    ys = alt.Scale(domain=[-R, R], nice=False, zero=False)
     tx, ty = "Desplazamiento al este (″) · este a la izquierda", "Desplazamiento al norte (″)"
     X = alt.X("este:Q", scale=xs, title=tx)
     Y = alt.Y("norte:Q", scale=ys, title=ty)
@@ -224,8 +226,7 @@ def field_chart(png: bytes, info: dict, pixels: pd.DataFrame, cmap: sc.ChannelMa
             color=alt.Color("m:N", scale=alt.Scale(domain=["objetivo", "posición del espectro"],
                                                    range=["#1f5fbf", "#eda100"]), legend=None),
             tooltip=[alt.Tooltip("m:N", title="marca")]))
-    return alt.layer(*layers).properties(width="container", height=size,
-                                         autosize=alt.AutoSizeParams(type="fit", contains="padding"))
+    return alt.layer(*layers).properties(width=size, height=size)
 
 
 def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pixel_arcsec, size):
@@ -234,7 +235,7 @@ def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pix
 
     R = info["half_arcsec"]
     xs = alt.Scale(domain=[-R, R], reverse=True, nice=False, zero=False)
-    ys = alt.Scale(domain=alt.ExprRef(expr=f"[-{R}*height/width, {R}*height/width]"), nice=False, zero=False)
+    ys = alt.Scale(domain=[-R, R], nice=False, zero=False)       # fixed square frame, see ``field_chart``
     tx, ty = "Desplazamiento al este (″) · este a la izquierda", "Desplazamiento al norte (″)"
     X = alt.X("este:Q", scale=xs, title=tx)
     Y = alt.Y("norte:Q", scale=ys, title=ty)
@@ -287,8 +288,7 @@ def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pix
                                         strokeWidth=4, strokeJoin="round").encode(x=X, y=Y, text="letra:N")
     text = alt.Chart(letters).mark_text(dx=14, dy=-13, fontSize=15, fontWeight="bold", color=INK).encode(
         x=X, y=Y, text="letra:N")
-    return alt.layer(bg, lines, pts, under, symbols, halo, text).properties(
-        width="container", height=size, autosize=alt.AutoSizeParams(type="fit", contains="padding"))
+    return alt.layer(bg, lines, pts, under, symbols, halo, text).properties(width=size, height=size)
 
 
 QUANTITIES = {

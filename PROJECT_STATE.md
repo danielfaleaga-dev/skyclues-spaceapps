@@ -16,10 +16,14 @@
   - fondo en Región y Espectro.
   
   Evidencias en `results/rgb_contrast/`.
-- **Pruebas:** 3 nuevas en `tests/test_multiband.py`. La de regresión falla con el código anterior.
-- **Pendiente:**
-  - la vista «Un canal» (`spectral_view.py`) conserva el mismo dominio dependiente de la anchura y no se ha cambiado;
-  - en el móvil hay que desplazar el gráfico RGB para verlo entero.
+- **Vista «Un canal»:** tenía el mismo fallo en `field_chart` y en `_field_chart_ab`, y se corrige igual: gráfico cuadrado y fijo, desplazable dentro de su caja en pantallas estrechas. El clic para elegir posición no cambia.
+- **Pruebas:**
+  - 3 nuevas en `tests/test_multiband.py` y 1 en `tests/test_spectral_app.py`; las de regresión fallan con el código anterior;
+  - se actualiza `test_spectrum_analysis_app.py` a los colores de marcador «negro / cobrizo» que pidió el usuario;
+  - regresión completa: **644 superadas y 1 fallida** (681 s). La fallida es `test_motion_app.py::test_real_eps_ind_b_d3_reproduces_from_cached_originals`, porque ESA Gaia no responde (ConnectTimeout, también al repetirla sola). Es el mismo fallo externo ya registrado y no guarda relación con estos cambios. La regresión empezó antes de los últimos ajustes de CSS del interruptor y de la opacidad, que se comprobaron en el navegador.
+- **Interruptor de nivel:** antes no respondía al pulsar la palanca, porque el centro no pertenecía a ningún botón y la zona ampliada quedaba recortada. Ahora el botón de la opción no activa ocupa también la pista. Comprobado en navegador con clics reales en el centro de la palanca: Sencillo → Científico → Sencillo, a 1400 px y a 375 px.
+- **Fondo:** se baja la opacidad de las estrellas de 0,72 a 0,45, a petición del usuario.
+- **Limitación:** en el móvil hay que desplazar los mapas de campo dentro de su caja para verlos enteros.
 
 ## Integración científica — 15-11-2026 (Claude Code A, rama `integration/science-v1`)
 

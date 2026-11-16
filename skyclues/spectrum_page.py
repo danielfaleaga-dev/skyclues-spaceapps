@@ -300,8 +300,10 @@ def render(level: str) -> None:
         pick_b = spectrum_analysis.point_b(region_key)      # second position, only if the user placed one
         chart = sv.field_chart(png, info, pixels, cmap, target=target, pick=pick, aperture=ap_now,
                                pixel_arcsec=tile0.pixel_scale_arcsec, pick_b=pick_b)
-        st.altair_chart(chart, on_select=_set_pick_from_chart, selection_mode="pick", key="sx_field",
-                        width="stretch")
+        # Fixed square chart; on a narrow screen it scrolls inside its own box instead of being scaled.
+        with st.container(key="sx_field_box"):
+            st.altair_chart(chart, on_select=_set_pick_from_chart, selection_mode="pick", key="sx_field",
+                            width="content")
         st.image(sv.colorbar_png(info))
         spectrum_analysis.point_controls(sci, region_key)
         if sci:
