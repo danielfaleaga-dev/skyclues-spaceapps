@@ -153,7 +153,7 @@ def test_suggestion_cache_success_but_not_outage(monkeypatch):
     monkeypatch.setattr(search,'remote_suggestions',answer)
     release_ui.suggestions('ABC');release_ui.suggestions('ABC');assert calls==['ABC']
     release_ui.suggestions.clear()
-    def outage(q):calls.append(q);return [],'Sugerencias remotas no disponibles'
+    def outage(q):calls.append(q);return [],'Remote suggestions not available'
     monkeypatch.setattr(search,'remote_suggestions',outage)
     for _ in range(2):
         with pytest.raises(RuntimeError):release_ui.suggestions('XYZ')

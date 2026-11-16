@@ -1,0 +1,217 @@
+﻿## test_static_target_and_missing_parameter_warnings  [tests/test_audit_offline.py:67]
+   SRC: assert any("velocidad radial" in w for w in EPS_IND_B.warnings())
+   E: assert False
+   E: +  where False = any(<generator object test_static_target_and_missing_parameter_warnings.<locals>.<genexpr> at 0x000001E04A6736B0>)
+## test_partial_failure_preserves_jpl_choices  [tests/test_autocomplete.py:69]
+   SRC: assert rows == [{'id': 'JPL:615'}] and 'no responde' in message
+   E: AssertionError: assert ([{'id': 'JPL:615'}] == [{'id': 'JPL:615'}]
+   E: 
+## test_options_of_both_explorers_survive_a_round_trip_with_one_region  [tests/test_integration_science.py:98]
+   SRC: raise KeyError
+   E: KeyError
+   E: KeyError: 'st.session_state has no key "sx_region_key". Did you forget to initialize it? More info: https://docs.streamlit.io/develop/concepts/architecture/session-state#initialization'
+## test_motion_tab_renders_and_gaia_outage_is_explained  [tests/test_motion_app.py:36]
+   SRC: raise KeyError(key)
+   E: KeyError: 'mv_saved'
+## test_extended_baseline_offers_images_per_season  [tests/test_motion_app.py:76]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^^^
+   E: KeyError: 'mv_images'
+## test_empty_and_failure_are_different  [tests/test_moving_app.py:32]
+   SRC: raise KeyError(key)
+   E: KeyError: 'moving_search'
+## test_solar_route_preserves_region_and_never_uses_fixed_field_engine  [tests/test_moving_app.py:47]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   E: KeyError: 'moving_search'
+## test_dates_survive_navigation_and_switching_levels  [tests/test_moving_app.py:58]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   E: KeyError: 'w_moving_start'
+## test_failed_fits_is_not_no_coverage  [tests/test_moving_app.py:72]
+   SRC: raise KeyError(key)
+   E: KeyError: 'moving_search'
+## test_invalid_selections_are_refused[nums0-distintos]  [tests/test_multiband.py:82]
+   SRC: with pytest.raises(ValueError, match=match):
+   E: AssertionError: Regex pattern did not match.
+   E: Expected regex: 'distintos'
+## test_invalid_selections_are_refused[nums1-inexistente]  [tests/test_multiband.py:82]
+   SRC: with pytest.raises(ValueError, match=match):
+   E: AssertionError: Regex pattern did not match.
+   E: Expected regex: 'inexistente'
+## test_invalid_selections_are_refused[nums2-exactamente]  [tests/test_multiband.py:82]
+   SRC: with pytest.raises(ValueError, match=match):
+   E: AssertionError: Regex pattern did not match.
+   E: Expected regex: 'exactamente'
+## test_invalid_selections_are_refused[nums3-inexistente]  [tests/test_multiband.py:82]
+   SRC: with pytest.raises(ValueError, match=match):
+   E: AssertionError: Regex pattern did not match.
+   E: Expected regex: 'inexistente'
+## test_alignment_verified_and_no_resampling  [tests/test_multiband.py:109]
+   SRC: assert comp.provenance()['remuestreo'].startswith('ninguno')
+   E: assert False
+   E: +  where False = <built-in method startswith of str object at 0x000001E04FC7A330>('ninguno')
+## test_missing_data_in_any_channel_is_never_coloured  [tests/test_multiband.py:165]
+   SRC: assert (row['cobertura'] == 'datos solo en 2 canal(es)').all() and len(row) == 1
+   E: AssertionError: assert (np.False_)
+   E: +  where np.False_ = all()
+## test_all_nan_channel_is_refused_not_painted  [tests/test_multiband.py:205]
+   SRC: with pytest.raises(mb.InsufficientDataError, match='0 píxeles'):
+   E: AssertionError: Regex pattern did not match.
+   E: Expected regex: '0 píxeles'
+## test_common_scale_without_useful_contrast_is_measured_and_explained  [tests/test_multiband.py:289]
+   SRC: assert len(msg) == 1 and 'Resaltar cada color' in msg[0] and 'no un fallo' in msg[0]
+   E: assert (0 == 1)
+   E: +  where 0 = len([])
+## test_field_split_over_several_tiles  [tests/test_multiband.py:334]
+   SRC: assert any('varias teselas' in w for w in comp.warnings)
+   E: assert False
+   E: +  where False = any(<generator object test_field_split_over_several_tiles.<locals>.<genexpr> at 0x000001E0AA985630>)
+## test_switch_to_multiband_and_back_keeps_region_channel_and_pick  [tests/test_multiband.py:410]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   E: KeyError: 'sx_pick_ra'
+## test_multiband_reader_failure_is_visible_without_image  [tests/test_multiband.py:461]
+   SRC: assert any('composición' in e.value and 'temporalmente' in e.value for e in at.error)
+   E: assert False
+   E: +  where False = any(<generator object test_multiband_reader_failure_is_visible_without_image.<locals>.<genexpr> at 0x000001E05041F850>)
+## test_insufficient_coverage_message_in_app  [tests/test_multiband.py:481]
+   SRC: assert any('Datos insuficientes' in e.value for e in at.error)
+   E: assert False
+   E: +  where False = any(<generator object test_insufficient_coverage_message_in_app.<locals>.<genexpr> at 0x000001E050120FB0>)
+## test_returning_to_spectrum_explorer_with_the_same_region_keeps_working  [tests/test_multiband.py:498]
+   SRC: raise KeyError
+   E: KeyError
+   E: KeyError: 'st.session_state has no key "sx_pick_ra". Did you forget to initialize it? More info: https://docs.streamlit.io/develop/concepts/architecture/session-state#initialization'
+## test_missing_observer_orbit_is_service_limit_not_empty_sky  [tests/test_non_sidereal.py:150]
+   SRC: with pytest.raises(s.solar_system.ServiceError,match='cobertura orbital'):
+   E: AssertionError: Regex pattern did not match.
+   E: Expected regex: 'cobertura orbital'
+## test_fits_dates_and_identity_verified  [tests/test_non_sidereal.py:224]
+   SRC: assert not frames and 'fecha' in fail[0]['error']
+   E: AssertionError: assert (not [] and 'fecha' in 'The FITS date does not match the per-exposure prediction.')
+## test_flag_classes_and_unknown_names  [tests/test_offline.py:78]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   E: AssertionError: assert 'header' == 'cabecera'
+   E: 
+## test_time_reference_region_and_gaia_outage  [tests/test_reference_app.py:23]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   E: KeyError: 'time_ref_open'
+## test_spectrum_reference_field_and_transfer  [tests/test_reference_app.py:40]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   E: KeyError: 'spectrum_ref_open'
+## test_iframe_independent_controls_and_failures[success]  [tests/test_references.py:128]
+   SRC: assert result.returncode==0,result.stdout+result.stderr
+   E: AssertionError: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+   E: 
+## test_iframe_independent_controls_and_failures[wise_error]  [tests/test_references.py:128]
+   SRC: assert result.returncode==0,result.stdout+result.stderr
+   E: AssertionError: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+   E: 
+## test_refresh_ui_requests_new_query  [tests/test_release.py:143]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   E: KeyError: 'example_sequence_m101'
+## test_suggestion_cache_success_but_not_outage  [tests/test_release.py:159]
+   SRC: with pytest.raises(RuntimeError):release_ui.suggestions('XYZ')
+   E: Failed: DID NOT RAISE RuntimeError
+## test_simple_level_preserves_hidden_measurement_controls  [tests/test_spectral_app.py:13]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^
+   E: KeyError: 'sx_rap'
+## test_url_channels_pick_extraction_and_return  [tests/test_spectral_app.py:78]
+   SRC: if channel in [51,52]: assert any('sin datos en DR1' in w.value for w in at.warning)
+   E: assert False
+   E: +  where False = any(<generator object test_url_channels_pick_extraction_and_return.<locals>.<genexpr> at 0x000001E0AA968040>)
+## test_time_transfer_keeps_wise_region_not_expected_marker  [tests/test_spectral_app.py:123]
+   SRC: raise KeyError
+   E: KeyError
+   E: KeyError: 'st.session_state has no key "sx_region_key". Did you forget to initialize it? More info: https://docs.streamlit.io/develop/concepts/architecture/session-state#initialization'
+## test_invalid_spectral_url_never_reads_cube[query0]  [tests/test_spectral_app.py:135]
+   SRC: assert any('no válid' in e.value for e in at.error)
+   E: assert False
+   E: +  where False = any(<generator object test_invalid_spectral_url_never_reads_cube.<locals>.<genexpr> at 0x000001E0500193C0>)
+## test_invalid_spectral_url_never_reads_cube[query1]  [tests/test_spectral_app.py:135]
+   SRC: assert any('no válid' in e.value for e in at.error)
+   E: assert False
+   E: +  where False = any(<generator object test_invalid_spectral_url_never_reads_cube.<locals>.<genexpr> at 0x000001E05041D080>)
+## test_invalid_spectral_url_never_reads_cube[query2]  [tests/test_spectral_app.py:135]
+   SRC: assert any('no válid' in e.value for e in at.error)
+   E: assert False
+   E: +  where False = any(<generator object test_invalid_spectral_url_never_reads_cube.<locals>.<genexpr> at 0x000001E067DC0C70>)
+## test_ratio_withheld_when_denominator_is_inside_reference_scatter  [tests/test_spectral_features.py:95]
+   SRC: assert by[40]["relacion"] == 2.0 and by[40]["estado_relacion"] == "válida"
+   E: AssertionError: assert (2.0 == 2.0 and 'valid' == 'válida'
+   E: 
+## test_different_extractions_or_units_block_the_operations  [tests/test_spectral_features.py:108]
+   SRC: assert "tablas de canales" in sf.compare(a, other).issues[0]
+   E: AssertionError: assert 'tablas de canales' in 'The channel tables of A and B do not match (different wavelengths or intervals): they are not compared channel by channel.'
+## test_contamination_and_overlap_are_reported  [tests/test_spectral_features.py:116]
+   SRC: assert far.comparable and any("anillo de fondo de la otra" in n for n in far.notes)
+   E: AssertionError: assert (True and False)
+   E: +  where True = Comparison(label_a='A', label_b='B', quantity='flux', unit='mJy', comparable=True, issues=[], notes=['Each aperture fa...rencia_min': 0.0, 'diferencia_max': 0.0, 'fraccion_a_mayor': 0.0, 'relacion_mediana': 1.0, 'relacion_dispersion': 0.0}).comparable
+## test_edges_of_the_spectral_range_are_not_evaluable  [tests/test_spectral_features.py:264]
+   SRC: assert f.klass == sf.NOT_EVALUABLE and "borde del intervalo espectral" in f.reasons[0] and f.contrast is None
+   E: AssertionError: assert ('no_evaluable' == 'no_evaluable'
+   E: 
+## test_no_reliable_continuum_next_to_channels_without_data  [tests/test_spectral_features.py:275]
+   SRC: assert g.klass == sf.NOT_EVALUABLE and "No se interpolan" in g.reasons[0] and "51, 52" in g.reasons[0]
+   E: AssertionError: assert ('no_evaluable' == 'no_evaluable'
+   E: 
+## test_manual_interval_matches_the_scan_and_wide_intervals_are_refused  [tests/test_spectral_interpreter.py:204]
+   SRC: assert it2.matches[0].status == si.MATCH_WEAK and "orientativa" in it2.matches[0].reasons[-1]
+   E: AssertionError: assert ('no_evaluable' == 'no_evaluable'
+   E: 
+## test_step_between_detectors_is_not_a_substance  [tests/test_spectral_interpreter.py:215]
+   SRC: assert it.verdict == si.NOT_EVALUABLE and "no son sustancias" in it.blockers[0]
+   E: AssertionError: assert ('no_evaluable' == 'no_evaluable'
+   E: 
+## test_arp220_redshift_is_applied_and_both_hypotheses_remain_unconfirmed  [tests/test_spectral_interpreter_app.py:66]
+   SRC: assert "no hay nada que interpretar" in text_of(at)
+   E: AssertionError: assert 'radio 26″' in 'Matching in position and type does not identify a substance: it is a hypothesis consistent with the data. The cube sp...the feature, widened only by the documented error of the band centre (1 nm in D1–D4, 10 nm in D5–D6; Hui et al. 2026).'
+   E: +  where 'Matching in position and type does not identify a substance: it is a hypothesis consistent with the data. The cube sp...the feature, widened only by the documented error of the band centre (1 nm in D1–D4, 10 nm in D5–D6; Hui et al. 2026).' = <built-in method join of str object at 0x00007FF9A52B18C8>(['Matching in posit
+## test_a_and_b_are_interpreted_separately  [tests/test_spectral_interpreter_app.py:107]
+   SRC: assert "Espectro A: " in page and "Espectro B: " in page
+   E: assert ('Espectro A: ' in 'What could this spectrum indicate?</p> <p style="margin:.35rem 0 .1rem"><b>A</b> · <span class="sc-badge sc-ok">Compa...tgpt.com"]{display:none}\n.st-key-sc_scroll_top{position:absolute;width:0;height:0;overflow:hidden;margin:0}\n</style>')
+## test_truncated_header_does_not_loop  [tests/test_spectral_offline.py:181]
+   SRC: with pytest.raises(sc.CubeFormatError,match='sin END'): sc.read_layout(445)
+   E: AssertionError: Regex pattern did not match.
+   E: Expected regex: 'sin END'
+## test_rows_without_coverage_information_do_not_break_anything  [tests/test_spectral_quality.py:106]
+   SRC: assert sq.table_rows([q])[0]["Píxeles válidos"] == "no disponible" and sq.plain(q).startswith("Este canal no puede")
+   E: KeyError: 'Píxeles válidos'
+## test_aperture_without_cube_pixels_is_described_not_crashed  [tests/test_spectral_quality.py:116]
+   SRC: assert sq.table_rows([q])[0]["Píxeles válidos"] == "0 píxeles en la apertura"
+   E: KeyError: 'Píxeles válidos'
+## test_plain_wording_for_the_simple_level  [tests/test_spectral_quality.py:122]
+   SRC: assert sq.plain(sq.ChannelQuality(status="no_data_aperture", **base)) == (
+   E: AssertionError: assert 'This channel... usable data.' == 'Este canal n... utilizables.'
+   E: 
+## test_page_explains_rejected_channels_in_both_levels  [tests/test_spectral_quality.py:149]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^
+   E: assert 0 == 2
+   E: +  where 0 = len([])
+## test_second_position_gets_its_own_diagnosis_with_a_spectrum_column  [tests/test_spectral_quality.py:182]
+   SRC: interval = _quality_frames(at)[0]
+   E: IndexError: list index out of range
+## test_one_position_is_the_default_and_nothing_is_compared  [tests/test_spectrum_analysis_app.py:54]
+   SRC: assert "Espectro exploratorio de una posición" in text_of(at)
+   E: AssertionError: assert 'Espectro exploratorio de una posición' in 'To compare with another point, choose «Point B» next to the image and press it. Press a point on the chart, or drag o... no peaks or valleys in this spectrum: there is nothing to interpret. This does not prove that substances are missing.'
+   E: +  where 'To compare with another point, choose «Point B» next to the image and press it. Press a point on the chart, or drag o... no peaks or valleys in this spectrum: there is nothing to interpret. This does not prove that substances are missing.' = text_of(AppTest(\n    _script_path='C:\\Users\\danie\\Documents\\SkyClues-ux\\
+## test_click_places_b_only_when_b_is_the_active_point  [tests/test_spectrum_analysis_app.py:70]
+   SRC: assert state[sa.B_KEY] == {"ra": pick["ra"], "dec": pick["dec"], "region": (1.0, 2.0, 0.1)}
+   E: KeyError: 'sx_b'
+## test_second_position_is_extracted_like_a_and_can_be_removed  [tests/test_spectrum_analysis_app.py:81]
+   SRC: assert "Espectros exploratorios de dos posiciones" in txt and "Misma extracción en ambos" in txt
+   E: AssertionError: assert ('Espectros exploratorios de dos posiciones' in 'A: black diamond · B: copper square, with the same colours as their curves. A difference between two points does not ... no peaks or valleys in this spectrum: there is nothing to interpret. This does not prove that substances are missing.')
+## test_b_uses_the_aperture_of_a_never_its_own  [tests/test_spectrum_analysis_app.py:103]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^
+   E: KeyError: 'sx_rap'
+## test_selection_inspector_and_state_survive_level_mode_and_view_changes  [tests/test_spectrum_analysis_app.py:28]
+   SRC: return next(d.value for d in at.dataframe if list(d.value.columns)[0] == "Magnitud")
+   E: StopIteration
+## test_interval_with_no_data_is_reported_not_filled  [tests/test_spectrum_analysis_app.py:28]
+   SRC: return next(d.value for d in at.dataframe if list(d.value.columns)[0] == "Magnitud")
+   E: StopIteration
+## test_same_numbers_in_both_levels  [tests/test_spectrum_analysis_app.py:193]
+   SRC: assert "un 40%" in sa._plain(f) and dict(zip(rows["Magnitud"], rows["Espectro A"]))["Contraste relativo"] == "+40.0%"
+   E: AssertionError: assert ('un 40%' in 'peak: 40% brighter than the neighbouring colours. It stands out clearly.')
+   E: +  where 'peak: 40% brighter than the neighbouring colours. It stands out clearly.' = <function _plain at 0x000001E04FF63060>(Feature(serie='A', origin='automatic', klass='cuantificable', kind='pico', reasons=['Contrast of more than 1000 times ...2, env_left=[28, 29, 30], env_right=[32, 33, 34], detectors=[2], nhits_feature=4.0,
+## test_an_interval_without_a_feature_is_never_given_a_type_or_a_centre  [tests/test_spectrum_analysis_app.py:205]
+   SRC: warn(f'ERFA function "{func_name}" yielded {wmsg}', ErfaWarning)
+   E: KeyError: 'Tipo'
+60 blocks

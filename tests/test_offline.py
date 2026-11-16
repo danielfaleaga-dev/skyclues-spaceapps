@@ -1,4 +1,4 @@
-"""Offline unit tests. Arrays here are synthetic test fixtures for the logic
+﻿"""Offline unit tests. Arrays here are synthetic test fixtures for the logic
 only; they are never shown or stored as observations."""
 
 import numpy as np
@@ -75,7 +75,7 @@ def _flag_header(extra=None):
 
 def test_flag_classes_and_unknown_names():
     defs = read_flag_definitions(_flag_header({30: "NEWTHING"}))
-    assert defs.source == "cabecera"            # header complete: nothing added from the documentation
+    assert defs.source == "header"            # header complete: nothing added from the documentation
     assert defs.classify("SOURCE") == "info"
     assert defs.classify("OVERFLOW") == "unusable"
     assert defs.classify("HALO") == "artifact"

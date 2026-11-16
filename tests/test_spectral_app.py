@@ -22,7 +22,7 @@ def test_simple_level_preserves_hidden_measurement_controls(app_cube):
     assert at.session_state['sx_region_key']==region
     assert not any(s.key=='sx_rap' for s in at.slider)
     assert not any(r.key in ('sx_layer','sx_quantity') for r in at.radio)
-    assert not any('Método y limitaciones' in x.label or 'Tabla del espectro' in x.label for x in at.expander)
+    assert not any('Method and limitations' in x.label or 'Spectrum table' in x.label for x in at.expander)
     at.button_group(key='level').set_value('Scientific').run()
     assert not at.exception
     assert at.slider(key='sx_rap').value==3.0
@@ -75,11 +75,11 @@ def test_url_channels_pick_extraction_and_return(app_cube):
         assert not at.exception
         assert at.session_state['sx_region_key']==key
         assert at.query_params['canal']==str(channel)
-        if channel in [51,52]: assert any('sin datos en DR1' in w.value for w in at.warning)
+        if channel in [51,52]: assert any('no data in DR1' in w.value for w in at.warning)
     old=at.session_state['sx_spec_params']
     at.number_input(key='sx_pick_ra').set_value(app_cube.centre[0]+.001).run()
     assert at.session_state['sx_spec_params']==old
-    assert any('espectro anterior' in c.value for c in at.caption)
+    assert any('previous spectrum' in c.value for c in at.caption)
     at.button(key='sx_extract').click().run()
     assert not at.exception
     assert at.session_state['sx_spec_params'][0]==round(app_cube.centre[0]+.001,6)
@@ -88,7 +88,7 @@ def test_url_channels_pick_extraction_and_return(app_cube):
     assert at.session_state['region']['ra']==pytest.approx(key[0],abs=1e-6)
     assert at.session_state['region']['dec']==pytest.approx(key[1],abs=1e-6)
     assert at.session_state['region']['fov']==.1
-    assert not any(m.label=='Épocas' for m in at.metric)
+    assert not any(m.label=='Epochs' for m in at.metric)
 
 
 def test_time_transfer_keeps_wise_region_not_expected_marker(app_cube,monkeypatch):
@@ -106,7 +106,7 @@ def test_time_transfer_keeps_wise_region_not_expected_marker(app_cube,monkeypatc
     assert not at.exception
     assert at.session_state['sx_region_key']==(round(shared['ra'],6),round(shared['dec'],6),shared['fov'])
     text=' '.join(str(x.proto) for x in at if hasattr(x, 'proto'))
-    assert 'no es una época efectiva' in text and 'no una detección' in text
+    assert 'not an effective observation epoch' in text and 'not a detection' in text
     at.button_group(key='nav').set_value('Time').run()
     assert not at.exception
     assert at.session_state['region']['ra']==pytest.approx(shared['ra'],abs=1e-6)

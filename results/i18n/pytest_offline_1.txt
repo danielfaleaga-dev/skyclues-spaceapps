@@ -1,0 +1,1625 @@
+﻿F.........F..F....FF...F.........F.....F....................F.F......... [ 12%]
+........................................................................ [ 25%]
+.....................F.................F..F.F..F..FFFF.....F........F... [ 37%]
+F...........FFF............F.........F.FFFFFF...FFFF.F......F.FFF.FF..F. [ 50%]
+.....FFFF..............F...F..F.F.....F.....F....F.........FF........... [ 62%]
+......FF
+================================== FAILURES ===================================
+_________ test_layers_identify_mission_product_and_are_official_hips __________
+
+    def test_layers_identify_mission_product_and_are_official_hips():
+        ids = [L["id"] for L in atlas.LAYERS]
+        assert len(ids) == len(set(ids))
+        for L in atlas.LAYERS:
+            assert L["url"].startswith("https://irsa.ipac.caltech.edu/data/hips/")
+            assert all(L[k] for k in ("mission", "product", "bands", "epoch", "note"))
+            assert "SPHEREx" not in L["mission"]          # no SPHEREx map is presented as a layer
+        assert {"allwise", "w1", "w2"} <= set(ids) and "2mass" in ids
+>       assert atlas.SPHEREX_HIPS["release"] and "combinado" in atlas.SPHEREX_HIPS["kind"]
+E       AssertionError: assert ('2026-11-01' and 'combinado' in 'HiPS cube of 102 PNG planes (0.75–5.0 µm), combined product')
+
+tests\test_atlas.py:32: AssertionError
+___________________ test_unified_component_and_gaia_outage ____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002197A2BC0D0>
+
+    def test_unified_component_and_gaia_outage(monkeypatch):
+        from skyclues import region_ui, reference_page
+        calls=[]
+        monkeypatch.setattr(region_ui,'REGION',lambda **kw:calls.append(kw['data']))
+        def down(*a,**k):raise references.ReferenceError('Gaia no responde')
+        from skyclues import gaia_atlas
+        monkeypatch.setattr(gaia_atlas.CATALOGUE,'poll',lambda *a,**k:{'state':'error','message':'Gaia no disponible'})
+        at=AppTest.from_file(APP,default_timeout=30)
+        at.session_state['atlas_gaia']=True
+        at.run()
+        assert not at.exception and len(calls)==1
+        d=calls[0]
+        assert d['region']['fov']==.1 and d['gaia']==[] and 'no disponible' in d['gaia_note']
+>       assert at.button_group(key='nav').options==['Región','Tiempo','Espectro']
+E       AssertionError: assert ['Region', 'Time', 'Spectrum'] == ['Región', 'T...', 'Espectro']
+E         
+E         At index 0 diff: 'Region' != 'Región'
+E         Use -v to get more diff
+
+tests\test_atlas.py:91: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 20:54:55.344 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 20:54:55.344 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_______________ test_rejected_component_event_preserves_region ________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002197FAF02D0>
+
+    def test_rejected_component_event_preserves_region(monkeypatch):
+        from skyclues import region_ui
+        state={'region_ui':{'region':{'ra':12,'dec':0,'fov':8}}};params={}
+        before=navigation.get_region(state,params).copy()
+        monkeypatch.setattr(region_ui.st,'session_state',state)
+        monkeypatch.setattr(region_ui.st,'query_params',params)
+        region_ui._on_region()
+>       assert state['region']==before and 'no válida' in state['region_notice']
+E       AssertionError: assert ({'ra': 210.80...e': None, ...} == {'ra': 210.80...e': None, ...}
+E         
+E         Omitting 13 identical items, use -vv to show
+E         Use -v to get more diff and 'no válida' in 'Invalid region: Field of view 8.0° outside [0.05°, 0.5°] (3′–30′).')
+
+tests\test_atlas.py:114: AssertionError
+______________ test_parallax_is_applied_with_the_right_amplitude ______________
+
+    def test_parallax_is_applied_with_the_right_amplitude():
+        no_plx = Astrometry(**{**WISE0855.to_dict(), "parallax_mas": None})
+        shifts = [_sep(WISE0855.position_at(2026.0 + f), no_plx.position_at(2026.0 + f))
+                  for f in np.linspace(0, 1, 25)]
+        assert 0.30 < max(shifts) < 0.50                            # parallax 0.439 arcsec
+>       assert any("paralaje" in w for w in no_plx.warnings())
+E       assert False
+E        +  where False = any(<generator object test_parallax_is_applied_with_the_right_amplitude.<locals>.<genexpr> at 0x0000021979C4F370>)
+
+tests\test_audit_offline.py:61: AssertionError
+______________ test_static_target_and_missing_parameter_warnings ______________
+
+    def test_static_target_and_missing_parameter_warnings():
+        assert M101.position_at(2026.4) == (M101.ra_deg, M101.dec_deg)
+>       assert not M101.has_proper_motion and "Sin movimiento propio" in M101.warnings()[0]
+E       AssertionError: assert (not False and 'Sin movimiento propio' in 'No proper motion in the catalogue: the catalogue position is used for all dates (correct for distant objects; wrong if the object moves).')
+E        +  where False = Astrometry(name='M 101', ra_deg=210.80242916666668, dec_deg=54.34875, epoch_jyear=2000.0, pmra_masyr=None, pmdec_masyr=None, parallax_mas=None, rv_kms=None, source='SIMBAD 2026-11-14 (galaxy: no measurable proper motion)').has_proper_motion
+
+tests\test_audit_offline.py:66: AssertionError
+_____ test_satellite_halo_from_documentation_when_header_stops_at_bit_28 ______
+
+    def test_satellite_halo_from_documentation_when_header_stops_at_bit_28():
+        defs = read_flag_definitions(_real_style_header())
+>       assert defs.bits[29] == "SATELLITE_HALO" and "documentación" in defs.source
+E       AssertionError: assert ('SATELLITE_HALO' == 'SATELLITE_HALO'
+E         
+E           SATELLITE_HALO and 'documentación' in 'cabecera + documentation (bits 29)')
+E        +  where 'cabecera + documentation (bits 29)' = FlagDefinitions(bits={0: 'TRANSIENT', 1: 'OVERFLOW', 2: 'SUR_ERROR', 6: 'NONFUNC', 7: 'DICHROIC', 9: 'MISSING_DATA', 1...ed in the official documentation (absent from the header)'}, source='cabecera + documentation (bits 29)', conflicts={}).source
+
+tests\test_audit_offline.py:126: AssertionError
+________________ test_capabilities_502_but_direct_query_works _________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002197F9CA450>
+
+    def test_capabilities_502_but_direct_query_works(monkeypatch):
+        sleeps = []
+        monkeypatch.setattr(archive.time, "sleep", sleeps.append)
+        ok = _fake_sia2(monkeypatch, capabilities_ok=True)
+        archive._query_images_live(10.0, 20.0, 1 / 3600, config.WIDE_COLLECTIONS)
+        assert archive.last_sia2_route == "capabilities" and ok["built"] == [True]
+    
+        log = _fake_sia2(monkeypatch, capabilities_ok=False)
+        assert archive._query_images_live(10.0, 20.0, 1 / 3600, config.WIDE_COLLECTIONS) == []
+        assert log["built"] == [True, False]                       # one capabilities attempt, then direct
+>       assert archive.last_sia2_route.startswith("directo") and sleeps == []
+E       AssertionError: assert (False)
+E        +  where False = <built-in method startswith of str object at 0x00000219775A59B0>('directo')
+E        +    where <built-in method startswith of str object at 0x00000219775A59B0> = 'direct (capabilities not available)'.startswith
+E        +      where 'direct (capabilities not available)' = archive.last_sia2_route
+
+tests\test_audit_offline.py:257: AssertionError
+________________ test_corrupt_reference_file_is_never_modified ________________
+
+tmp_store = WindowsPath('C:/Users/danie/AppData/Local/Temp/pytest-of-danie/pytest-165/test_corrupt_reference_file_is0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002197F9CBF10>
+l2_bytes = <function synthetic_l2_bytes at 0x0000021974384FE0>
+
+    def test_corrupt_reference_file_is_never_modified(tmp_store, monkeypatch, l2_bytes):
+        ref = config.REFERENCE_DIR / archive._cache_path(URL).name
+        bad = l2_bytes()[:5760]
+        archive.atomic_write(ref, bad)
+        calls = _scripted(monkeypatch, [_R(200, l2_bytes())])
+>       with pytest.raises(archive.CorruptFitsError, match="referencia"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'referencia'
+E         Actual message: 'Reference file level2_T_D1_spx_l2b-v1-2026-001__a1240bf63af4fc1f.fits is damaged (FITS ilegible: AstropyUserWarning: File may have been truncated: actual file length (5760) is smaller than the expected size (8640)); it is not modified'
+
+tests\test_audit_offline.py:342: AssertionError
+__ test_atlas_suggestions_include_interstellar_identity_beyond_first_twelve ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002197FAC0310>
+
+    def test_atlas_suggestions_include_interstellar_identity_beyond_first_twelve(monkeypatch):
+        # Synthetic ordering, official identifier fields: many ATLAS comets precede 3I in JPL.
+        rows = [{'name': 'ATLAS', 'type': 'comet (integrated barycenter)', 'spkid': str(1003000+i),
+                 'pdes': f'C/2015 A{i}', 'alias': []} for i in range(14)]
+        rows.append({'name': 'ATLAS (C/2025 N1)', 'type': 'comet (integrated barycenter)',
+                     'spkid': '1004083', 'pdes': 'C/2025 N1', 'alias': ['3I', 'K25N010']})
+        monkeypatch.setattr(solar, 'request_json', lambda *a: {'result': rows})
+        result = solar.suggestions('atlas')
+        assert result[0]['id'] == 'JPL:1004083'
+        assert result[0]['label'] == '3I/ATLAS (C/2025 N1)'
+>       assert len(result) == 12 and result[0]['type'] == 'Cometa'
+E       AssertionError: assert (12 == 12 and 'Comet' == 'Cometa'
+E        +  where 12 = len([{'id': 'JPL:1004083', 'label': '3I/ATLAS (C/2025 N1)', 'type': 'Comet', 'aliases': ['C/2025 N1', '3I', 'K25N010'], .....5 A3'], ...}, {'id': 'JPL:1003004', 'label': 'ATLAS (C/2015 A4)', 'type': 'Comet', 'aliases': ['C/2015 A4'], ...}, ...])
+E         
+E         - Cometa
+E         ?      -
+E         + Comet)
+
+tests\test_autocomplete.py:47: AssertionError
+_________________ test_partial_failure_preserves_jpl_choices __________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002197FAD9B90>
+
+    def test_partial_failure_preserves_jpl_choices(monkeypatch):
+        region_ui.suggestions.clear()
+        monkeypatch.setattr(search, 'remote_suggestions', lambda q: ([], 'Sugerencias remotas no disponibles'))
+        monkeypatch.setattr(solar, 'suggestions', lambda q: [{'id': 'JPL:615'}])
+        rows, message = region_ui.suggestions('Atlas')
+>       assert rows == [{'id': 'JPL:615'}] and 'no responde' in message
+E       AssertionError: assert ([{'id': 'JPL:615'}] == [{'id': 'JPL:615'}]
+E         
+E         Use -v to get more diff and 'no responde' in '')
+
+tests\test_autocomplete.py:69: AssertionError
+_________________ test_complete_messier_range_is_dynamic[102] _________________
+
+n = 102
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002197FB19590>
+
+    @pytest.mark.parametrize('n', range(1,111))
+    def test_complete_messier_range_is_dynamic(n, monkeypatch):
+        calls=[]
+        monkeypatch.setattr(search,'INDEX',[])
+        monkeypatch.setattr(search,'resolve_name',lambda name:(calls.append(name) or None, []))
+        if n==102:
+>           with pytest.raises(ValueError,match='ambigua'):search.resolve('Messier 102')
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'ambigua'
+E             Actual message: 'M102 has an ambiguous historical identification: select NGC 5866 or M101 explicitly.'
+
+tests\test_continuity.py:13: AssertionError
+_______________________ test_network_outage_is_explicit _______________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002197F9E0E10>
+
+    def test_network_outage_is_explicit(monkeypatch):
+        def down(*a,**k):raise solar.requests.Timeout()
+        monkeypatch.setattr(solar.requests,'get',down)
+>       with pytest.raises(solar.ServiceError,match='no disponible'):solar.lookup('Bennu')
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'no disponible'
+E         Actual message: 'Astronomical service not available; try again.'
+
+tests\test_continuity.py:76: AssertionError
+_ test_registration_error_rejects_the_exposure_instead_of_shifting_the_stack __
+
+    def test_registration_error_rejects_the_exposure_instead_of_shifting_the_stack():
+        good = [exposure(i) for i in (1, 2, 3)]
+        st = en.combine(good + [exposure(4, wcs_error=1.6)], RA0, DEC0, FOV)
+        assert st.n_exposures == 3
+>       assert any("Registro" in r["reason"] for r in st.selection["rejected"])
+E       assert False
+E        +  where False = any(<generator object test_registration_error_rejects_the_exposure_instead_of_shifting_the_stack.<locals>.<genexpr> at 0x000002197FAFAEA0>)
+
+tests\test_enhance.py:111: AssertionError
+__________________________ test_no_gain_is_rejected ___________________________
+
+    def test_no_gain_is_rejected():
+        st = en.combine([exposure(1, sigma=1.0), exposure(2, sigma=30.0)], RA0, DEC0, FOV)
+        m = en.evaluate(st)
+        v = en.verdict(m)
+>       assert not v["accepted"] and "no aporta" in " ".join(v["reasons"])
+E       AssertionError: assert (not False and 'no aporta' in 'Compared with the best individual exposure the gain is only 1.00 (< 1.2): the combination does not provide a measurable improvement over it.')
+E        +  where 'Compared with the best individual exposure the gain is only 1.00 (< 1.2): the combination does not provide a measurable improvement over it.' = <built-in method join of str object at 0x00007FF9A52B18C8>(['Compared with the best individual exposure the gain is only 1.00 (< 1.2): the combination does not provide a measurable improvement over it.'])
+E        +    where <built-in method join of str object at 0x00007FF9A52B18C8> = ' '.join
+
+tests\test_enhance.py:136: AssertionError
+______ test_partial_coverage_is_propagated_and_tiny_overlap_is_rejected _______
+
+    def test_partial_coverage_is_propagated_and_tiny_overlap_is_rejected():
+        half = exposure(4, dx=-28.0)                                    # covers part of the field only
+        st = en.combine([exposure(1), exposure(2), exposure(3), half], RA0, DEC0, FOV)
+        assert st.n_exposures == 4 and st.n.max() == 4 and st.n[st.field].min() == 3
+        assert (st.coverage[st.field] >= 3).all()
+        far = exposure(5, dx=-74.0)                                     # shares almost nothing
+        st2 = en.combine([exposure(1), exposure(2), far], RA0, DEC0, FOV)
+        assert st2.n_exposures == 2
+>       assert any("nivel de cielo" in r["reason"] for r in st2.selection["rejected"])
+E       assert False
+E        +  where False = any(<generator object test_partial_coverage_is_propagated_and_tiny_overlap_is_rejected.<locals>.<genexpr> at 0x000002197FAFA880>)
+
+tests\test_enhance.py:176: AssertionError
+_________________ test_psf_incompatible_exposure_is_rejected __________________
+
+    def test_psf_incompatible_exposure_is_rejected():
+        st = en.combine([exposure(1), exposure(2), exposure(3), exposure(4, psf_sigma=2.2)], RA0, DEC0, FOV)
+        assert st.n_exposures == 3
+>       assert any("PSF incompatible" in r["reason"] for r in st.selection["rejected"])
+E       assert False
+E        +  where False = any(<generator object test_psf_incompatible_exposure_is_rejected.<locals>.<genexpr> at 0x000002197FAF8E40>)
+
+tests\test_enhance.py:207: AssertionError
+_________ test_spectral_differences_change_the_product_not_the_method _________
+
+    def test_spectral_differences_change_the_product_not_the_method():
+        mono = en.combine([exposure(1, lam=1.250), exposure(2, lam=1.255)], RA0, DEC0, FOV)
+        assert mono.selection["kind"] == "monochromatic" and not mono.selection["warnings"]
+        broad = en.combine([exposure(1, lam=1.25), exposure(2, lam=1.31), exposure(3, lam=1.40)], RA0, DEC0, FOV)
+        assert broad.selection["kind"] == "broadband"
+>       assert "BANDA ANCHA" in broad.selection["warnings"][0] and "monocromático" in broad.selection["warnings"][0]
+E       AssertionError: assert ('BANDA ANCHA' in 'BROADBAND product: it combines different wavelengths of the same detector. It is useful for detecting and locating sources; its brightness is not monochromatic and must not be compared between dates or with a channel.')
+
+tests\test_enhance.py:215: AssertionError
+_______________ test_detectors_and_calibrations_are_never_mixed _______________
+
+    def test_detectors_and_calibrations_are_never_mixed():
+        sel = en.select([exposure(1, det=2), exposure(2, det=5)], RA0, DEC0, FOV)
+>       assert not sel["ok"] and "detectores distintos" in sel["reason"]
+E       AssertionError: assert (not False and 'detectores distintos' in 'The exposures come from different detectors (D2, D5): different bands, PSF and calibration. This product only combines one detector.')
+
+tests\test_enhance.py:223: AssertionError
+________________ test_temporal_differences_and_a_moving_target ________________
+
+    def test_temporal_differences_and_a_moving_target():
+        exps = [exposure(1, mjd=60000.0), exposure(2, mjd=60200.0)]
+        st = en.combine(exps, RA0, DEC0, FOV, target_motion_arcsec=1.0)
+        assert st.selection["span_days"] == pytest.approx(200.0)
+>       with pytest.raises(en.EnhanceError, match="emborronaría"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'emborronaría'
+E         Actual message: 'The target moves 8.0″ between the first and the last date (more than 0.5 pixels): a combination fixed on the sky would blur it. The dates are compared separately.'
+
+tests\test_enhance.py:242: AssertionError
+__ test_moving_source_needs_a_comoving_stack_and_a_wrong_track_shows_nothing __
+
+    def test_moving_source_needs_a_comoving_stack_and_a_wrong_track_shows_nothing():
+        exps, centres = moving_set()
+        ra, dec = centres[0]
+        follow = en.combine(exps, ra, dec, 0.06, purpose="comoving", centres=centres)
+        snr, m = centre_snr(follow)
+        assert snr > 6 and m["snr_single_median"] < 5                   # visible only when followed
+>       assert "TRAYECTORIA PREVISTA" in " ".join(follow.selection["warnings"])
+E       AssertionError: assert 'TRAYECTORIA PREVISTA' in 'Combination FOLLOWING A PREDICTED TRAJECTORY: the stars end up shifted and the position of the object in this image is set by the ephemeris. It is not a measurement of its position or its motion.'
+E        +  where 'Combination FOLLOWING A PREDICTED TRAJECTORY: the stars end up shifted and the position of the object in this image is set by the ephemeris. It is not a measurement of its position or its motion.' = <built-in method join of str object at 0x00007FF9A52B18C8>(['Combination FOLLOWING A PREDICTED TRAJECTORY: the stars end up shifted and the position of the object in this image is set by the ephemeris. It is not a measurement of its position or its motion.'])
+E        +    where <built-in method join of str object at 0x00007FF9A52B18C8> = ' '.join
+
+tests\test_enhance.py:315: AssertionError
+____________ test_exact_source_selection_without_remote_resolution ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002197FB72590>
+
+    def test_exact_source_selection_without_remote_resolution(monkeypatch):
+        state,qp=state_for_click(),{}
+        navigation.set_region(state,qp,323.21,-21.78,.1)
+        monkeypatch.setattr(region_ui.st,'session_state',state)
+        monkeypatch.setattr(region_ui.st,'query_params',qp)
+        def no_network(*a,**k):raise AssertionError('Selection must reuse loaded rows')
+        monkeypatch.setattr(region_ui,'resolve',no_network)
+        monkeypatch.setattr(gaia_atlas.references,'fetch_gaia',no_network)
+        region_ui._on_gaia_pick()
+        r=state['region']
+        assert r['name']=='Gaia DR3 '+SOURCE['source_id']
+        assert (r['ra'],r['dec'],r['fov'])==(SOURCE['ra'],SOURCE['dec'],.2)
+        assert r['astrometry']['epoch_jyear']==2016.
+        assert r['astrometry']['pmra_masyr']==12.
+        assert 'J2016.0' in region_ui.object_card(r)['detail']
+>       assert 'detección SPHEREx' in ' '.join(region_ui.object_card(r)['notes'])
+E       AssertionError: assert 'detección SPHEREx' in 'Gaia DR3 catalogue coordinates (ICRS, J2016.0). Selecting this source does not confirm a SPHEREx detection. The explorers compute the expected position for their own dates with Gaia astrometry; that calculation is not a detection.'
+E        +  where 'Gaia DR3 catalogue coordinates (ICRS, J2016.0). Selecting this source does not confirm a SPHEREx detection. The explorers compute the expected position for their own dates with Gaia astrometry; that calculation is not a detection.' = <built-in method join of str object at 0x00007FF9A52B18C8>(['Gaia DR3 catalogue coordinates (ICRS, J2016.0). Selecting this source does not confirm a SPHEREx detection.', 'The explorers compute the expected position for their own dates with Gaia astrometry; that calculation is not a detection.'])
+E        +    where <built-in method join of str object at 0x00007FF9A52B18C8> = ' '.join
+
+tests\test_gaia_atlas.py:69: AssertionError
+_________ test_actual_component_selection_loading_and_stale_responses _________
+
+    def test_actual_component_selection_loading_and_stale_responses():
+        root=Path(__file__).resolve().parents[1]
+        result=subprocess.run(['node',str(root/'tests/gaia_atlas_harness.cjs')],cwd=root,capture_output=True,text=True,timeout=20)
+>       assert result.returncode==0,result.stdout+result.stderr
+E       AssertionError: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+E         
+E           assert(node('.rg-gaia-message').textContent.includes('No se encontraron'))
+E         
+E             at C:\Users\danie\Documents\SkyClues-ux\tests\gaia_atlas_harness.cjs:58:2 {
+E           generatedMessage: true,
+E           code: 'ERR_ASSERTION',
+E           actual: false,
+E           expected: true,
+E           operator: '==',
+E           diff: 'simple'
+E         }
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['node', 'C:\\Users\\danie\\Documents\\SkyClues-ux\\tests\\gaia_atlas_harness.cjs'], returncode=...ssage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n").returncode
+
+tests\test_gaia_atlas.py:93: AssertionError
+__________ test_interpreter_output_has_verdicts_and_no_probabilities __________
+
+    def test_interpreter_output_has_verdicts_and_no_probabilities():
+        assert set(si.VERDICT_LABELS) == {si.COMPATIBLE, si.SEVERAL, si.WEAK, si.NONE, si.NOT_EVALUABLE}
+        words = " ".join(list(si.VERDICT_LABELS.values()) + list(si.VERDICT_MEANING.values())
+                         + list(si.STATUS_LABELS.values()) + list(sxi.PLAIN_LIMITS.values())).lower()
+        for banned in ("probab", "identificad", "confirmad", "hemos encontrado", "%"):
+            assert banned not in words, banned
+>       assert "no es una identificación" in si.VERDICT_MEANING[si.COMPATIBLE]
+E       AssertionError: assert 'no es una identificación' in 'a single reference matches in position and type, with data without reservations; it is not an identification'
+
+tests\test_integration_science.py:80: AssertionError
+_____ test_options_of_both_explorers_survive_a_round_trip_with_one_region _____
+
+self = SessionState(_old_state={'level': 'Científico', '$$STREAMLIT_INTERNAL_KEY_TESTING': {'$$ID-65279e261fd13c885fc5a90fa2a...ral']}), _persist_tracker=PersistedWidgetTracker(_scopes={}, _widget_pages={}, _value_pages={}, _pending_resets=set()))
+key = 'sx_region_key'
+
+    def __getitem__(self, key: str) -> Any:
+        wid_key_map = self._key_id_mapper.id_key_mapping
+        widget_id = self._get_widget_id(key)
+    
+        if widget_id in wid_key_map and widget_id == key:
+            # the "key" is a raw widget id, so get its associated user key for lookup
+            key = wid_key_map[widget_id]
+        try:
+>           base_value = self._getitem(widget_id, key)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\runtime\state\session_state.py:776: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = SessionState(_old_state={'level': 'Científico', '$$STREAMLIT_INTERNAL_KEY_TESTING': {'$$ID-65279e261fd13c885fc5a90fa2a...ral']}), _persist_tracker=PersistedWidgetTracker(_scopes={}, _widget_pages={}, _value_pages={}, _pending_resets=set()))
+widget_id = 'sx_region_key', user_key = 'sx_region_key'
+
+    def _getitem(self, widget_id: str | None, user_key: str | None) -> Any:
+        """Get the value of an entry in Session State, using either the
+        user-provided key or a widget id as appropriate for the internal dict
+        being accessed.
+    
+        At least one of the arguments must have a value.
+        """
+        if user_key is None and widget_id is None:  # pragma: no cover - defensive
+            raise ValueError(
+                "user_key and widget_id cannot both be None. This should never happen."
+            )
+    
+        if user_key is not None:
+            try:
+                return self._new_session_state[user_key]
+            except KeyError:
+                pass
+    
+        if widget_id is not None:
+            try:
+                return self._new_widget_state[widget_id]
+            except KeyError:
+                pass
+    
+        # Typically, there won't be both a widget id and an associated state key in
+        # old state at the same time, so the order we check is arbitrary.
+        # The exception is if session state is set and then a later run has
+        # a widget created, so the widget id entry should be newer.
+        # The opposite case shouldn't happen, because setting the value of a widget
+        # through session state will result in the next widget state reflecting that
+        # value.
+        if widget_id is not None:
+            try:
+                return self._old_state[widget_id]
+            except KeyError:
+                pass
+    
+        if user_key is not None:
+            try:
+                return self._old_state[user_key]
+            except KeyError:
+                pass
+    
+        # We'll never get here
+>       raise KeyError
+E       KeyError
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\runtime\state\session_state.py:829: KeyError
+
+During handling of the above exception, another exception occurred:
+
+app_cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002197A214050>
+
+    def test_options_of_both_explorers_survive_a_round_trip_with_one_region(app_cube, monkeypatch):  # noqa: F811
+        monkeypatch.setattr(page, "cached_epoch", lambda _: (app_cube.centre[0], app_cube.centre[1], {
+            "propagated": True, "mjd_mid": 60000, "date_mid": "2023-02-25", "date_beg": "2023-01-01",
+            "date_end": "2023-05-01", "motion_over_inputs_arcsec": 3}))
+        at = AppTest.from_file(APP, default_timeout=60)
+        at.session_state["level"] = "Científico"
+        at.run()
+        stem = next(s for s in config.VALIDATED_EXAMPLES if "wise" in s)
+        at.button(key="example_" + stem).click().run()
+        assert not at.exception
+        at.toggle(key="w_enhance").set_value(True).run()                     # Time: S/N option on
+        assert not at.exception and at.session_state["opt_enhance"] is True
+        shared = dict(at.session_state["region"])
+        at.button_group(key="nav").set_value("Espectro").run()
+        assert not at.exception
+>       assert at.session_state["sx_region_key"] == (round(shared["ra"], 6), round(shared["dec"], 6), shared["fov"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_integration_science.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\SkyClues\.venv\Lib\site-packages\streamlit\testing\v1\app_test.py:292: in __getitem__
+    return self._state[key]
+           ^^^^^^^^^^^^^^^^
+..\SkyClues\.venv\Lib\site-packages\streamlit\runtime\state\safe_session_state.py:123: in __getitem__
+    return self._state[key]
+           ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = SessionState(_old_state={'level': 'Científico', '$$STREAMLIT_INTERNAL_KEY_TESTING': {'$$ID-65279e261fd13c885fc5a90fa2a...ral']}), _persist_tracker=PersistedWidgetTracker(_scopes={}, _widget_pages={}, _value_pages={}, _pending_resets=set()))
+key = 'sx_region_key'
+
+    def __getitem__(self, key: str) -> Any:
+        wid_key_map = self._key_id_mapper.id_key_mapping
+        widget_id = self._get_widget_id(key)
+    
+        if widget_id in wid_key_map and widget_id == key:
+            # the "key" is a raw widget id, so get its associated user key for lookup
+            key = wid_key_map[widget_id]
+        try:
+            base_value = self._getitem(widget_id, key)
+            return (
+                apply_presenter(self, widget_id, base_value)
+                if widget_id is not None
+                else base_value
+            )
+        except KeyError:
+>           raise KeyError(_missing_key_error_message(key))
+E           KeyError: 'st.session_state has no key "sx_region_key". Did you forget to initialize it? More info: https://docs.streamlit.io/develop/concepts/architecture/session-state#initialization'
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\runtime\state\session_state.py:783: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 20:55:14.077 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 20:55:14.077 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 20:55:14.263 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+2026-11-15 20:55:15.074 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+________________ test_psf_is_the_official_epsf_and_normalised _________________
+
+    def test_psf_is_the_official_epsf_and_normalised():
+        img = FakeImage(np.zeros((N, N)), np.ones((N, N)), _wcs(), 0, "x")
+        psf = motion.psf_for(img, 30, 30)
+>       assert "EPSF oficial" in psf.description and psf.array is not None
+E       AssertionError: assert ('EPSF oficial' in 'Official EPSF zone (10,10), 296 stars, λc 1.338 µm · epsf_2_20260507.fits')
+E        +  where 'Official EPSF zone (10,10), 296 stars, λc 1.338 µm · epsf_2_20260507.fits' = PSF(array=array([[ 9.72871944e-04,  5.45288365e-04,  7.05345846e-04, ...,\n         1.07871079e-04,  5.78697206e-04,  5...rsample=(5, 5), sigma_px=None, description='Official EPSF zone (10,10), 296 stars, λc 1.338 µm · epsf_2_20260507.fits').description
+
+tests\test_motion.py:124: AssertionError
+___________ test_source_below_detection_threshold_is_never_measured ___________
+
+stars = [(np.float64(37.52863998140009), np.float64(119.16414029087264), 7654.114141471161), (np.float64(-82.43784300282245), ...35206032), 6027.28955374772), (np.float64(16.049205622347728), np.float64(148.65008503031783), 7755.971515282518), ...]
+
+    def test_source_below_detection_threshold_is_never_measured(stars):
+        # SIMULATED flux 5 (≈ 2–3σ per image, < 10σ per season): too faint to claim anything.
+        frames, gaia = simulate(stars, target_shift=(6.0, 0.0), target_flux=5.0, seed=7)
+        inv = motion.investigate(frames, (RA0, DEC0), gaia=gaia)
+        assert inv.outcome in (motion.INSUFFICIENT_EVIDENCE, motion.INSUFFICIENT_DATA)
+>       assert "detecta" in " ".join(inv.reasons) or "temporada" in " ".join(inv.reasons)
+E       AssertionError: assert ('detecta' in 'The source is not detected at a significance ≥ 10σ in any season (joint fit of its exposures).' or 'temporada' in 'The source is not detected at a significance ≥ 10σ in any season (joint fit of its exposures).')
+E        +  where 'The source is not detected at a significance ≥ 10σ in any season (joint fit of its exposures).' = <built-in method join of str object at 0x00007FF9A52B18C8>(['The source is not detected at a significance ≥ 10σ in any season (joint fit of its exposures).'])
+E        +    where <built-in method join of str object at 0x00007FF9A52B18C8> = ' '.join
+E        +    and   ['The source is not detected at a significance ≥ 10σ in any season (joint fit of its exposures).'] = Investigation(outcome='INSUFFICIENT_DATA', reasons=['The source is not detected at a significance ≥ 10σ in any season ... 'reason': 'the fit χ² has no well-defined minimum (non-positive curvature; typical of a saturated or masked core)'}]}).reasons
+E        +  and   'The source is not detected at a significance ≥ 10σ in any season (joint fit of its exposures).' = <built-in method join of str object at 0x00007FF9A52B18C8>(['The source is not detected at a significance ≥ 10σ in any season (joint fit of its exposures).'])
+E        +    where <built-in method join of str object at 0x00007FF9A52B18C8> = ' '.join
+E        +    and   ['The source is not detected at a significance ≥ 10σ in any season (joint fit of its exposures).'] = Investigation(outcome='INSUFFICIENT_DATA', reasons=['The source is not detected at a significance ≥ 10σ in any season ... 'reason': 'the fit χ² has no well-defined minimum (non-positive curvature; typical of a saturated or masked core)'}]}).reasons
+
+tests\test_motion.py:200: AssertionError
+_______________ test_failed_season_is_reported_with_its_reason ________________
+
+stars = [(np.float64(37.52863998140009), np.float64(119.16414029087264), 7654.114141471161), (np.float64(-82.43784300282245), ...35206032), 6027.28955374772), (np.float64(16.049205622347728), np.float64(148.65008503031783), 7755.971515282518), ...]
+
+    def test_failed_season_is_reported_with_its_reason(stars):
+        frames, _ = simulate(stars, seasons=((0.0, 2),), seed=14)
+        ents = [motion._Entry(k, f.image, motion.science_data(f.image), f.image.variance, motion.usable_mask(f.image),
+                              np.zeros((N, N), bool), f.image.meta["MJD-AVG"], 0.0, 0.0, 0.01, 0.01)
+                for k, f in enumerate(frames)]
+        why = []
+        assert motion.season_fit(ents, lambda e: (500.0, 0.0), RA0, DEC0, 20.0, why=why) is None   # outside the cutout
+>       assert why and "borde" in why[0]
+E       AssertionError: assert (['the search circle touches the edge of the cutout or the mask in all images'] and 'borde' in 'the search circle touches the edge of the cutout or the mask in all images')
+
+tests\test_motion.py:277: AssertionError
+____________ test_motion_tab_renders_and_gaia_outage_is_explained _____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000219122DBC90>
+
+    def test_motion_tab_renders_and_gaia_outage_is_explained(monkeypatch):
+        def down(*a, **k):   # SIMULATED external outage of the ESA Gaia archive
+            raise references.ReferenceError("Gaia DR3 (ESA) no responde.")
+        monkeypatch.setattr(motion_page, "_gaia", down)
+        at = AppTest.from_file(APP, default_timeout=120)
+        at.session_state['level']='Científico'
+        at.session_state['time_tab']='Movimiento'
+        at.run()
+        at.button(key='example_sequence_m101').click().run()
+        assert not at.exception
+>       assert any(t.label == "Movimiento" for t in at.tabs)
+E       assert False
+E        +  where False = any(<generator object test_motion_tab_renders_and_gaia_outage_is_explained.<locals>.<genexpr> at 0x000002197A189490>)
+
+tests\test_motion_app.py:35: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:21.618 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:21.618 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:21.618 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:21.820 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+2026-11-15 21:00:22.677 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+_______________ test_extended_baseline_offers_images_per_season _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021912421750>
+
+    def test_extended_baseline_offers_images_per_season(monkeypatch):
+        at = AppTest.from_file(APP, default_timeout=120)
+        at.session_state['level']='Científico'
+        at.session_state['time_tab']='Movimiento'
+        at.run()
+        at.button(key='example_sequence_m101').click().run()
+        assert not at.exception
+>       at.radio(key="mv_images").set_value(motion_page.IMAGE_MODES[1]).run()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_motion_app.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WidgetList(), key = 'mv_images'
+
+    def __call__(self, key: str) -> El_co:
+        """Return the first element in this collection with the given user key.
+    
+        The same key can appear on different element types, so this returns the
+        first match in this collection. Use ``get_by_key`` when an ambiguous
+        key should raise.
+        """
+        for e in self._list:
+            if getattr(e, "key", None) == key:
+                return e
+>       raise KeyError(key)
+E       KeyError: 'mv_images'
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\testing\v1\element_tree.py:602: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:22.692 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:22.693 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:22.693 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:22.914 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+2026-11-15 21:00:22.939 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+____________________ test_empty_and_failure_are_different _____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021912757410>
+
+    def test_empty_and_failure_are_different(monkeypatch):
+        monkeypatch.setattr(page,'discover',lambda *a,**k:reply([]))
+>       at=app();at.button(key='moving_search').click().run()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_moving_app.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WidgetList(_list=[Button(key='FormSubmitter:solar_epoch-Calculate position for this date', label='Calculate position f... 4 epochs · 1.42 µm'), Button(key='example_sequence_wise0855_pm', label='WISE 0855 · 2 epochs · 4.86 µm · Δt 1 year')])
+key = 'moving_search'
+
+    def __call__(self, key: str) -> El_co:
+        """Return the first element in this collection with the given user key.
+    
+        The same key can appear on different element types, so this returns the
+        first match in this collection. Use ``get_by_key`` when an ambiguous
+        key should raise.
+        """
+        for e in self._list:
+            if getattr(e, "key", None) == key:
+                return e
+>       raise KeyError(key)
+E       KeyError: 'moving_search'
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\testing\v1\element_tree.py:602: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:23.166 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:23.166 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:23.166 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_____ test_solar_route_preserves_region_and_never_uses_fixed_field_engine _____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002191216BB10>
+
+    def test_solar_route_preserves_region_and_never_uses_fixed_field_engine(monkeypatch):
+        from skyclues import time_page
+        def forbidden(*a,**k):raise AssertionError('Stellar fixed-field search must not handle a solar target')
+        monkeypatch.setattr(time_page,'find_sequence',forbidden)
+        monkeypatch.setattr(page,'discover',lambda *a,**k:reply([ROW]))
+        at=app();region=deepcopy(at.session_state['region'])
+>       at.button(key='moving_search').click().run()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_moving_app.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WidgetList(_list=[Button(key='FormSubmitter:solar_epoch-Calculate position for this date', label='Calculate position f... 4 epochs · 1.42 µm'), Button(key='example_sequence_wise0855_pm', label='WISE 0855 · 2 epochs · 4.86 µm · Δt 1 year')])
+key = 'moving_search'
+
+    def __call__(self, key: str) -> El_co:
+        """Return the first element in this collection with the given user key.
+    
+        The same key can appear on different element types, so this returns the
+        first match in this collection. Use ``get_by_key`` when an ambiguous
+        key should raise.
+        """
+        for e in self._list:
+            if getattr(e, "key", None) == key:
+                return e
+>       raise KeyError(key)
+E       KeyError: 'moving_search'
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\testing\v1\element_tree.py:602: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:23.517 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:23.517 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:23.517 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_____________ test_dates_survive_navigation_and_switching_levels ______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002191243AE90>
+
+    def test_dates_survive_navigation_and_switching_levels(monkeypatch):
+        monkeypatch.setattr(page,'discover',lambda *a,**k:reply([ROW]))
+        at=app()
+>       at.date_input(key='w_moving_start').set_value(date(2025,12,1)).run()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_moving_app.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WidgetList(), key = 'w_moving_start'
+
+    def __call__(self, key: str) -> El_co:
+        """Return the first element in this collection with the given user key.
+    
+        The same key can appear on different element types, so this returns the
+        first match in this collection. Use ``get_by_key`` when an ambiguous
+        key should raise.
+        """
+        for e in self._list:
+            if getattr(e, "key", None) == key:
+                return e
+>       raise KeyError(key)
+E       KeyError: 'w_moving_start'
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\testing\v1\element_tree.py:602: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:23.856 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:23.856 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:23.856 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_____________________ test_failed_fits_is_not_no_coverage _____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000219124A46D0>
+
+    def test_failed_fits_is_not_no_coverage(monkeypatch):
+        monkeypatch.setattr(page,'discover',lambda *a,**k:reply([ROW]))
+        monkeypatch.setattr(page,'prepare',lambda *a:([],[{'obs_id':'SIMULATED','error':'Timeout de prueba'}]))
+>       at=app();at.button(key='moving_search').click().run();at.button(key='moving_prepare').click().run()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_moving_app.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WidgetList(_list=[Button(key='FormSubmitter:solar_epoch-Calculate position for this date', label='Calculate position f... 4 epochs · 1.42 µm'), Button(key='example_sequence_wise0855_pm', label='WISE 0855 · 2 epochs · 4.86 µm · Δt 1 year')])
+key = 'moving_search'
+
+    def __call__(self, key: str) -> El_co:
+        """Return the first element in this collection with the given user key.
+    
+        The same key can appear on different element types, so this returns the
+        first match in this collection. Use ``get_by_key`` when an ambiguous
+        key should raise.
+        """
+        for e in self._list:
+            if getattr(e, "key", None) == key:
+                return e
+>       raise KeyError(key)
+E       KeyError: 'moving_search'
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\testing\v1\element_tree.py:602: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:24.219 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:24.219 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:24.219 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+____________ test_invalid_selections_are_refused[nums0-distintos] _____________
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+nums = {'R': 1, 'G': 1, 'B': 2}, match = 'distintos'
+
+    @pytest.mark.parametrize('nums,match', [({'R': 1, 'G': 1, 'B': 2}, 'distintos'), ({'R': 1, 'G': 2, 'B': 103}, 'inexistente'),
+                                             ({'R': 1, 'G': 2}, 'exactamente'), ({'R': 1, 'G': 2, 'B': 3.0}, 'inexistente')])
+    def test_invalid_selections_are_refused(cube, nums, match):
+>       with pytest.raises(ValueError, match=match):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'distintos'
+E         Actual message: 'the three channels must be different'
+
+tests\test_multiband.py:82: AssertionError
+___________ test_invalid_selections_are_refused[nums1-inexistente] ____________
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+nums = {'R': 1, 'G': 2, 'B': 103}, match = 'inexistente'
+
+    @pytest.mark.parametrize('nums,match', [({'R': 1, 'G': 1, 'B': 2}, 'distintos'), ({'R': 1, 'G': 2, 'B': 103}, 'inexistente'),
+                                             ({'R': 1, 'G': 2}, 'exactamente'), ({'R': 1, 'G': 2, 'B': 3.0}, 'inexistente')])
+    def test_invalid_selections_are_refused(cube, nums, match):
+>       with pytest.raises(ValueError, match=match):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'inexistente'
+E         Actual message: 'channel 103 does not exist for B'
+
+tests\test_multiband.py:82: AssertionError
+___________ test_invalid_selections_are_refused[nums2-exactamente] ____________
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+nums = {'R': 1, 'G': 2}, match = 'exactamente'
+
+    @pytest.mark.parametrize('nums,match', [({'R': 1, 'G': 1, 'B': 2}, 'distintos'), ({'R': 1, 'G': 2, 'B': 103}, 'inexistente'),
+                                             ({'R': 1, 'G': 2}, 'exactamente'), ({'R': 1, 'G': 2, 'B': 3.0}, 'inexistente')])
+    def test_invalid_selections_are_refused(cube, nums, match):
+>       with pytest.raises(ValueError, match=match):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'exactamente'
+E         Actual message: 'the composite needs exactly one channel for each of R, G and B'
+
+tests\test_multiband.py:82: AssertionError
+___________ test_invalid_selections_are_refused[nums3-inexistente] ____________
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+nums = {'R': 1, 'G': 2, 'B': 3.0}, match = 'inexistente'
+
+    @pytest.mark.parametrize('nums,match', [({'R': 1, 'G': 1, 'B': 2}, 'distintos'), ({'R': 1, 'G': 2, 'B': 103}, 'inexistente'),
+                                             ({'R': 1, 'G': 2}, 'exactamente'), ({'R': 1, 'G': 2, 'B': 3.0}, 'inexistente')])
+    def test_invalid_selections_are_refused(cube, nums, match):
+>       with pytest.raises(ValueError, match=match):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'inexistente'
+E         Actual message: 'channel 3.0 does not exist for B'
+
+tests\test_multiband.py:82: AssertionError
+__________________ test_alignment_verified_and_no_resampling __________________
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+grads = ({89: array([[ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ....2010125478, 1.5, 89), (60.76414271325402, 51.36862010125478, 1.5, 39), (60.76414271325402, 51.36862010125478, 1.5, 9)])
+
+    def test_alignment_verified_and_no_resampling(cube, grads):
+        _, map_fn, _ = grads
+        comp = build(cube, map_fn)
+        a = comp.alignment
+        assert a['verificada'] and not a['varias_teselas'] and a['teselas'][0]['tesela'] == 445
+>       assert comp.provenance()['remuestreo'].startswith('ninguno')
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x0000021979B05ED0>('ninguno')
+E        +    where <built-in method startswith of str object at 0x0000021979B05ED0> = "none: the three planes share each tile's native HEALPix grid".startswith
+
+tests\test_multiband.py:109: AssertionError
+_____________ test_missing_data_in_any_channel_is_never_coloured ______________
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+grads = ({89: array([[ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ....3324,
+        15.51828453, 16.21320344]], shape=(32, 32))}, <function grads.<locals>.map_fn at 0x0000021912CC1A80>, [])
+
+    def test_missing_data_in_any_channel_is_never_coloured(cube, grads):
+        arrays, _, _ = grads
+        arrays = {k: v.copy() for k, v in arrays.items()}
+        arrays[NUMS['R'] - 1][16, 16] = np.nan                 # NaN in R only
+        arrays[NUMS['B'] - 1][16, 10] = np.inf                 # invalid value in B only
+        hits_g = np.full((32, 32), 4)
+        hits_g[10, 16] = 0                                     # NHITS = 0 in G only
+    
+        def map_fn(ra, dec, fov, plane):
+            nh = hits_g if plane == NUMS['G'] - 1 else None
+            return synth_map(cube.tile, plane, arrays[plane], nh, ra=ra, dec=dec, fov=fov)
+        comp = build(cube, map_fn)
+        rgb = comp.rgb(0)
+        for y, x in [(16, 16), (16, 10), (10, 16)]:
+            assert np.isnan(rgb[y, x]).all()                  # no partial colour
+        assert np.isfinite(rgb[15, 15]).all()
+        cov = comp.coverage
+        assert cov['parcial'] == 3 and cov['tres_canales'] == cov['n_campo'] - 3
+        assert cov['con_datos']['R'] == cov['n_campo'] - 1
+>       assert any('Cobertura distinta' in w for w in comp.warnings)
+E       assert False
+E        +  where False = any(<generator object test_missing_data_in_any_channel_is_never_coloured.<locals>.<genexpr> at 0x000002197A0FDBE0>)
+
+tests\test_multiband.py:161: AssertionError
+_________________ test_all_nan_channel_is_refused_not_painted _________________
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+grads = ({89: array([[ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ....3324,
+        15.51828453, 16.21320344]], shape=(32, 32))}, <function grads.<locals>.map_fn at 0x0000021912CC05E0>, [])
+
+    def test_all_nan_channel_is_refused_not_painted(cube, grads):
+        arrays, _, _ = grads
+    
+        def map_fn(ra, dec, fov, plane):
+            a = np.full((32, 32), np.nan) if plane == NUMS['G'] - 1 else arrays[plane]
+            return synth_map(cube.tile, plane, a, ra=ra, dec=dec, fov=fov)
+>       with pytest.raises(mb.InsufficientDataError, match='0 píxeles'):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: '0 píxeles'
+E         Actual message: 'only 0 pixels of the field have data in all three channels (minimum 50); the composite is not built'
+
+tests\test_multiband.py:205: AssertionError
+________________ test_each_colour_carries_its_assigned_channel ________________
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+grads = ({89: array([[ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ....2010125478, 1.5, 9), (60.76414271325402, 51.36862010125478, 1.5, 39), (60.76414271325402, 51.36862010125478, 1.5, 89)])
+
+    def test_each_colour_carries_its_assigned_channel(cube, grads):
+        arrays, map_fn, _ = grads
+        comp = build(cube, map_fn)
+        rgb = comp.rgb(0)
+        ok = comp.common_valid(0)
+        for k, r in enumerate(mb.ROLES):
+            expected = comp.stretch.apply(r, arrays[NUMS[r] - 1])
+            np.testing.assert_array_equal(rgb[..., k][ok], expected[ok])
+        assert np.all(np.diff(rgb[16, 2:30, 0]) >= 0) and np.ptp(rgb[2:30, 16, 0]) == 0      # R follows x only
+        assert np.all(np.diff(rgb[2:30, 16, 1]) >= 0) and np.ptp(rgb[16, 2:30, 1]) == 0      # G follows y only
+        swapped = build(cube, map_fn, nums={'R': 10, 'G': 40, 'B': 90})
+        np.testing.assert_array_equal(swapped.rgb(0)[..., 0], rgb[..., 2])
+        np.testing.assert_array_equal(swapped.rgb(0)[..., 2], rgb[..., 0])
+>       assert any('orden cromático' in w for w in swapped.warnings)
+E       assert False
+E        +  where False = any(<generator object test_each_colour_carries_its_assigned_channel.<locals>.<genexpr> at 0x0000021979CC68E0>)
+
+tests\test_multiband.py:223: AssertionError
+_________ test_stretch_is_documented_and_reproducible[independiente] __________
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+grads = ({89: array([[ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ....2010125478, 1.5, 89), (60.76414271325402, 51.36862010125478, 1.5, 39), (60.76414271325402, 51.36862010125478, 1.5, 9)])
+mode = 'independiente'
+
+    @pytest.mark.parametrize('mode', list(mb.STRETCH_MODES))
+    def test_stretch_is_documented_and_reproducible(cube, grads, mode):
+        arrays, map_fn, _ = grads
+        a, b = build(cube, map_fn, mode), build(cube, map_fn, mode)
+        assert a.stretch == b.stretch
+        np.testing.assert_array_equal(a.rgb(0), b.rgb(0))
+        assert mv.composite_png(a)[0] == mv.composite_png(b)[0]
+        spec = mb.StretchSpec.from_dict(json.loads(json.dumps(a.stretch.to_dict())))
+        assert spec == a.stretch
+        # independent formula: asinh(x / a) / asinh(1 / a), x = clip((v - vmin) / (vmax - vmin), 0, 1)
+        ok = a.common_valid(0)
+        for r in mb.ROLES:
+            v = arrays[NUMS[r] - 1][ok]
+            lo, hi = np.percentile(np.concatenate([arrays[NUMS[q] - 1][a.field_masks[0] & ok] for q in mb.ROLES])
+                                   if mode == 'comun' else v[a.field_masks[0][ok]], [1, 99.5])
+            assert (a.stretch.vmin[r], a.stretch.vmax[r]) == pytest.approx((lo, hi))
+            x = np.clip((v - lo) / (hi - lo), 0, 1)
+            np.testing.assert_allclose(a.stretch.apply(r, v), np.arcsinh(x / .1) / np.arcsinh(1 / .1), atol=1e-12)
+        if mode == 'comun':
+            assert len(set(a.stretch.vmin.values())) == len(set(a.stretch.vmax.values())) == 1
+            assert not any('Escala independiente' in w for w in a.warnings)
+        else:
+>           assert any('NO reflejan' in w for w in a.warnings)
+E           assert False
+E            +  where False = any(<generator object test_stretch_is_documented_and_reproducible.<locals>.<genexpr> at 0x000002197FBC1080>)
+
+tests\test_multiband.py:250: AssertionError
+_________________ test_flat_channel_is_reported_not_amplified _________________
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+grads = ({89: array([[ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ....3324,
+        15.51828453, 16.21320344]], shape=(32, 32))}, <function grads.<locals>.map_fn at 0x0000021912CDA0C0>, [])
+
+    def test_flat_channel_is_reported_not_amplified(cube, grads):
+        arrays, _, _ = grads
+    
+        def map_fn(ra, dec, fov, plane):
+            a = np.full((32, 32), 7.0) if plane == NUMS['B'] - 1 else arrays[plane]
+            return synth_map(cube.tile, plane, a, ra=ra, dec=dec, fov=fov)
+        comp = build(cube, map_fn)
+        assert comp.stretch.degenerate == ('B',)
+        assert np.ptp(comp.rgb(0)[..., 2][comp.common_valid(0)]) == 0
+>       assert any('no tiene contraste' in w for w in comp.warnings)
+E       assert False
+E        +  where False = any(<generator object test_flat_channel_is_reported_not_amplified.<locals>.<genexpr> at 0x0000021979F28930>)
+
+tests\test_multiband.py:262: AssertionError
+_____ test_common_scale_without_useful_contrast_is_measured_and_explained _____
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+
+    def test_common_scale_without_useful_contrast_is_measured_and_explained(cube):
+        base, map_fn = _faint_field_with_bright_spots(cube)
+        comp = build(cube, map_fn, 'comun')
+        ds = comp.display_stats()
+        # still ONE common physical scale; nothing replaced by three independent scales
+        assert len(set(comp.stretch.vmin.values())) == len(set(comp.stretch.vmax.values())) == 1
+        assert ds['poco_contraste'] and ds['fraccion_oscura'] >= mb.LOW_CONTRAST_FRACTION
+        assert ds['fraccion_blanca'] < 0.05                        # dark, not white
+        assert ds['n_pixeles'] == comp.coverage['tres_canales']
+        msg = [w for w in comp.warnings if 'poco contraste útil' in w]
+>       assert len(msg) == 1 and 'Resaltar cada color' in msg[0] and 'no un fallo' in msg[0]
+E       assert (0 == 1)
+E        +  where 0 = len([])
+
+tests\test_multiband.py:289: AssertionError
+_____________________ test_field_split_over_several_tiles _____________________
+
+cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+grads = ({89: array([[ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ..., 30., 31., 32.],
+       [ 1.,  2.,  3., ....3324,
+        15.51828453, 16.21320344]], shape=(32, 32))}, <function grads.<locals>.map_fn at 0x0000021913856020>, [])
+
+    def test_field_split_over_several_tiles(cube, grads):
+        arrays, _, _ = grads
+        other = sc.CubeTile(**{**cube.tile.to_dict(), 'ipix': 446})
+        other.headers = dict(cube.tile.headers)
+    
+        def map_fn(ra, dec, fov, plane):
+            left = sc.Patch(cube.tile, 0, 0, arrays[plane][:, :16].copy(), np.full((32, 16), 4), np.zeros((32, 16), 'i4'))
+            right = sc.Patch(other, 16, 0, arrays[plane][:, 16:].copy(), np.full((32, 16), 4), np.zeros((32, 16), 'i4'))
+            return sc.ChannelMap(cube.tile.channels[plane], ra, dec, fov, [left, right])
+        comp = build(cube, map_fn)
+        assert [t['tesela'] for t in comp.alignment['teselas']] == [445, 446]
+>       assert any('varias teselas' in w for w in comp.warnings)
+E       assert False
+E        +  where False = any(<generator object test_field_split_over_several_tiles.<locals>.<genexpr> at 0x00000219149C53C0>)
+
+tests\test_multiband.py:334: AssertionError
+_______ test_switch_to_multiband_and_back_keeps_region_channel_and_pick _______
+
+app_cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+
+    def test_switch_to_multiband_and_back_keeps_region_channel_and_pick(app_cube):
+        at = spectral_app(app_cube)
+        key, url = at.session_state['sx_region_key'], dict(at.query_params)
+        at.select_slider(key='sx_channel').set_value(94).run()
+>       at.number_input(key='sx_pick_ra').set_value(app_cube.centre[0] + .001).run()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_multiband.py:410: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WidgetList(), key = 'sx_pick_ra'
+
+    def __call__(self, key: str) -> El_co:
+        """Return the first element in this collection with the given user key.
+    
+        The same key can appear on different element types, so this returns the
+        first match in this collection. Use ``get_by_key`` when an ambiguous
+        key should raise.
+        """
+        for e in self._list:
+            if getattr(e, "key", None) == key:
+                return e
+>       raise KeyError(key)
+E       KeyError: 'sx_pick_ra'
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\testing\v1\element_tree.py:602: KeyError
+---------------------------- Captured stderr setup ----------------------------
+2026-11-15 21:00:28.002 No runtime found, using MemoryCacheStorageManager
+2026-11-15 21:00:28.003 No runtime found, using MemoryCacheStorageManager
+2026-11-15 21:00:28.003 No runtime found, using MemoryCacheStorageManager
+----------------------------- Captured log setup ------------------------------
+WARNING  streamlit.runtime.caching.cache_data_api:cache_data_api.py:445 No runtime found, using MemoryCacheStorageManager
+WARNING  streamlit.runtime.caching.cache_data_api:cache_data_api.py:445 No runtime found, using MemoryCacheStorageManager
+WARNING  streamlit.runtime.caching.cache_data_api:cache_data_api.py:445 No runtime found, using MemoryCacheStorageManager
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:28.005 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:28.005 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+___________ test_multiband_reader_failure_is_visible_without_image ____________
+
+app_cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002197FB29010>
+
+    def test_multiband_reader_failure_is_visible_without_image(app_cube, monkeypatch):
+        def fail(*a):
+            raise archive.ArchiveTransientError('test')
+        monkeypatch.setattr(page, 'cached_map', fail)
+        at = AppTest.from_file(APP, default_timeout=60)
+        at.session_state['level'] = 'Científico'
+        at.query_params = {'explorer': 'espectral', 'ra': str(app_cube.centre[0]), 'dec': str(app_cube.centre[1]),
+                           'fov': '.5'}
+        at.session_state['sx_mode'] = mpage.MODES[1]
+        at.run()
+        assert not at.exception
+>       assert any('composición' in e.value and 'temporalmente' in e.value for e in at.error)
+E       assert False
+E        +  where False = any(<generator object test_multiband_reader_failure_is_visible_without_image.<locals>.<genexpr> at 0x0000021979CC75E0>)
+
+tests\test_multiband.py:461: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:30.682 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:30.683 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:30.683 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+__________________ test_insufficient_coverage_message_in_app __________________
+
+app_cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021912415ED0>
+
+    def test_insufficient_coverage_message_in_app(app_cube, monkeypatch):
+        real = page.cached_map
+    
+        def sparse(ra, dec, fov, plane):
+            m = real(ra, dec, fov, plane)
+            p = m.patches[0]
+            img = np.full(p.image.shape, np.nan)
+            return sc.ChannelMap(m.channel, ra, dec, fov, [sc.Patch(p.tile, p.x0, p.y0, img, p.nhits, p.flags)])
+        monkeypatch.setattr(page, 'cached_map', sparse)
+        at = AppTest.from_file(APP, default_timeout=60)
+        at.session_state['level'] = 'Científico'
+        at.query_params = {'explorer': 'espectral', 'ra': str(app_cube.centre[0]), 'dec': str(app_cube.centre[1]),
+                           'fov': '.5'}
+        at.session_state['sx_mode'] = mpage.MODES[1]
+        at.run()
+        assert not at.exception
+>       assert any('Datos insuficientes' in e.value for e in at.error)
+E       assert False
+E        +  where False = any(<generator object test_insufficient_coverage_message_in_app.<locals>.<genexpr> at 0x000002191386D630>)
+
+tests\test_multiband.py:481: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:30.984 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:30.984 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:30.984 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+___ test_returning_to_spectrum_explorer_with_the_same_region_keeps_working ____
+
+self = SessionState(_old_state={'$$STREAMLIT_INTERNAL_KEY_TESTING': {'$$ID-65279e261fd13c885fc5a90fa2a40f64-nav': <class 'str...ral']}), _persist_tracker=PersistedWidgetTracker(_scopes={}, _widget_pages={}, _value_pages={}, _pending_resets=set()))
+key = 'sx_pick_ra'
+
+    def __getitem__(self, key: str) -> Any:
+        wid_key_map = self._key_id_mapper.id_key_mapping
+        widget_id = self._get_widget_id(key)
+    
+        if widget_id in wid_key_map and widget_id == key:
+            # the "key" is a raw widget id, so get its associated user key for lookup
+            key = wid_key_map[widget_id]
+        try:
+>           base_value = self._getitem(widget_id, key)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\runtime\state\session_state.py:776: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = SessionState(_old_state={'$$STREAMLIT_INTERNAL_KEY_TESTING': {'$$ID-65279e261fd13c885fc5a90fa2a40f64-nav': <class 'str...ral']}), _persist_tracker=PersistedWidgetTracker(_scopes={}, _widget_pages={}, _value_pages={}, _pending_resets=set()))
+widget_id = 'sx_pick_ra', user_key = 'sx_pick_ra'
+
+    def _getitem(self, widget_id: str | None, user_key: str | None) -> Any:
+        """Get the value of an entry in Session State, using either the
+        user-provided key or a widget id as appropriate for the internal dict
+        being accessed.
+    
+        At least one of the arguments must have a value.
+        """
+        if user_key is None and widget_id is None:  # pragma: no cover - defensive
+            raise ValueError(
+                "user_key and widget_id cannot both be None. This should never happen."
+            )
+    
+        if user_key is not None:
+            try:
+                return self._new_session_state[user_key]
+            except KeyError:
+                pass
+    
+        if widget_id is not None:
+            try:
+                return self._new_widget_state[widget_id]
+            except KeyError:
+                pass
+    
+        # Typically, there won't be both a widget id and an associated state key in
+        # old state at the same time, so the order we check is arbitrary.
+        # The exception is if session state is set and then a later run has
+        # a widget created, so the widget id entry should be newer.
+        # The opposite case shouldn't happen, because setting the value of a widget
+        # through session state will result in the next widget state reflecting that
+        # value.
+        if widget_id is not None:
+            try:
+                return self._old_state[widget_id]
+            except KeyError:
+                pass
+    
+        if user_key is not None:
+            try:
+                return self._old_state[user_key]
+            except KeyError:
+                pass
+    
+        # We'll never get here
+>       raise KeyError
+E       KeyError
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\runtime\state\session_state.py:829: KeyError
+
+During handling of the above exception, another exception occurred:
+
+app_cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+
+    def test_returning_to_spectrum_explorer_with_the_same_region_keeps_working(app_cube):
+        """Regression (already present in 2ec4881): Streamlit drops the pick widgets while Time Explorer
+        is shown, and a second visit with an unchanged region raised KeyError 'sx_pick_ra'."""
+        at = AppTest.from_file(APP, default_timeout=60).run()
+        stem = next(s for s in config.VALIDATED_EXAMPLES if 'm101' in s)
+        at.button(key='example_' + stem).click().run()
+        explorer = ['Tiempo', 'Espectro']
+        for _ in range(2):
+            at.button_group(key='nav').set_value(explorer[1]).run()
+            assert not at.exception
+            at.button_group(key='nav').set_value(explorer[0]).run()
+            assert not at.exception
+        at.button_group(key='nav').set_value(explorer[1]).run()
+        assert not at.exception
+>       assert at.session_state['sx_pick_ra'] == pytest.approx(at.session_state['sx_region_key'][0])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_multiband.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\SkyClues\.venv\Lib\site-packages\streamlit\testing\v1\app_test.py:292: in __getitem__
+    return self._state[key]
+           ^^^^^^^^^^^^^^^^
+..\SkyClues\.venv\Lib\site-packages\streamlit\runtime\state\safe_session_state.py:123: in __getitem__
+    return self._state[key]
+           ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = SessionState(_old_state={'$$STREAMLIT_INTERNAL_KEY_TESTING': {'$$ID-65279e261fd13c885fc5a90fa2a40f64-nav': <class 'str...ral']}), _persist_tracker=PersistedWidgetTracker(_scopes={}, _widget_pages={}, _value_pages={}, _pending_resets=set()))
+key = 'sx_pick_ra'
+
+    def __getitem__(self, key: str) -> Any:
+        wid_key_map = self._key_id_mapper.id_key_mapping
+        widget_id = self._get_widget_id(key)
+    
+        if widget_id in wid_key_map and widget_id == key:
+            # the "key" is a raw widget id, so get its associated user key for lookup
+            key = wid_key_map[widget_id]
+        try:
+            base_value = self._getitem(widget_id, key)
+            return (
+                apply_presenter(self, widget_id, base_value)
+                if widget_id is not None
+                else base_value
+            )
+        except KeyError:
+>           raise KeyError(_missing_key_error_message(key))
+E           KeyError: 'st.session_state has no key "sx_pick_ra". Did you forget to initialize it? More info: https://docs.streamlit.io/develop/concepts/architecture/session-state#initialization'
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\runtime\state\session_state.py:783: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:31.304 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:31.486 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+2026-11-15 21:00:31.509 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+2026-11-15 21:00:31.545 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+2026-11-15 21:00:31.580 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+2026-11-15 21:00:31.619 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+2026-11-15 21:00:31.654 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+2026-11-15 21:00:31.692 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+_________ test_contaminating_stationary_sources_prevent_motion_claim __________
+
+    def test_contaminating_stationary_sources_prevent_motion_claim():
+        a,b=frame(shift=-12),frame(shift=12,seed=2)
+        yy,xx=np.indices(b.image.shape)
+        b.image.image+=4000/(2*np.pi)*np.exp(-((xx-78)**2+(yy-90)**2)/2)
+        r=n.assess([a,b],.2)
+>       assert not r['observed_motion'] and 'contaminación' in r['motion_reason']
+E       AssertionError: assert (not False and 'contaminación' in 'A source persists at the same sky position: possible stellar contamination.')
+
+tests\test_non_sidereal.py:124: AssertionError
+_________ test_missing_observer_orbit_is_service_limit_not_empty_sky __________
+
+    def test_missing_observer_orbit_is_service_limit_not_empty_sky():
+>       with pytest.raises(s.solar_system.ServiceError,match='cobertura orbital'):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'cobertura orbital'
+E         Actual message: "MOST could not compute the ephemeris in that interval. It may lie outside the observer's orbital coverage; try other dates."
+
+tests\test_non_sidereal.py:150: AssertionError
+_______________ test_cached_reference_keeps_each_exposure_time ________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000219149AC9D0>
+
+    def test_cached_reference_keeps_each_exposure_time(monkeypatch):
+        import io
+        from astropy.table import Table
+        from astropy.time import Time
+        row=frame().row;row.update(mjd_start=60000,mjd_end=60000.001,mjd=60000.0005)
+        prediction=deepcopy(row['prediction']);prediction.pop('refined')
+        row['prediction']=prediction
+        calls=[]
+        def query(identity,start,end,**kw):
+            calls.append((start,end,kw))
+            r=deepcopy(row);r['prediction'].update(ra=155.,dec=11.)
+            return {'rows':[r],'provenance':{'source':'SIMULATED'},
+                    'workspace_url':'https://irsa.ipac.caltech.edu/workspace/SYNTHETIC'}
+        monkeypatch.setattr(s,'discover',query)
+        times=[Time(row['mjd']+v/86400,format='mjd').datetime.strftime('%Y-%b-%d %H:%M:%S.%f') for v in [-.5,.5]]
+        tab=Table({'Date':times,'RA_obs':[154.999,155.001],'Dec_obs':[11.,11.],'segment':[0,0]})
+        buf=io.StringIO();tab.write(buf,format='ascii.ipac')
+        monkeypatch.setattr(s,'_request',lambda url,**kw:(buf.getvalue().encode(),{'url':url}))
+        out=s.refine_prediction({'spkid':'999'},row)
+        assert out['prediction']['ra']==pytest.approx(155,abs=1e-6) and out['prediction']['mjd']==row['mjd']
+        assert out['prediction']['refined'] and calls[0][2]['step_days']==1/86400
+        assert out['prediction']['sample_gap_s']==pytest.approx(1,abs=1e-5)
+>       assert 'punto medio' in out['prediction']['time_basis']
+E       AssertionError: assert 'punto medio' in 'exposure midpoint UTC'
+
+tests\test_non_sidereal.py:197: AssertionError
+____________________ test_fits_dates_and_identity_verified ____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000219120EFF90>
+tmp_path = WindowsPath('C:/Users/danie/AppData/Local/Temp/pytest-of-danie/pytest-165/test_fits_dates_and_identity_v0')
+
+    def test_fits_dates_and_identity_verified(monkeypatch,tmp_path):
+        f=frame();f.image.meta.update(DETECTOR=2,OBSID='WRONG',**{'MJD-AVG':f.row['mjd']})
+        row=f.row;row['url']='https://irsa.ipac.caltech.edu/example.fits'
+        monkeypatch.setattr(n.archive,'fetch',lambda u:tmp_path/'fixture.fits')
+        monkeypatch.setattr(n.fitsdata,'load',lambda p:f.image)
+        frames,fail=n.fetch_frames({'spkid':'999'},[row],.1)
+>       assert not frames and 'diferentes' in fail[0]['error']
+E       AssertionError: assert (not [] and 'diferentes' in 'FITS and metadata identify different exposures.')
+
+tests\test_non_sidereal.py:221: AssertionError
+_________ test_different_detectors_are_not_compared_for_disappearance _________
+
+    def test_different_detectors_are_not_compared_for_disappearance():
+        a,b=frame(shift=-12),frame(shift=12,seed=2)
+        b.row['detector']=5
+        r=n.assess([a,b],.2)
+>       assert not r['observed_motion'] and 'Detectores distintos' in r['motion_reason']
+E       AssertionError: assert (not False and 'Detectores distintos' in 'Different detectors: brightnesses at the same position are not compared.')
+
+tests\test_non_sidereal.py:288: AssertionError
+___________ test_too_few_common_stars_keeps_the_signal_as_candidate ___________
+
+    def test_too_few_common_stars_keeps_the_signal_as_candidate():
+        a,b=frame(shift=-12,stars=False),frame(shift=12,seed=2,stars=False)
+        r=n.assess([a,b],.2)
+>       assert not r['observed_motion'] and 'estrellas comunes' in r['motion_reason']
+E       AssertionError: assert (not False and 'estrellas comunes' in 'There are not 4 measurable common stars to verify the registration; the signal is kept as a candidate.')
+
+tests\test_non_sidereal.py:312: AssertionError
+_____________ test_faint_source_with_masked_core_is_not_measured ______________
+
+    def test_faint_source_with_masked_core_is_not_measured():
+        p=n.locate(saturated(frame(flux=80,stars=False)))
+>       assert not p['measured'] and 'alas de la PSF no es fiable' in p['reason']
+E       AssertionError: assert (not False and 'alas de la PSF no es fiable' in 'Saturated or masked core: the fit with the PSF wings is not reliable (S/N 9.9 < 30, reduced χ² 1). The position is not measured.')
+
+tests\test_non_sidereal.py:374: AssertionError
+_________________ test_time_reference_region_and_gaia_outage __________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002191221E590>
+
+    def test_time_reference_region_and_gaia_outage(monkeypatch):
+        calls=[]
+        def outage(ra,dec,fov): calls.append((ra,dec,fov));raise ref.ReferenceError('Gaia DR3 no disponible')
+        monkeypatch.setattr(page,'cached_gaia',outage)
+        at=AppTest.from_file(APP,default_timeout=30)
+        at.session_state['level']='Científico'
+        at.run()
+        assert not at.exception
+        at.button(key='example_sequence_m101').click().run()
+        shared=at.session_state['region']
+>       at.toggle(key='time_ref_open').set_value(True).run()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_reference_app.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WidgetList(_list=[Toggle(key='w_enhance', label='Infrared enhancement', help='Combines several real exposures of the same area to reduce noise and reveal fainter sources. It does not smooth or fill in the image.')])
+key = 'time_ref_open'
+
+    def __call__(self, key: str) -> El_co:
+        """Return the first element in this collection with the given user key.
+    
+        The same key can appear on different element types, so this returns the
+        first match in this collection. Use ``get_by_key`` when an ambiguous
+        key should raise.
+        """
+        for e in self._list:
+            if getattr(e, "key", None) == key:
+                return e
+>       raise KeyError(key)
+E       KeyError: 'time_ref_open'
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\testing\v1\element_tree.py:602: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:39.249 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:39.249 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:39.467 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+2026-11-15 21:00:39.495 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+WARNING  streamlit.deprecation_util:deprecation_util.py:81 Please replace `st.components.v1.html` with `st.iframe`.
+
+`st.components.v1.html` will be removed after 2026-06-01.
+_________________ test_spectrum_reference_field_and_transfer __________________
+
+app_cube = namespace(tile=CubeTile(ipix=445, order=5, url='https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/hips5_cube/hips_202...],
+        [4, 4, 4, ..., 4, 4, 4]]], shape=(102, 32, 32), dtype=int32), centre=(60.76414271325402, 51.36862010125478))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021912C602D0>
+
+    def test_spectrum_reference_field_and_transfer(app_cube,monkeypatch):
+        calls=[]
+        def html(ra,dec,fov,*args): calls.append((ra,dec,fov));return '<p>Reference test</p>'
+        monkeypatch.setattr(page,'viewer_html',html)
+        at=spectral_app(app_cube)
+        key=at.session_state['sx_region_key']
+>       at.toggle(key='spectrum_ref_open').set_value(True).run()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_reference_app.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WidgetList(_list=[Toggle(key='w_sx_refs', label='Show on the chart where the references fall', help='Dotted lines at t...known). In terracotta, those compatible with what you are examining. It does not change the spectrum or any result.')])
+key = 'spectrum_ref_open'
+
+    def __call__(self, key: str) -> El_co:
+        """Return the first element in this collection with the given user key.
+    
+        The same key can appear on different element types, so this returns the
+        first match in this collection. Use ``get_by_key`` when an ambiguous
+        key should raise.
+        """
+        for e in self._list:
+            if getattr(e, "key", None) == key:
+                return e
+>       raise KeyError(key)
+E       KeyError: 'spectrum_ref_open'
+
+..\SkyClues\.venv\Lib\site-packages\streamlit\testing\v1\element_tree.py:602: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:00:39.597 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:00:39.597 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+________________ test_failed_gaia_is_not_empty_catalogue[404] _________________
+
+status = 404
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021914A4A510>
+
+    @pytest.mark.parametrize('status', [404,429,500,503])
+    def test_failed_gaia_is_not_empty_catalogue(status,monkeypatch):
+        response=Response(b'failure',status)
+        monkeypatch.setattr(ref.requests,'get',lambda *a,**k:response)
+>       with pytest.raises(ref.ReferenceError,match='no disponible'): ref.fetch_gaia(10,0,.1)
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'no disponible'
+E         Actual message: 'Gaia DR3 not available: HTTPError. You can retry; WISE is independent.'
+
+tests\test_references.py:92: AssertionError
+________________ test_failed_gaia_is_not_empty_catalogue[429] _________________
+
+status = 429
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021954DA8850>
+
+    @pytest.mark.parametrize('status', [404,429,500,503])
+    def test_failed_gaia_is_not_empty_catalogue(status,monkeypatch):
+        response=Response(b'failure',status)
+        monkeypatch.setattr(ref.requests,'get',lambda *a,**k:response)
+>       with pytest.raises(ref.ReferenceError,match='no disponible'): ref.fetch_gaia(10,0,.1)
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'no disponible'
+E         Actual message: 'Gaia DR3 not available: HTTPError. You can retry; WISE is independent.'
+
+tests\test_references.py:92: AssertionError
+============================== warnings summary ===============================
+tests/test_motion.py::test_select_epochs_longest_baseline
+  C:\Users\danie\Documents\SkyClues\.venv\Lib\site-packages\erfa\core.py:133: ErfaWarning: ERFA function "d2dtf" yielded 1 of "dubious year (Note 5)"
+    warn(f'ERFA function "{func_name}" yielded {wmsg}', ErfaWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_atlas.py::test_layers_identify_mission_product_and_are_official_hips
+FAILED tests/test_atlas.py::test_unified_component_and_gaia_outage - Assertio...
+FAILED tests/test_atlas.py::test_rejected_component_event_preserves_region - ...
+FAILED tests/test_audit_offline.py::test_parallax_is_applied_with_the_right_amplitude
+FAILED tests/test_audit_offline.py::test_static_target_and_missing_parameter_warnings
+FAILED tests/test_audit_offline.py::test_satellite_halo_from_documentation_when_header_stops_at_bit_28
+FAILED tests/test_audit_offline.py::test_capabilities_502_but_direct_query_works
+FAILED tests/test_audit_offline.py::test_corrupt_reference_file_is_never_modified
+FAILED tests/test_autocomplete.py::test_atlas_suggestions_include_interstellar_identity_beyond_first_twelve
+FAILED tests/test_autocomplete.py::test_partial_failure_preserves_jpl_choices
+FAILED tests/test_continuity.py::test_complete_messier_range_is_dynamic[102]
+FAILED tests/test_continuity.py::test_network_outage_is_explicit - AssertionE...
+FAILED tests/test_enhance.py::test_registration_error_rejects_the_exposure_instead_of_shifting_the_stack
+FAILED tests/test_enhance.py::test_no_gain_is_rejected - AssertionError: asse...
+FAILED tests/test_enhance.py::test_partial_coverage_is_propagated_and_tiny_overlap_is_rejected
+FAILED tests/test_enhance.py::test_psf_incompatible_exposure_is_rejected - as...
+FAILED tests/test_enhance.py::test_spectral_differences_change_the_product_not_the_method
+FAILED tests/test_enhance.py::test_detectors_and_calibrations_are_never_mixed
+FAILED tests/test_enhance.py::test_temporal_differences_and_a_moving_target
+FAILED tests/test_enhance.py::test_moving_source_needs_a_comoving_stack_and_a_wrong_track_shows_nothing
+FAILED tests/test_gaia_atlas.py::test_exact_source_selection_without_remote_resolution
+FAILED tests/test_gaia_atlas.py::test_actual_component_selection_loading_and_stale_responses
+FAILED tests/test_integration_science.py::test_interpreter_output_has_verdicts_and_no_probabilities
+FAILED tests/test_integration_science.py::test_options_of_both_explorers_survive_a_round_trip_with_one_region
+FAILED tests/test_motion.py::test_psf_is_the_official_epsf_and_normalised - A...
+FAILED tests/test_motion.py::test_source_below_detection_threshold_is_never_measured
+FAILED tests/test_motion.py::test_failed_season_is_reported_with_its_reason
+FAILED tests/test_motion_app.py::test_motion_tab_renders_and_gaia_outage_is_explained
+FAILED tests/test_motion_app.py::test_extended_baseline_offers_images_per_season
+FAILED tests/test_moving_app.py::test_empty_and_failure_are_different - KeyEr...
+FAILED tests/test_moving_app.py::test_solar_route_preserves_region_and_never_uses_fixed_field_engine
+FAILED tests/test_moving_app.py::test_dates_survive_navigation_and_switching_levels
+FAILED tests/test_moving_app.py::test_failed_fits_is_not_no_coverage - KeyErr...
+FAILED tests/test_multiband.py::test_invalid_selections_are_refused[nums0-distintos]
+FAILED tests/test_multiband.py::test_invalid_selections_are_refused[nums1-inexistente]
+FAILED tests/test_multiband.py::test_invalid_selections_are_refused[nums2-exactamente]
+FAILED tests/test_multiband.py::test_invalid_selections_are_refused[nums3-inexistente]
+FAILED tests/test_multiband.py::test_alignment_verified_and_no_resampling - a...
+FAILED tests/test_multiband.py::test_missing_data_in_any_channel_is_never_coloured
+FAILED tests/test_multiband.py::test_all_nan_channel_is_refused_not_painted
+FAILED tests/test_multiband.py::test_each_colour_carries_its_assigned_channel
+FAILED tests/test_multiband.py::test_stretch_is_documented_and_reproducible[independiente]
+FAILED tests/test_multiband.py::test_flat_channel_is_reported_not_amplified
+FAILED tests/test_multiband.py::test_common_scale_without_useful_contrast_is_measured_and_explained
+FAILED tests/test_multiband.py::test_field_split_over_several_tiles - assert ...
+FAILED tests/test_multiband.py::test_switch_to_multiband_and_back_keeps_region_channel_and_pick
+FAILED tests/test_multiband.py::test_multiband_reader_failure_is_visible_without_image
+FAILED tests/test_multiband.py::test_insufficient_coverage_message_in_app - a...
+FAILED tests/test_multiband.py::test_returning_to_spectrum_explorer_with_the_same_region_keeps_working
+FAILED tests/test_non_sidereal.py::test_contaminating_stationary_sources_prevent_motion_claim
+FAILED tests/test_non_sidereal.py::test_missing_observer_orbit_is_service_limit_not_empty_sky
+FAILED tests/test_non_sidereal.py::test_cached_reference_keeps_each_exposure_time
+FAILED tests/test_non_sidereal.py::test_fits_dates_and_identity_verified - As...
+FAILED tests/test_non_sidereal.py::test_different_detectors_are_not_compared_for_disappearance
+FAILED tests/test_non_sidereal.py::test_too_few_common_stars_keeps_the_signal_as_candidate
+FAILED tests/test_non_sidereal.py::test_faint_source_with_masked_core_is_not_measured
+FAILED tests/test_reference_app.py::test_time_reference_region_and_gaia_outage
+FAILED tests/test_reference_app.py::test_spectrum_reference_field_and_transfer
+FAILED tests/test_references.py::test_failed_gaia_is_not_empty_catalogue[404]
+FAILED tests/test_references.py::test_failed_gaia_is_not_empty_catalogue[429]
+!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 60 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+60 failed, 308 passed, 72 deselected, 1 warning in 360.63s (0:06:00)

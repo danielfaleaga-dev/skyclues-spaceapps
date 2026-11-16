@@ -1,0 +1,146 @@
+﻿## test_partial_failure_preserves_jpl_choices  [tests/test_autocomplete.py:69]
+   SRC: assert rows == [{'id': 'JPL:615'}] and 'no responde' in message
+   E: AssertionError: assert ([{'id': 'JPL:615'}] == [{'id': 'JPL:615'}]
+   E: 
+## test_empty_and_failure_are_different  [tests/test_moving_app.py:33]
+   SRC: assert not at.exception and any('Sin cobertura' in m.value for m in at.info)
+   E: AssertionError: assert (not ElementList() and False)
+   E: +  where ElementList() = AppTest(\n    _script_path='C:\\Users\\danie\\Documents\\SkyClues-ux\\app.py',\n    default_timeout=20,\n    _session_sta...pecialBlock(\n            type='event',\n            children={\n                0: Html()\n            }\n        )\n    }\n).exception
+## test_solar_route_preserves_region_and_never_uses_fixed_field_engine  [tests/test_moving_app.py:52]
+   SRC: assert any(s.label=='Secuencia de observaciones compatibles' for s in at.selectbox)
+   E: assert False
+   E: +  where False = any(<generator object test_solar_route_preserves_region_and_never_uses_fixed_field_engine.<locals>.<genexpr> at 0x000002D7A0D09560>)
+## test_dates_survive_navigation_and_switching_levels  [tests/test_moving_app.py:66]
+   SRC: assert any(s.label=='Secuencia de observaciones compatibles' for s in at.selectbox)
+   E: assert False
+   E: +  where False = any(<generator object test_dates_survive_navigation_and_switching_levels.<locals>.<genexpr> at 0x000002D7A0AC75E0>)
+## test_failed_fits_is_not_no_coverage  [tests/test_moving_app.py:74]
+   SRC: assert any('No evaluable' in m.value for m in at.info)
+   E: assert False
+   E: +  where False = any(<generator object test_failed_fits_is_not_no_coverage.<locals>.<genexpr> at 0x000002D7A0814A00>)
+## test_common_scale_without_useful_contrast_is_measured_and_explained  [tests/test_multiband.py:289]
+   SRC: assert len(msg) == 1 and 'Stretch each colour' in msg[0] and 'not a failure' in msg[0]
+   E: assert (0 == 1)
+   E: +  where 0 = len([])
+## test_field_split_over_several_tiles  [tests/test_multiband.py:334]
+   SRC: assert any('varias teselas' in w for w in comp.warnings)
+   E: assert False
+   E: +  where False = any(<generator object test_field_split_over_several_tiles.<locals>.<genexpr> at 0x000002D7E1D64A00>)
+## test_switch_to_multiband_and_back_keeps_region_channel_and_pick  [tests/test_multiband.py:422]
+   SRC: assert 'Convención de visualización, no color real' in text and 'no detecta' in text
+   E: assert ('Convención de visualización, no color real' in '### Multiband composite · false colour <div class="sc-note"><b>Display convention, not real colour.</b> Three infrare... resampling: none.\n- **This process** has read 0.0 MiB of HTTP bodies in 0 attempts and 0.0 MiB from the local cache.')
+## test_multiband_reader_failure_is_visible_without_image  [tests/test_multiband.py:461]
+   SRC: assert any('composición' in e.value and 'temporalmente' in e.value for e in at.error)
+   E: assert False
+   E: +  where False = any(<generator object test_multiband_reader_failure_is_visible_without_image.<locals>.<genexpr> at 0x000002D7E1D52F60>)
+## test_missing_observer_orbit_is_service_limit_not_empty_sky  [tests/test_non_sidereal.py:150]
+   SRC: with pytest.raises(s.solar_system.ServiceError,match='cobertura orbital'):
+   E: AssertionError: Regex pattern did not match.
+   E: Expected regex: 'cobertura orbital'
+## test_flag_classes_and_unknown_names  [tests/test_offline.py:78]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   E: AssertionError: assert 'header' == 'cabecera'
+   E: 
+## test_iframe_independent_controls_and_failures[success]  [tests/test_references.py:128]
+   SRC: assert result.returncode==0,result.stdout+result.stderr
+   E: AssertionError: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+   E: 
+## test_iframe_independent_controls_and_failures[wise_error]  [tests/test_references.py:128]
+   SRC: assert result.returncode==0,result.stdout+result.stderr
+   E: AssertionError: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+   E: 
+## test_suggestion_cache_success_but_not_outage  [tests/test_release.py:159]
+   SRC: with pytest.raises(RuntimeError):release_ui.suggestions('XYZ')
+   E: Failed: DID NOT RAISE RuntimeError
+## test_url_channels_pick_extraction_and_return  [tests/test_spectral_app.py:78]
+   SRC: if channel in [51,52]: assert any('sin datos en DR1' in w.value for w in at.warning)
+   E: assert False
+   E: +  where False = any(<generator object test_url_channels_pick_extraction_and_return.<locals>.<genexpr> at 0x000002D79B3DB780>)
+## test_time_transfer_keeps_wise_region_not_expected_marker  [tests/test_spectral_app.py:123]
+   SRC: assert any(text in e.value for e in at.error)
+   E: assert ('no es una época efectiva' in 'None id: "$$ID-8bce4efa7cb1441a3112c72ec8ee761b-sc_header"\nflex_container {\n  gap_config {\n    gap_size: SMALL\n  ...m\\"]{display:none}\\n.st-key-sc_scroll_top{position:absolute;width:0;height:0;overflow:hidden;margin:0}\\n</style>"\n')
+   E: assert False
+## test_invalid_spectral_url_never_reads_cube[query0]  [tests/test_spectral_app.py:135]
+   SRC: assert any('no válid' in e.value for e in at.error)
+   E: assert False
+   E: +  where False = any(<generator object test_invalid_spectral_url_never_reads_cube.<locals>.<genexpr> at 0x000002D7E51D6670>)
+## test_invalid_spectral_url_never_reads_cube[query1]  [tests/test_spectral_app.py:135]
+   SRC: assert any('no válid' in e.value for e in at.error)
+   E: assert False
+   E: +  where False = any(<generator object test_invalid_spectral_url_never_reads_cube.<locals>.<genexpr> at 0x000002D7A093B6B0>)
+## test_invalid_spectral_url_never_reads_cube[query2]  [tests/test_spectral_app.py:135]
+   SRC: assert any('no válid' in e.value for e in at.error)
+   E: assert False
+   E: +  where False = any(<generator object test_invalid_spectral_url_never_reads_cube.<locals>.<genexpr> at 0x000002D7E5208450>)
+## test_ratio_withheld_when_denominator_is_inside_reference_scatter  [tests/test_spectral_features.py:97]
+   SRC: assert no_ref.rows[5]["relacion"] == 10.0 and "sin filtro" in no_ref.rows[5]["estado_relacion"]
+   E: AssertionError: assert (10.0 == 10.0 and 'sin filtro' in 'valid (no stability filter)')
+## test_contamination_and_overlap_are_reported  [tests/test_spectral_features.py:116]
+   SRC: assert far.comparable and any("anillo de fondo de la otra" in n for n in far.notes)
+   E: AssertionError: assert (True and False)
+   E: +  where True = Comparison(label_a='A', label_b='B', quantity='flux', unit='mJy', comparable=True, issues=[], notes=['Each aperture fa...rencia_min': 0.0, 'diferencia_max': 0.0, 'fraccion_a_mayor': 0.0, 'relacion_mediana': 1.0, 'relacion_dispersion': 0.0}).comparable
+## test_edges_of_the_spectral_range_are_not_evaluable  [tests/test_spectral_features.py:264]
+   SRC: assert f.klass == sf.NOT_EVALUABLE and "borde del intervalo espectral" in f.reasons[0] and f.contrast is None
+   E: AssertionError: assert ('no_evaluable' == 'no_evaluable'
+   E: 
+## test_no_reliable_continuum_next_to_channels_without_data  [tests/test_spectral_features.py:275]
+   SRC: assert g.klass == sf.NOT_EVALUABLE and "No se interpolan" in g.reasons[0] and "51, 52" in g.reasons[0]
+   E: AssertionError: assert ('no_evaluable' == 'no_evaluable'
+   E: 
+## test_manual_interval_matches_the_scan_and_wide_intervals_are_refused  [tests/test_spectral_interpreter.py:204]
+   SRC: assert it2.matches[0].status == si.MATCH_WEAK and "orientativa" in it2.matches[0].reasons[-1]
+   E: AssertionError: assert ('no_evaluable' == 'no_evaluable'
+   E: 
+## test_step_between_detectors_is_not_a_substance  [tests/test_spectral_interpreter.py:215]
+   SRC: assert it.verdict == si.NOT_EVALUABLE and "no son sustancias" in it.blockers[0]
+   E: AssertionError: assert ('no_evaluable' == 'no_evaluable'
+   E: 
+## test_arp220_redshift_is_applied_and_both_hypotheses_remain_unconfirmed  [tests/test_spectral_interpreter_app.py:66]
+   SRC: assert "no hay nada que interpretar" in text_of(at)
+   E: AssertionError: assert 'radio 26″' in 'Matching in position and type does not identify a substance: it is a hypothesis consistent with the data. The cube sp...the feature, widened only by the documented error of the band centre (1 nm in D1–D4, 10 nm in D5–D6; Hui et al. 2026).'
+   E: +  where 'Matching in position and type does not identify a substance: it is a hypothesis consistent with the data. The cube sp...the feature, widened only by the documented error of the band centre (1 nm in D1–D4, 10 nm in D5–D6; Hui et al. 2026).' = <built-in method join of str object at 0x00007FF9A52B18C8>(['Matching in posit
+## test_a_and_b_are_interpreted_separately  [tests/test_spectral_interpreter_app.py:107]
+   SRC: assert "Espectro A: " in page and "Espectro B: " in page
+   E: assert ('Espectro A: ' in 'What could this spectrum indicate?</p> <p style="margin:.35rem 0 .1rem">Spectrum A: <span class="sc-badge sc-ok">Comp...tgpt.com"]{display:none}\n.st-key-sc_scroll_top{position:absolute;width:0;height:0;overflow:hidden;margin:0}\n</style>')
+## test_truncated_header_does_not_loop  [tests/test_spectral_offline.py:181]
+   SRC: with pytest.raises(sc.CubeFormatError,match='sin END'): sc.read_layout(445)
+   E: AssertionError: Regex pattern did not match.
+   E: Expected regex: 'sin END'
+## test_rows_without_coverage_information_do_not_break_anything  [tests/test_spectral_quality.py:106]
+   SRC: assert sq.table_rows([q])[0]["Píxeles válidos"] == "no disponible" and sq.plain(q).startswith("Este canal no puede")
+   E: KeyError: 'Píxeles válidos'
+## test_aperture_without_cube_pixels_is_described_not_crashed  [tests/test_spectral_quality.py:116]
+   SRC: assert sq.table_rows([q])[0]["Píxeles válidos"] == "0 píxeles en la apertura"
+   E: KeyError: 'Píxeles válidos'
+## test_plain_wording_for_the_simple_level  [tests/test_spectral_quality.py:122]
+   SRC: assert sq.plain(sq.ChannelQuality(status="no_data_aperture", **base)) == (
+   E: AssertionError: assert 'This channel... usable data.' == 'Este canal n... utilizables.'
+   E: 
+## test_page_explains_rejected_channels_in_both_levels  [tests/test_spectral_quality.py:149]
+   SRC: ^^^^^^^^^^^^^^^^^^^^^^^
+   E: assert 0 == 2
+   E: +  where 0 = len([])
+## test_second_position_gets_its_own_diagnosis_with_a_spectrum_column  [tests/test_spectral_quality.py:182]
+   SRC: interval = _quality_frames(at)[0]
+   E: IndexError: list index out of range
+## test_one_position_is_the_default_and_nothing_is_compared  [tests/test_spectrum_analysis_app.py:54]
+   SRC: assert "Espectro exploratorio de una posición" in text_of(at)
+   E: AssertionError: assert 'Espectro exploratorio de una posición' in 'WCS geometry: each native pixel of the cube (12.9″) is drawn at its position, with its original value, without resamp...t averaged; channels 51 and 52 are empty in DR1; spectrum without uncertainties or aperture correction (display only).'
+   E: +  where 'WCS geometry: each native pixel of the cube (12.9″) is drawn at its position, with its original value, without resamp...t averaged; channels 51 and 52 are empty in DR1; spectrum without uncertainties or aperture correction (display only).' = text_of(AppTest(\n    _script_path='C:\\Users\\danie\\Documents\\SkyClues-ux\\
+## test_second_position_is_extracted_like_a_and_can_be_removed  [tests/test_spectrum_analysis_app.py:81]
+   SRC: assert "Espectros exploratorios de dos posiciones" in txt and "Misma extracción en ambos" in txt
+   E: AssertionError: assert ('Espectros exploratorios de dos posiciones' in 'A: black diamond · B: copper square, with the colours of their spectra. Solid line: aperture; dashed: background annu...t averaged; channels 51 and 52 are empty in DR1; spectrum without uncertainties or aperture correction (display only).')
+## test_selection_inspector_and_state_survive_level_mode_and_view_changes  [tests/test_spectrum_analysis_app.py:28]
+   SRC: return next(d.value for d in at.dataframe if list(d.value.columns)[0] == "Magnitud")
+   E: StopIteration
+## test_interval_with_no_data_is_reported_not_filled  [tests/test_spectrum_analysis_app.py:28]
+   SRC: return next(d.value for d in at.dataframe if list(d.value.columns)[0] == "Magnitud")
+   E: StopIteration
+## test_same_numbers_in_both_levels  [tests/test_spectrum_analysis_app.py:193]
+   SRC: assert "un 40%" in sa._plain(f) and dict(zip(rows["Magnitud"], rows["Espectro A"]))["Contraste relativo"] == "+40.0%"
+   E: AssertionError: assert ('un 40%' in 'peak: 40% brighter than the neighbouring colours. It stands out clearly.')
+   E: +  where 'peak: 40% brighter than the neighbouring colours. It stands out clearly.' = <function _plain at 0x000002D7A09C4360>(Feature(serie='A', origin='automatic', klass='cuantificable', kind='pico', reasons=['Contrast of more than 1000 times ...2, env_left=[28, 29, 30], env_right=[32, 33, 34], detectors=[2], nhits_feature=4.0,
+## test_an_interval_without_a_feature_is_never_given_a_type_or_a_centre  [tests/test_spectrum_analysis_app.py:205]
+   SRC: assert col["Tipo"] == "No identificada" and col["Centro de la característica (µm)"] == "No aplica"
+   E: KeyError: 'Tipo'
+39 blocks

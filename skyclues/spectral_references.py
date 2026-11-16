@@ -18,7 +18,7 @@ CONSULTED = "2026-11-15"
 EMISSION, ABSORPTION = "emision", "absorcion"
 BAND, LINE = "banda", "linea"
 NATURE_TEXT = {EMISSION: "emission", ABSORPTION: "absorption"}
-FORM_TEXT = {BAND: "banda", LINE: "line"}
+FORM_TEXT = {BAND: "band", LINE: "line"}
 
 
 @dataclass(frozen=True)

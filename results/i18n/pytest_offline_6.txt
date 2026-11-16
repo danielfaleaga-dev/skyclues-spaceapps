@@ -1,0 +1,370 @@
+﻿........F.F............................F............................F... [ 23%]
+...................................................FF................... [ 46%]
+...................F....FFFFFFFF......................................F. [ 69%]
+.............F...FF....F.......F.F...................................... [ 93%]
+....FFF.FFF.F.FF..FF.                                                    [100%]
+================================== FAILURES ===================================
+_________________ test_partial_failure_preserves_jpl_choices __________________
+tests\test_autocomplete.py:69: in test_partial_failure_preserves_jpl_choices
+    assert rows == [{'id': 'JPL:615'}] and 'no responde' in message
+E   AssertionError: assert ([{'id': 'JPL:615'}] == [{'id': 'JPL:615'}]
+E     
+E     Use -v to get more diff and 'no responde' in '')
+____________________ test_empty_and_failure_are_different _____________________
+tests\test_moving_app.py:37: in test_empty_and_failure_are_different
+    assert not at.exception and any('Service not available' in m.value for m in at.error)
+E   AssertionError: assert (not ElementList() and False)
+E    +  where ElementList() = AppTest(\n    _script_path='C:\\Users\\danie\\Documents\\SkyClues-ux\\app.py',\n    default_timeout=20,\n    _session_sta...pecialBlock(\n            type='event',\n            children={\n                0: Html()\n            }\n        )\n    }\n).exception
+E    +  and   False = any(<generator object test_empty_and_failure_are_different.<locals>.<genexpr> at 0x0000021460D3B2A0>)
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:37:07.126 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:37:07.127 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:37:07.127 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:37:07.447 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:37:07.447 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:37:07.447 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_____________________ test_field_split_over_several_tiles _____________________
+tests\test_multiband.py:334: in test_field_split_over_several_tiles
+    assert any('several tiles' in w for w in comp.warnings)
+E   assert False
+E    +  where False = any(<generator object test_field_split_over_several_tiles.<locals>.<genexpr> at 0x00000214A327B9F0>)
+_________ test_missing_observer_orbit_is_service_limit_not_empty_sky __________
+tests\test_non_sidereal.py:150: in test_missing_observer_orbit_is_service_limit_not_empty_sky
+    with pytest.raises(s.solar_system.ServiceError,match='cobertura orbital'):
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'cobertura orbital'
+E     Actual message: "MOST could not compute the ephemeris in that interval. It may lie outside the observer's orbital coverage; try other dates."
+___________ test_iframe_independent_controls_and_failures[success] ____________
+tests\test_references.py:128: in test_iframe_independent_controls_and_failures
+    assert result.returncode==0,result.stdout+result.stderr
+E   AssertionError: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+E     
+E       assert(node('wisestatus').textContent.includes('tesela central JPEG recibida'))
+E     
+E         at C:\Users\danie\Documents\SkyClues-ux\tests\reference_view_harness.cjs:28:2 {
+E       generatedMessage: true,
+E       code: 'ERR_ASSERTION',
+E       actual: false,
+E       expected: true,
+E       operator: '==',
+E       diff: 'simple'
+E     }
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['C:\\Program Files\\nodejs\\node.EXE', 'C:\\Users\\danie\\Documents\\SkyClues-ux\\tests\\refere...ssage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n").returncode
+__________ test_iframe_independent_controls_and_failures[wise_error] __________
+tests\test_references.py:128: in test_iframe_independent_controls_and_failures
+    assert result.returncode==0,result.stdout+result.stderr
+E   AssertionError: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+E     
+E       assert(node('wisestatus').textContent.includes('no disponible (HTTP 503)'))
+E     
+E         at C:\Users\danie\Documents\SkyClues-ux\tests\reference_view_harness.cjs:25:3 {
+E       generatedMessage: true,
+E       code: 'ERR_ASSERTION',
+E       actual: false,
+E       expected: true,
+E       operator: '==',
+E       diff: 'simple'
+E     }
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['C:\\Program Files\\nodejs\\node.EXE', 'C:\\Users\\danie\\Documents\\SkyClues-ux\\tests\\refere...ssage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n").returncode
+________________ test_suggestion_cache_success_but_not_outage _________________
+tests\test_release.py:159: in test_suggestion_cache_success_but_not_outage
+    with pytest.raises(RuntimeError):release_ui.suggestions('XYZ')
+E   Failed: DID NOT RAISE RuntimeError
+_ test_cube_errors_are_visible_without_partial_spectrum[RangeNotHonoured-lectura parcial] _
+tests\test_spectral_app.py:123: in test_cube_errors_are_visible_without_partial_spectrum
+    assert any(text in e.value for e in at.error)
+E   assert False
+E    +  where False = any(<generator object test_cube_errors_are_visible_without_partial_spectrum.<locals>.<genexpr> at 0x00000214A32EFA00>)
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:38:09.449 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:38:09.449 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_ test_cube_errors_are_visible_without_partial_spectrum[FileChangedError-cambi\xf3] _
+tests\test_spectral_app.py:123: in test_cube_errors_are_visible_without_partial_spectrum
+    assert any(text in e.value for e in at.error)
+E   assert False
+E    +  where False = any(<generator object test_cube_errors_are_visible_without_partial_spectrum.<locals>.<genexpr> at 0x00000214A32ED7E0>)
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:38:09.667 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:38:09.668 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_ test_cube_errors_are_visible_without_partial_spectrum[CubeFormatError-estructura documentada] _
+tests\test_spectral_app.py:123: in test_cube_errors_are_visible_without_partial_spectrum
+    assert any(text in e.value for e in at.error)
+E   assert False
+E    +  where False = any(<generator object test_cube_errors_are_visible_without_partial_spectrum.<locals>.<genexpr> at 0x00000214A32ECBA0>)
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:38:09.881 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:38:09.881 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_ test_cube_errors_are_visible_without_partial_spectrum[ArchiveTransientError-temporalmente] _
+tests\test_spectral_app.py:123: in test_cube_errors_are_visible_without_partial_spectrum
+    assert any(text in e.value for e in at.error)
+E   assert False
+E    +  where False = any(<generator object test_cube_errors_are_visible_without_partial_spectrum.<locals>.<genexpr> at 0x00000214A3433300>)
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:38:10.106 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:38:10.106 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_ test_cube_errors_are_visible_without_partial_spectrum[ArchivePermanentError-rechaz\xf3] _
+tests\test_spectral_app.py:123: in test_cube_errors_are_visible_without_partial_spectrum
+    assert any(text in e.value for e in at.error)
+E   assert False
+E    +  where False = any(<generator object test_cube_errors_are_visible_without_partial_spectrum.<locals>.<genexpr> at 0x00000214A32ECBA0>)
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:38:10.318 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:38:10.318 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_____________ test_invalid_spectral_url_never_reads_cube[query0] ______________
+tests\test_spectral_app.py:135: in test_invalid_spectral_url_never_reads_cube
+    assert any('no válid' in e.value for e in at.error)
+E   assert False
+E    +  where False = any(<generator object test_invalid_spectral_url_never_reads_cube.<locals>.<genexpr> at 0x00000214A320F850>)
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:38:10.560 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_____________ test_invalid_spectral_url_never_reads_cube[query1] ______________
+tests\test_spectral_app.py:135: in test_invalid_spectral_url_never_reads_cube
+    assert any('no válid' in e.value for e in at.error)
+E   assert False
+E    +  where False = any(<generator object test_invalid_spectral_url_never_reads_cube.<locals>.<genexpr> at 0x0000021460FD7510>)
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:38:10.768 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_____________ test_invalid_spectral_url_never_reads_cube[query2] ______________
+tests\test_spectral_app.py:135: in test_invalid_spectral_url_never_reads_cube
+    assert any('no válid' in e.value for e in at.error)
+E   assert False
+E    +  where False = any(<generator object test_invalid_spectral_url_never_reads_cube.<locals>.<genexpr> at 0x00000214610BC1E0>)
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:38:10.953 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+____ test_manual_interval_matches_the_scan_and_wide_intervals_are_refused _____
+tests\test_spectral_features.py:329: in test_manual_interval_matches_the_scan_and_wide_intervals_are_refused
+    assert wide.klass == sf.NOT_EVALUABLE and "demasiado ancho" in wide.reasons[0]
+E   AssertionError: assert ('no_evaluable' == 'no_evaluable'
+E     
+E       no_evaluable and 'demasiado ancho' in 'Interval of 21 channels: too wide for a local continuum (maximum 15). What is seen at that scale is the general shape of the spectrum.')
+_ test_isolated_minimum_is_not_water_ice_and_a_broad_one_is_only_orientative __
+tests\test_spectral_interpreter.py:168: in test_isolated_minimum_is_not_water_ice_and_a_broad_one_is_only_orientative
+    assert it2.matches[0].status == si.MATCH_WEAK and "orientativa" in it2.matches[0].reasons[-1]
+E   AssertionError: assert ('insuficiente' == 'insuficiente'
+E     
+E       insuficiente and 'orientativa' in 'For an ice a coherent depression is needed against a reliable continuum that spans the band, and an infrared source b...nalyser (three channels on each side) does not guarantee it and V1 has no absorption model: indicative reference only.')
+__ test_channels_without_data_are_not_evaluable_and_absence_is_not_concluded __
+tests\test_spectral_interpreter.py:204: in test_channels_without_data_are_not_evaluable_and_absence_is_not_concluded
+    assert "No demuestra ausencia" in cov["hi_brackett_alpha"].reasons[0]
+E   AssertionError: assert 'No demuestra ausencia' in 'The analyser flags nothing there. This does not prove absence: the spectrum has no uncertainties and the signal could be below its criteria.'
+_______________ test_step_between_detectors_is_not_a_substance ________________
+tests\test_spectral_interpreter.py:215: in test_step_between_detectors_is_not_a_substance
+    assert it.verdict == si.NOT_EVALUABLE and "no son sustancias" in it.blockers[0]
+E   AssertionError: assert ('no_evaluable' == 'no_evaluable'
+E     
+E       no_evaluable and 'no son sustancias' in 'The interval and its surroundings span detectors D4, D5: a calibration or resolution jump between detectors produces peaks and valleys that are not substances. It is not interpreted.')
+___ test_arp220_redshift_is_applied_and_both_hypotheses_remain_unconfirmed ____
+tests\test_spectral_interpreter.py:278: in test_arp220_redshift_is_applied_and_both_hypotheses_remain_unconfirmed
+    assert "radio 26″" in " ".join(it.limitations)
+E   AssertionError: assert 'radio 26″' in 'Matching in position and type does not identify a substance: it is a hypothesis consistent with the data. The cube sp...the feature, widened only by the documented error of the band centre (1 nm in D1–D4, 10 nm in D5–D6; Hui et al. 2026).'
+E    +  where 'Matching in position and type does not identify a substance: it is a hypothesis consistent with the data. The cube sp...the feature, widened only by the documented error of the band centre (1 nm in D1–D4, 10 nm in D5–D6; Hui et al. 2026).' = <built-in method join of str object at 0x00007FF9A52B18C8>(['Matching in position and type does not identify a substance: it is a hypothesis consistent with the data.', 'The cub...ixture, not a specific object inside it, and extended emission that also fills the annulus is partly subtracted.', ...])
+E    +    where <built-in method join of str object at 0x00007FF9A52B18C8> = ' '.join
+E    +    and   ['Matching in position and type does not identify a substance: it is a hypothesis consistent with the data.', 'The cub...ixture, not a specific object inside it, and extended emission that also fills the annulus is partly subtracted.', ...] = Interpretation(serie='A', verdict='insuficiente', feature=Feature(serie='A', origin='automatic', klass='visible', kind...['visible', 'varias'], version='skyclues-interprete 1.0 (2026-11-15)', library='skyclues-referencias 1.0 (2026-11-15)').limitations
+__ test_selecting_a_feature_explains_it_in_both_levels_with_the_same_result ___
+tests\test_spectral_interpreter_app.py:66: in test_selecting_a_feature_explains_it_in_both_levels_with_the_same_result
+    assert 'class="sc-badge sc-ok">Referencia compatible' in html_of(at)   # a class theme.py actually styles
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   assert 'class="sc-badge sc-ok">Referencia compatible' in '<a class="sc-brand" href="?" target="_self" aria-label="SkyClues, home"><svg xmlns="http://www.w3.org/2000/svg" width...tgpt.com"]{display:none}\n.st-key-sc_scroll_top{position:absolute;width:0;height:0;overflow:hidden;margin:0}\n</style>'
+E    +  where '<a class="sc-brand" href="?" target="_self" aria-label="SkyClues, home"><svg xmlns="http://www.w3.org/2000/svg" width...tgpt.com"]{display:none}\n.st-key-sc_scroll_top{position:absolute;width:0;height:0;overflow:hidden;margin:0}\n</style>' = html_of(AppTest(\n    _script_path='C:\\Users\\danie\\Documents\\SkyClues-ux\\app.py',\n    default_timeout=30,\n    _session_sta...pecialBlock(\n            type='event',\n            children={\n                0: Html()\n            }\n        )\n    }\n))
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:39:24.804 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:39:24.804 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+___________________ test_a_and_b_are_interpreted_separately ___________________
+tests\test_spectral_interpreter_app.py:109: in test_a_and_b_are_interpreted_separately
+    assert "No evaluable" in page[page.index("Spectrum B: "):]       # B has no peak: nothing to interpret there
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   assert 'No evaluable' in 'Spectrum B: <span class="sc-badge ">Not evaluable</span> <span class="sc-muted">the data in this interval do not allo...tgpt.com"]{display:none}\n.st-key-sc_scroll_top{position:absolute;width:0;height:0;overflow:hidden;margin:0}\n</style>'
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:39:30.098 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:39:30.098 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:39:32.007 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:39:32.007 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+________ test_rows_without_coverage_information_do_not_break_anything _________
+tests\test_spectral_quality.py:106: in test_rows_without_coverage_information_do_not_break_anything
+    assert sq.table_rows([q])[0]["Píxeles válidos"] == "no disponible" and sq.plain(q).startswith("Este canal no puede")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'Píxeles válidos'
+_________ test_aperture_without_cube_pixels_is_described_not_crashed __________
+tests\test_spectral_quality.py:116: in test_aperture_without_cube_pixels_is_described_not_crashed
+    assert sq.table_rows([q])[0]["Píxeles válidos"] == "0 píxeles en la apertura"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'Píxeles válidos'
+___________________ test_plain_wording_for_the_simple_level ___________________
+tests\test_spectral_quality.py:122: in test_plain_wording_for_the_simple_level
+    assert sq.plain(sq.ChannelQuality(status="no_data_aperture", **base)) == (
+E   AssertionError: assert 'This channel... usable data.' == 'Este canal n... utilizables.'
+E     
+E     - Este canal no puede analizarse porque parte de la región seleccionada no tiene datos utilizables.
+E     + This channel cannot be analysed because part of the selected region has no usable data.
+_____________ test_page_explains_rejected_channels_in_both_levels _____________
+tests\test_spectral_quality.py:149: in test_page_explains_rejected_channels_in_both_levels
+    assert len(frames) == 2                                    # the interval and the whole-spectrum section
+    ^^^^^^^^^^^^^^^^^^^^^^^
+E   assert 0 == 2
+E    +  where 0 = len([])
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:39:54.134 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:39:54.135 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:39:56.163 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_____ test_second_position_gets_its_own_diagnosis_with_a_spectrum_column ______
+tests\test_spectral_quality.py:182: in test_second_position_gets_its_own_diagnosis_with_a_spectrum_column
+    interval = _quality_frames(at)[0]
+               ^^^^^^^^^^^^^^^^^^^^^^
+E   IndexError: list index out of range
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:39:56.549 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:39:56.549 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:39:58.226 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:39:58.226 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+__________ test_one_position_is_the_default_and_nothing_is_compared ___________
+tests\test_spectrum_analysis_app.py:54: in test_one_position_is_the_default_and_nothing_is_compared
+    assert "Espectro exploratorio de una posición" in text_of(at)
+E   AssertionError: assert 'Espectro exploratorio de una posición' in 'WCS geometry: each native pixel of the cube (12.9″) is drawn at its position, with its original value, without resamp...t averaged; channels 51 and 52 are empty in DR1; spectrum without uncertainties or aperture correction (display only).'
+E    +  where 'WCS geometry: each native pixel of the cube (12.9″) is drawn at its position, with its original value, without resamp...t averaged; channels 51 and 52 are empty in DR1; spectrum without uncertainties or aperture correction (display only).' = text_of(AppTest(\n    _script_path='C:\\Users\\danie\\Documents\\SkyClues-ux\\app.py',\n    default_timeout=30,\n    _session_sta...pecialBlock(\n            type='event',\n            children={\n                0: Html()\n            }\n        )\n    }\n))
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:40:00.306 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:40:00.306 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+_________ test_second_position_is_extracted_like_a_and_can_be_removed _________
+tests\test_spectrum_analysis_app.py:81: in test_second_position_is_extracted_like_a_and_can_be_removed
+    assert "Espectros exploratorios de dos posiciones" in txt and "Misma extracción en ambos" in txt
+E   AssertionError: assert ('Espectros exploratorios de dos posiciones' in 'A: black diamond · B: copper square, with the colours of their spectra. Solid line: aperture; dashed: background annu...t averaged; channels 51 and 52 are empty in DR1; spectrum without uncertainties or aperture correction (display only).')
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:40:02.245 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:40:02.245 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:40:04.008 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+___ test_selection_inspector_and_state_survive_level_mode_and_view_changes ____
+tests\test_spectrum_analysis_app.py:117: in test_selection_inspector_and_state_survive_level_mode_and_view_changes
+    table = inspector(at)
+            ^^^^^^^^^^^^^
+tests\test_spectrum_analysis_app.py:28: in inspector
+    return next(d.value for d in at.dataframe if list(d.value.columns)[0] == "Magnitud")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   StopIteration
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:40:11.706 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:40:11.708 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:40:13.601 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:40:13.601 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+______________ test_interval_with_no_data_is_reported_not_filled ______________
+tests\test_spectrum_analysis_app.py:154: in test_interval_with_no_data_is_reported_not_filled
+    table = inspector(at)
+            ^^^^^^^^^^^^^
+tests\test_spectrum_analysis_app.py:28: in inspector
+    return next(d.value for d in at.dataframe if list(d.value.columns)[0] == "Magnitud")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   StopIteration
+---------------------------- Captured stderr call -----------------------------
+2026-11-15 21:40:15.400 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:40:15.400 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-15 21:40:17.108 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+------------------------------ Captured log call ------------------------------
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+WARNING  streamlit.runtime.scriptrunner_utils.script_run_context:script_run_context.py:522 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+______________________ test_same_numbers_in_both_levels _______________________
+tests\test_spectrum_analysis_app.py:193: in test_same_numbers_in_both_levels
+    assert "un 40%" in sa._plain(f) and dict(zip(rows["Magnitud"], rows["Espectro A"]))["Contraste relativo"] == "+40.0%"
+E   AssertionError: assert ('un 40%' in 'peak: 40% brighter than the neighbouring colours. It stands out clearly.')
+E    +  where 'peak: 40% brighter than the neighbouring colours. It stands out clearly.' = <function _plain at 0x0000021460D80360>(Feature(serie='A', origin='automatic', klass='cuantificable', kind='pico', reasons=['Contrast of more than 1000 times ...2, env_left=[28, 29, 30], env_right=[32, 33, 34], detectors=[2], nhits_feature=4.0, nhits_env=4.0, caution_channels=[]))
+E    +    where <function _plain at 0x0000021460D80360> = sa._plain
+____ test_an_interval_without_a_feature_is_never_given_a_type_or_a_centre _____
+tests\test_spectrum_analysis_app.py:205: in test_an_interval_without_a_feature_is_never_given_a_type_or_a_centre
+    assert col["Tipo"] == "No identificada" and col["Centro de la característica (µm)"] == "No aplica"
+           ^^^^^^^^^^^
+E   KeyError: 'Tipo'
+=========================== short test summary info ===========================
+FAILED tests/test_autocomplete.py::test_partial_failure_preserves_jpl_choices
+FAILED tests/test_moving_app.py::test_empty_and_failure_are_different - Asser...
+FAILED tests/test_multiband.py::test_field_split_over_several_tiles - assert ...
+FAILED tests/test_non_sidereal.py::test_missing_observer_orbit_is_service_limit_not_empty_sky
+FAILED tests/test_references.py::test_iframe_independent_controls_and_failures[success]
+FAILED tests/test_references.py::test_iframe_independent_controls_and_failures[wise_error]
+FAILED tests/test_release.py::test_suggestion_cache_success_but_not_outage - ...
+FAILED tests/test_spectral_app.py::test_cube_errors_are_visible_without_partial_spectrum[RangeNotHonoured-lectura parcial]
+FAILED tests/test_spectral_app.py::test_cube_errors_are_visible_without_partial_spectrum[FileChangedError-cambi\xf3]
+FAILED tests/test_spectral_app.py::test_cube_errors_are_visible_without_partial_spectrum[CubeFormatError-estructura documentada]
+FAILED tests/test_spectral_app.py::test_cube_errors_are_visible_without_partial_spectrum[ArchiveTransientError-temporalmente]
+FAILED tests/test_spectral_app.py::test_cube_errors_are_visible_without_partial_spectrum[ArchivePermanentError-rechaz\xf3]
+FAILED tests/test_spectral_app.py::test_invalid_spectral_url_never_reads_cube[query0]
+FAILED tests/test_spectral_app.py::test_invalid_spectral_url_never_reads_cube[query1]
+FAILED tests/test_spectral_app.py::test_invalid_spectral_url_never_reads_cube[query2]
+FAILED tests/test_spectral_features.py::test_manual_interval_matches_the_scan_and_wide_intervals_are_refused
+FAILED tests/test_spectral_interpreter.py::test_isolated_minimum_is_not_water_ice_and_a_broad_one_is_only_orientative
+FAILED tests/test_spectral_interpreter.py::test_channels_without_data_are_not_evaluable_and_absence_is_not_concluded
+FAILED tests/test_spectral_interpreter.py::test_step_between_detectors_is_not_a_substance
+FAILED tests/test_spectral_interpreter.py::test_arp220_redshift_is_applied_and_both_hypotheses_remain_unconfirmed
+FAILED tests/test_spectral_interpreter_app.py::test_selecting_a_feature_explains_it_in_both_levels_with_the_same_result
+FAILED tests/test_spectral_interpreter_app.py::test_a_and_b_are_interpreted_separately
+FAILED tests/test_spectral_quality.py::test_rows_without_coverage_information_do_not_break_anything
+FAILED tests/test_spectral_quality.py::test_aperture_without_cube_pixels_is_described_not_crashed
+FAILED tests/test_spectral_quality.py::test_plain_wording_for_the_simple_level
+FAILED tests/test_spectral_quality.py::test_page_explains_rejected_channels_in_both_levels
+FAILED tests/test_spectral_quality.py::test_second_position_gets_its_own_diagnosis_with_a_spectrum_column
+FAILED tests/test_spectrum_analysis_app.py::test_one_position_is_the_default_and_nothing_is_compared
+FAILED tests/test_spectrum_analysis_app.py::test_second_position_is_extracted_like_a_and_can_be_removed
+FAILED tests/test_spectrum_analysis_app.py::test_selection_inspector_and_state_survive_level_mode_and_view_changes
+FAILED tests/test_spectrum_analysis_app.py::test_interval_with_no_data_is_reported_not_filled
+FAILED tests/test_spectrum_analysis_app.py::test_same_numbers_in_both_levels
+FAILED tests/test_spectrum_analysis_app.py::test_an_interval_without_a_feature_is_never_given_a_type_or_a_centre
+33 failed, 276 passed in 210.24s (0:03:30)

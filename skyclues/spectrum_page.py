@@ -453,8 +453,8 @@ def render(level: str) -> None:
                 "flags_apertura"]
         cols += [c for c in ("ap_pix_total", "ap_pix_invalidos", "ap_pix_nan", "ap_pix_nhits0", "ap_bloom",
                              "ap_overflow") if c in df.columns]          # coverage of the aperture (diagnostic)
-        st.dataframe(df[cols], hide_index=True, width="stretch")
-        st.caption("«fondo_sigma_mjysr» is the scatter (clipped at 3σ) of the annulus pixels: it describes the "
+        st.dataframe(df[cols], hide_index=True, width="stretch", column_config=sv.column_config(df[cols]))
+        st.caption("“Background scatter” is the scatter (clipped at 3σ) of the annulus pixels: it describes the "
                    "background, it is not the flux uncertainty.")
         meta = {"producto": "SPHEREx DR1 All-Sky spectral cube", "doi": config.CUBE_DOI,
                 "metodo": "exploratory aperture photometry (official IRSA tutorial); display only",

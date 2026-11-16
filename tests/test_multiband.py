@@ -285,7 +285,7 @@ def test_common_scale_without_useful_contrast_is_measured_and_explained(cube):
     assert ds['poco_contraste'] and ds['fraccion_oscura'] >= mb.LOW_CONTRAST_FRACTION
     assert ds['fraccion_blanca'] < 0.05                        # dark, not white
     assert ds['n_pixeles'] == comp.coverage['tres_canales']
-    msg = [w for w in comp.warnings if 'poco contraste útil' in w]
+    msg = [w for w in comp.warnings if 'little useful contrast' in w]
     assert len(msg) == 1 and 'Stretch each colour' in msg[0] and 'not a failure' in msg[0]
     assert comp.provenance()['visualizacion'] == ds
     for r in mb.ROLES:                                         # values never modified
@@ -293,14 +293,14 @@ def test_common_scale_without_useful_contrast_is_measured_and_explained(cube):
     # the same data with independent limits is not flagged (the flag describes the common scale)
     ind = build(cube, map_fn, 'independiente')
     assert not ind.display_stats()['poco_contraste']
-    assert not any('poco contraste útil' in w for w in ind.warnings)
+    assert not any('little useful contrast' in w for w in ind.warnings)
 
 
 def test_well_spread_common_scale_is_not_flagged(cube, grads):
     _, map_fn, _ = grads
     comp = build(cube, map_fn, 'comun')
     assert not comp.display_stats()['poco_contraste']
-    assert not any('poco contraste útil' in w for w in comp.warnings)
+    assert not any('little useful contrast' in w for w in comp.warnings)
 
 
 def test_composite_chart_frame_does_not_depend_on_browser_width(cube, grads):
@@ -331,7 +331,7 @@ def test_field_split_over_several_tiles(cube, grads):
         return sc.ChannelMap(cube.tile.channels[plane], ra, dec, fov, [left, right])
     comp = build(cube, map_fn)
     assert [t['tesela'] for t in comp.alignment['teselas']] == [445, 446]
-    assert any('varias teselas' in w for w in comp.warnings)
+    assert any('several tiles' in w for w in comp.warnings)
     whole = build(cube, grads[1])
     assert comp.coverage == whole.coverage and comp.stretch == whole.stretch
     np.testing.assert_array_equal(np.hstack([comp.rgb(0), comp.rgb(1)]), whole.rgb(0))
@@ -419,7 +419,7 @@ def test_switch_to_multiband_and_back_keeps_region_channel_and_pick(app_cube):
     assert at.session_state['sx_region_key'] == key
     assert all(at.query_params[k] == url[k] for k in ('ra', 'dec', 'fov'))
     text = ' '.join(m.value for m in at.markdown)
-    assert 'Convención de visualización, no color real' in text and 'no detecta' in text
+    assert 'Display convention, not real colour' in text and 'does not detect' in text
     lam = app_cube.tile.channels[89].wavelength_um
     assert any(c.value.startswith(f'λ {lam:.3f} µm') for c in at.caption)
     assert not any(e for e in at.error)
@@ -444,7 +444,7 @@ def test_switch_to_multiband_and_back_keeps_region_channel_and_pick(app_cube):
     assert at.selectbox(key='mb_R').value == 90 and at.selectbox(key='mb_B').value == 10
     for role, n in (('R', 90), ('B', 10)):
         sb = at.selectbox(key=f'mb_{role}').proto
-        assert sb.set_value and sb.raw_value.startswith(f'Canal {n} ')
+        assert sb.set_value and sb.raw_value.startswith(f'Channel {n} ')
 
 
 def test_multiband_reader_failure_is_visible_without_image(app_cube, monkeypatch):
@@ -458,7 +458,7 @@ def test_multiband_reader_failure_is_visible_without_image(app_cube, monkeypatch
     at.session_state['sx_mode'] = mpage.MODES[1]
     at.run()
     assert not at.exception
-    assert any('composición' in e.value and 'temporalmente' in e.value for e in at.error)
+    assert any('composite' in e.value and 'temporarily' in e.value for e in at.error)
     assert not at.metric
 
 

@@ -1,0 +1,16 @@
+﻿python.exe : ERROR: not found: 
+C:\Users\danie\Documents\SkyClues-ux\tests\test_spectral_app.py::test_cube_errors_are_visible_without_partial_spectrum
+At line:1 char:999
++ ... ed_ids.txt; & C:/Users/danie/Documents/SkyClues/.venv/Scripts/python. ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ERROR: not foun...artial_spectrum:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(no match in any of [<Module test_spectral_app.py>])
+
+no tests ran in 5.52s
+
+ERROR: not found: 
+C:\Users\danie\Documents\SkyClues-ux\tests\test_spectral_app.py::test_cube_errors_are_visible_without_partial_spectrum
+(no match in any of [<Module test_spectral_app.py>])
+

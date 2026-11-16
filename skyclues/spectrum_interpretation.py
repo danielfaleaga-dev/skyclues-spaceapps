@@ -15,6 +15,7 @@ import streamlit as st
 from . import spectral_features as sf
 from . import spectral_interpreter as si
 from . import spectral_references as sr
+from . import spectral_view as sv
 from . import theme
 
 REFS_OPTION = "sx_refs"            # show the reference marks on the plot (persistent option, off by default)
@@ -202,7 +203,7 @@ def _scientific_block(k: str, it: si.Interpretation) -> None:
              f"resolution element ≈ {o['elemento_resolucion_um']:.3f} µm" +
              ("" if o["R_del_fits"] else " (R estimated)")),
             ("Redshift", z, zsrc),
-            ("Data", f"{f.kind} · {f.label.lower()}",
+            ("Data", f"{sv.KIND_TEXT.get(f.kind, f.kind)} · {f.label.lower()}",
              f"contrast / scatter {abs(o['contraste_sobre_dispersion']):.1f} (descriptive, not significance)")])
     else:
         theme.facts([("Interval examined", f"channels {f.trial_lo}–{f.trial_hi}" if f is not None else "—",
@@ -243,7 +244,7 @@ def _overview(ctx: Context, sci: bool, inspect_key: str) -> None:
             f = it.feature
             left, right = st.columns([4, 1], vertical_alignment="center")
             where = f"{f.lam:.3f} µm (channel {f.canal})" if sci else f"near {_um(f.lam)}"
-            left.html(f'<p style="margin:0"><b>{k}</b> · {f.kind} {where} '
+            left.html(f'<p style="margin:0"><b>{k}</b> · {sv.KIND_TEXT.get(f.kind, f.kind)} {where} '
                       f'{theme.badge(it.label, si.VERDICT_BADGE[it.verdict])}</p>')
             right.button("Examine", key=f"sx_interp_{k}_{f.canal}", on_click=_pick, args=(inspect_key, f.canal),
                          help="Examine this peak or valley on the chart and show its interpretation.")

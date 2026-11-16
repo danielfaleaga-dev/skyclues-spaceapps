@@ -94,7 +94,7 @@ def test_ratio_withheld_when_denominator_is_inside_reference_scatter():
     assert by[5]["relacion"] is None and "not reliable" in by[5]["estado_relacion"] and by[5]["diferencia"] == 18.0
     assert by[40]["relacion"] == 2.0 and by[40]["estado_relacion"] == "valid"
     no_ref = sf.compare(mk(np.full(N, 20.0), "A"), mk(b, "B"))
-    assert no_ref.rows[5]["relacion"] == 10.0 and "sin filtro" in no_ref.rows[5]["estado_relacion"]
+    assert no_ref.rows[5]["relacion"] == 10.0 and "no stability filter" in no_ref.rows[5]["estado_relacion"]
     assert not no_ref.summary["filtro_estabilidad"]
 
 
@@ -113,10 +113,10 @@ def test_contamination_and_overlap_are_reported():
     a = mk(POWER, "A", meta=meta(10.0, 0.0))
     assert any("overlap" in n for n in sf.compare(a, mk(POWER, "B", meta=meta(10.0, 3 * pix_deg))).notes)
     far = sf.compare(a, mk(POWER, "B", meta=meta(10.0, 6 * pix_deg)))
-    assert far.comparable and any("anillo de fondo de la otra" in n for n in far.notes)
+    assert far.comparable and any("background annulus of the other" in n for n in far.notes)
     assert far.separation_arcsec == pytest.approx(6 * 12.883, abs=0.01)
     assert not sf.compare(a, mk(POWER, "B", meta=meta(10.0, 12 * pix_deg))).notes
-    assert any("misma posición" in n for n in sf.compare(a, mk(POWER, "B", meta=meta(10.0, 0.0))).notes)
+    assert any("same position" in n for n in sf.compare(a, mk(POWER, "B", meta=meta(10.0, 0.0))).notes)
 
 
 def test_real_extraction_path_two_positions(cube):
@@ -261,7 +261,7 @@ def test_edges_of_the_spectral_range_are_not_evaluable():
     assert sf.find_features(s) == []
     for canal in (1, 102):
         f = sf.measure_interval(s, canal, canal)
-        assert f.klass == sf.NOT_EVALUABLE and "borde del intervalo espectral" in f.reasons[0] and f.contrast is None
+        assert f.klass == sf.NOT_EVALUABLE and "edge of the spectral interval" in f.reasons[0] and f.contrast is None
 
 
 def test_no_reliable_continuum_next_to_channels_without_data():
@@ -272,7 +272,7 @@ def test_no_reliable_continuum_next_to_channels_without_data():
     f = sf.inspect_channel(s, 50)
     assert f.klass == sf.NOT_EVALUABLE and "channel 51" in f.reasons[0] and "reliable local continuum" in f.reasons[0]
     g = sf.measure_interval(s, 49, 53)
-    assert g.klass == sf.NOT_EVALUABLE and "No se interpolan" in g.reasons[0] and "51, 52" in g.reasons[0]
+    assert g.klass == sf.NOT_EVALUABLE and "not interpolated" in g.reasons[0] and "51, 52" in g.reasons[0]
 
 
 def test_feature_across_detectors_is_only_visible():
@@ -303,7 +303,7 @@ def test_documented_artefact_is_flagged_not_identified():
     y[i] *= 1.5
     (f,) = sf.find_features(mk(y))
     assert any("1.083" in t and "instrumental" in t for t in f.limitations)
-    assert not any(w in " ".join(f.limitations + f.reasons).lower() for w in ("detección de", "se identifica"))
+    assert not any(w in " ".join(f.limitations + f.reasons).lower() for w in ("detection of", "is identified"))
 
 
 def test_linear_fallback_with_non_positive_values():

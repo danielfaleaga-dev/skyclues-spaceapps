@@ -29,7 +29,7 @@ def test_two_real_positions_are_extracted_identically_and_compared(spectra):
     assert spec_a.aperture == spec_b.aperture and spec_a.pixel_solid_angle_sr == spec_b.pixel_solid_angle_sr
     assert c.summary["n_ambos"] == 100 and c.summary["n_ninguno"] == 2          # channels 51 and 52: no data
     by = {r["canal"]: r for r in c.rows}
-    assert by[51]["diferencia"] is None and by[52]["relacion"] is None and by[51]["estado_a"] == "canal sin datos en DR1"
+    assert by[51]["diferencia"] is None and by[52]["relacion"] is None and by[51]["estado_a"] == "channel without data in DR1"
     for r in c.rows:                                                            # exact arithmetic, valid domain only
         if r["diferencia"] is not None:
             assert r["diferencia"] == r["a"] - r["b"]
@@ -58,17 +58,17 @@ def test_peak_near_3p3_um_is_quantifiable_in_b_and_absent_in_a(spectra):
     from skyclues import spectrum_analysis as spa
     rows = spa._science_rows({"A": fa, "B": fb}, sb)
     col = {k: dict(zip(rows["Magnitud"], rows[f"Espectro {k}"])) for k in "AB"}
-    assert (col["A"]["Clase"], col["B"]["Clase"]) == ("Sin característica", "Cuantificable")
+    assert (col["A"]["Class"], col["B"]["Class"]) == ("No feature", "Quantifiable")
     assert col["A"]["Tipo"] == "No identificada" and col["B"]["Tipo"] == "pico · estrecha"
-    assert col["A"]["Centro de la característica (µm)"] == "No aplica"
-    assert col["B"]["Centro de la característica (µm)"].startswith("3.293")
+    assert col["A"]["Centre of the feature (µm)"] == "Not applicable"
+    assert col["B"]["Centre of the feature (µm)"].startswith("3.293")
     assert col["A"]["Intervalo examinado (µm)"] == col["B"]["Intervalo examinado (µm)"]
     assert col["A"]["Contraste"] == spa._num(fa.contrast, "mJy", signed=True) and fa.contrast > 0
-    assert col["B"]["Contraste / dispersión de referencia"] == f"{abs(fb.ratio):.1f}"
+    assert col["B"]["Contrast / reference scatter"] == f"{abs(fb.ratio):.1f}"
     head = spa._heading(fb, True, sb)
-    assert head == 'Característica examinada · 3,293&nbsp;<span class="sc-unit">µm</span> (canal 63)'
-    print("A:", col["A"]["Contraste"], col["A"]["Contraste / dispersión de referencia"], "| B:", col["B"]["Contraste"],
-          col["B"]["Contraste / dispersión de referencia"])
+    assert head == 'Feature examined · 3.293&nbsp;<span class="sc-unit">µm</span> (channel 63)'
+    print("A:", col["A"]["Contraste"], col["A"]["Contrast / reference scatter"], "| B:", col["B"]["Contraste"],
+          col["B"]["Contrast / reference scatter"])
 
 
 def test_repeated_extraction_is_reproducible_and_local(spectra):

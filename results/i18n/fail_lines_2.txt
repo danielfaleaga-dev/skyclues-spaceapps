@@ -1,0 +1,181 @@
+﻿tests/test_atlas.py:32: assert atlas.SPHEREX_HIPS["release"] and "combinado" in atlas.SPHEREX_HIPS["kind"]
+      -> AssertionError: assert ('2026-11-01' and 'combinado' in 'HiPS cube of 102 PNG planes (0.75–5.0 µm), combined product')
+tests/test_atlas.py:91: assert at.button_group(key='nav').options==['Región','Tiempo','Espectro']
+      -> AssertionError: assert ['Region', 'Time', 'Spectrum'] == ['Región', 'T...', 'Espectro']
+tests/test_atlas.py:114: assert state['region']==before and 'no válida' in state['region_notice']
+      -> AssertionError: assert ({'ra': 210.80...e': None, ...} == {'ra': 210.80...e': None, ...}
+tests/test_audit_offline.py:61: assert any("paralaje" in w for w in no_plx.warnings())
+      -> assert False
+tests/test_audit_offline.py:66: assert not M101.has_proper_motion and "Sin movimiento propio" in M101.warnings()[0]
+      -> AssertionError: assert (not False and 'Sin movimiento propio' in 'No proper motion in the catalogue: the catalogue position is used for all dates (correct for distant objects; wrong if the object moves).')
+tests/test_audit_offline.py:126: assert defs.bits[29] == "SATELLITE_HALO" and "documentación" in defs.source
+      -> AssertionError: assert ('SATELLITE_HALO' == 'SATELLITE_HALO'
+tests/test_audit_offline.py:257: assert archive.last_sia2_route.startswith("directo") and sleeps == []
+      -> AssertionError: assert (False)
+tests/test_audit_offline.py:342: with pytest.raises(archive.CorruptFitsError, match="referencia"):
+      -> AssertionError: Regex pattern did not match.
+tests/test_autocomplete.py:47: assert len(result) == 12 and result[0]['type'] == 'Cometa'
+      -> AssertionError: assert (12 == 12 and 'Comet' == 'Cometa'
+tests/test_autocomplete.py:69: assert rows == [{'id': 'JPL:615'}] and 'no responde' in message
+      -> AssertionError: assert ([{'id': 'JPL:615'}] == [{'id': 'JPL:615'}]
+tests/test_continuity.py:13: with pytest.raises(ValueError,match='ambigua'):search.resolve('Messier 102')
+      -> AssertionError: Regex pattern did not match.
+tests/test_continuity.py:76: with pytest.raises(solar.ServiceError,match='no disponible'):solar.lookup('Bennu')
+      -> AssertionError: Regex pattern did not match.
+tests/test_enhance.py:111: assert any("Registro" in r["reason"] for r in st.selection["rejected"])
+      -> assert False
+tests/test_enhance.py:136: assert not v["accepted"] and "no aporta" in " ".join(v["reasons"])
+      -> AssertionError: assert (not False and 'no aporta' in 'Compared with the best individual exposure the gain is only 1.00 (< 1.2): the combination does not provide a measurable improvement over it.')
+tests/test_enhance.py:176: assert any("nivel de cielo" in r["reason"] for r in st2.selection["rejected"])
+      -> assert False
+tests/test_enhance.py:207: assert any("PSF incompatible" in r["reason"] for r in st.selection["rejected"])
+      -> assert False
+tests/test_enhance.py:215: assert "BANDA ANCHA" in broad.selection["warnings"][0] and "monocromático" in broad.selection["warnings"][0]
+      -> AssertionError: assert ('BANDA ANCHA' in 'BROADBAND product: it combines different wavelengths of the same detector. It is useful for detecting and locating sources; its brightness is not monochromatic and must not be compared bet
+tests/test_enhance.py:223: assert not sel["ok"] and "detectores distintos" in sel["reason"]
+      -> AssertionError: assert (not False and 'detectores distintos' in 'The exposures come from different detectors (D2, D5): different bands, PSF and calibration. This product only combines one detector.')
+tests/test_enhance.py:242: with pytest.raises(en.EnhanceError, match="emborronaría"):
+      -> AssertionError: Regex pattern did not match.
+tests/test_enhance.py:315: assert "TRAYECTORIA PREVISTA" in " ".join(follow.selection["warnings"])
+      -> AssertionError: assert 'TRAYECTORIA PREVISTA' in 'Combination FOLLOWING A PREDICTED TRAJECTORY: the stars end up shifted and the position of the object in this image is set by the ephemeris. It is not a measurement of its position
+tests/test_gaia_atlas.py:69: assert 'detección SPHEREx' in ' '.join(region_ui.object_card(r)['notes'])
+      -> AssertionError: assert 'detección SPHEREx' in 'Gaia DR3 catalogue coordinates (ICRS, J2016.0). Selecting this source does not confirm a SPHEREx detection. The explorers compute the expected position for their own dates with Gaia a
+tests/test_gaia_atlas.py:93: assert result.returncode==0,result.stdout+result.stderr
+      -> AssertionError: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+tests/test_integration_science.py:80: assert "no es una identificación" in si.VERDICT_MEANING[si.COMPATIBLE]
+      -> AssertionError: assert 'no es una identificación' in 'a single reference matches in position and type, with data without reservations; it is not an identification'
+tests/test_motion.py:124: assert "EPSF oficial" in psf.description and psf.array is not None
+      -> AssertionError: assert ('EPSF oficial' in 'Official EPSF zone (10,10), 296 stars, λc 1.338 µm · epsf_2_20260507.fits')
+tests/test_motion.py:200: assert "detecta" in " ".join(inv.reasons) or "temporada" in " ".join(inv.reasons)
+      -> AssertionError: assert ('detecta' in 'The source is not detected at a significance ≥ 10σ in any season (joint fit of its exposures).' or 'temporada' in 'The source is not detected at a significance ≥ 10σ in any season (joint fit o
+tests/test_motion.py:277: assert why and "borde" in why[0]
+      -> AssertionError: assert (['the search circle touches the edge of the cutout or the mask in all images'] and 'borde' in 'the search circle touches the edge of the cutout or the mask in all images')
+tests/test_motion_app.py:19: assert r["outcome"] in motion.OUTCOME_LABELS and r["outcome_label"] in label
+      -> AssertionError: assert ('INSUFFICIENT_EVIDENCE' in {'MOTION_MEASURED': 'Motion measured', 'INSUFFICIENT_EVIDENCE': 'Insufficient evidence', 'INCOMPATIBLE_OBSERVATIONS': 'Incompatible observations', 'INSUFFICIENT_DATA': 'Insufficie
+tests/test_motion_app.py:35: assert any(t.label == "Movimiento" for t in at.tabs)
+      -> assert False
+tests/test_multiband.py:82: with pytest.raises(ValueError, match=match):
+      -> AssertionError: Regex pattern did not match.
+tests/test_multiband.py:109: assert comp.provenance()['remuestreo'].startswith('ninguno')
+      -> assert False
+tests/test_multiband.py:161: assert any('Cobertura distinta' in w for w in comp.warnings)
+      -> assert False
+tests/test_multiband.py:205: with pytest.raises(mb.InsufficientDataError, match='0 píxeles'):
+      -> AssertionError: Regex pattern did not match.
+tests/test_multiband.py:223: assert any('orden cromático' in w for w in swapped.warnings)
+      -> assert False
+tests/test_multiband.py:250: assert any('NO reflejan' in w for w in a.warnings)
+      -> assert False
+tests/test_multiband.py:262: assert any('no tiene contraste' in w for w in comp.warnings)
+      -> assert False
+tests/test_multiband.py:289: assert len(msg) == 1 and 'Resaltar cada color' in msg[0] and 'no un fallo' in msg[0]
+      -> assert (0 == 1)
+tests/test_multiband.py:334: assert any('varias teselas' in w for w in comp.warnings)
+      -> assert False
+tests/test_multiband.py:461: assert any('composición' in e.value and 'temporalmente' in e.value for e in at.error)
+      -> assert False
+tests/test_multiband.py:481: assert any('Datos insuficientes' in e.value for e in at.error)
+      -> assert False
+tests/test_non_sidereal.py:124: assert not r['observed_motion'] and 'contaminación' in r['motion_reason']
+      -> AssertionError: assert (not False and 'contaminación' in 'A source persists at the same sky position: possible stellar contamination.')
+tests/test_non_sidereal.py:150: with pytest.raises(s.solar_system.ServiceError,match='cobertura orbital'):
+      -> AssertionError: Regex pattern did not match.
+tests/test_non_sidereal.py:197: assert 'punto medio' in out['prediction']['time_basis']
+      -> AssertionError: assert 'punto medio' in 'exposure midpoint UTC'
+tests/test_non_sidereal.py:221: assert not frames and 'diferentes' in fail[0]['error']
+      -> AssertionError: assert (not [] and 'diferentes' in 'FITS and metadata identify different exposures.')
+tests/test_non_sidereal.py:288: assert not r['observed_motion'] and 'Detectores distintos' in r['motion_reason']
+      -> AssertionError: assert (not False and 'Detectores distintos' in 'Different detectors: brightnesses at the same position are not compared.')
+tests/test_non_sidereal.py:312: assert not r['observed_motion'] and 'estrellas comunes' in r['motion_reason']
+      -> AssertionError: assert (not False and 'estrellas comunes' in 'There are not 4 measurable common stars to verify the registration; the signal is kept as a candidate.')
+tests/test_non_sidereal.py:374: assert not p['measured'] and 'alas de la PSF no es fiable' in p['reason']
+      -> AssertionError: assert (not False and 'alas de la PSF no es fiable' in 'Saturated or masked core: the fit with the PSF wings is not reliable (S/N 9.9 < 30, reduced χ² 1). The position is not measured.')
+tests/test_references.py:92: with pytest.raises(ref.ReferenceError,match='no disponible'): ref.fetch_gaia(10,0,.1)
+      -> AssertionError: Regex pattern did not match.
+tests/test_references.py:128: assert result.returncode==0,result.stdout+result.stderr
+      -> AssertionError: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+tests/test_release.py:106: assert not rows and 'no disponibles' in status
+      -> AssertionError: assert (not [] and 'no disponibles' in 'Remote suggestions not available; local index and full-name search available. Timeout/Timeout')
+tests/test_release.py:159: with pytest.raises(RuntimeError):release_ui.suggestions('XYZ')
+      -> Failed: DID NOT RAISE RuntimeError
+tests/test_spectral_app.py:78: if channel in [51,52]: assert any('sin datos en DR1' in w.value for w in at.warning)
+      -> assert False
+tests/test_spectral_app.py:123: assert any(text in e.value for e in at.error)
+      -> assert False
+tests/test_spectral_app.py:135: assert any('no válid' in e.value for e in at.error)
+      -> assert False
+tests/test_spectral_features.py:69: assert by[canal]["estado_relacion"] == "falta A o B"
+      -> AssertionError: assert 'A or B missing' == 'falta A o B'
+tests/test_spectral_features.py:94: assert by[5]["relacion"] is None and "no fiable" in by[5]["estado_relacion"] and by[5]["diferencia"] == 18.0
+      -> AssertionError: assert (None is None and 'no fiable' in 'not reliable: B < 3 × the reference scatter')
+tests/test_spectral_features.py:106: assert not c.comparable and "Magnitudes distintas" in c.issues[0]
+      -> AssertionError: assert (not False and 'Magnitudes distintas' in 'Different quantities (mJy and MJy/sr): they are neither subtracted nor divided.')
+tests/test_spectral_features.py:114: assert any("solapan" in n for n in sf.compare(a, mk(POWER, "B", meta=meta(10.0, 3 * pix_deg))).notes)
+      -> assert False
+tests/test_spectral_features.py:131: assert r["diferencia"] is None and r["estado_a"] == "canal sin datos en DR1"
+      -> AssertionError: assert (None is None and 'channel without data in DR1' == 'canal sin datos en DR1'
+tests/test_spectral_features.py:264: assert f.klass == sf.NOT_EVALUABLE and "borde del intervalo espectral" in f.reasons[0] and f.contrast is None
+      -> AssertionError: assert ('no_evaluable' == 'no_evaluable'
+tests/test_spectral_features.py:273: assert f.klass == sf.NOT_EVALUABLE and "canal 51" in f.reasons[0] and "continuo local fiable" in f.reasons[0]
+      -> AssertionError: assert ('no_evaluable' == 'no_evaluable'
+tests/test_spectral_features.py:282: assert f.klass == sf.VISIBLE and f.detectors == [1, 2] and "detectores D1, D2" in f.limitations[0]
+      -> AssertionError: assert ('visible' == 'visible'
+tests/test_spectral_features.py:295: assert g.klass == sf.VISIBLE and "Cambio de cobertura" in g.limitations[0]
+      -> AssertionError: assert ('visible' == 'visible'
+tests/test_spectral_features.py:315: assert any("Valores ≤ 0" in t for t in f.limitations)
+      -> assert False
+tests/test_spectral_features.py:325: assert manual.origin == "selección" and manual.canal == 26 and manual.contrast == pytest.approx(auto.contrast)
+      -> AssertionError: assert ('selection' == 'selección'
+tests/test_spectral_interpreter.py:99: assert not sr.redshift_at(60.81, 51.34).known and "nunca se estima" in sr.UNKNOWN_Z.note
+      -> AssertionError: assert (not False and 'nunca se estima' in 'No documented redshift for this position: it is compared at rest (z = 0). A different z would shift the references; it is never estimated from a coincidence.')
+tests/test_spectral_interpreter.py:114: assert any("no las separa" in b for b in it.blockers)
+      -> assert False
+tests/test_spectral_interpreter.py:125: assert any("no una significación" in b for b in it.blockers)
+      -> assert False
+tests/test_spectral_interpreter.py:160: assert "mínimo aislado" in it.others[0].reasons[0]
+      -> AssertionError: assert 'mínimo aislado' in 'The documented band is about 0.35 µm wide (≈ 4 channels) and here the feature spans 1 channel at half height: an isolated minimum is not consistent with it.'
+tests/test_spectral_interpreter.py:191: assert any("no excluye otras sustancias" in x for x in it.limitations)
+      -> assert False
+tests/test_spectral_interpreter.py:202: assert cov["pah_3p3"].status == si.COV_NO_DATA and "ni presencia ni ausencia" in cov["pah_3p3"].reasons[0]
+      -> AssertionError: assert ('sin_cobertura' == 'sin_cobertura'
+tests/test_spectral_interpreter.py:215: assert it.verdict == si.NOT_EVALUABLE and "no son sustancias" in it.blockers[0]
+      -> AssertionError: assert ('no_evaluable' == 'no_evaluable'
+tests/test_spectral_interpreter.py:225: assert it.verdict == si.WEAK and any("entorno" in b for b in it.blockers)
+      -> AssertionError: assert ('insuficiente' == 'insuficiente'
+tests/test_spectral_interpreter.py:241: assert not it.observation["R_del_fits"] and "estimada" in " ".join(it.limitations)
+      -> AssertionError: assert (not False and 'estimada' in 'Matching in position and type does not identify a substance: it is a hypothesis consistent with the data. The cube sp...the feature, widened only by the documented error of the 
+tests/test_spectral_interpreter.py:278: assert "radio 26″" in " ".join(it.limitations)
+      -> AssertionError: assert 'radio 26″' in 'Matching in position and type does not identify a substance: it is a hypothesis consistent with the data. The cube sp...the feature, widened only by the documented error of the band centre (1
+tests/test_spectral_interpreter.py:287: assert "no un objeto concreto" in " ".join(it.limitations)
+      -> AssertionError: assert 'no un objeto concreto' in 'Matching in position and type does not identify a substance: it is a hypothesis consistent with the data. The cube sp...the feature, widened only by the documented error of the ba
+tests/test_spectral_interpreter_app.py:54: assert "¿Qué podría indicar este espectro?" in html_of(at)
+      -> assert '¿Qué podría indicar este espectro?' in '<a class="sc-brand" href="?" target="_self" aria-label="SkyClues, home"><svg xmlns="http://www.w3.org/2000/svg" width...tgpt.com"]{display:none}\n.st-key-sc_scroll_top{position:absol
+tests/test_spectral_interpreter_app.py:65: assert "Referencia compatible" in html_of(at)                     # overview badge for the simulated peak
+      -> assert 'Referencia compatible' in '<a class="sc-brand" href="?" target="_self" aria-label="SkyClues, home"><svg xmlns="http://www.w3.org/2000/svg" width...tgpt.com"]{display:none}\n.st-key-sc_scroll_top{position:absolute;width:0;h
+tests/test_spectral_interpreter_app.py:106: page = page[page.index("¿Qué podría indicar este espectro?"):]   # the section (the inspector also names A, B)
+      -> ValueError: substring not found
+tests/test_spectral_offline.py:181: with pytest.raises(sc.CubeFormatError,match='sin END'): sc.read_layout(445)
+      -> AssertionError: Regex pattern did not match.
+tests/test_spectral_quality.py:106: assert sq.table_rows([q])[0]["Píxeles válidos"] == "no disponible" and sq.plain(q).startswith("Este canal no puede")
+      -> KeyError: 'Píxeles válidos'
+tests/test_spectral_quality.py:116: assert sq.table_rows([q])[0]["Píxeles válidos"] == "0 píxeles en la apertura"
+      -> KeyError: 'Píxeles válidos'
+tests/test_spectral_quality.py:122: assert sq.plain(sq.ChannelQuality(status="no_data_aperture", **base)) == (
+      -> AssertionError: assert 'This channel... usable data.' == 'Este canal n... utilizables.'
+tests/test_spectral_quality.py:149: assert len(frames) == 2                                    # the interval and the whole-spectrum section
+      -> assert 0 == 2
+tests/test_spectral_quality.py:182: interval = _quality_frames(at)[0]
+      -> IndexError: list index out of range
+tests/test_spectrum_analysis_app.py:53: assert at.button_group(key="w_sx_active").value == "Punto A"
+      -> AssertionError: assert 'Point A' == 'Punto A'
+tests/test_spectrum_analysis_app.py:70: assert state[sa.B_KEY] == {"ra": pick["ra"], "dec": pick["dec"], "region": (1.0, 2.0, 0.1)}
+      -> KeyError: 'sx_b'
+tests/test_spectrum_analysis_app.py:81: assert "Espectros exploratorios de dos posiciones" in txt and "Misma extracción en ambos" in txt
+      -> AssertionError: assert ('Espectros exploratorios de dos posiciones' in 'A: black diamond · B: copper square, with the same colours as their curves. A difference between two points does not ... no peaks or valleys in this spectrum:
+tests/test_spectrum_analysis_app.py:28: return next(d.value for d in at.dataframe if list(d.value.columns)[0] == "Magnitud")
+      -> StopIteration
+tests/test_spectrum_analysis_app.py:205: assert col["Tipo"] == "No identificada" and col["Centro de la característica (µm)"] == "No aplica"
+      -> KeyError: 'Tipo'
+tests/test_spectrum_analysis_app.py:219: assert head == '3,293&nbsp;<span class="sc-unit">µm</span> (canal 63)'
+      -> assert '3.293&nbsp;<... (channel 63)' == '3,293&nbsp;<...n> (canal 63)'
+90 distinct failing lines

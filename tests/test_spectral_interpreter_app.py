@@ -40,7 +40,7 @@ def frames(at) -> list[pd.DataFrame]:
 
 
 def interp_table(at) -> pd.DataFrame:
-    return next(d for d in frames(at) if "Compatibilidad" in d.columns)
+    return next(d for d in frames(at) if "Compatibility" in d.columns)
 
 
 def level(at, name):
@@ -53,10 +53,10 @@ def test_section_is_present_in_both_levels_and_says_nothing_without_features(app
     assert not at.exception
     assert "What could this spectrum indicate?" in html_of(at)
     assert at.toggle(key="w_sx_refs").value is False
-    assert "no hay nada que interpretar" in text_of(at)
+    assert "nothing to interpret" in text_of(at)
     level(at, "Simple")
     assert "What could this spectrum indicate?" in html_of(at)
-    assert "no hay nada que interpretar" in text_of(at) and "no demuestra que falten sustancias" in text_of(at)
+    assert "nothing to interpret" in text_of(at) and "does not prove that substances are missing" in text_of(at)
 
 
 def test_selecting_a_feature_explains_it_in_both_levels_with_the_same_result(app_cube, peak):
@@ -67,21 +67,21 @@ def test_selecting_a_feature_explains_it_in_both_levels_with_the_same_result(app
     at.button(key="sx_interp_A_61").click().run()
     assert not at.exception and at.session_state[sa.INSPECT_KEY] == {"lo": 61, "hi": 61}
     table = interp_table(at)
-    row = dict(zip(table["Referencia"], table["Compatibilidad"]))
-    assert row["PAH aromático (3,3 µm)"] == "Compatible"
-    assert row["H I Pfund δ (3,297 µm)"] == "No compatible: canal contiguo"
+    row = dict(zip(table["Referencia"], table["Compatibility"]))
+    assert row["Aromatic PAH (3.3 µm)"] == "Compatible"
+    assert row["H I Pfund δ (3.297 µm)"] == "Not compatible: adjacent channel"
     sci_txt = " ".join(str(m.value) for m in at.markdown)
-    assert "Qué impide la certeza" in sci_txt and "no identifica una sustancia" in sci_txt
-    assert "Señal «visible»" not in sci_txt                           # quantifiable: no cap from the signal
+    assert "What prevents certainty" in sci_txt and "does not identify a substance" in sci_txt
+    assert "«Visible» signal" not in sci_txt                           # quantifiable: no cap from the signal
     assert "desconocido" in html_of(at)                               # z of an uncatalogued position, stated
     level(at, "Simple")
     txt = text_of(at)
-    assert "Detectamos un exceso de emisión cerca de 3,3 µm" in txt
-    assert "Podría relacionarse con compuestos aromáticos de carbono (PAH)" in txt
-    assert "Hemos encontrado" not in txt and "Un pico o un valle no basta para identificar un material." in txt
+    assert "We detected an excess of emission near 3.3 µm" in txt
+    assert "It could be related to aromatic carbon compounds (PAH)" in txt
+    assert "We have found" not in txt and "A peak or a valley is not enough to identify a material." in txt
     assert "Compatible reference" in html_of(at)
     assert at.session_state[sa.INSPECT_KEY] == {"lo": 61, "hi": 61}  # level change keeps the selection
-    assert not [d for d in frames(at) if "Compatibilidad" in d.columns]   # no scientific table in Sencillo
+    assert not [d for d in frames(at) if "Compatibility" in d.columns]   # no scientific table in Sencillo
 
 
 def test_reference_marks_toggle_survives_level_changes(app_cube, peak):
@@ -104,15 +104,15 @@ def test_a_and_b_are_interpreted_separately(app_cube, peak):
     assert not at.exception
     page = html_of(at)
     page = page[page.index("What could this spectrum indicate?"):]   # the section (the inspector also names A, B)
-    assert "Espectro A: " in page and "Espectro B: " in page
-    assert page.index("Compatible reference") < page.index("Espectro B: ")
-    assert "No evaluable" in page[page.index("Espectro B: "):]       # B has no peak: nothing to interpret there
+    assert "Spectrum A: " in page and "Spectrum B: " in page
+    assert page.index("Compatible reference") < page.index("Spectrum B: ")
+    assert "No evaluable" in page[page.index("Spectrum B: "):]       # B has no peak: nothing to interpret there
     sci_txt = " ".join(str(m.value) for m in at.markdown)
-    assert "no identifica una sustancia" in sci_txt                   # A: a match is not an identification
-    assert "que ninguna coincida no excluye otras sustancias" in sci_txt   # B: no match excludes nothing
+    assert "does not identify a substance" in sci_txt                   # A: a match is not an identification
+    assert "that none matches does not exclude other substances" in sci_txt   # B: no match excludes nothing
     level(at, "Simple")
     txt = text_of(at)
-    assert "Aquí no destaca ningún pico ni valle." in txt and "Detectamos un exceso de emisión" in txt
+    assert "No peak or valley stands out here." in txt and "We detected an excess of emission" in txt
 
 
 def test_chart_draws_reference_marks_only_when_asked(cube):

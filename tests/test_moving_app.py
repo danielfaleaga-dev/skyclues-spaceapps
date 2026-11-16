@@ -30,12 +30,12 @@ def reply(rows):
 def test_empty_and_failure_are_different(monkeypatch):
     monkeypatch.setattr(page,'discover',lambda *a,**k:reply([]))
     at=app();at.button(key='moving_search').click().run()
-    assert not at.exception and any('Sin cobertura' in m.value for m in at.info)
+    assert not at.exception and any('No coverage' in m.value for m in at.info)
     def fail(*a,**k):raise RuntimeError('Servicio no disponible, reintente')
     monkeypatch.setattr(page,'discover',fail)
     at=app();at.button(key='moving_search').click().run()
-    assert not at.exception and any('Servicio no disponible' in m.value for m in at.error)
-    assert not any('Sin cobertura' in m.value for m in at.info)
+    assert not at.exception and any('Service not available' in m.value for m in at.error)
+    assert not any('No coverage' in m.value for m in at.info)
 
 
 def test_solar_route_preserves_region_and_never_uses_fixed_field_engine(monkeypatch):
@@ -49,7 +49,7 @@ def test_solar_route_preserves_region_and_never_uses_fixed_field_engine(monkeypa
     at.button_group(key='level').set_value('Scientific').run()
     assert not at.exception and at.session_state['region']==region
     assert at.session_state['region']['fov']==.2
-    assert any(s.label=='Secuencia de observaciones compatibles' for s in at.selectbox)
+    assert any(s.label=='Sequence of compatible observations' for s in at.selectbox)
 
 
 def test_dates_survive_navigation_and_switching_levels(monkeypatch):
@@ -63,7 +63,7 @@ def test_dates_survive_navigation_and_switching_levels(monkeypatch):
     assert not at.exception
     assert at.date_input(key='w_moving_start').value==date(2025,12,1)
     assert at.date_input(key='w_moving_end').value==date(2025,12,20)
-    assert any(s.label=='Secuencia de observaciones compatibles' for s in at.selectbox)
+    assert any(s.label=='Sequence of compatible observations' for s in at.selectbox)
 
 
 def test_failed_fits_is_not_no_coverage(monkeypatch):
@@ -71,5 +71,5 @@ def test_failed_fits_is_not_no_coverage(monkeypatch):
     monkeypatch.setattr(page,'prepare',lambda *a:([],[{'obs_id':'SIMULATED','error':'Timeout de prueba'}]))
     at=app();at.button(key='moving_search').click().run();at.button(key='moving_prepare').click().run()
     assert not at.exception
-    assert any('No evaluable' in m.value for m in at.info)
+    assert any('Not evaluable' in m.value for m in at.info)
     assert at.button(key='moving_retry')

@@ -205,10 +205,10 @@ def _science_rows(fs: dict, series: sf.Series | None = None) -> pd.DataFrame:
         if f.contrast is None:
             return [f.label, NOT_IDENTIFIED, examined, NOT_APPLICABLE, NOT_APPLICABLE,
                     f"— · {f.trial_lo}–{f.trial_hi}", "—", "—", "—", "—", "—", "—", "—", "—", "—"]
-        refs = " · ".join(f"{n} {_num(v)}" for n, v in (("entorno", f.ref_local), ("detector", f.ref_detector),
-                                                         ("fondo", f.ref_background)) if v is not None)
+        refs = " · ".join(f"{n} {_num(v)}" for n, v in (("surroundings", f.ref_local), ("detector", f.ref_detector),
+                                                         ("background", f.ref_background)) if v is not None)
         if _labelled(f):
-            kind, centre = f"{f.kind} · {f.width}", f"{f.lam:.3f} (centroid {f.lam_centroid:.3f})"
+            kind, centre = f"{sv.KIND_TEXT.get(f.kind, f.kind)} · {sv.WIDTH_TEXT.get(f.width, f.width)}", f"{f.lam:.3f} (centroid {f.lam_centroid:.3f})"
             half = f"{f.lam_lo:.3f}–{f.lam_hi:.3f} ({f.width_um:.3f})"
             chans = f"{f.canal_lo}–{f.canal_hi} · {f.trial_lo}–{f.trial_hi}"
         else:
@@ -219,7 +219,7 @@ def _science_rows(fs: dict, series: sf.Series | None = None) -> pd.DataFrame:
                 _num(f.continuum, f.unit), _num(f.contrast, f.unit, signed=True),
                 "—" if f.relative is None else f"{f.relative:+.1%}",
                 "> 1000" if abs(f.ratio) > 1000 else f"{abs(f.ratio):.1f}", f"{_num(f.ref, f.unit)} ({refs})",
-                f"{f.env_left[0]}–{f.env_left[-1]} y {f.env_right[0]}–{f.env_right[-1]}",
+                f"{f.env_left[0]}–{f.env_left[-1]} and {f.env_right[0]}–{f.env_right[-1]}",
                 ", ".join(f"D{d}" for d in f.detectors),
                 "—" if f.nhits_feature is None else f"{f.nhits_feature:.0f} / {f.nhits_env:.0f}"]
     names = ["Class", "Type", "Interval examined (µm)", "Centre of the feature (µm)",
@@ -231,7 +231,7 @@ def _science_rows(fs: dict, series: sf.Series | None = None) -> pd.DataFrame:
 
 
 def _feature_list(fs: list) -> str:
-    return ", ".join(f"{f.kind} en {f.lam:.2f} µm" for f in fs)
+    return ", ".join(f"{sv.KIND_TEXT.get(f.kind, f.kind)} at {f.lam:.2f} µm" for f in fs)
 
 
 # ----------------------------------------------------------------------------- page section
@@ -335,11 +335,11 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
         st.caption("The method flags no peak or valley in this spectrum above its criteria.")
     if sci:
         with st.expander("Peaks and valleys: table, method and criteria"):
-            rows = [{"espectro": f.serie, "tipo": f.kind, "clase": f.label.lower(), "canal": f.canal,
-                     "lambda_um": round(f.lam, 4), "intervalo_um": f"{f.lam_lo:.3f}–{f.lam_hi:.3f}",
-                     "canales": f.n_channels, "valor": f.value, "continuo": f.continuum, "contraste": f.contrast,
-                     "relativo": f.relative, "contraste_sobre_dispersion": None if abs(f.ratio) > 1e6 else f.ratio,
-                     "limitaciones": " ".join(f.limitations)} for _, fs in marked for f in fs]
+            rows = [{"spectrum": f.serie, "type": sv.KIND_TEXT.get(f.kind, f.kind), "class": f.label.lower(), "channel": f.canal,
+                     "lambda_um": round(f.lam, 4), "interval_um": f"{f.lam_lo:.3f}–{f.lam_hi:.3f}",
+                     "channels": f.n_channels, "value": f.value, "continuum": f.continuum, "contrast": f.contrast,
+                     "relative": f.relative, "contrast_over_scatter": None if abs(f.ratio) > 1e6 else f.ratio,
+                     "limitations": " ".join(f.limitations)} for _, fs in marked for f in fs]
             if rows:
                 st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
             m = sf.method_summary()
@@ -512,7 +512,7 @@ def _comparison_text(cmp: sf.Comparison, spec_a, spec_b, kind: str, sci: bool) -
     with st.expander("Comparison table (values per channel)"):
         df = cmp.table()[["canal", "lambda_um", "lambda_min_um", "lambda_max_um", "detector", "a", "b", "estado_a",
                           "estado_b", "diferencia", "relacion", "estado_relacion", "precaucion"]]
-        st.dataframe(df, hide_index=True, width="stretch")
+        st.dataframe(df, hide_index=True, width="stretch", column_config=sv.column_config(df))
         meta = {"producto": "SPHEREx DR1 All-Sky spectral cube", "doi": config.CUBE_DOI,
                 "metodo": "comparison of two exploratory spectra extracted the same way; display only",
                 "magnitud": sf.QUANTITY_NAMES[cmp.quantity], "unidad": unit,

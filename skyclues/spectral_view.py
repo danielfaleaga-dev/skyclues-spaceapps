@@ -301,6 +301,28 @@ CAUTION = "OVERFLOW/OUTLIER in the aperture"
 Y_AXIS_EXTENT = 62                           # same left margin in the spectrum and in the A−B / A/B panel
 X_DOMAIN = [0.70, 5.05]
 GLYPHS = {("pico", True): "▼", ("pico", False): "▽", ("valle", True): "▲", ("valle", False): "△"}
+#: Display words for the analyser's internal kind/width values (the values stay as they are: they are contracts).
+KIND_TEXT = {"pico": "peak", "valle": "valley"}
+WIDTH_TEXT = {"estrecha": "narrow", "amplia": "broad"}
+
+#: English headers shown for the raw data columns of the spectrum tables. The columns themselves (and the CSV/JSON
+#: downloads) keep their identifiers: they are contracts. Only the displayed header changes.
+COLUMN_LABELS = {
+    "canal": "Channel", "lambda_um": "λ (µm)", "lambda_min_um": "λ min (µm)", "lambda_max_um": "λ max (µm)",
+    "detector": "Detector", "subcanal": "Subchannel", "estado": "Status", "flujo_mjy": "Flux (mJy)",
+    "fondo_mjysr": "Background (MJy/sr)", "fondo_sigma_mjysr": "Background scatter (MJy/sr)", "n_fondo": "Background pixels",
+    "pixel_mjysr": "Pixel (MJy/sr)", "pixel_nhits": "Pixel NHITS", "nhits_min_apertura": "Min NHITS in aperture",
+    "flags_apertura": "Aperture flags", "ap_pix_total": "Aperture pixels", "ap_pix_invalidos": "Invalid pixels",
+    "ap_pix_nan": "NaN pixels", "ap_pix_nhits0": "NHITS = 0 pixels", "ap_bloom": "BLOOM pixels",
+    "ap_overflow": "OVERFLOW pixels", "a": "A", "b": "B", "estado_a": "Status A", "estado_b": "Status B",
+    "diferencia": "Difference A − B", "relacion": "Ratio A / B", "estado_relacion": "Ratio status", "precaucion": "Caution",
+}
+
+
+def column_config(df) -> dict:
+    """``st.dataframe(..., column_config=...)`` with English headers for the known columns."""
+    return {c: COLUMN_LABELS[c] for c in df.columns if c in COLUMN_LABELS}
+
 
 
 def _series_frame(spec: sc.Spectrum, quantity: str, label: str) -> pd.DataFrame:
@@ -341,7 +363,7 @@ def _reference_layers(refs: list[dict], xsc):
     import altair as alt
 
     df = pd.DataFrame(refs)
-    tip = [alt.Tooltip("nombre:N", title="referencia"), alt.Tooltip("naturaleza:N", title="tipo"),
+    tip = [alt.Tooltip("nombre:N", title="reference"), alt.Tooltip("naturaleza:N", title="type"),
            alt.Tooltip("lambda_um:Q", title="λ expected (µm)", format=".3f"), alt.Tooltip("nota:N", title="note")]
     rule = alt.Chart(df).mark_rule(strokeDash=[1, 3], strokeWidth=1.4, strokeCap="round").encode(   # dotted: not the
                                                                                                    # dashed channel rule
@@ -442,7 +464,7 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
         fdf = pd.DataFrame([{
             "lambda_um": f.lam, "valor": f.value, "serie": f.serie, "tipo": f.kind,
             "glifo": GLYPHS[(f.kind, f.klass == "cuantificable")],
-            "nota": f"{f.kind.capitalize()} · {f.label.lower()}", "canal": f.canal, "contraste": f.contrast,
+            "nota": f"{KIND_TEXT.get(f.kind, f.kind).capitalize()} · {f.label.lower()}", "canal": f.canal, "contraste": f.contrast,
             "relativo": f.relative} for f in marks])
         ftip = [alt.Tooltip("nota:N", title="feature"), alt.Tooltip("serie:N", title="espectro"),
                 alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),

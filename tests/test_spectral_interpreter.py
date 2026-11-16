@@ -245,7 +245,7 @@ def test_output_is_deterministic_and_serialisable():
     s = mk(bump(63, 1.5))
     a = json.dumps(si.interpret(s, feature_at(s, 63), resolution=RES).to_dict(), sort_keys=True)
     b = json.dumps(si.interpret(s, feature_at(s, 63), resolution=RES).to_dict(), sort_keys=True)
-    assert a == b and "probabilidad" not in a.lower().replace("no se dan probabilidades", "")
+    assert a == b and "probabilit" not in a.lower().replace("no probabilities are given", "")
     assert si.method_summary()["motor"] == si.ENGINE_VERSION
 
 

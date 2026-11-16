@@ -178,7 +178,7 @@ def test_truncated_header_does_not_loop(monkeypatch):
     def read(url,ranges,size,etag):
         return {r:raw[r[0]:r[1]] for r in ranges},'test',len(raw),None
     monkeypatch.setattr(sc,'_request_ranges',read)
-    with pytest.raises(sc.CubeFormatError,match='sin END'): sc.read_layout(445)
+    with pytest.raises(sc.CubeFormatError,match='no END'): sc.read_layout(445)
 
 
 def test_insufficient_background_is_flagged(cube,monkeypatch):
