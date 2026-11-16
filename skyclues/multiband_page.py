@@ -43,6 +43,16 @@ def restore(keys) -> None:
             st.session_state[k] = saved
 
 
+def set_kept(key: str, value) -> None:
+    """Set a widget value from a callback AND in its stashed copy.
+
+    A page that stashes a widget every run and restores it before drawing (see ``restore``) would
+    otherwise give back the older stashed copy over a value changed by a callback, e.g. a click
+    on a chart in the simple level."""
+    st.session_state[key] = value
+    st.session_state[_SHADOW + key] = value
+
+
 def kept(key: str, default):
     """Initial value for a widget created with an explicit default (restoring it through the
     Session State API would raise Streamlit's duplicated-default warning)."""

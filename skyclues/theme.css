@@ -251,3 +251,7 @@ a:hover{color:var(--sc-ember);text-decoration-color:var(--sc-ember)}
   .sc-steps{gap:.3rem 1.4rem}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* Unforeseen errors: Streamlit (showErrorDetails = "none") already redacts the message; the external
+   "Ask Google / Ask ChatGPT" links are not offered to visitors. Details stay in the server log. */
+[data-testid="stException"] a[href*="google.com/search"],[data-testid="stException"] a[href*="chatgpt.com"]{display:none}
+.st-key-sc_scroll_top{position:absolute;width:0;height:0;overflow:hidden;margin:0}

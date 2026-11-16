@@ -14,6 +14,7 @@ from __future__ import annotations
 import os
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from skyclues import config, navigation, region_ui, release_ui, spectrum_page, theme, time_page
 
@@ -65,6 +66,14 @@ level = theme.level()
 if view != "spectrum":
     spectrum_page.stash_state()        # keep the channel, the pick and the mode while another view is shown
 theme.area_flag(view)                  # the visible area gives its accent to the shared styles
+
+if state.get("_last_view") not in (None, view):
+    # A new view starts at its top, where its loading indicator is drawn: otherwise a long wait is shown
+    # as a dimmed copy of the previous view with the indicator out of sight.
+    with st.container(key="sc_scroll_top"):
+        components.html("<script>const m=window.parent.document.querySelector('[data-testid=\"stMain\"]');"
+                        "if(m)m.scrollTo(0,0);window.parent.scrollTo(0,0);</script>", height=0)
+state["_last_view"] = view
 
 # ---------------------------------------------------------------- views
 if view == "region":

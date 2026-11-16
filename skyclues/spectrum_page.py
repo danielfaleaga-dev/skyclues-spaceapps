@@ -100,7 +100,8 @@ def _set_pick_from_chart() -> None:
         ra, dec = float(pts[0]["ra"]), float(pts[0]["dec"])
         if spectrum_analysis.place_click(st.session_state, ra, dec):    # the click placed the comparison point B
             return
-        st.session_state["sx_pick_ra"], st.session_state["sx_pick_dec"] = ra, dec
+        multiband_page.set_kept("sx_pick_ra", ra)       # also the stashed copy: restore() must not undo the click
+        multiband_page.set_kept("sx_pick_dec", dec)
 
 
 def _step_channel(delta: int, numbers: list[int]) -> None:

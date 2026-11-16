@@ -2,6 +2,15 @@
 
 Última actualización: integración científica del 15-11-2026 (Claude Code A, rama `integration/science-v1`, copia `C:\Users\danie\Documents\SkyClues-integrated`). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md); las reglas visuales obligatorias están en [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md). La primera sección prevalece sobre el historial conservado debajo.
 
+## Bloqueos de la evaluación final — 16-11-2026 (rama `ux/redesign-v1`)
+
+- **Espectro, Sencillo:** el clic sobre la imagen no elegía punto. `spectrum_page.render` guarda y restaura cada ejecución la posición (`sx_pick_*`) para conservarla entre vistas, y la copia guardada, más antigua, pisaba el valor que acababa de fijar el callback del gráfico. Ahora el callback actualiza también la copia guardada (`multiband_page.set_kept`). Científico y la conservación entre vistas no cambian.
+- **Tiempo › Calidad (Científico):** `def render(level)` tapaba el módulo `render`, usado en «Cobertura y longitud de onda». El módulo se importa ahora como `figures`.
+- **Errores públicos:** `.streamlit/config.toml` fija `showErrorDetails = "none"` (valor válido en Streamlit 1.67.0): el visitante ve un mensaje genérico, sin traza ni rutas, y el detalle queda en el registro del servidor. Una regla de `theme.css` oculta los enlaces «Ask Google / Ask ChatGPT».
+- **Indicador de carga:** al cambiar de vista la página vuelve arriba (`app.py`), donde se dibuja el indicador.
+- **Comprobado en navegador** (puerto 8524, datos reales): clics sucesivos en Sencillo con marcador y espectro del punto elegido; paso a Científico con las mismas coordenadas, un clic nuevo, y vuelta a Sencillo; tras recargar; Calidad › Cobertura de M101; error controlado en una app mínima con la misma configuración. Tests relacionados: 67 superados.
+- **Limitación:** el mensaje genérico de Streamlit para errores imprevistos está en inglés y no se puede traducir con la configuración.
+
 ## RGB «Mismo contraste» y fondo estelar — 15-11-2026 (rama `ux/redesign-v1`)
 
 - **Problema:** el panel RGB aparecía vacío (sin imagen ni círculo y sin marcas verticales) aunque los tres canales tenían datos.

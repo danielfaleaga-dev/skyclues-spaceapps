@@ -14,7 +14,8 @@ import streamlit as st
 import streamlit.components.v1 as components
 from astropy.time import Time
 
-from . import archive, config, motion_page, navigation, player, reference_page, release_ui, render, theme
+from . import archive, config, motion_page, navigation, player, reference_page, release_ui, theme
+from . import render as figures  # the module; `render` below is this page's entry point and would hide it
 from .quality import flag_census
 from .sequence import STRICT, find_sequence, load_sequence, report_urls, save_report
 
@@ -452,9 +453,9 @@ def _quality(seq, m, sci: bool) -> None:
     def tables():
         cols = st.columns(2)
         with cols[0]:
-            st.image(render.figure_png(render.sequence_coverage_figure(seq)))
+            st.image(figures.figure_png(figures.sequence_coverage_figure(seq)))
         with cols[1]:
-            st.image(render.figure_png(render.sequence_spread_figure(seq)))
+            st.image(figures.figure_png(figures.sequence_spread_figure(seq)))
         st.markdown(f"Región válida común a las {seq.n} épocas: **{m['coverage_common_valid']:.1%}** del campo "
                     f"({m['n_common_px']} píxeles). Dispersión máxima de λ en esa región: "
                     f"**{m['lambda_spread_common_max_bw']:.2f}** anchos de banda.")

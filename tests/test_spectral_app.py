@@ -167,3 +167,21 @@ def test_single_channel_chart_frame_does_not_depend_on_browser_width(cube):
         domains = [enc['scale']['domain'] for layer in spec['layer'] for ch, enc in layer.get('encoding', {}).items()
                    if ch in ('x', 'y') and 'scale' in enc]
         assert domains and all(d == [-R, R] for d in domains)
+
+
+def test_chart_click_survives_the_restore_of_kept_widget_state(monkeypatch):
+    """Simple level: the page stashes the pick position every run and gives it back before drawing
+    (spectrum_page.render). A click, applied by the chart callback before that restore, must not be
+    overwritten by the older stashed copy (blocker found in the final evaluation)."""
+    from skyclues import multiband_page
+    state={'sx_field':{'selection':{'pick':[{'ra':83.9,'dec':-5.3}]}},'sx_region_key':(1.0,2.0,.1),
+           'sx_pick_ra':83.8,'sx_pick_dec':-5.4,'opt_sx_active':'Punto A'}
+    monkeypatch.setattr(page.st,'session_state',state)
+    keys=page.SINGLE_STATE_KEYS
+    multiband_page.stash(keys)                     # end of the previous run in Sencillo: old position kept aside
+    page._set_pick_from_chart()                    # the click: callback runs before the script
+    multiband_page.restore(keys)                   # start of this run: kept values are given back
+    assert (state['sx_pick_ra'],state['sx_pick_dec'])==(83.9,-5.3)
+    multiband_page.stash(keys)                     # next run keeps the new position, not the old one
+    multiband_page.restore(keys)
+    assert (state['sx_pick_ra'],state['sx_pick_dec'])==(83.9,-5.3)

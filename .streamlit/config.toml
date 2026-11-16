@@ -25,3 +25,6 @@ gatherUsageStats = false
 
 [client]
 toolbarMode = "minimal"
+# Public visitors never see Python tracebacks, local paths or "Ask ChatGPT" links; the full exception
+# still goes to the server log. (Valid values checked against the pinned Streamlit 1.67.0.)
+showErrorDetails = "none"
