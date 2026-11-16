@@ -118,6 +118,9 @@ def render(region,scientific=False):
     ij=json.dumps(identity,sort_keys=True)
     theme.region_strip(region.get('name') or identity['name'],region['ra'],region['dec'],fov)
     st.markdown('### Observations of the moving object')
+    if identity.get('spkid')=='1004083':
+        st.markdown('**3I/ATLAS is an interstellar comet:** it comes from outside the Solar System. Press «Find SPHEREx '
+                    'observations», then «Prepare images» to measure how far it moved between exposures.')
     active=st.session_state.get('moving_active')
     ready=active and active[0]==ij and active[2:]==(fov,pipeline_key())
     with st.expander('Observations and dates',expanded=not ready):

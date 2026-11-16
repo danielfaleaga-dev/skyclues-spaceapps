@@ -94,6 +94,21 @@ if view == "region":
             "region", "Sky region", "Centre and field of the exploration",
             "Name, coordinates and atlas edit a single region (ICRS centre and field of view). The circle is the "
             "scientific field, of fixed angular diameter; zooming the map does not change it.")
+    # Featured example: the project's strongest result, one compact row under the header (same lookup as the search box).
+    with st.container(key="featured_atlas_block"):
+        st.html('<p class="sc-eyebrow">' + ("Featured · a comet from another star" if level == "simple"
+                                            else "Featured · interstellar object") + "</p>")
+        with st.container(horizontal=True, vertical_alignment="center"):
+            if level == "simple":
+                st.markdown("**3I/ATLAS** comes from outside our Solar System: only the third visitor of its kind ever "
+                            "detected. SPHEREx photographed it in 2025. See how far it moved between images taken hours "
+                            "apart, measured against the fixed stars.")
+            else:
+                st.markdown("**3I/ATLAS** (C/2025 N1), an interstellar comet. Search its SPHEREx exposures along the JPL "
+                            "Horizons trajectory and measure its displacement between same-detector exposures, registered "
+                            "on stationary reference stars, with its uncertainty.")
+            st.button("Follow 3I/ATLAS across the sky", key="featured_atlas", type="primary",
+                      on_click=region_ui.open_atlas_comet)
     region_ui.render(level)
 
     examples = [(stem, title) for stem, title in config.VALIDATED_EXAMPLES.items() if time_page.saved_path(stem)]

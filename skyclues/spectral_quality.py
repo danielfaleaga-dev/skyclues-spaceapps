@@ -110,6 +110,40 @@ def has_unreported_loss(qs: list[ChannelQuality]) -> bool:
     return any((not q.valid_for_extraction) and q.status != "blank" for q in qs)
 
 
+def too_bright(qs: list[ChannelQuality]) -> dict | None:
+    """Counts when the channels without a value are explained by a very bright source at the position.
+
+    The instrument flags the pixels around a saturated source (OVERFLOW, and BLOOM for the charge that spills into
+    neighbours) and the cube leaves them without data, so the extraction (which needs every aperture pixel) rejects
+    the channel. Returned only when most of the rejected channels carry one of those flags; otherwise the missing
+    values have another cause and no brightness claim is made. Nothing here changes a measurement.
+    """
+    rejected = [q for q in qs if q.status != "blank" and not q.valid_for_extraction and q.available]
+    if not rejected:
+        return None
+    bright = [q for q in rejected if q.bloom or q.overflow]
+    if len(bright) < max(3, (len(rejected) + 1) // 2):
+        return None
+    return {"rejected": len(rejected), "bright": len(bright), "bloom": sum(bool(q.bloom) for q in rejected),
+            "overflow": sum(bool(q.overflow) for q in rejected), "measured": sum(q.valid_for_extraction for q in qs),
+            "channels": len(qs)}
+
+
+def bright_text(info: dict, scientific: bool) -> str:
+    """Why the spectrum is empty or partial at a very bright position, in the wording of each level."""
+    if scientific:
+        return (f"<b>Very bright position.</b> {info['bright']} of the {info['rejected']} channels without a value have "
+                f"aperture pixels flagged by the instrument as BLOOM (charge spilling from a saturated source; {info['bloom']} "
+                f"channels) or OVERFLOW (saturation; {info['overflow']} channels). The cube leaves those pixels without data "
+                "and the extraction requires every pixel of the aperture, so it does not measure them and does not fill or "
+                "interpolate. This is a limit of the observation at this position, not a spectrum of zero light. Try a "
+                "nearby position away from the brightest source.")
+    return ("<b>This spot is too bright for the detector.</b> The instrument saturates around very bright sources and "
+            f"leaves those pixels without data, so SPHEREx gives no value here in {info['rejected']} of the "
+            f"{info['channels']} colours. It is a limit of the observation, not an error. Press another point on the image, "
+            "away from the brightest spot, to see its spectrum.")
+
+
 # ----------------------------------------------------------------------------- wording
 def plain(q: ChannelQuality) -> str | None:
     """One sentence for the Sencillo level; None when there is nothing to say."""

@@ -124,3 +124,10 @@ Antes de entregar una modificación visual:
 - Comprobar las transiciones de carga, listo, vacío y fallo afectadas, sin pedir tráfico remoto por cada marcador.
 - Ejecutar las pruebas relevantes, incluyendo conservación de estado al cambiar de nivel. No reemplazar las pruebas científicas con comprobaciones solo visuales.
 - Guardar evidencia visual y actualizar el estado del proyecto. No afirmar comprobaciones no ejecutadas.
+
+## Ejemplo destacado y explicaciones de saturación (16-11-2026)
+
+- **Ejemplo destacado (3I/ATLAS):** una sola fila bajo la cabecera de Región, con filete fino arriba y abajo, texto y un botón primario negro. Sin tarjeta, sin insignia en píldora. Es el resultado más fuerte del proyecto y debe verse sin desplazarse. En Sencillo explica en una frase qué es (cometa que viene de fuera del Sistema Solar); en Científico, qué mide.
+- **Saturación:** se explica solo cuando una medida lo respalda (píxeles BLOOM/OVERFLOW/NONLINEAR). Nota sobria (`theme.note`) justo bajo el gráfico o el resumen, con la salida práctica («press another point», «move the map»). Nunca se afirma saturación sin esa medida, ni se rellenan píxeles.
+- **Indicador de carga:** `sc_loading_*` es pegajoso arriba y abajo; una espera larga siempre queda a la vista.
+- **Todo el texto visible de la versión final es inglés.**

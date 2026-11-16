@@ -2,6 +2,20 @@
 
 Última actualización: integración científica del 15-11-2026 (Claude Code A, rama `integration/science-v1`, copia `C:\Users\danie\Documents\SkyClues-integrated`). El contexto estable está en [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md); las reglas visuales obligatorias están en [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md). La primera sección prevalece sobre el historial conservado debajo.
 
+## Mejoras de la evaluación final: 3I/ATLAS, saturación y carga — 16-11-2026 (rama `ux/redesign-v1`)
+
+Todo el texto nuevo de la interfaz está en inglés (la versión final es inglesa). Sin cambios en algoritmos, extracción, máscaras ni resultados.
+
+- **3I/ATLAS destacado.** Fila compacta en Región, justo bajo la cabecera (ambos niveles), con filetes finos y sin tarjeta: «Featured · a comet from another star» y el botón «Follow 3I/ATLAS across the sky». `region_ui.open_atlas_comet` resuelve la identidad con la misma consulta JPL del buscador (SPK-ID 1004083), calcula la efeméride y abre Tiempo; no simula nada. El nombre mostrado es «3I/ATLAS (C/2025 N1)» (solo presentación). Tiempo explica qué es y qué pulsar («Find SPHEREx observations», «Prepare images»). Si JPL falla, la región no cambia y se avisa.
+- **Saturación explicada, solo con causa medida.**
+  - Espectro: `spectral_quality.too_bright` cuenta los canales sin valor cuyos píxeles de apertura llevan BLOOM u OVERFLOW; solo si son la mitad o más (y al menos 3) se muestra, bajo el gráfico, «This spot is too bright for the detector…» (Científico: recuento de BLOOM/OVERFLOW y la regla de apertura completa). Si la causa es otra (sin datos sin marca), no se afirma nada sobre brillo. En M42, con el cubo real: 100 de 102 canales sin valor, BLOOM en 100 y OVERFLOW en 24.
+  - Tiempo: `_saturation_note` usa la fracción saturada (OVERFLOW/NONLINEAR) que la secuencia ya mide y solo aparece sobre su umbral de aviso (0,1 %). M42 real: hasta 11 % saturado, coherente con la mancha rosa del núcleo.
+- **Carga visible.** `theme.css`: los contenedores `sc_loading_*` son `position: sticky` con `top` y `bottom`, de modo que permanecen a la vista aunque el usuario esté desplazado a cualquier lado. Medido con una carga real (RGB) con la página desplazada a 2053 px: la tarjeta quedó a 68 px del borde superior. Se mantiene el desplazamiento arriba al cambiar de vista.
+- **Comprobado en navegador** (puerto 8522, datos reales de IRSA, Horizons y SIMBAD): Región (Sencillo y Científico, 1600 px y 375 px sin desplazamiento horizontal); botón 3I/ATLAS → Tiempo → «Find» (160 exposiciones) → «Prepare images»: 166″ ± 3″ en 99 min, 100″/h, 16 estrellas de control; M42 en Tiempo y en Espectro; carga con scroll. Evidencia en `results/ux_redesign/final_fixes/`.
+- **Pruebas:** `tests/test_final_fixes.py` (5, lógica pura). Los cinco archivos relacionados (`test_spectral_quality`, `test_spectral_app`, `test_spectrum_analysis_app`, `test_moving_app`, `test_app`) dan 24 superadas y 29 fallos que son idénticos a los del commit desplegado `34c346b` (esperan texto en español); sin fallos nuevos.
+- **No comprobado:** la nota de saturación con un punto B en Espectro; Científico de la nota de Tiempo en vivo; Gaia.
+- **Pendiente del informe de evaluación (no hecho aquí):** intérprete sin explicación de «continuum» frente a líneas, nota de flujo negativo, reproductor de 3I/ATLAS con otra disposición, nombres internos y ruta `results/motion_*.json` en «Investigaciones guardadas» (visibles en Científico), rueda del ratón sobre el atlas, texto «orange/amber diamond» frente al marcador negro, cruz sin explicar en M42 (Sencillo), y la explicación de por qué la mejora infrarroja de M101 no añade puntos.
+
 ## Bloqueos de la evaluación final — 16-11-2026 (rama `ux/redesign-v1`)
 
 - **Espectro, Sencillo:** el clic sobre la imagen no elegía punto. `spectrum_page.render` guarda y restaura cada ejecución la posición (`sx_pick_*`) para conservarla entre vistas, y la copia guardada, más antigua, pisaba el valor que acababa de fijar el callback del gráfico. Ahora el callback actualiza también la copia guardada (`multiband_page.set_kept`). Científico y la conservación entre vistas no cambian.

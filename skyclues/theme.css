@@ -126,6 +126,10 @@ a:hover{color:var(--sc-ember);text-decoration-color:var(--sc-ember)}
   color:var(--sc-ink);margin:.4rem 0}
 [data-testid="stStatusWidget"]{border:1px solid var(--sc-rule);border-radius:var(--sc-r);background:rgba(255,255,255,.6);
   backdrop-filter:blur(8px)}
+/* A long wait stays in view whichever side of it the page is scrolled to: sticky to the top below the header
+   and to the bottom edge when its natural place is further down. The wrapper rule is for Streamlit's layout wrapper. */
+[class*="st-key-sc_loading_"]{position:sticky;top:4.5rem;bottom:1rem;z-index:30}
+div:has(>[class*="st-key-sc_loading_"]){position:sticky;top:4.5rem;bottom:1rem;z-index:30}
 [class*="st-key-sc_loading_"] [data-testid="stSpinner"]{position:relative;isolation:isolate;min-height:215px;
   display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;text-align:center;
   padding:28px;border:1px solid rgba(20,20,20,.1);border-radius:var(--sc-r);
@@ -255,3 +259,8 @@ a:hover{color:var(--sc-ember);text-decoration-color:var(--sc-ember)}
    "Ask Google / Ask ChatGPT" links are not offered to visitors. Details stay in the server log. */
 [data-testid="stException"] a[href*="google.com/search"],[data-testid="stException"] a[href*="chatgpt.com"]{display:none}
 .st-key-sc_scroll_top{position:absolute;width:0;height:0;overflow:hidden;margin:0}
+/* featured example on Region: a quiet row with a hairline above and below, no card */
+.st-key-featured_atlas_block{border-top:1px solid var(--sc-line);border-bottom:1px solid var(--sc-line);padding:.7rem 0 .8rem;margin:.2rem 0 1.1rem;gap:.15rem}
+.st-key-featured_atlas_block [data-testid="stHorizontalBlock"]{flex-wrap:wrap;gap:.6rem 1.4rem}
+.st-key-featured_atlas_block [data-testid="stMarkdownContainer"] p{max-width:78ch;margin:0}
+.st-key-featured_atlas_block .sc-eyebrow{margin:0}

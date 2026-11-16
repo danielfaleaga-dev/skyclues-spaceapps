@@ -322,6 +322,7 @@ def render(level: str) -> None:
     status_txt = ("Comparable" if not seq.warnings else "Comparable with warnings") if seq.admissible else "Not comparable"
     theme.region_strip(inp["label"], float(seq.ra), float(seq.dec), float(seq.field_deg), theme.badge(status_txt, status_cls))
     _download_warning(report, retrieval, n_failed)
+    _saturation_note(m, sci)
 
     centre_rule = (report.get("target", {}).get("centre") or {}).get("rule")
     if seq.target_moves and sci:
@@ -428,6 +429,27 @@ def _download_warning(report, retrieval, n_failed) -> None:
                "better sequence may exist; repeat the search later to complete it.")
     with st.expander("Cutouts not obtained"):
         st.dataframe(pd.DataFrame(report.get("retrieval_failures") or []).astype(str), hide_index=True)
+
+
+def _saturation_note(m: dict, sci: bool) -> None:
+    """Explain pink (no-data) areas caused by saturation, using the saturated fraction the sequence measured.
+
+    Shown only when the saturated pixels (OVERFLOW/NONLINEAR) exceed the sequence's own warning threshold; it never
+    changes a metric or a mask."""
+    fractions = [float(f) for f in (m.get("saturation_fraction") or [])]
+    worst = max(fractions, default=0.0)
+    if worst <= config.SATURATION_WARN_FRACTION:
+        return
+    if sci:
+        theme.note(f"<b>Saturated pixels.</b> Up to {worst:.1%} of the field is flagged OVERFLOW or NONLINEAR in at least one "
+                   f"epoch (warning threshold {config.SATURATION_WARN_FRACTION:.1%}). Those pixels have no valid data and are "
+                   "excluded by the strict mask: they are not zero light. Per-epoch fractions are in the criteria of «Quality».")
+    else:
+        pct = f"{worst:.0%}" if worst >= 0.01 else f"{worst:.1%}"
+        theme.note("<b>Part of this area is too bright for the detector.</b> The instrument saturates around very bright "
+                   f"sources: up to {pct} of the area is saturated in at least one image, and saturated pixels have no valid data "
+                   "(they appear pink). It is a limit of the observation, not an error. Move the map to a fainter position, "
+                   "or try another object.")
 
 
 def _quality(seq, m, sci: bool) -> None:

@@ -274,6 +274,11 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
                                       features=fa + fb, focus=focus, interactive=True,
                                       references=sxi.chart_marks(interp)),
                     width="stretch", key=CHART_KEY, on_select=_on_select, selection_mode=["canal", "intervalo"])
+    # A very bright source explains an empty or partial spectrum: say so right under the plot, per point.
+    for k, qs in quals.items():
+        bright = sq.too_bright(qs)
+        if bright:
+            theme.note((f"<b>Point {k}.</b> " if len(quals) > 1 else "") + sq.bright_text(bright, sci))
 
     # ------------------------------------------------------------ A and B
     if sb is not None:

@@ -431,6 +431,30 @@ def solar_position(identity, utc):
     return solar_system.ephemeris(identity, utc)
 
 
+def open_atlas_comet() -> None:
+    """Callback of the featured example: resolve 3I/ATLAS like the search box does, then open Time.
+
+    Same JPL identity lookup and ephemeris as typing the name; nothing is simulated and nothing is cached as a result.
+    A failure leaves the region unchanged and says why."""
+    from datetime import datetime, timezone
+    state = st.session_state
+    try:
+        candidates = solar_lookup('3I/ATLAS')
+        identity = next((x for x in candidates if str(x.get('spkid')) == '1004083'), None)
+        if identity is None:
+            raise solar_system.ServiceError('JPL did not return the 3I/ATLAS identity.')
+        position = solar_position(identity, datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:00'))
+    except (ValueError, solar_system.ServiceError) as e:
+        state['region_notice'] = f'3I/ATLAS could not be opened: {e} Try again later or search for it by name.'
+        return
+    # Display name only: JPL lists it as «ATLAS (C/2025 N1)» and the «3I» by which it is known would be lost.
+    position = dict(position, identity=dict(position['identity'], name='3I/ATLAS (C/2025 N1)'))
+    navigation.set_solar(state, st.query_params, position)
+    state.pop('region_notice', None)
+    state.pop('solar_choices', None)
+    state['view_request'] = 'time'
+
+
 @st.cache_data(ttl=43200, show_spinner=False)
 def comet_table():
     return solar_system.atlas_observations()
