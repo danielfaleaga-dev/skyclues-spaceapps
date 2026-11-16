@@ -20,9 +20,9 @@ from .astrometry import Astrometry
 from .targets import validate_coordinates, validate_fov_deg
 
 DEFAULT_LAMBDA_UM = 1.6
-LAYERS = {"IMAGE · brillo superficial (MJy/sr)": "image", "NHITS · cobertura (píxeles de entrada)": "nhits"}
-QUANTITY_LABELS = {"Densidad de flujo en apertura (mJy) · exploratoria": "flux",
-                   "Brillo superficial del píxel (MJy/sr)": "pixel"}
+LAYERS = {"IMAGE · surface brightness (MJy/sr)": "image", "NHITS · coverage (input pixels)": "nhits"}
+QUANTITY_LABELS = {"Aperture flux density (mJy) · exploratory": "flux",
+                   "Surface brightness of the pixel (MJy/sr)": "pixel"}
 #: widget keys of the single-channel mode kept while the multiband mode is shown: given back through
 #: the Session State API, or as the initial value of sliders created with an explicit default.
 #: (The channel needs neither: it is restored from the ``canal`` URL parameter.)
@@ -63,30 +63,30 @@ def channel_list(ra: float, dec: float) -> list[sc.Channel]:
 
 def error_message(err: Exception) -> str:
     if isinstance(err, sc.RangeNotHonoured):
-        return ("IRSA no atendió la lectura parcial del cubo (habría enviado el archivo completo de ~320 MB). "
-                "No se ha descargado ni mostrado nada. Pruebe de nuevo más tarde.")
+        return ("IRSA did not serve the partial read of the cube (it would have sent the whole ~320 MB file). "
+                "Nothing has been downloaded or shown. Try again later.")
     if isinstance(err, sc.FileChangedError):
-        return ("El cubo cambió en IRSA mientras se leía (ETag distinto). Se ha descartado lo leído; recargue la "
-                "página para leer la versión nueva.")
+        return ("The cube changed at IRSA while it was being read (different ETag). What was read has been discarded; reload the "
+                "page to read the new version.")
     if isinstance(err, sc.CubeFormatError):
-        return ("El archivo del cubo no tiene la estructura documentada; no se interpreta. "
-                f"Detalle: {err}")
+        return ("The cube file does not have the documented structure; it is not interpreted. "
+                f"Detail: {err}")
     if isinstance(err, archive.ArchiveTransientError):
-        return ("NASA/IPAC IRSA no está disponible temporalmente para el cubo espectral (error 5xx o tiempo de "
-                "espera agotado tras varios reintentos). No se ha mostrado ningún dato parcial.")
+        return ("NASA/IPAC IRSA is temporarily unavailable for the spectral cube (5xx error or "
+                "timeout after several retries). No partial data have been shown.")
     if isinstance(err, archive.ArchivePermanentError):
-        return "IRSA rechazó la solicitud del cubo (error permanente). No se ha mostrado ningún dato parcial."
+        return "IRSA rejected the cube request (permanent error). No partial data have been shown."
     if isinstance(err, ValueError):
-        return f"Entrada no válida: {err}"
-    return "No se pudo leer el cubo espectral. No se ha mostrado ningún dato parcial."
+        return f"Invalid input: {err}"
+    return "The spectral cube could not be read. No partial data have been shown."
 
 
 def _show_error(err: Exception, what: str) -> None:
     if not theme.scientific():
-        st.error(f'{what}. Inténtalo de nuevo; el modo Científico muestra los detalles.')
+        st.error(f'{what}. Try again; Scientific mode shows the details.')
         return
     st.error(f"{what}: {error_message(err)}")
-    with st.expander("Detalle técnico"):
+    with st.expander("Technical detail"):
         st.code(f"{type(err).__name__}: {err}", language=None)
 
 
@@ -126,29 +126,29 @@ def stash_state() -> None:
 def _region_extra(epoch_info: dict, follow: bool) -> str:
     if not epoch_info.get("propagated"):
         return ""
-    return theme.badge("centro en la posición esperada del objeto" if follow else "centro fijo de la secuencia")
+    return theme.badge("centre at the expected position of the object" if follow else "fixed centre of the sequence")
 
 
 def reading_guide(quantity: str, sci: bool) -> list[tuple[str, str]]:
     """What the spectrum plot shows, in the words of each level. The same facts in both."""
-    unit = ("<b>mJy</b> (milijansky): cuánta luz llega de la apertura por unidad de frecuencia "
+    unit = ("<b>mJy</b> (millijansky): how much light arrives from the aperture per unit of frequency "
             "(1 mJy = 10⁻²⁹ W·m⁻²·Hz⁻¹)."
             if quantity == "flux" else
-            "<b>MJy/sr</b> (megajansky por estereorradián): brillo de un píxel por unidad de área del cielo, no la luz "
-            "total de una fuente.")
-    extra = (" La barra horizontal de cada punto es el intervalo del canal (WL_MIN–WL_MAX), no un error." if sci else
-             " Un valor alto significa más luz en ese canal; cerca de cero, que apenas se distingue del fondo.")
+            "<b>MJy/sr</b> (megajansky per steradian): brightness of a pixel per unit area of sky, not the total "
+            "light of a source.")
+    extra = (" The horizontal bar of each point is the channel interval (WL_MIN–WL_MAX), not an error." if sci else
+             " A high value means more light in that channel; close to zero, that it is hardly distinguishable from the background.")
     return [
-        ("Eje horizontal · longitud de onda",
-         "El «color» infrarrojo de la luz, en <b>µm</b> (micrómetros, millonésimas de metro; no son partes por millón). "
-         "De 0.75 a 5.0 µm, todo invisible para el ojo. Cada punto es uno de los 102 canales reales."),
-        ("Eje vertical · " + ("densidad de flujo" if quantity == "flux" else "brillo superficial"), unit + extra),
-        ("Picos y valles",
-         "Un pico es un canal más brillante que sus vecinos (posible emisión); un valle, uno más débil (posible "
-         "absorción, por ejemplo de hielos o gases). También los producen el ruido, una fuente vecina o el mosaico."),
-        ("Qué no se puede concluir",
-         "Este espectro es exploratorio y no tiene incertidumbres: no basta para afirmar que hay una línea, una "
-         "molécula o un hielo, ni para medir temperaturas. Sirve para decidir qué merece un análisis calibrado."),
+        ("Horizontal axis · wavelength",
+         "The infrared «colour» of the light, in <b>µm</b> (micrometres, millionths of a metre; not parts per million). "
+         "From 0.75 to 5.0 µm, all invisible to the eye. Each point is one of the 102 real channels."),
+        ("Vertical axis · " + ("flux density" if quantity == "flux" else "surface brightness"), unit + extra),
+        ("Peaks and valleys",
+         "A peak is a brighter channel than its neighbours (possible emission); a valley, a fainter one (possible "
+         "absorption, for example by ices or gases). Noise, a neighbouring source or the mosaic also produce them."),
+        ("What cannot be concluded",
+         "This spectrum is exploratory and has no uncertainties: it is not enough to claim that there is a line, a "
+         "molecule or an ice, or to measure temperatures. It is useful for deciding what deserves a calibrated analysis."),
     ]
 
 
@@ -165,35 +165,35 @@ def render(level: str) -> None:
         return
     inp = navigation.explorer_inputs(region)
     if region.get("gaia"):
-        st.caption("Fuente seleccionada en Gaia DR3: coordenadas de catálogo ICRS, J2016.0. La posición calculada para el cubo no confirma una detección SPHEREx." if sci else "Fuente de catálogo; no confirma una detección SPHEREx.")
+        st.caption("Source selected in Gaia DR3: ICRS catalogue coordinates, J2016.0. The position calculated for the cube does not confirm a SPHEREx detection." if sci else "Catalogue source; it does not confirm a SPHEREx detection.")
     if region.get("solar"):
-        st.info("Cuerpo móvil: este cubo combina muchas fechas. Se muestra el cielo en una coordenada fija; no es un espectro identificado del objeto ni una detección." if sci else "Esta imagen muestra la zona del cielo, no un espectro identificado del objeto móvil.")
+        st.info("Moving body: this cube combines many dates. The sky is shown at a fixed coordinate; it is not an identified spectrum of the object or a detection." if sci else "This image shows the area of the sky, not an identified spectrum of the moving object.")
     multiband_page.restore(("sx_mode", "sx_channel"))
     try:
         ra_c, dec_c = validate_coordinates(inp["ra"], inp["dec"])
         fov = validate_fov_deg(inp["fov"])
     except ValueError as err:
-        st.error(f"Entrada no válida: {err} No se ha leído nada del cubo.")
+        st.error(f"Invalid input: {err} Nothing has been read from the cube.")
         return
 
     astro = inp["astrometry"]
     epoch_info = {"propagated": False}
     if astro is not None and astro.has_proper_motion:
         try:
-            with st.spinner("Consultando la época del cubo y calculando la posición esperada…", show_time=True):
+            with st.spinner("Querying the epoch of the cube and calculating the expected position…", show_time=True):
                 expected_ra, expected_dec, epoch_info = cached_epoch(json.dumps(astro.to_dict(), sort_keys=True))
             # A saved sequence keeps its exact centre; a named object is centred on its expected position.
             if inp["follow"]:
                 ra_c, dec_c = expected_ra, expected_dec
         except Exception as err:  # noqa: BLE001
-            _show_error(err, "No se pudo leer la cabecera de la tesela")
+            _show_error(err, "The tile header could not be read")
             return
     try:
-        with theme.loading("Abriendo la región y leyendo los canales disponibles en IRSA…" if sci else "Preparando esta zona del cielo…", "spectrum_region"):
+        with theme.loading("Opening the region and reading the available channels at IRSA…" if sci else "Preparing this area of the sky…", "spectrum_region"):
             channels = channel_list(ra_c, dec_c)
     except Exception as err:  # noqa: BLE001
         theme.region_strip(inp["label"], ra_c, dec_c, fov)
-        _show_error(err, "No se pudo leer la tabla de canales del cubo")
+        _show_error(err, "The cube channel table could not be read")
         return
     numbers = [c.number for c in channels]
     by_number = {c.number: c for c in channels}
@@ -217,43 +217,43 @@ def render(level: str) -> None:
     navigation.write_url(params, {"ra": ra_c, "dec": dec_c, "fov": fov}, "spectrum", state["sx_canal"])
 
     if not sci:
-        theme.hero("spectrum", "Espectro · la luz infrarroja de esta zona", "¿Qué luz infrarroja emite esta zona?",
-                   "La luz infrarroja es invisible al ojo. SPHEREx la separa en 102 colores (longitudes de onda). "
-                   "Elige un color para ver la imagen, pulsa un punto y obtén su espectro: cuánta luz llega en cada "
-                   "color. Sus picos y valles pueden dar pistas sobre gas, polvo o hielos, pero no los identifican por "
-                   "sí solos.")
+        theme.hero("spectrum", "Spectrum · the infrared light of this area", "What infrared light does this area emit?",
+                   "Infrared light is invisible to the eye. SPHEREx splits it into 102 colours (wavelengths). "
+                   "Choose a colour to see the image, press a point and get its spectrum: how much light arrives in each "
+                   "colour. Its peaks and valleys can give clues about gas, dust or ices, but do not identify them on their "
+                   "own.")
     theme.region_strip(inp["label"], ra_c, dec_c, fov, _region_extra(epoch_info, inp["follow"]) if sci else '')
     theme.note(("<b>Producto combinado, no temporal.</b> " +
             "Cada imagen es un canal del cubo DR1: el promedio de muchas exposiciones de fechas distintas (sin luz "
             "zodiacal), en píxeles de 12.9″. Sirve para ver cómo cambia el cielo con la longitud de onda; no muestra "
-            "cambios en el tiempo (para eso, «Tiempo» usa observaciones individuales de 6.15″/px).") if sci else
+            "cambios en el tiempo (para eso, «Time» usa observaciones individuales de 6.15″/px).") if sci else
             "Estas imágenes combinan muchas fechas: muestran colores, no cambios en el tiempo. Para comparar fechas, "
-            "abre «Tiempo».")
+            "abre «Time».")
     if epoch_info.get("warning"):
-        st.warning(epoch_info["warning"] + f" Época de referencia: {astro.epoch_jyear:.2f}. No es una detección.")
+        st.warning(epoch_info["warning"] + f" Reference epoch: {astro.epoch_jyear:.2f}. It is not a detection.")
     if epoch_info.get("propagated") and "mjd_mid" in epoch_info and sci:
         mv = epoch_info["motion_over_inputs_arcsec"]
         theme.note(
-            f"<b>Objetivo en movimiento: {astro.name}</b> ({astro.total_pm_arcsec_yr:.2f}″/año). "
-            f"Época de referencia del catálogo: {astro.epoch_jyear:.2f}. Posición <b>esperada, calculada</b> para "
-            f"el punto medio del intervalo de entradas de esta tesela (no es una época efectiva de observación) "
-            f"({epoch_info['date_mid']}; entradas del {epoch_info['date_beg']} al {epoch_info['date_end']}). "
-            f"Durante ese intervalo el objeto se desplaza {mv:.1f}″ ({mv / 12.883:.2f} píxeles del cubo): en el "
-            "promedio puede aparecer alargado. La cruz es un cálculo, no una detección.")
+            f"<b>Moving target: {astro.name}</b> ({astro.total_pm_arcsec_yr:.2f}″/yr). "
+            f"Catalogue reference epoch: {astro.epoch_jyear:.2f}. <b>Expected, calculated</b> position for "
+            f"the midpoint of the input interval of this tile (it is not an effective observation epoch) "
+            f"({epoch_info['date_mid']}; inputs from {epoch_info['date_beg']} to {epoch_info['date_end']}). "
+            f"During that interval the object moves {mv:.1f}″ ({mv / 12.883:.2f} cube pixels): in the "
+            "average it may appear elongated. The cross is a calculation, not a detection.")
     elif epoch_info.get('propagated') and not sci:
-        st.caption('La cruz marca una posición calculada, no una detección.')
+        st.caption('The cross marks a calculated position, not a detection.')
 
     # ---------------------------------------------------------------- display mode
-    view_mode = st.segmented_control("Imagen infrarroja", multiband_page.MODES, required=True, default=multiband_page.MODES[0], key="sx_mode",
+    view_mode = st.segmented_control("Infrared image", multiband_page.MODES, required=True, default=multiband_page.MODES[0], key="sx_mode",
                          label_visibility="visible",
-                         help="«Composición multibanda» combina tres canales reales en falso color (R, G, B) con el "
-                              "mismo centro y campo. Puede volver a «Un canal» en cualquier momento.")
+                         help="«Multiband composite» combines three real channels in false colour (R, G, B) with the "
+                              "same centre and field. You can go back to «Single channel» at any time.")
     if view_mode == multiband_page.MODES[1]:
         multiband_page.stash(SINGLE_STATE_KEYS + SINGLE_SLIDER_KEYS)
         state.pop("sx_channel", None)       # given back from the stored channel on return
         target = (expected_ra, expected_dec) if epoch_info.get("propagated") else (ra_c, dec_c)
         multiband_page.render_section(ra_c, dec_c, fov, channels, target, cached_map, _show_error)
-        st.caption("Vuelve a «Un canal» para explorar el espectro de un punto.")
+        st.caption("Go back to «Single channel» to explore the spectrum of a point.")
         _footer(ra_c, dec_c, fov, state["sx_canal"])
         return
     multiband_page.stash(multiband_page.STATE_KEYS)
@@ -267,12 +267,12 @@ def render(level: str) -> None:
         state["sx_spec_params"] = None
 
     # ---------------------------------------------------------------- channel selector
-    theme.eyebrow("Canal espectral · longitud de onda creciente" if sci else "Elige un color infrarrojo")
+    theme.eyebrow("Spectral channel · increasing wavelength" if sci else "Choose an infrared colour")
     b1, mid, b2 = st.columns([1, 14, 1], vertical_alignment="center")
-    b1.button("◀", key="sx_prev", on_click=_step_channel, args=(-1, numbers), help="Canal anterior (λ menor)")
-    b2.button("▶", key="sx_next", on_click=_step_channel, args=(1, numbers), help="Canal siguiente (λ mayor)")
+    b1.button("◀", key="sx_prev", on_click=_step_channel, args=(-1, numbers), help="Previous channel (shorter λ)")
+    b2.button("▶", key="sx_next", on_click=_step_channel, args=(1, numbers), help="Next channel (longer λ)")
     with mid:
-        number = st.select_slider("Canal (longitud de onda creciente)", options=numbers, key="sx_channel",
+        number = st.select_slider("Channel (increasing wavelength)", options=numbers, key="sx_channel",
                                   format_func=lambda n: f"{n} · {by_number[n].wavelength_um:.3f} µm",
                                   label_visibility="collapsed")
     ch = by_number[number]
@@ -280,18 +280,18 @@ def render(level: str) -> None:
     left, right = st.columns([1.25, 1], gap="large")
     defaults = config.CUBE_APERTURE_DEFAULT_PX
     with left:
-        layer_label = (st.radio("Capa", list(LAYERS), horizontal=True, key="sx_layer") if sci else
+        layer_label = (st.radio("Layer", list(LAYERS), horizontal=True, key="sx_layer") if sci else
                        state.get('sx_layer', next(iter(LAYERS))))
         layer = LAYERS[layer_label]
         if not sci and layer == 'nhits':
-            st.caption('Mostrando cobertura; puedes cambiar a brillo en «Científico».')
-        with theme.loading(f"Leyendo el canal {ch.number} del cubo en IRSA…" if sci else "Preparando la imagen…", "spectrum_image"):
+            st.caption('Showing coverage; you can switch to brightness in «Scientific».')
+        with theme.loading(f"Reading channel {ch.number} of the cube at IRSA…" if sci else "Preparing the image…", "spectrum_image"):
             try:
                 cmap = cached_map(ra_c, dec_c, fov, ch.plane)
                 png, info = cached_png(ra_c, dec_c, fov, ch.plane, layer)
                 pixels = cached_pixels(ra_c, dec_c, fov, ch.plane)
             except Exception as err:  # noqa: BLE001
-                _show_error(err, f"No se pudo leer el canal {ch.number}")
+                _show_error(err, f"Channel {ch.number} could not be read")
                 return
         pick = (state["sx_pick_ra"], state["sx_pick_dec"])
         ap_now = sc.Aperture(state.get("sx_rap", multiband_page.kept('sx_rap', defaults[0])), state.get("sx_rin", defaults[1]),
@@ -309,39 +309,39 @@ def render(level: str) -> None:
         spectrum_analysis.point_controls(sci, region_key)
         if sci:
             st.caption(
-                "Geometría WCS: cada píxel nativo del cubo (12.9″) se dibuja en su posición, con su valor original, sin "
-                f"remuestreo ni suavizado; norte arriba, este a la izquierda (raster base de "
-                f"{info['npix']} píxeles, {info['screen_arcsec_per_px']:.1f}″/px; su tamaño en pantalla se adapta al visor). "
-                f"Escala de visualización propia de cada canal "
-                f"({'percentiles 1–99.5 del campo, asinh' if layer == 'image' else 'lineal'}); compare intensidades entre "
-                "canales con el espectro. Rosa/morado: valor no finito o NHITS = 0 (sin dato utilizable); no significa cielo oscuro. Gris claro: fuera de la región leída. "
-                "Cruz azul: objetivo; rombo ámbar: posición del espectro, con su apertura y su anillo de fondo. "
-                "Pase el cursor para ver el valor de cada píxel; haga clic para elegir la posición del espectro.")
+                "WCS geometry: each native pixel of the cube (12.9″) is drawn at its position, with its original value, without "
+                f"resampling or smoothing; north up, east on the left (base raster of "
+                f"{info['npix']} pixels, {info['screen_arcsec_per_px']:.1f}″/px; its size on screen adapts to the viewer). "
+                f"Display scale specific to each channel "
+                f"({'percentiles 1–99.5 of the field, asinh' if layer == 'image' else 'linear'}); compare intensities between "
+                "channels with the spectrum. Pink/purple: non-finite value or NHITS = 0 (no usable data); it does not mean dark sky. Light grey: outside the region read. "
+                "Blue cross: target; amber diamond: spectrum position, with its aperture and background annulus. "
+                "Hover to see the value of each pixel; click to choose the spectrum position.")
         else:
-            st.markdown("Pulsa la imagen para elegir un punto. **Rosa: sin datos.**")
+            st.markdown("Press the image to choose a point. **Pink: no data.**")
 
     with right:
         if ch.blank:
-            st.warning((f"**Canal {ch.number} sin datos en DR1.** {ch.wavelength_um:.3f} µm, D{ch.detector} subcanal "
-                       f"{ch.subchannel}: canal contiguo al divisor dicroico. La documentación oficial lo publica "
-                       f"vacío (todo NaN, NHITS = 0; cabecera BLANKCH = '{tile0.header('PRIMARY').get('BLANKCH')}') "
-                       "para conservar la numeración. SkyClues no lo rellena ni lo interpola.") if sci else
-                       f"El canal {ch.number} no tiene datos. Elige otro color infrarrojo.")
+            st.warning((f"**Channel {ch.number} has no data in DR1.** {ch.wavelength_um:.3f} µm, D{ch.detector} subchannel "
+                       f"{ch.subchannel}: channel adjacent to the dichroic splitter. The official documentation publishes it "
+                       f"empty (all NaN, NHITS = 0; BLANKCH header = '{tile0.header('PRIMARY').get('BLANKCH')}') "
+                       "to keep the numbering. SkyClues does not fill it in or interpolate it.") if sci else
+                       f"Channel {ch.number} has no data. Choose another infrared colour.")
         s = cmap.summary()
         if sci:
             theme.facts([
                 (theme.unit("λ") + " central", f"{ch.wavelength_um:.3f} µm", f"{ch.wl_min_um:.3f}–{ch.wl_max_um:.3f} µm"),
-                ("Detector · subcanal", f"D{ch.detector} · {ch.subchannel}", f"R = λ/Δλ = {ch.resolving_power:.0f}"),
-                ("Píxeles con datos", f"{s['valid_fraction']:.1%}", f"{s['n_valid']} de {s['n_field']}"),
-                ("NHITS mediano", f"{s['nhits_median']:.0f}", f"mínimo {s['nhits_min']}")])
-            st.caption(f"Canal {ch.number} de 102 = plano {ch.plane} del cubo (0-based) · ancho {ch.bandwidth_um:.3f} µm · "
-                       f"teselas HEALPix {', '.join(str(t) for t in s['tiles'])} · píxeles del campo con OVERFLOW: "
+                ("Detector · subchannel", f"D{ch.detector} · {ch.subchannel}", f"R = λ/Δλ = {ch.resolving_power:.0f}"),
+                ("Pixels with data", f"{s['valid_fraction']:.1%}", f"{s['n_valid']} de {s['n_field']}"),
+                ("Median NHITS", f"{s['nhits_median']:.0f}", f"minimum {s['nhits_min']}")])
+            st.caption(f"Channel {ch.number} of 102 = plane {ch.plane} of the cube (0-based) · width {ch.bandwidth_um:.3f} µm · "
+                       f"HEALPix tiles {', '.join(str(t) for t in s['tiles'])} · field pixels with OVERFLOW: "
                        f"{s['flag_pixels']['OVERFLOW']}, OUTLIER: {s['flag_pixels']['OUTLIER']}, SOURCE: "
-                       f"{s['flag_pixels']['SOURCE']}. λ, intervalo y R proceden de la tabla SPECTRAL_CHANNELS del FITS.")
+                       f"{s['flag_pixels']['SOURCE']}. λ, interval and R come from the SPECTRAL_CHANNELS table of the FITS.")
         else:
             theme.facts([
-                ("Longitud de onda", f"{ch.wavelength_um:.2f} µm", f"canal {ch.number} de 102"),
-                ("Píxeles con datos", f"{s['valid_fraction']:.0%}", "del campo en este canal")])
+                ("Wavelength", f"{ch.wavelength_um:.2f} µm", f"canal {ch.number} de 102"),
+                ("Pixels with data", f"{s['valid_fraction']:.0%}", "of the field in this channel")])
 
         mx = config.CUBE_APERTURE_MAX_PX
         pxs = tile0.pixel_scale_arcsec
@@ -349,23 +349,23 @@ def render(level: str) -> None:
         def measure_controls():
             st.number_input("RA (°)", format="%.6f", min_value=0.0, max_value=359.999999, key="sx_pick_ra")
             st.number_input("Dec (°)", format="%.6f", min_value=-90.0, max_value=90.0, key="sx_pick_dec")
-            ap = st.slider("Radio de apertura (píxeles del cubo)", 1.0, mx[0],
+            ap = st.slider("Aperture radius (cube pixels)", 1.0, mx[0],
                            multiband_page.kept("sx_rap", defaults[0]), 0.5, key="sx_rap")
-            rin, rout = st.slider("Anillo de fondo: radios interior y exterior (píxeles)", 1.5, mx[2],
+            rin, rout = st.slider("Background annulus: inner and outer radii (pixels)", 1.5, mx[2],
                                   multiband_page.kept("sx_ann", defaults[1:]), 0.5, key="sx_ann")
-            st.caption(f"Apertura {ap * pxs:.0f}″ · anillo {rin * pxs:.0f}″–{rout * pxs:.0f}″ (1 píxel = {pxs:.2f}″).")
+            st.caption(f"Aperture {ap * pxs:.0f}″ · annulus {rin * pxs:.0f}″–{rout * pxs:.0f}″ (1 pixel = {pxs:.2f}″).")
             return ap, rin, rout
 
-        theme.eyebrow("Posición del espectro")
+        theme.eyebrow("Spectrum position")
         if sci:
             r_ap, r_in, r_out = measure_controls()
         else:
-            st.markdown('El rombo naranja marca el punto elegido.' if pick_b is None else
-                        'El rombo negro (A) y el cuadrado cobrizo (B) marcan los dos puntos.')
+            st.markdown('The orange diamond marks the chosen point.' if pick_b is None else
+                        'The black diamond (A) and the copper square (B) mark the two points.')
             r_ap = state.get('sx_rap', multiband_page.kept('sx_rap', defaults[0]))
             r_in, r_out = state.get('sx_ann', multiband_page.kept('sx_ann', defaults[1:]))
         state["sx_rin"], state["sx_rout"] = r_in, r_out
-        go = st.button("Obtener el espectro en esta posición", type="primary", key="sx_extract")
+        go = st.button("Get the spectrum at this position", type="primary", key="sx_extract")
 
     # ---------------------------------------------------------------- spectrum
     # One plot and, under it, its context. Later analyses (comparing two spectra, inspecting peaks and
@@ -374,22 +374,22 @@ def render(level: str) -> None:
     if go or state.get("sx_spec_params") is None:
         state["sx_spec_params"] = params_now
     if pick_b is None:
-        st.markdown("### Espectro exploratorio de una posición" if sci else "### La luz del punto elegido")
+        st.markdown("### Exploratory spectrum of a position" if sci else "### The light of the chosen point")
     else:
-        st.markdown("### Espectros exploratorios de dos posiciones" if sci else "### La luz de los dos puntos")
+        st.markdown("### Espectros exploratorios de dos posiciones" if sci else "### The light of the two points")
     sp = state["sx_spec_params"]
     if sp != params_now:
-        st.caption("La posición o la apertura han cambiado: pulse «Obtener el espectro en esta posición» para "
-                   "actualizarlo. Se muestra el espectro anterior.")
+        st.caption("The position or the aperture have changed: press «Get the spectrum at this position» to "
+                   "update it. The previous spectrum is shown.")
     try:
         validate_coordinates(sp[0], sp[1])
         sc.Aperture(*sp[2:]).validate()
-        with theme.loading("Leyendo los 102 canales alrededor de la posición…" if sci else "Preparando el espectro de este punto…", "spectrum_plot"):
+        with theme.loading("Reading the 102 channels around the position…" if sci else "Preparing the spectrum of this point…", "spectrum_plot"):
             spec = cached_spectrum(*sp)
     except Exception as err:  # noqa: BLE001
-        _show_error(err, "No se pudo obtener el espectro")
+        _show_error(err, "The spectrum could not be obtained")
         return
-    qlabel = (st.radio("Magnitud representada", list(QUANTITY_LABELS), horizontal=True, key="sx_quantity") if sci else
+    qlabel = (st.radio("Quantity shown", list(QUANTITY_LABELS), horizontal=True, key="sx_quantity") if sci else
               state.get('sx_quantity', next(iter(QUANTITY_LABELS))))
     quantity = QUANTITY_LABELS[qlabel]
     # The plot, the second spectrum (same aperture and annulus as A, never tuned per position), A − B, A / B
@@ -399,54 +399,54 @@ def render(level: str) -> None:
     n_missing = sum(r["status"] != "ok" for r in spec.rows)
     if sci:
         st.container(key="sx_notes_plot").caption(
-            f"Posición RA {spec.ra:.5f}°, Dec {spec.dec:+.5f}°. {spec.n_measured} de 102 canales con valor; {n_missing} sin "
-            "valor (marcas rosas sobre el eje: canales 51 y 52 sin datos en DR1, o apertura/fondo sin datos). Un punto "
-            "por canal real; la barra horizontal es el intervalo del canal (WL_MIN–WL_MAX), no un error. Sin curva ni "
-            "interpolación. Contorno hueco: algún píxel de entrada de la apertura tenía OVERFLOW (saturación) u OUTLIER. "
-            "Línea discontinua vertical: canal mostrado arriba.")
-        with st.expander("Cómo leer este gráfico"):
+            f"Position RA {spec.ra:.5f}°, Dec {spec.dec:+.5f}°. {spec.n_measured} of 102 channels with a value; {n_missing} without "
+            "a value (pink marks on the axis: channels 51 and 52 without data in DR1, or aperture/background without data). One point "
+            "per real channel; the horizontal bar is the channel interval (WL_MIN–WL_MAX), not an error. No curve or "
+            "interpolation. Hollow outline: some input pixel of the aperture had OVERFLOW (saturation) or OUTLIER. "
+            "Vertical dashed line: channel shown above.")
+        with st.expander("How to read this chart"):
             theme.reading_guide(reading_guide(quantity, sci))
     else:
         theme.reading_guide([
-            ("Eje horizontal", "El color infrarrojo (longitud de onda, en µm): de 0,75 µm a la izquierda a 5 µm a "
-                               "la derecha."),
-            ("Altura de cada punto", "Cuánta luz llega en ese color. Un punto por color medido; las marcas rosas "
-                                     "son colores sin datos, no luz cero."),
-            ("Picos y valles", "Un pico es más luz que en los colores vecinos; un valle, menos. Pulsa uno en el "
-                               "gráfico para examinarlo.")])
-        st.container(key="sx_notes_plot_simple").caption('Vista orientativa: los picos por sí solos no identifican materiales.')
+            ("Horizontal axis", "The infrared colour (wavelength, in µm): from 0.75 µm on the left to 5 µm on "
+                               "the right."),
+            ("Height of each point", "How much light arrives in that colour. One point per measured colour; the pink marks "
+                                     "are colours without data, not zero light."),
+            ("Peaks and valleys", "A peak is more light than in the neighbouring colours; a valley, less. Press one on the "
+                               "chart to examine it.")])
+        st.container(key="sx_notes_plot_simple").caption('Indicative view: peaks on their own do not identify materials.')
         if spec.warnings:
-            st.warning('Hay datos limitados en esta posición. El modo Científico muestra los detalles.')
+            st.warning('There are limited data at this position. Scientific mode shows the details.')
         _footer(ra_c, dec_c, fov, state['sx_canal'])
         return
     for w in spec.warnings:
         st.warning(w)
     method = (
-        "Fotometría de apertura sobre el cubo combinado, adaptando el método del tutorial de IRSA: apertura circular "
-        f"sobre el cielo de {spec.aperture.r_ap:g} píxeles ({spec.aperture.r_ap * spec.pixel_scale_arcsec:.0f}″; "
-        f"fracciones de píxel con {spec.subpixels}×{spec.subpixels} submuestras), menos la media con recorte 3σ del "
-        f"anillo {spec.aperture.r_in:g}–{spec.aperture.r_out:g} píxeles por el área de la apertura, multiplicada por el "
-        f"ángulo sólido del píxel ({spec.pixel_solid_angle_sr:.4e} sr, píxeles HEALPix de igual área) → mJy. IRSA "
-        "advierte que un espectro extraído del cubo <b>solo es apropiado para visualización</b>: no tiene "
-        "incertidumbres (el cubo no incluye varianza; la dispersión del fondo no es un error del flujo). El tutorial "
-        "usa círculos en coordenadas de píxel y Photutils con solapamiento exacto; aquí se usan distancias angulares y "
-        "submuestras, por lo que los valores pueden diferir. No corrige la fracción de la PSF fuera de la apertura, "
-        "puede incluir fuentes vecinas y el rayado del mosaico cerca de líneas intensas. No es una medida de precisión "
-        "del flujo de una estrella ni permite afirmar la presencia de líneas o materiales. Para espectrofotometría "
-        f'científica, use la <a href="{config.SPECTROPHOTOMETRY_TOOL_URL}" target="_blank">herramienta oficial SPHEREx '
-        "Spectrophotometry de IRSA</a> (fotometría forzada sobre las imágenes Level 2, con incertidumbres; solo "
-        "interfaz web, sin API documentada).")
+        "Aperture photometry on the combined cube, adapting the method of the IRSA tutorial: circular aperture "
+        f"on the sky of {spec.aperture.r_ap:g} pixels ({spec.aperture.r_ap * spec.pixel_scale_arcsec:.0f}″; "
+        f"pixel fractions with {spec.subpixels}×{spec.subpixels} subsamples), minus the 3σ-clipped mean of the "
+        f"annulus {spec.aperture.r_in:g}–{spec.aperture.r_out:g} pixels times the area of the aperture, multiplied by the "
+        f"solid angle of the pixel ({spec.pixel_solid_angle_sr:.4e} sr, equal-area HEALPix pixels) → mJy. IRSA "
+        "warns that a spectrum extracted from the cube <b>is only appropriate for visualisation</b>: it has no "
+        "uncertainties (the cube includes no variance; the background scatter is not a flux error). The tutorial "
+        "uses circles in pixel coordinates and Photutils with exact overlap; here angular distances and "
+        "subsamples are used, so the values may differ. It does not correct the fraction of the PSF outside the aperture, "
+        "may include neighbouring sources and the striping of the mosaic near intense lines. It is not a precision measurement "
+        "of the flux of a star nor does it allow claiming the presence of lines or materials. For scientific spectrophotometry "
+        f'use the <a href="{config.SPECTROPHOTOMETRY_TOOL_URL}" target="_blank">official IRSA SPHEREx '
+        "Spectrophotometry tool</a> (forced photometry on the Level 2 images, with uncertainties; web "
+        "interface only, no documented API).")
     if sci:
-        theme.note("<b>Qué es y qué no es este espectro.</b> " + method)
+        theme.note("<b>What this spectrum is and is not.</b> " + method)
     else:
-        theme.note("<b>Espectro exploratorio, no calibrado.</b> Sirve para ver la forma general de la luz de este punto. "
-                   "No tiene incertidumbres y no permite afirmar la presencia de líneas o materiales. Para medidas "
-                   f'científicas, use la <a href="{config.SPECTROPHOTOMETRY_TOOL_URL}" target="_blank">herramienta '
-                   "oficial SPHEREx Spectrophotometry de IRSA</a>.")
-        with st.expander("Método y limitaciones del espectro"):
+        theme.note("<b>Exploratory spectrum, not calibrated.</b> It is useful for seeing the general shape of the light at this point. "
+                   "It has no uncertainties and does not allow claiming the presence of lines or materials. For scientific "
+                   f'measurements, use the <a href="{config.SPECTROPHOTOMETRY_TOOL_URL}" target="_blank">official '
+                   "IRSA SPHEREx Spectrophotometry tool</a>.")
+        with st.expander("Method and limitations of the spectrum"):
             st.html(f'<div class="sc-note">{method}</div>')
 
-    with st.expander("Tabla del espectro (valores por canal)"):
+    with st.expander("Spectrum table (values per channel)"):
         df = spec.table()
         cols = ["canal", "lambda_um", "lambda_min_um", "lambda_max_um", "detector", "subcanal", "estado", "flujo_mjy",
                 "fondo_mjysr", "fondo_sigma_mjysr", "n_fondo", "pixel_mjysr", "pixel_nhits", "nhits_min_apertura",
@@ -454,45 +454,45 @@ def render(level: str) -> None:
         cols += [c for c in ("ap_pix_total", "ap_pix_invalidos", "ap_pix_nan", "ap_pix_nhits0", "ap_bloom",
                              "ap_overflow") if c in df.columns]          # coverage of the aperture (diagnostic)
         st.dataframe(df[cols], hide_index=True, width="stretch")
-        st.caption("«fondo_sigma_mjysr» es la dispersión (recortada a 3σ) de los píxeles del anillo: describe el "
-                   "fondo, no es la incertidumbre del flujo.")
+        st.caption("«fondo_sigma_mjysr» is the scatter (clipped at 3σ) of the annulus pixels: it describes the "
+                   "background, it is not the flux uncertainty.")
         meta = {"producto": "SPHEREx DR1 All-Sky spectral cube", "doi": config.CUBE_DOI,
-                "metodo": "fotometría de apertura exploratoria (tutorial oficial IRSA); solo visualización",
+                "metodo": "exploratory aperture photometry (official IRSA tutorial); display only",
                 "ra_deg": spec.ra, "dec_deg": spec.dec, "apertura_px": spec.aperture.r_ap,
                 "anillo_px": [spec.aperture.r_in, spec.aperture.r_out], "pixel_arcsec": spec.pixel_scale_arcsec,
                 "pixel_sr": spec.pixel_solid_angle_sr, "unidades": {"flujo_mjy": "mJy", "pixel_mjysr": "MJy/sr"},
                 "teselas": spec.tiles}
         csv = "".join(f"# {k}: {json.dumps(v, ensure_ascii=False)}\n" for k, v in meta.items()) + \
             df[cols].to_csv(index=False)
-        st.download_button("Descargar CSV con procedencia", csv.encode("utf-8"),
+        st.download_button("Download CSV with provenance", csv.encode("utf-8"),
                            file_name=f"skyclues_espectro_{spec.ra:.4f}_{spec.dec:+.4f}.csv", mime="text/csv",
                            key="sx_csv")
 
-    with st.expander("Procedencia del producto y limitaciones"):
+    with st.expander("Provenance of the product and limitations"):
         prov = pd.DataFrame(spec.tiles).drop_duplicates("tile")
         st.dataframe(prov.astype(str), hide_index=True, width="stretch")
         stats = sc.io_stats()
         st.markdown(
-            f"- **Producto:** SPHEREx DR1 All-Sky spectral cube, doi:{config.CUBE_DOI}. Ficheros FITS por tesela HEALPix "
-            f"de orden 5 ({config.CUBE_DATA_URL}), los mismos del [tutorial oficial]({config.CUBE_TUTORIAL_URL}).\n"
-            "- **Lectura:** solo las filas necesarias, por rangos de bytes HTTP (cada tesela pesa ~320 MB y nunca se "
-            "descarga entera); bytes verificados con Content-Range, tamaño y ETag; caché local con SHA-256. "
-            f"Este proceso ha leído {stats['bytes_network'] / 2**20:.1f} MiB de cuerpos HTTP "
-            f"en {stats['requests']} intentos (sin contar cabeceras HTTP/TLS).\n"
-            "- **Valores:** IMAGE en MJy/sr con la luz zodiacal ya restada por el pipeline; cada píxel es la media de "
-            "NHITS píxeles de entrada (asignación al píxel más próximo, sin suavizado). Los píxeles de entrada con "
+            f"- **Product:** SPHEREx DR1 All-Sky spectral cube, doi:{config.CUBE_DOI}. FITS files per HEALPix tile "
+            f"of order 5 ({config.CUBE_DATA_URL}), the same ones as in the [official tutorial]({config.CUBE_TUTORIAL_URL}).\n"
+            "- **Reading:** only the necessary rows, by HTTP byte ranges (each tile weighs ~320 MB and is never "
+            "downloaded whole); bytes verified with Content-Range, size and ETag; local cache with SHA-256. "
+            f"This process has read {stats['bytes_network'] / 2**20:.1f} MiB of HTTP bodies "
+            f"in {stats['requests']} attempts (not counting HTTP/TLS headers).\n"
+            "- **Values:** IMAGE in MJy/sr with the zodiacal light already subtracted by the pipeline; each pixel is the mean of "
+            "NHITS input pixels (assignment to the nearest pixel, no smoothing). Input pixels with "
             "TRANSIENT, SUR_ERROR, NONFUNC, DICHROIC, MISSING_DATA, HOT, COLD, PHANMISS, NONLINEAR, PERSIST, "
-            "CROSSTALK, STREAK, BLOOM, SNOWBALL, HALO o SATELLITE_HALO se excluyeron antes de promediar "
-            "(Explanatory Supplement v2.1, §2.5 y §3.4). La extensión FLAGS del cubo declara esas máscaras (más "
-            "OVERFLOW, SOURCE y OUTLIER) y las activas aparecen en los píxeles resultantes; SkyClues cuenta BLOOM y "
-            "OVERFLOW en los píxeles de la apertura y trata OVERFLOW y OUTLIER como precaución. Un canal con algún "
-            "píxel de la apertura sin datos (valor NaN o NHITS = 0) no se mide: ver «Calidad de los canales».\n"
-            "- **λ:** de la tabla SPECTRAL_CHANNELS de cada FITS (λ central, WL_MIN, WL_MAX, R). "
-            "Canal n = 17·(detector − 1) + subcanal; plano = n − 1.\n"
-            "- **Limitaciones:** producto combinado de fechas distintas (no temporal); píxel de 12.9″ (≈ 2 píxeles "
-            "Level 2); rayado del mosaico cerca de líneas intensas (He 1.083 µm, Paα, PAH 3.3 µm, Brα) que no se "
-            "promedia; los canales 51 y 52 están vacíos en DR1; espectro sin incertidumbres ni corrección de "
-            "apertura (solo visualización).")
+            "CROSSTALK, STREAK, BLOOM, SNOWBALL, HALO or SATELLITE_HALO were excluded before averaging "
+            "(Explanatory Supplement v2.1, §2.5 and §3.4). The FLAGS extension of the cube declares those masks (plus "
+            "OVERFLOW, SOURCE and OUTLIER) and the active ones appear in the resulting pixels; SkyClues counts BLOOM and "
+            "OVERFLOW in the aperture pixels and treats OVERFLOW and OUTLIER as caution. A channel with any "
+            "aperture pixel without data (NaN value or NHITS = 0) is not measured: see «Channel quality».\n"
+            "- **λ:** from the SPECTRAL_CHANNELS table of each FITS (central λ, WL_MIN, WL_MAX, R). "
+            "Channel n = 17·(detector − 1) + subchannel; plane = n − 1.\n"
+            "- **Limitations:** combined product of different dates (not temporal); 12.9″ pixel (≈ 2 Level 2 "
+            "pixels); striping of the mosaic near intense lines (He 1.083 µm, Paα, PAH 3.3 µm, Brα) that is not "
+            "averaged; channels 51 and 52 are empty in DR1; spectrum without uncertainties or aperture correction "
+            "(display only).")
     _footer(ra_c, dec_c, fov, state["sx_canal"])
 
 
@@ -501,5 +501,5 @@ def _footer(ra: float, dec: float, fov: float, canal: int) -> None:
     if theme.scientific():
         reference_page.render(ra, dec, fov, key="spectrum_ref")
     release_ui.share(ra, dec, fov, "espectral", canal)
-    st.caption("Datos: NASA/IPAC IRSA · SPHEREx DR1 All-Sky spectral cube (doi:10.26131/IRSA679), leído por rangos de "
-               "bytes de los FITS oficiales (sin descargar teselas completas)." if theme.scientific() else 'Datos: SPHEREx · NASA/IPAC IRSA.')
+    st.caption("Data: NASA/IPAC IRSA · SPHEREx DR1 All-Sky spectral cube (doi:10.26131/IRSA679), read by byte "
+               "ranges from the official FITS files (without downloading whole tiles)." if theme.scientific() else 'Data: SPHEREx · NASA/IPAC IRSA.')

@@ -120,8 +120,8 @@ def pixel_table(comp: mb.Composite, npix: int = DISPLAY_NPIX) -> pd.DataFrame:
         for role, p in zip(mb.ROLES, ps):
             cols[role] = np.round(np.where(p.valid, p.image, np.nan)[keep], 4)
             cols[f"nhits_{role}"] = p.nhits[keep].astype(int)
-        cols["cobertura"] = np.where(k == 3, "datos en los 3 canales",
-                                     np.where(k == 0, "sin datos", "datos solo en " + k.astype(str) + " canal(es)"))
+        cols["cobertura"] = np.where(k == 3, "data in all 3 channels",
+                                     np.where(k == 0, "no data", "data only in " + k.astype(str) + " canal(es)"))
         cols["tesela"] = int(ps[0].tile.ipix)
         parts.append(pd.DataFrame(cols))
     return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame()
@@ -141,13 +141,13 @@ def composite_chart(png: bytes, info: dict, pixels: pd.DataFrame, comp: mb.Compo
     # its column had no width, and it was not recomputed afterwards.
     xs = alt.Scale(domain=[-R, R], reverse=True, nice=False, zero=False)
     ys = alt.Scale(domain=[-R, R], nice=False, zero=False)
-    tx, ty = "Desplazamiento al este (″) · este a la izquierda", "Desplazamiento al norte (″)"
+    tx, ty = "Offset to the east (″) · east to the left", "Offset to the north (″)"
     X, Y = alt.X("este:Q", scale=xs, title=tx), alt.Y("norte:Q", scale=ys, title=ty)
     uri = "data:image/png;base64," + base64.b64encode(png).decode()
     bg = alt.Chart(pd.DataFrame({"e1": [R], "e2": [-R], "n1": [-R], "n2": [R], "url": [uri]})).mark_image(
         aspect=False).encode(x=alt.X("e1:Q", scale=xs, title=tx), x2="e2:Q",
                              y=alt.Y("n1:Q", scale=ys, title=ty), y2="n2:Q", url="url:N")
-    circle = sv._circle(0.0, 0.0, comp.field_deg / 2 * 3600, "campo de visión")
+    circle = sv._circle(0.0, 0.0, comp.field_deg / 2 * 3600, "field of view")
     # Overlays in white over a dark halo: legible on any colour of the composition.
     halo = alt.Chart(circle).mark_line(strokeWidth=3.2, clip=True, color="#14181f", opacity=0.55).encode(
         x=X, y=Y, order="orden:Q")
@@ -158,7 +158,7 @@ def composite_chart(png: bytes, info: dict, pixels: pd.DataFrame, comp: mb.Compo
     for r in mb.ROLES:
         tip.append(alt.Tooltip(f"{r}:Q", title=f"{r} · canal {ch[r].number} · {ch[r].wavelength_um:.3f} µm (MJy/sr)",
                                format=".4g"))
-    tip += [alt.Tooltip("cobertura:N"), alt.Tooltip("tesela:Q", title="tesela HEALPix")]
+    tip += [alt.Tooltip("cobertura:N"), alt.Tooltip("tesela:Q", title="HEALPix tile")]
     px = max(4.0, size * comp.alignment["pixel_arcsec"] / (2 * R))
     pts = alt.Chart(pixels).mark_square(size=px * px, opacity=0.001).encode(x=X, y=Y, tooltip=tip)
     layers = [bg, lines, pts]
@@ -178,8 +178,8 @@ def assignment_table(comp: mb.Composite) -> pd.DataFrame:
     for r in mb.ROLES:
         c = comp.channels[r]
         rows.append({"color": f"{r} ({mb.ROLE_NAMES[r]})", "canal": c.number, "λ central (µm)": round(c.wavelength_um, 4),
-                     "ancho (µm)": round(c.bandwidth_um, 4),
-                     "intervalo (µm)": f"{c.wl_min_um:.3f}–{c.wl_max_um:.3f}", "detector": f"D{c.detector}·{c.subchannel}",
-                     "píxeles con datos": comp.coverage["con_datos"][r],
-                     "escala (MJy/sr)": f"{comp.stretch.vmin[r]:.4g} – {comp.stretch.vmax[r]:.4g}"})
+                     "width (µm)": round(c.bandwidth_um, 4),
+                     "interval (µm)": f"{c.wl_min_um:.3f}–{c.wl_max_um:.3f}", "detector": f"D{c.detector}·{c.subchannel}",
+                     "pixels with data": comp.coverage["con_datos"][r],
+                     "scale (MJy/sr)": f"{comp.stretch.vmin[r]:.4g} – {comp.stretch.vmax[r]:.4g}"})
     return pd.DataFrame(rows)

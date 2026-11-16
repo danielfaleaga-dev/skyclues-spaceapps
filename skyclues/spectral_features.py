@@ -84,20 +84,20 @@ MAD_TO_SIGMA = 1.4826
 
 UNITS = {"flux": "mJy", "pixel": "MJy/sr"}
 COLUMNS = {"flux": "flujo_mjy", "pixel": "pixel_mjysr"}
-QUANTITY_NAMES = {"flux": "densidad de flujo en apertura", "pixel": "brillo superficial del píxel"}
+QUANTITY_NAMES = {"flux": "flux density in aperture", "pixel": "surface brightness of the pixel"}
 
 QUANTIFIABLE, VISIBLE, NOT_EVALUABLE, NO_FEATURE = "cuantificable", "visible", "no_evaluable", "sin_caracteristica"
-CLASS_LABELS = {QUANTIFIABLE: "Cuantificable", VISIBLE: "Visible", NOT_EVALUABLE: "No evaluable",
-                NO_FEATURE: "Sin característica"}
+CLASS_LABELS = {QUANTIFIABLE: "Quantifiable", VISIBLE: "Visible", NOT_EVALUABLE: "Not evaluable",
+                NO_FEATURE: "No feature"}
 CLASS_MEANING = {
-    QUANTIFIABLE: "se puede caracterizar respecto a un entorno espectral válido",
-    VISIBLE: "hay una variación en los valores, pero no se puede caracterizar con fiabilidad",
-    NOT_EVALUABLE: "faltan datos adecuados para concluir nada",
-    NO_FEATURE: "el valor no se aparta de su entorno más que la dispersión de referencia",
+    QUANTIFIABLE: "it can be characterised against a valid spectral surrounding",
+    VISIBLE: "there is a variation in the values, but it cannot be characterised reliably",
+    NOT_EVALUABLE: "suitable data are missing to conclude anything",
+    NO_FEATURE: "the value does not depart from its surroundings by more than the reference scatter",
 }
 #: Documented instrumental artefact of the cube (Explanatory Supplement, known issues): not a line list.
-KNOWN_ARTEFACTS = ((1.083, "He I 1.083 µm del resplandor atmosférico: el mosaico presenta rayado documentado "
-                           "en este canal; un pico aquí puede ser instrumental"),)
+KNOWN_ARTEFACTS = ((1.083, "He I 1.083 µm atmospheric glow: the mosaic shows documented striping "
+                           "in this channel; a peak here may be instrumental"),)
 
 
 class FeatureInputError(ValueError):
@@ -135,7 +135,7 @@ class Series:
     def index(self, canal: int) -> int:
         hit = np.flatnonzero(self.canal == int(canal))
         if not hit.size:
-            raise FeatureInputError(f"Canal {canal} fuera de la tabla del espectro.")
+            raise FeatureInputError(f"Channel {canal} is outside the spectrum table.")
         return int(hit[0])
 
 
@@ -144,14 +144,14 @@ def series_from_arrays(value, lam=None, *, label: str = "A", quantity: str = "fl
                        meta: dict | None = None) -> Series:
     """Build a Series from plain arrays (used by the tests and by any caller with its own table)."""
     if quantity not in UNITS:
-        raise FeatureInputError("Magnitud desconocida.")
+        raise FeatureInputError("Unknown quantity.")
     v = np.array(value, dtype=float)
     n = v.size
     if n < 3 or v.ndim != 1:
-        raise FeatureInputError("Un espectro necesita al menos tres canales.")
+        raise FeatureInputError("A spectrum needs at least three channels.")
     lam = np.linspace(0.75, 5.0, n) if lam is None else np.array(lam, dtype=float)
     if lam.shape != v.shape or not np.all(np.isfinite(lam)) or not np.all(np.diff(lam) > 0):
-        raise FeatureInputError("Las longitudes de onda deben ser finitas y crecientes, una por canal.")
+        raise FeatureInputError("The wavelengths must be finite and increasing, one per channel.")
     v = np.where(np.isfinite(v), v, np.nan)                      # ±inf is not a measurement
     half = np.gradient(lam) / 2
     arr = lambda a, d, t: np.array(d if a is None else a, dtype=t)   # noqa: E731
@@ -168,7 +168,7 @@ def series_from_arrays(value, lam=None, *, label: str = "A", quantity: str = "fl
 def series_from_spectrum(spec, quantity: str = "flux", label: str = "A") -> Series:
     """The chosen quantity of a ``spectral_cube.Spectrum`` (values untouched)."""
     if quantity not in COLUMNS:
-        raise FeatureInputError("Magnitud desconocida.")
+        raise FeatureInputError("Unknown quantity.")
     rows = spec.rows
     num = lambda k: np.array([np.nan if r.get(k) is None else float(r[k]) for r in rows])   # noqa: E731
     value, sig = num(COLUMNS[quantity]), num("fondo_sigma_mjysr")
@@ -237,43 +237,43 @@ def compatibility(a: Series, b: Series) -> tuple[list, list, float | None]:
                  and np.allclose(a.lam_min, b.lam_min, rtol=0, atol=1e-6)
                  and np.allclose(a.lam_max, b.lam_max, rtol=0, atol=1e-6))
     if not same_grid:
-        issues.append("Las tablas de canales de A y B no coinciden (longitudes de onda o intervalos distintos): "
-                      "no se comparan canal a canal.")
+        issues.append("The channel tables of A and B do not match (different wavelengths or intervals): "
+                      "they are not compared channel by channel.")
     ma, mb = a.meta, b.meta
     if "pixel_sr" in ma and "pixel_sr" in mb and not math.isclose(ma["pixel_sr"], mb["pixel_sr"], rel_tol=1e-9):
-        issues.append("Píxeles de distinto ángulo sólido en A y B.")
+        issues.append("Pixels of different solid angle in A and B.")
     if a.quantity == "flux" and ma and mb:
         diff = [k for k in ("r_ap", "r_in", "r_out", "subpixels") if ma.get(k) != mb.get(k)]
         if diff:
-            issues.append("Extracciones distintas en A y B (" + ", ".join(
-                f"{k}: {ma.get(k)} y {mb.get(k)}" for k in diff) + "): los flujos no son equivalentes.")
+            issues.append("Different extractions in A and B (" + ", ".join(
+                f"{k}: {ma.get(k)} y {mb.get(k)}" for k in diff) + "): the fluxes are not equivalent.")
         elif "n_aperture_px" in ma and not math.isclose(ma["n_aperture_px"], mb["n_aperture_px"], rel_tol=0.02):
-            notes.append(f"El área efectiva de la apertura difiere ({ma['n_aperture_px']:.2f} y "
-                         f"{mb['n_aperture_px']:.2f} píxeles) por el muestreo de los bordes.")
+            notes.append(f"The effective area of the aperture differs ({ma['n_aperture_px']:.2f} and "
+                         f"{mb['n_aperture_px']:.2f} pixels) because of the sampling of the edges.")
     sep = _separation_arcsec(a, b)
     if sep is not None:
         pix = ma.get("pixel_arcsec") or float("nan")
         if sep < 0.05:
-            notes.append("A y B son la misma posición: la comparación es trivial.")
+            notes.append("A and B are the same position: the comparison is trivial.")
         elif a.quantity == "pixel":
             if math.isfinite(pix) and sep < pix / 2:
-                notes.append("A y B caen probablemente en el mismo píxel del cubo.")
+                notes.append("A and B probably fall in the same cube pixel.")
         elif math.isfinite(pix):
             r_ap, r_in, r_out = ma["r_ap"] * pix, ma["r_in"] * pix, ma["r_out"] * pix
             if sep < 2 * r_ap:
-                notes.append(f"Las aperturas se solapan (separación {sep:.0f}″ < {2 * r_ap:.0f}″): A y B comparten "
-                             "píxeles y no son medidas independientes.")
+                notes.append(f"The apertures overlap (separation {sep:.0f}″ < {2 * r_ap:.0f}″): A and B share "
+                             "pixels and are not independent measurements.")
             if r_in - r_ap < sep < r_out + r_ap:
-                notes.append(f"Cada apertura cae en el anillo de fondo de la otra (separación {sep:.0f}″; anillo "
-                             f"{r_in:.0f}″–{r_out:.0f}″): el fondo restado en una posición incluye luz de la otra.")
+                notes.append(f"Each aperture falls in the background annulus of the other (separation {sep:.0f}″; annulus "
+                             f"{r_in:.0f}″–{r_out:.0f}″): the background subtracted at one position includes light from the other.")
     if ma.get("tiles") and mb.get("tiles") and set(ma["tiles"]) != set(mb["tiles"]):
-        notes.append("A y B se leen de teselas HEALPix distintas (misma rejilla y mismo ángulo sólido por píxel).")
+        notes.append("A and B are read from different HEALPix tiles (same grid and same solid angle per pixel).")
     return issues, notes, sep
 
 
 def _missing(status: str) -> str:
-    return {"ok": "con valor", "blank": "canal sin datos en DR1", "no_data_aperture": "apertura con píxeles sin datos",
-            "no_background": "fondo insuficiente", "pixel_sin_datos": "píxel sin datos"}.get(status, "sin valor")
+    return {"ok": "with value", "blank": "channel without data in DR1", "no_data_aperture": "aperture with pixels without data",
+            "no_background": "insufficient background", "pixel_sin_datos": "pixel without data"}.get(status, "no value")
 
 
 def compare(a: Series, b: Series) -> Comparison:
@@ -291,17 +291,17 @@ def compare(a: Series, b: Series) -> Comparison:
                "a": float(va) if np.isfinite(va) else None, "b": float(vb) if np.isfinite(vb) else None,
                "estado_a": _missing(a.status[i]), "estado_b": _missing(b.status[i]),
                "precaucion": bool(a.caution[i] or b.caution[i]), "diferencia": None, "relacion": None,
-               "estado_relacion": "falta A o B"}
+               "estado_relacion": "A or B missing"}
         if both:
             row["diferencia"] = float(va - vb)
             rb = b.ref_scatter[i]
             if vb <= tiny or va <= tiny:
-                row["estado_relacion"] = "no definida: A o B ≤ 0"
+                row["estado_relacion"] = "undefined: A or B ≤ 0"
             elif np.isfinite(rb) and vb < RATIO_MIN_DENOMINATOR * rb:
-                row["estado_relacion"] = (f"no fiable: B < {RATIO_MIN_DENOMINATOR:g} × la dispersión de referencia")
+                row["estado_relacion"] = (f"not reliable: B < {RATIO_MIN_DENOMINATOR:g} × the reference scatter")
             else:
                 row["relacion"] = float(va / vb)
-                row["estado_relacion"] = "válida" if np.isfinite(rb) else "válida (sin filtro de estabilidad)"
+                row["estado_relacion"] = "valid" if np.isfinite(rb) else "valid (no stability filter)"
         rows.append(row)
     d = np.array([r["diferencia"] for r in rows if r["diferencia"] is not None], float)
     q = np.array([r["relacion"] for r in rows if r["relacion"] is not None], float)
@@ -430,18 +430,18 @@ def _evaluate(s: Series, lo: int, hi: int, masked, sdet, *, origin: str, centre:
     bad = [int(s.canal[j]) for j in idx if not math.isfinite(s.value[j])]
     if bad:
         why = sorted({_missing(s.status[s.index(c)]) for c in bad})
-        f.reasons.append(f"Canales sin valor en el intervalo ({', '.join(map(str, bad))}: {'; '.join(why)}). "
-                         "No se interpolan.")
+        f.reasons.append(f"Channels without a value in the interval ({', '.join(map(str, bad))}: {'; '.join(why)}). "
+                         "They are not interpolated.")
         return f
     left, right = _side(s.value, lo - 1, -1, masked), _side(s.value, hi + 1, 1, masked)
     f.env_left, f.env_right = [int(s.canal[j]) for j in left[::-1]], [int(s.canal[j]) for j in right]
     for name, side, edge in (("menor", left, lo - 1), ("mayor", right, hi + 1)):
         if len(side) < N_SIDE:
-            cause = ("borde del intervalo espectral" if not 0 <= edge < s.n else
+            cause = ("edge of the spectral interval" if not 0 <= edge < s.n else
                      f"canal {int(s.canal[edge])}: {_missing(s.status[edge])}"
-                     if not math.isfinite(s.value[edge]) else "canales sin valor o de otra característica")
-            f.reasons.append(f"Sin entorno válido hacia λ {name} ({len(side)} de {N_SIDE} canales; {cause}): "
-                             "no hay continuo local fiable.")
+                     if not math.isfinite(s.value[edge]) else "channels without a value or of another feature")
+            f.reasons.append(f"No valid surroundings towards λ {name} ({len(side)} of {N_SIDE} channels; {cause}): "
+                             "there is no reliable local continuum.")
     if f.reasons:
         return f
     env = left + right
@@ -451,7 +451,7 @@ def _evaluate(s: Series, lo: int, hi: int, masked, sdet, *, origin: str, centre:
     k = int(np.argmax(np.abs(d)))
     s_local = float(s_env[k])
     if centre is not None and idx[k] != centre:
-        f.klass, f.reasons = NO_FEATURE, ["El extremo no está en el centro del intervalo de prueba."]
+        f.klass, f.reasons = NO_FEATURE, ["The extremum is not at the centre of the test interval."]
         return f
     j = idx[k]
     contrast = float(d[k])
@@ -499,29 +499,29 @@ def _evaluate(s: Series, lo: int, hi: int, masked, sdet, *, origin: str, centre:
 
     blockers = []                                        # conditions that cap the class at "visible"
     if f.caution_channels:
-        blockers.append("Píxeles de entrada con OVERFLOW u OUTLIER en los canales "
-                        f"{', '.join(map(str, f.caution_channels))}: el valor puede no ser fiable.")
+        blockers.append("Input pixels with OVERFLOW or OUTLIER in channels "
+                        f"{', '.join(map(str, f.caution_channels))}: the value may not be reliable.")
     if len(f.detectors) > 1:
-        blockers.append("El intervalo y su entorno abarcan los detectores "
-                        f"{', '.join(f'D{x}' for x in f.detectors)}: calibración y resolución distintas pueden "
-                        "producir un escalón.")
+        blockers.append("The interval and its surroundings span detectors "
+                        f"{', '.join(f'D{x}' for x in f.detectors)}: different calibration and resolution can "
+                        "produce a step.")
     if f.nhits_feature and f.nhits_env and not (1 / COVERAGE_CHANGE <= f.nhits_feature / f.nhits_env
                                                 <= COVERAGE_CHANGE):
-        blockers.append(f"Cambio de cobertura: NHITS {f.nhits_feature:.0f} en la característica y "
-                        f"{f.nhits_env:.0f} en el entorno.")
+        blockers.append(f"Change of coverage: NHITS {f.nhits_feature:.0f} in the feature and "
+                        f"{f.nhits_env:.0f} in the surroundings.")
     if any(s.caution[t] for t in env):
-        f.limitations.append("Algún canal del entorno tiene OVERFLOW u OUTLIER: el continuo puede estar afectado.")
+        f.limitations.append("Some channel of the surroundings has OVERFLOW or OUTLIER: the continuum may be affected.")
     if not log_space:
-        f.limitations.append("Valores ≤ 0 en el entorno: continuo ajustado sobre los valores, no sobre sus "
-                             "logaritmos; menos fiable si el espectro tiene mucha pendiente.")
+        f.limitations.append("Values ≤ 0 in the surroundings: continuum fitted on the values, not on their "
+                             "logarithms; less reliable if the spectrum has a steep slope.")
     if f.n_channels == 1:
-        f.limitations.append("Un solo canal: cada canal equivale a un elemento de resolución, así que no se "
-                             "distingue de un valor atípico del mosaico.")
+        f.limitations.append("A single channel: each channel equals one resolution element, so it cannot "
+                             "be told apart from an outlier of the mosaic.")
     if f.relative is None:
-        f.limitations.append("Continuo ≤ 0: no se calcula el contraste relativo.")
+        f.limitations.append("Continuum ≤ 0: the relative contrast is not computed.")
     if (hi - lo + 1) >= 7:
-        f.limitations.append("Característica ancha: si se extiende más allá del intervalo, el entorno la incluye y "
-                             "el contraste queda subestimado.")
+        f.limitations.append("Broad feature: if it extends beyond the interval, the surroundings include it and "
+                             "the contrast is underestimated.")
     for lam0, text in KNOWN_ARTEFACTS:
         if f.lam_lo <= lam0 <= f.lam_hi:
             f.limitations.append(text + ".")
@@ -529,26 +529,26 @@ def _evaluate(s: Series, lo: int, hi: int, masked, sdet, *, origin: str, centre:
     aq = abs(ratio)
     if aq < Q_VISIBLE:
         f.klass = NO_FEATURE
-        f.reasons.append(f"Contraste de {aq:.1f} veces la dispersión de referencia, por debajo de {Q_VISIBLE:g}: "
-                         "fluctuación que no se etiqueta.")
+        f.reasons.append(f"Contrast of {aq:.1f} times the reference scatter, below {Q_VISIBLE:g}: "
+                         "a fluctuation that is not labelled.")
     elif f.relative is not None and abs(f.relative) < MIN_RELATIVE:
         f.klass = NO_FEATURE
-        f.reasons.append(f"Contraste del {abs(f.relative):.2%} del continuo, por debajo del {MIN_RELATIVE:.0%}: no "
-                         "se distingue de la curvatura de un espectro suave.")
+        f.reasons.append(f"Contrast of {abs(f.relative):.2%} of the continuum, below {MIN_RELATIVE:.0%}: it "
+                         "cannot be told apart from the curvature of a smooth spectrum.")
     elif aq >= Q_QUANTIFIABLE and not blockers:
         f.klass = QUANTIFIABLE
-        f.reasons.append(f"Contraste de {_fmt_ratio(aq)} veces la dispersión de referencia (criterio "
-                         f"{Q_QUANTIFIABLE:g}), con entorno válido a ambos lados.")
+        f.reasons.append(f"Contrast of {_fmt_ratio(aq)} times the reference scatter (criterion "
+                         f"{Q_QUANTIFIABLE:g}), with valid surroundings on both sides.")
     else:
         f.klass = VISIBLE
-        f.reasons.append(f"Contraste de {_fmt_ratio(aq)} veces la dispersión de referencia" + (
-            f", entre {Q_VISIBLE:g} y {Q_QUANTIFIABLE:g}." if aq < Q_QUANTIFIABLE else
-            ", pero hay condiciones que impiden caracterizarla con fiabilidad."))
+        f.reasons.append(f"Contrast of {_fmt_ratio(aq)} times the reference scatter" + (
+            f", between {Q_VISIBLE:g} and {Q_QUANTIFIABLE:g}." if aq < Q_QUANTIFIABLE else
+            ", but there are conditions that prevent characterising it reliably."))
     return f
 
 
 def _fmt_ratio(v: float) -> str:
-    return "más de 1000" if v > 1000 else f"{v:.1f}"
+    return "more than 1000" if v > 1000 else f"{v:.1f}"
 
 
 def _robust_sigma(r) -> float:
@@ -642,7 +642,7 @@ def _scan(s: Series, sdet: dict) -> list:
                 if lo < 0 or hi >= s.n or any(t in masked for t in range(lo, hi + 1)):
                     continue
                 if (i, h) not in cache:
-                    cache[i, h] = _evaluate(s, lo, hi, masked, sdet, origin="automática", centre=i)
+                    cache[i, h] = _evaluate(s, lo, hi, masked, sdet, origin="automatic", centre=i)
                 f = cache[i, h]
                 if f.ratio is not None and f.kind is not None and abs(f.ratio) >= Q_PROVISIONAL:
                     trials.append((h, f))
@@ -713,13 +713,13 @@ def measure_interval(s: Series, canal_lo: int, canal_hi: int, features=(), scatt
     ``scatter``: the detector scatter of ``analyse(s)``; computed here if not given."""
     lo, hi = sorted((s.index(canal_lo), s.index(canal_hi)))
     if hi - lo + 1 > MAX_MANUAL_CHANNELS:
-        return Feature(serie=s.label, origin="selección", klass=NOT_EVALUABLE, kind=None, unit=s.unit, limitations=[],
+        return Feature(serie=s.label, origin="selection", klass=NOT_EVALUABLE, kind=None, unit=s.unit, limitations=[],
                        trial_lo=int(s.canal[lo]), trial_hi=int(s.canal[hi]),
-                       reasons=[f"Intervalo de {hi - lo + 1} canales: demasiado ancho para un continuo local "
-                                f"(máximo {MAX_MANUAL_CHANNELS}). Lo que se ve a esa escala es la forma general del "
-                                "espectro."])
+                       reasons=[f"Interval of {hi - lo + 1} channels: too wide for a local continuum "
+                                f"(maximum {MAX_MANUAL_CHANNELS}). What is seen at that scale is the general shape of the "
+                                "spectrum."])
     sdet = analyse(s).scatter if scatter is None else scatter
-    return _evaluate(s, lo, hi, _masked_for(s, features, lo, hi), sdet, origin="selección")
+    return _evaluate(s, lo, hi, _masked_for(s, features, lo, hi), sdet, origin="selection")
 
 
 def inspect_channel(s: Series, canal: int, features=(), scatter: dict | None = None) -> Feature:
@@ -734,7 +734,7 @@ def inspect_channel(s: Series, canal: int, features=(), scatter: dict | None = N
         lo, hi = i - h, i + h
         if lo < 0 or hi >= s.n:
             continue
-        f = _evaluate(s, lo, hi, _masked_for(s, features, lo, hi), sdet, origin="selección", centre=i)
+        f = _evaluate(s, lo, hi, _masked_for(s, features, lo, hi), sdet, origin="selection", centre=i)
         if h == 0:
             last = f
         if f.ratio is not None:
@@ -764,8 +764,8 @@ def method_summary() -> dict:
     return {"metodo": METHOD_VERSION, "canales_entorno_por_lado": N_SIDE, "grado_del_continuo": DEGREE,
             "intervalos_de_prueba_canales": [2 * h + 1 for h in HALF_WIDTHS], "umbral_visible": Q_VISIBLE,
             "umbral_cuantificable": Q_QUANTIFIABLE, "contraste_relativo_minimo": MIN_RELATIVE,
-            "continuo": "polinomio local en ln(valor)–ln(λ) si el entorno es positivo; en valor–λ si no",
+            "continuo": "local polynomial in ln(value)–ln(λ) if the surroundings are positive; in value–λ if not",
             "relacion_denominador_minimo": RATIO_MIN_DENOMINATOR,
             "cambio_de_cobertura": COVERAGE_CHANGE, "suavizado": "ninguno",
-            "nota": "Umbrales descriptivos sobre una dispersión de referencia; no son incertidumbres fotométricas "
-                    "ni significación estadística."}
+            "nota": "Descriptive thresholds on a reference scatter; they are not photometric uncertainties "
+                    "or statistical significance."}

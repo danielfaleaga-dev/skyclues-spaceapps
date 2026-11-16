@@ -31,10 +31,10 @@ def parse_region(params):
     fov = validate_fov_deg(params.get('fov', .1))
     explorer = params.get('explorer', 'temporal')
     if explorer not in ('temporal', 'espectral'):
-        raise ValueError('Explorador desconocido')
+        raise ValueError('Unknown explorer')
     ch = params.get('canal', '63')
     if not str(ch).isdigit() or not 1 <= int(ch) <= 102:
-        raise ValueError('Canal fuera de 1-102')
+        raise ValueError('Channel outside 1-102')
     return {'ra': ra, 'dec': dec, 'fov': fov, 'explorer': explorer, 'canal': int(ch)}
 
 
@@ -76,7 +76,7 @@ def _finite(v, what):
     try:
         f = float(v)
     except (TypeError, ValueError):
-        raise ValueError(f"{what} no numérica: {v!r}.") from None
+        raise ValueError(f"{what} is not numeric: {v!r}.") from None
     if not math.isfinite(f):
         raise ValueError(f"{what} no finita: {v!r}.")
     return f
@@ -99,14 +99,14 @@ def get_region(state, params) -> dict:
         try:
             ra, dec = validate_coordinates(params.get("ra"), params.get("dec"))
         except ValueError as err:
-            errors.append(f"Coordenadas del enlace no válidas: {err} Se muestra la región por defecto y no se ha "
-                          "realizado ninguna consulta.")
+            errors.append(f"Invalid coordinates in the link: {err} The default region is shown and no query has been "
+                          "made.")
             ra, dec = DEFAULT_REGION["ra"], DEFAULT_REGION["dec"]
     if "fov" in params:
         try:
             fov = validate_fov_deg(params.get("fov"))
         except ValueError as err:
-            errors.append(f"Campo de visión del enlace no válido: {err}")
+            errors.append(f"Invalid field of view in the link: {err}")
     region = state["region"] = _blank(float(ra), float(dec), fov)
     if errors:
         state["region_errors"] = errors
@@ -176,16 +176,16 @@ def set_gaia(state, params, source, provenance):
     from .astrometry import Astrometry
     sid = source['source_id']
     if not isinstance(sid, str) or not sid.isdecimal() or not 0 < int(sid) < 2**63:
-        raise ValueError('source_id Gaia inválido')
+        raise ValueError('invalid Gaia source_id')
     if source['ref_epoch'] != 2016.0:
-        raise ValueError('Época Gaia DR3 inesperada')
+        raise ValueError('Unexpected Gaia DR3 epoch')
     a = Astrometry(f'Gaia DR3 {sid}', source['ra'], source['dec'], source['ref_epoch'],
                    pmra_masyr=source.get('pmra'), pmdec_masyr=source.get('pmdec'),
                    parallax_mas=source.get('parallax'), rv_kms=source.get('radial_velocity'),
                    source='ESA Gaia DR3 · gaiadr3.gaia_source · ' + provenance.get('sha256', ''))
     r = set_object(state, params, a)
     r['gaia'] = {'source_id': sid, 'catalogue_epoch': source['ref_epoch'], 'provenance': dict(provenance)}
-    r['notes'] = ['Coordenadas de catálogo Gaia DR3 (ICRS, J2016.0). Seleccionar esta fuente no confirma una detección SPHEREx.']
+    r['notes'] = ['Gaia DR3 catalogue coordinates (ICRS, J2016.0). Selecting this source does not confirm a SPHEREx detection.']
     return r
 
 
@@ -210,7 +210,7 @@ def explorer_inputs(region: dict) -> dict:
     follow = astro is not None and not region.get("fixed_centre")
     ra, dec = (astro.ra_deg, astro.dec_deg) if follow else (region["ra"], region["dec"])
     return {"ra": float(ra), "dec": float(dec), "fov": float(region["fov"]), "astrometry": astro,
-            "follow": follow, "label": region.get("name") or "coordenadas elegidas"}
+            "follow": follow, "label": region.get("name") or "chosen coordinates"}
 
 
 # ----------------------------------------------------------------------------- URL mirror

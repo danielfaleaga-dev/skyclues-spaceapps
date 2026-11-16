@@ -12,10 +12,10 @@ def normalize(text):
     return re.sub(r"\s+", " ", re.sub(r"\b(m|ngc|ic|hd|hip)\s*(?=\d)", r"\1 ", text)).strip()
 
 def validate_name(text):
-    if any(ord(c)<32 for c in text):raise ValueError("Caracter de control invalido")
+    if any(ord(c)<32 for c in text):raise ValueError("Invalid control character")
     text = text.strip()
     if not 1 <= len(text) <= 100 or any(ord(c)<32 for c in text) or any(c in text for c in "%_\\;<>"):
-        raise ValueError("Nombre invalido: 1-100 caracteres, sin comodines SQL ni controles.")
+        raise ValueError("Invalid name: 1-100 characters, no SQL wildcards or control characters.")
     return text
 
 def local_suggestions(text):
@@ -27,7 +27,7 @@ def resolve(text):
     text=validate_name(text)
     text = canonical_name(text)
     if normalize(text) == 'm 102':
-        raise ValueError('M102 tiene una identificación histórica ambigua: seleccione NGC 5866 o M101 explícitamente.')
+        raise ValueError('M102 has an ambiguous historical identification: select NGC 5866 or M101 explicitly.')
     exact=[x for x in INDEX if normalize(text) in [normalize(a) for a in [x['id'],*x['aliases']]]]
     if len(exact)==1:
         item=exact[0];a=Astrometry.from_dict(item['astrometry'])
@@ -41,7 +41,7 @@ def canonical_name(text):
     text = re.sub(r'^messier\s*', 'M ', text.strip(), flags=re.I)
     text = re.sub(r'^(M|NGC|IC)\s*0*(\d+)', lambda m: m[1].upper()+' '+str(int(m[2])), text, flags=re.I)
     if re.fullmatch(r'M \d+', text) and not 1 <= int(text[2:]) <= 110:
-        raise ValueError('Los identificadores Messier van de M1 a M110.')
+        raise ValueError('Messier identifiers run from M1 to M110.')
     return text
 
 def catalogue_prefix(text):
@@ -74,7 +74,7 @@ def suggestion_patterns(text):
 
 def remote_suggestions(text):
     text=validate_name(text)
-    if not can_suggest(text):return [],"Escriba al menos 3 caracteres o un catálogo."
+    if not can_suggest(text):return [],"Type at least 3 characters or a catalogue."
     where = ' OR '.join("ident.id LIKE '" + p.replace("'", "''") + "'" for p in suggestion_patterns(text))
     cat = catalogue_prefix(text)
     exact_where = None
@@ -94,7 +94,7 @@ def remote_suggestions(text):
                     r.raise_for_status();raw=b''
                     for part in r.iter_content(32768):
                         raw+=part
-                        if len(raw)>1024*1024:raise ValueError('Respuesta demasiado grande')
+                        if len(raw)>1024*1024:raise ValueError('Response too large')
                 j=json.loads(raw);names=[x['name'] for x in j['metadata']]
                 for row in j['data'][:24]:
                     d=dict(zip(names,row))
@@ -108,4 +108,4 @@ def remote_suggestions(text):
                 rows.sort(key=lambda x: tuple(int(v) if v.isdigit() else v for v in re.split(r'(\d+)', x['label'])))
             return rows[:12],base
         except (requests.RequestException,ValueError,KeyError,TypeError) as e:errors.append(type(e).__name__)
-    return [],"Sugerencias remotas no disponibles; indice local y busqueda por nombre completo disponibles. " + '/'.join(errors)
+    return [],"Remote suggestions not available; local index and full-name search available. " + '/'.join(errors)

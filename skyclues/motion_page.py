@@ -1,4 +1,4 @@
-"""Time Explorer tab «Buscar algo que se mueve» (inspection and measurement on original images)."""
+"""Time Explorer tab «Find something that moves» (inspection and measurement on original images)."""
 from __future__ import annotations
 
 import json
@@ -10,8 +10,8 @@ import streamlit as st
 from . import archive, config, motion, references, theme
 from .astrometry import Astrometry
 
-SOURCE_MODES = ["Objetivo del catálogo", "Fuente detectada en la época 1", "Coordenadas RA/Dec"]
-IMAGE_MODES = ["Épocas de esta secuencia", "Ampliar la base temporal (mismo detector)"]
+SOURCE_MODES = ["Catalogue target", "Source detected in epoch 1", "RA/Dec coordinates"]
+IMAGE_MODES = ["Epochs of this sequence", "Extend the time baseline (same detector)"]
 BADGE = {motion.MOTION_MEASURED: "sc-ok", motion.INSUFFICIENT_EVIDENCE: "sc-warn",
          motion.INCOMPATIBLE: "sc-fail", motion.INSUFFICIENT_DATA: "sc-fail"}
 
@@ -31,7 +31,7 @@ def _gaia_or_none(ra, dec, fov):
 @st.cache_data(max_entries=8, show_spinner=False)
 def _investigate_extended(ra: float, dec: float, detector: int, per_season: int, radius: float,
                           start_ra: float, start_dec: float, astro_json: str | None,
-                          label: str = "selección en Time Explorer") -> dict:
+                          label: str = "selection in Time Explorer") -> dict:
     recs = archive.query_images(ra, dec)
     sel = motion.select_epochs(recs, ra, dec, detector, per_season=per_season)
     frames = motion.fetch_frames(sel, ra, dec)
@@ -68,30 +68,30 @@ def show_result(r: dict, key: str, simple: bool = False) -> None:
     if simple:
         # Plain-language verdicts: the outcome comes from the engine unchanged; only the wording is simpler.
         plain = {
-            motion.MOTION_MEASURED: ("ok", "Movimiento detectado",
-                                     "Comparamos la posición del objeto en imágenes reales de fechas distintas, alineadas "
-                                     "con estrellas fijas de referencia: se ha desplazado más de lo que permite explicar "
-                                     "la incertidumbre de la medida."),
-            motion.INSUFFICIENT_EVIDENCE: ("warn", "Movimiento no confirmado",
-                                           "Estas imágenes no muestran un desplazamiento claramente mayor que su "
-                                           "incertidumbre. Eso no demuestra que el objeto esté quieto: puede moverse "
-                                           "menos de lo que estas imágenes permiten medir."),
-            motion.INCOMPATIBLE: ("fail", "No evaluable",
-                                  "Las imágenes no son comparables entre sí (detector, cobertura o calidad), así que "
-                                  "no se puede decir si hubo movimiento."),
-            motion.INSUFFICIENT_DATA: ("", "Datos insuficientes",
-                                       "Faltan imágenes adecuadas (por ejemplo, de dos temporadas distintas) para "
-                                       "comprobar si hubo movimiento.")}
+            motion.MOTION_MEASURED: ("ok", "Motion detected",
+                                     "We compare the position of the object in real images from different dates, aligned "
+                                     "with fixed reference stars: it has moved by more than the uncertainty of the measurement "
+                                     "can explain."),
+            motion.INSUFFICIENT_EVIDENCE: ("warn", "Motion not confirmed",
+                                           "These images do not show a displacement clearly larger than their "
+                                           "uncertainty. That does not prove that the object is still: it may move "
+                                           "less than these images allow us to measure."),
+            motion.INCOMPATIBLE: ("fail", "Not evaluable",
+                                  "The images are not comparable with each other (detector, coverage or quality), so "
+                                  "we cannot say whether there was motion."),
+            motion.INSUFFICIENT_DATA: ("", "Insufficient data",
+                                       "Suitable images are missing (for example, from two different seasons) to "
+                                       "check whether there was motion.")}
         kind, label, text = plain.get(r["outcome"], ("", r["outcome_label"], ""))
         reasons = r.get("reasons") or []
-        more = ("Motivo: " + reasons[0]) if reasons and r["outcome"] != motion.MOTION_MEASURED else ""
+        more = ("Reason: " + reasons[0]) if reasons and r["outcome"] != motion.MOTION_MEASURED else ""
         theme.result(kind, label, text, more)
         d = r.get('displacement')
         if d and r['outcome'] == motion.MOTION_MEASURED:
-            theme.facts([('Cambio de posición', f"{d['total_arcsec']:.2f} ± {d['total_err_arcsec']:.2f}″",
-                          "± es la incertidumbre de la medida"),
-                         ('Tiempo entre imágenes', f"{d['delta_t_days']:.0f} días", f"{d['first']} → {d['last']}")])
-        st.caption('En Científico puedes revisar las medidas, los motivos y las imágenes utilizadas.')
+            theme.facts([('Change of position', f"{d['total_arcsec']:.2f} ± {d['total_err_arcsec']:.2f}″",
+                          "± is the uncertainty of the measurement"),
+                         ('Time between images', f"{d['delta_t_days']:.0f} days", f"{d['first']} → {d['last']}")])
+        st.caption('In Scientific you can review the measurements, the reasons and the images used.')
         return
     st.markdown(f'<span class="sc-badge {BADGE.get(r["outcome"], "")}">{r["outcome_label"]} · {r["outcome"]}</span>'
                 f' &nbsp; <span class="sc-badge">{r.get("source", {}).get("label") or "fuente seleccionada"}</span>',
@@ -102,43 +102,43 @@ def show_result(r: dict, key: str, simple: bool = False) -> None:
     if d:
         measured = r["outcome"] == motion.MOTION_MEASURED
         if not measured:
-            st.caption("Cifras del ajuste mostradas por transparencia. **No son una medida de movimiento**: los "
-                       "motivos anteriores impiden validarlas.")
+            st.caption("Fit figures shown for transparency. **They are not a motion measurement**: the "
+                       "reasons above prevent validating them.")
         c = st.columns(4)
-        c[0].metric("Desplazamiento medido" if measured else "Desplazamiento aparente (no validado)",
+        c[0].metric("Measured displacement" if measured else "Apparent displacement (not validated)",
                     f"{d['total_arcsec']:.2f}″", f"± {d['total_err_arcsec']:.2f}″", delta_color="off")
-        c[1].metric("Intervalo", f"{d['delta_t_days']:.0f} d", f"{d['first']} → {d['last']}", delta_color="off")
-        c[2].metric("Significación", f"{d['significance_calibrated']:.1f}σ", f"umbral {motion.SIGNIFICANCE:g}σ",
+        c[1].metric("Interval", f"{d['delta_t_days']:.0f} d", f"{d['first']} → {d['last']}", delta_color="off")
+        c[2].metric("Significance", f"{d['significance_calibrated']:.1f}σ", f"umbral {motion.SIGNIFICANCE:g}σ",
                     delta_color="off")
         ctl = r.get("control") or {}
-        c[3].metric("Control estacionario", f"{ctl.get('n', 0)} estrellas",
-                    f"máx. {ctl.get('max_significance_calibrated', 0):.1f}σ", delta_color="off")
-        st.caption(f"Δξ (este) = {d['dxi']:+.2f} ± {d['err_dxi_calibrated']:.2f}″ · Δη (norte) = {d['deta']:+.2f} ± "
-                   f"{d['err_deta_calibrated']:.2f}″ · tasa media aparente {d['rate_arcsec_yr']:.2f}″/año (incluye "
-                   "paralaje y la geometría de las fechas; no es un movimiento propio ajustado). Factor de "
-                   f"calibración del control: {ctl.get('calibration_factor', 1):.2f}.")
+        c[3].metric("Stationary control", f"{ctl.get('n', 0)} estrellas",
+                    f"max. {ctl.get('max_significance_calibrated', 0):.1f}σ", delta_color="off")
+        st.caption(f"Δξ (east) = {d['dxi']:+.2f} ± {d['err_dxi_calibrated']:.2f}″ · Δη (north) = {d['deta']:+.2f} ± "
+                   f"{d['err_deta_calibrated']:.2f}″ · mean apparent rate {d['rate_arcsec_yr']:.2f}″/yr (includes "
+                   "parallax and the geometry of the dates; it is not a fitted proper motion). Control "
+                   f"calibration factor: {ctl.get('calibration_factor', 1):.2f}.")
     cc = r.get("catalogue_comparison")
     if cc:
-        st.info(f"Comparación con el catálogo ({cc['source']}): desplazamiento **previsto** "
+        st.info(f"Comparison with the catalogue ({cc['source']}): **predicted** displacement "
                 f"{cc['predicted_total_arcsec']:.2f}″ (Δξ {cc['predicted_dxi']:+.2f}″, Δη {cc['predicted_deta']:+.2f}″) "
-                f"entre las mismas fechas; diferencia con la medida {cc['difference_sigma']:.1f}σ "
-                f"({'compatible' if cc['consistent_3sigma'] else 'no compatible'} a 3σ). La predicción no interviene "
-                "en la búsqueda, el ajuste ni la decisión.")
+                f"between the same dates; difference from the measurement {cc['difference_sigma']:.1f}σ "
+                f"({'compatible' if cc['consistent_3sigma'] else 'not compatible'} at 3σ). The prediction plays no part "
+                "in the search, the fit or the decision.")
     seasons = r.get("seasons") or []
     if seasons:
-        st.markdown("**Posición medida por temporada** (ajuste conjunto de las exposiciones; tangente en la selección)")
+        st.markdown("**Measured position per season** (joint fit of the exposures; tangent at the selection)")
         st.dataframe(pd.DataFrame([{
-            "temporada": s["date_utc"], "imágenes": s["n_images"], "detección (σ)": round(s["significance"], 1),
+            "temporada": s["date_utc"], "images": s["n_images"], "detection (σ)": round(s["significance"], 1),
             "ξ (″)": round(s["xi"], 2), "σξ (″)": round(s["err_xi"], 2), "η (″)": round(s["eta"], 2),
-            "ση (″)": round(s["err_eta"], 2), "registro (″)": f"{s['err_registration'][0]:.2f}/{s['err_registration'][1]:.2f}",
+            "ση (″)": round(s["err_eta"], 2), "registration (″)": f"{s['err_registration'][0]:.2f}/{s['err_registration'][1]:.2f}",
             "χ² interno": None if s.get("internal_chi2_red") is None else round(s["internal_chi2_red"], 2),
-            "núcleo saturado": "sí" if s["saturated_core"] else "no", "confusión": "sí" if s["confusion"] else "no",
-            "usada": "sí" if s.get("usable") else "no"} for s in seasons]), hide_index=True, width="stretch")
+            "saturated core": "yes" if s["saturated_core"] else "no", "confusion": "yes" if s["confusion"] else "no",
+            "usada": "yes" if s.get("usable") else "no"} for s in seasons]), hide_index=True, width="stretch")
     imgs = r.get("images") or []
     if imgs:
-        with st.expander(f"Imágenes originales usadas ({len(imgs)})"):
+        with st.expander(f"Original images used ({len(imgs)})"):
             st.dataframe(pd.DataFrame([{
-                "fecha (UTC)": (i.get("date_utc") or "")[:16], "obs_id": i.get("obs_id"),
+                "date (UTC)": (i.get("date_utc") or "")[:16], "obs_id": i.get("obs_id"),
                 "λ (µm)": None if i.get("lambda_um") is None else round(i["lambda_um"], 3),
                 "S/N": None if i.get("snr") is None else round(i["snr"], 1), "registro": i.get("registration_mode"),
                 "WCS − Gaia (″)": _pair(i.get("wcs_offset_vs_gaia_arcsec")),
@@ -147,16 +147,16 @@ def show_result(r: dict, key: str, simple: bool = False) -> None:
             st.caption(imgs[0].get("psf_model", ""))
     ctl = r.get("control") or {}
     if ctl.get("stars"):
-        with st.expander(f"Control: {ctl['n']} estrellas estacionarias medidas igual que la fuente"):
+        with st.expander(f"Control: {ctl['n']} stationary stars measured the same way as the source"):
             st.dataframe(pd.DataFrame([{"Gaia DR3": c["gaia_source_id"], "G": c.get("g"),
                                         "Δξ (″)": round(c["dxi"], 2), "Δη (″)": round(c["deta"], 2),
                                         "σ (″)": f"{c['err_dxi']:.2f}/{c['err_deta']:.2f}",
-                                        "significación": round(c["significance_calibrated"], 1)} for c in ctl["stars"]]),
+                                        "significance": round(c["significance_calibrated"], 1)} for c in ctl["stars"]]),
                          hide_index=True, width="stretch")
             st.caption(ctl.get("rule", ""))
     for w in r.get("warnings", []):
         st.caption(f"Aviso: {w}")
-    st.download_button("Descargar resultado reproducible (JSON)", json.dumps(r, ensure_ascii=False, indent=1),
+    st.download_button("Download reproducible result (JSON)", json.dumps(r, ensure_ascii=False, indent=1),
                        file_name=f"skyclues_motion_{r.get('detector', 'x')}_{(seasons or [{}])[0].get('date_utc', 'na')}.json",
                        mime="application/json", key=f"{key}_download")
 
@@ -172,38 +172,38 @@ def render(seq, report_json: str, level: str = "scientific") -> None:
     sci = level == 'scientific'
     if level == "simple":
         st.markdown(
-            '<div class="sc-note"><b>¿Se mueve algo?</b> Elige un punto para comprobar si su posición cambia entre fechas.</div>',
+            '<div class="sc-note"><b>Is anything moving?</b> Choose a point to check whether its position changes between dates.</div>',
             unsafe_allow_html=True)
     else:
         st.markdown(
-            '<div class="sc-note"><b>Buscar algo que se mueve.</b> Mide la posición de una fuente en cada exposición '
-            'SPHEREx original (IMAGE − ZODI, VARIANCE, FLAGS y el modelo ePSF oficial), registra cada imagen con '
-            'estrellas Gaia estacionarias del campo y compara temporadas con incertidumbres. Resultados posibles: '
-            '<i>Movimiento medido</i>, <i>Evidencia insuficiente</i>, <i>Observaciones incompatibles</i> o <i>Datos '
-            'insuficientes</i>. Una posición calculada con el catálogo nunca se cuenta como detección.</div>',
+            '<div class="sc-note"><b>Find something that moves.</b> Measures the position of a source in each original '
+            'SPHEREx exposure (IMAGE − ZODI, VARIANCE, FLAGS and the official ePSF model), registers each image with '
+            'stationary Gaia stars of the field and compares seasons with uncertainties. Possible results: '
+            '<i>Motion measured</i>, <i>Insufficient evidence</i>, <i>Incompatible observations</i> or <i>Insufficient '
+            'data</i>. A position computed from the catalogue is never counted as a detection.</div>',
             unsafe_allow_html=True)
     saved = saved_investigations()
     if saved:
-        with st.expander("Investigaciones reales guardadas (results/motion_*.json)" if sci else 'Investigaciones guardadas'):
-            label = st.selectbox("Resultado", list(saved), key="mv_saved")
+        with st.expander("Saved real investigations (results/motion_*.json)" if sci else 'Saved investigations'):
+            label = st.selectbox("Result", list(saved), key="mv_saved")
             show_result(json.loads(saved[label].read_text(encoding="utf-8")), key="mv_saved_view", simple=not sci)
     a = seq.astrometry
     modes = SOURCE_MODES if a is not None else SOURCE_MODES[1:]
-    src_mode = st.radio("Fuente a investigar", modes, horizontal=True, key="mv_source")
+    src_mode = st.radio("Source to investigate", modes, horizontal=True, key="mv_source")
     f0 = seq.frames[0]
     if src_mode == SOURCE_MODES[0]:
         start = seq.target_position(0)
-        st.caption((f"{a.name}: posición de catálogo calculada para la época 1 (RA {start[0]:.6f}°, Dec "
-                   f"{start[1]:+.6f}°). Solo define el círculo de búsqueda; la posición se mide en cada temporada.") if sci else f'Objeto seleccionado: {a.name}.')
+        st.caption((f"{a.name}: catalogue position computed for epoch 1 (RA {start[0]:.6f}°, Dec "
+                   f"{start[1]:+.6f}°). It only defines the search circle; the position is measured in each season.") if sci else f'Objeto seleccionado: {a.name}.')
     elif src_mode == SOURCE_MODES[1]:
         dets = motion.detect_sources(f0.image)
         if not dets:
-            st.warning("No hay fuentes ≥ 5σ en la época 1 de este campo.")
+            st.warning("There are no sources ≥ 5σ in epoch 1 of this field.")
             return
-        opts = {f"#{i + 1} · {d['significance']:.0f}σ · RA {d['ra']:.5f}°, Dec {d['dec']:+.5f}° · píxel ({d['x']}, {d['y']})": d
+        opts = {f"#{i + 1} · {d['significance']:.0f}σ · RA {d['ra']:.5f}°, Dec {d['dec']:+.5f}° · pixel ({d['x']}, {d['y']})": d
                 for i, d in enumerate(dets[:25])}
-        d = opts[st.selectbox("Fuente detectada (filtro adaptado a la PSF, época 1)" if sci else 'Punto en la primera imagen', list(opts), key="mv_detected",
-                             format_func=lambda x: x if sci else 'Punto ' + x.split(' · ')[0].lstrip('#'))]
+        d = opts[st.selectbox("Detected source (PSF-matched filter, epoch 1)" if sci else 'Point in the first image', list(opts), key="mv_detected",
+                             format_func=lambda x: x if sci else 'Point ' + x.split(' · ')[0].lstrip('#'))]
         start = (d["ra"], d["dec"])
     else:
         c1, c2 = st.columns(2)
@@ -211,39 +211,39 @@ def render(seq, report_json: str, level: str = "scientific") -> None:
                  c2.number_input("Dec (°)", value=float(seq.dec), format="%.6f", key="mv_dec"))
     radius = st.session_state.get('mv_radius', st.session_state.get('_mv_radius', int(motion.SEARCH_RADIUS_ARCSEC)))
     if sci:
-        radius = st.slider("Radio de búsqueda alrededor de la selección (″)", 5, 40, radius,
-                           key="mv_radius", help="La fuente se busca en cada temporada dentro de este círculo, sin usar "
-                                                 "predicciones. Debe cubrir el desplazamiento posible entre las fechas.")
+        radius = st.slider("Search radius around the selection (″)", 5, 40, radius,
+                           key="mv_radius", help="The source is searched for in each season inside this circle, without using "
+                                                 "predictions. It must cover the possible displacement between the dates.")
     st.session_state['_mv_radius'] = radius
     span = seq.metrics["span_days"]
-    img_mode = st.radio("Imágenes", IMAGE_MODES, key="mv_images", horizontal=True,
-                        captions=[f"{seq.n} imágenes · {span:.0f} d · campo {seq.field_deg * 60:g}′",
-                                  f"D{f0.detector}, hasta {motion.MAX_SEASONS} temporadas lo más separadas posible, "
-                                  f"recortes de {motion.MOTION_FIELD_DEG * 60:g}′"])
+    img_mode = st.radio("Images", IMAGE_MODES, key="mv_images", horizontal=True,
+                        captions=[f"{seq.n} images · {span:.0f} d · field {seq.field_deg * 60:g}′",
+                                  f"D{f0.detector}, up to {motion.MAX_SEASONS} seasons as far apart as possible, "
+                                  f"cutouts of {motion.MOTION_FIELD_DEG * 60:g}′"])
     per_season = motion.PER_SEASON
     if img_mode == IMAGE_MODES[1]:
         per_season = st.select_slider(
-            "Imágenes por temporada", [2, 3, 4, 6, 8], value=motion.PER_SEASON, key="mv_per_season",
-            help="Más exposiciones por temporada mejoran la señal de una fuente débil y la comprobación de "
-                 "consistencia interna, a cambio de más recortes (~4 MB cada uno).")
+            "Images per season", [2, 3, 4, 6, 8], value=motion.PER_SEASON, key="mv_per_season",
+            help="More exposures per season improve the signal of a faint source and the internal consistency "
+                 "check, at the cost of more cutouts (~4 MB each).")
         if sci:
-            st.caption(f"Hasta {motion.MAX_SEASONS * per_season} recortes (~{4 * motion.MAX_SEASONS * per_season} MB, "
-                   "se reutilizan desde la caché). El resultado depende de las exposiciones elegidas: se registra en "
-                   "el informe.")
+            st.caption(f"Up to {motion.MAX_SEASONS * per_season} cutouts (~{4 * motion.MAX_SEASONS * per_season} MB, "
+                   "reused from the cache). The result depends on the exposures chosen: it is recorded in "
+                   "the report.")
     if img_mode == IMAGE_MODES[0] and span < 30:
-        st.caption(f"Esta secuencia abarca {span:.0f} días: solo se detectarían movimientos grandes. La base "
-                   "temporal ampliada suele cubrir un año.")
-    run = st.button("Investigar movimiento", type="primary", key="mv_run")
+        st.caption(f"This sequence spans {span:.0f} days: only large motions would be detected. The extended "
+                   "time baseline usually covers a year.")
+    run = st.button("Investigate motion", type="primary", key="mv_run")
     key = json.dumps([report_json[:64], len(report_json), src_mode, start, radius, img_mode, per_season],
                      default=str)
     label = a.name if src_mode == SOURCE_MODES[0] and a else src_mode
     if run:
-        with st.status("Midiendo posiciones en las imágenes originales…", expanded=True) as box, theme.loading("Comparando la posición entre fechas…", "motion"):
+        with st.status("Measuring positions in the original images…", expanded=True) as box, theme.loading("Comparing the position between dates…", "motion"):
             try:
                 if img_mode == IMAGE_MODES[0]:
-                    box.write("Consultando Gaia DR3 (estrellas estacionarias del campo)…")
+                    box.write("Querying Gaia DR3 (stationary stars of the field)…")
                     gaia, err = _gaia_or_none(seq.ra, seq.dec, seq.field_deg)
-                    box.write("Ajustando la ePSF y registrando cada época…")
+                    box.write("Fitting the ePSF and registering each epoch…")
                     inv = motion.investigate(seq.frames, start, gaia=gaia, astrometry=a,
                                              search_radius_arcsec=float(radius),
                                              source_label=label)
@@ -251,18 +251,18 @@ def render(seq, report_json: str, level: str = "scientific") -> None:
                     if err:
                         out.setdefault("warnings", []).append(err)
                 else:
-                    box.write("Seleccionando temporadas y descargando recortes (o leyendo la caché)…")
+                    box.write("Selecting seasons and downloading cutouts (or reading the cache)…")
                     out = _investigate_extended(round(float(start[0]), 6), round(float(start[1]), 6),
                                                 int(f0.detector), int(per_season), float(radius),
                                                 float(start[0]), float(start[1]),
                                                 json.dumps(a.to_dict()) if a else None, label)
-                box.update(label=f"Investigación completada: {out['outcome_label']}", state="complete", expanded=False)
+                box.update(label=f"Investigation completed: {out['outcome_label']}", state="complete", expanded=False)
                 st.session_state["mv_result"] = {"key": key, "result": out}
             except (archive.ArchiveError, motion.MotionInputError, ValueError) as err:
-                box.update(label="La investigación no pudo completarse", state="error")
-                st.error(f"{type(err).__name__}: {err}. No se ha mostrado ningún resultado parcial.")
+                box.update(label="The investigation could not be completed", state="error")
+                st.error(f"{type(err).__name__}: {err}. No partial result has been shown.")
     res = st.session_state.get("mv_result")
     if res and res["key"] == key:
         show_result(res["result"], key="mv_current", simple=not sci)
     elif res:
-        st.caption("Ha cambiado la selección: pulse «Investigar movimiento» para obtener un resultado nuevo.")
+        st.caption("The selection has changed: press «Investigate motion» to get a new result.")

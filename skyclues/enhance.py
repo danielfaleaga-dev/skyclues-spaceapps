@@ -214,12 +214,12 @@ def select(exposures, ra: float, dec: float, field_deg: float, *, purpose: str =
     out = {"method": METHOD, "purpose": purpose, "ok": False, "reason": "", "rejected": rejected,
            "accepted": [], "warnings": []}
     if len(exps) < 2:
-        out["reason"] = "Hace falta más de una exposición para combinar."
+        out["reason"] = "More than one exposure is needed to combine."
         return out
     dets = sorted({e.detector for e in exps})
     if len(dets) > 1:
-        out["reason"] = ("Las exposiciones proceden de detectores distintos (" + ", ".join(f"D{d}" for d in dets) +
-                         "): bandas, PSF y calibración diferentes. Este producto solo combina un detector.")
+        out["reason"] = ("The exposures come from different detectors (" + ", ".join(f"D{d}" for d in dets) +
+                         "): different bands, PSF and calibration. This product only combines one detector.")
         return out
     # One processing: cross-release compatibility has not been established (Time Explorer S8).
     groups: dict = {}
@@ -229,14 +229,14 @@ def select(exposures, ra: float, dec: float, field_deg: float, *, purpose: str =
     for g in groups.values():
         if g is not main:
             for e in g:
-                drop(e, "Colección, versión de software o unidades distintas del resto: no se mezclan calibraciones.")
+                drop(e, "Collection, software version or units differ from the rest: calibrations are not mixed.")
     areas = {}
     for e in main:
         m = e.image.meta
         if str(m.get("L2DQAFLG", "")).strip() != "Pass":
             drop(e, f"Control de calidad oficial L2 = {m.get('L2DQAFLG')}.")
         elif m.get("FINAST") != 0:
-            drop(e, f"Astrometría fina no válida (FINAST = {m.get('FINAST')}): no se puede registrar.")
+            drop(e, f"Invalid fine astrometry (FINAST = {m.get('FINAST')}): it cannot be registered.")
         else:
             x, y = world_to_pixel(e.image.wcs, ra, dec)
             ny, nx = e.image.shape
@@ -250,13 +250,13 @@ def select(exposures, ra: float, dec: float, field_deg: float, *, purpose: str =
             a = areas[id(e)]
             if np.isfinite(a) and a > MAX_PSF_AREA_RATIO * med:
                 kept.remove(e)
-                drop(e, f"PSF incompatible: área equivalente de ruido {a:.1f} px frente a {med:.1f} px de mediana "
-                        f"(> {MAX_PSF_AREA_RATIO:g}×). Combinarla degradaría la resolución.")
+                drop(e, f"Incompatible PSF: equivalent noise area {a:.1f} px against a median of {med:.1f} px "
+                        f"(> {MAX_PSF_AREA_RATIO:g}×). Combining it would degrade the resolution.")
     kept.sort(key=lambda e: e.mjd)
     out["accepted"] = [e.obs_id for e in kept]
     out["exposures"] = kept
     if len(kept) < 2:
-        out["reason"] = "Tras las comprobaciones de calidad queda menos de dos exposiciones compatibles."
+        out["reason"] = "After the quality checks fewer than two compatible exposures remain."
         return out
     lam = np.array([_lambda_at(e.image, ra, dec) for e in kept], float)
     ok_lam = np.isfinite(lam[:, 0])
@@ -274,9 +274,9 @@ def select(exposures, ra: float, dec: float, field_deg: float, *, purpose: str =
         psf_fwhm_arcsec=kept[0].image.meta.get("PSF_FWHM"))
     scale = config.NOMINAL_PIXEL_SCALE_ARCSEC
     if purpose == "deep" and target_motion_arcsec is not None and target_motion_arcsec > MAX_TARGET_MOTION_PX * scale:
-        out["reason"] = (f"El objetivo se desplaza {target_motion_arcsec:.1f}″ entre la primera y la última fecha "
-                         f"(más de {MAX_TARGET_MOTION_PX:g} píxeles): una combinación fija sobre el cielo lo "
-                         "emborronaría. Las fechas se comparan por separado.")
+        out["reason"] = (f"The target moves {target_motion_arcsec:.1f}″ between the first and the last date "
+                         f"(more than {MAX_TARGET_MOTION_PX:g} pixels): a combination fixed on the sky would "
+                         "blur it. The dates are compared separately.")
         return out
     out["ok"] = True
     return out
@@ -331,7 +331,7 @@ def frame_weights(data, var, in_field, weighting: str = "frame"):
     if weighting == "pixel":
         return np.where(ok, 1.0 / np.where(ok, var, 1.0), 0.0)
     if weighting != "frame":
-        raise ValueError("weighting debe ser 'frame' o 'pixel'")
+        raise ValueError("weighting must be 'frame' or 'pixel'")
     w = np.zeros(data.shape)
     for i in range(len(data)):
         m = ok[i] & in_field
@@ -364,7 +364,7 @@ def combine(exposures, ra: float, dec: float, field_deg: float, *, purpose: str 
     if its centre were the grid centre, i.e. the stack follows a predicted track.
     """
     if oversample not in (1, 2, 3):
-        raise ValueError("oversample debe ser 1, 2 o 3")
+        raise ValueError("oversample must be 1, 2 or 3")
     exps_in = [exposure_from(e) for e in exposures]
     sel = select(exps_in, ra, dec, field_deg, purpose=purpose, target_motion_arcsec=target_motion_arcsec)
     if not sel["ok"]:
@@ -372,7 +372,7 @@ def combine(exposures, ra: float, dec: float, field_deg: float, *, purpose: str 
     exps = sel.pop("exposures")
     if purpose == "comoving":
         if centres is None or len(centres) != len(exps_in):
-            raise ValueError("Una combinación siguiendo al objeto necesita una posición prevista por exposición.")
+            raise ValueError("A combination that follows the object needs a predicted position for each exposure.")
         by_id = {id(e): c for e, c in zip(exps_in, centres)}
         centres = [by_id[id(e)] for e in exps]
         oversample = max(oversample, 1)
@@ -446,8 +446,8 @@ def combine(exposures, ra: float, dec: float, field_deg: float, *, purpose: str 
                                                    / sel["bandwidth_um"])
         sel["target_outlier_pixels_used"] = target_outliers
         sel["warnings"].append(
-            "Combinación SIGUIENDO UNA TRAYECTORIA PREVISTA: las estrellas quedan desplazadas y la posición del "
-            "objeto en esta imagen la fija la efeméride. No es una medida de su posición ni de su movimiento.")
+            "Combination FOLLOWING A PREDICTED TRAJECTORY: the stars end up shifted and the position of the "
+            "object in this image is set by the ephemeris. It is not a measurement of its position or its motion.")
     coverage = np.sum([ix >= 0 for ix in index], axis=0)
 
     # Sky constants: median difference with the reference over shared valid pixels of the field.
@@ -460,8 +460,8 @@ def combine(exposures, ra: float, dec: float, field_deg: float, *, purpose: str 
         if shared.sum() < MIN_SHARED_PIXELS:
             keep[i] = False
             sel["rejected"].append({"obs_id": exps[i].obs_id, "mjd": exps[i].mjd, "reason":
-                                    f"Solo comparte {int(shared.sum())} píxeles válidos con la referencia "
-                                    f"(< {MIN_SHARED_PIXELS}): su nivel de cielo no se puede enlazar."})
+                                    f"It only shares {int(shared.sum())} valid pixels with the reference "
+                                    f"(< {MIN_SHARED_PIXELS}): its sky level cannot be linked."})
             continue
         offsets[i] = float(np.median((data[i] - data[reference])[shared]))
 
@@ -474,7 +474,7 @@ def combine(exposures, ra: float, dec: float, field_deg: float, *, purpose: str 
                 sel["rejected"].append({"obs_id": exps[i].obs_id, "mjd": exps[i].mjd, "reason": r["rejected"]})
 
     if keep.sum() < 2:
-        raise EnhanceError("Menos de dos exposiciones comparten cielo válido suficiente para combinarse.")
+        raise EnhanceError("Fewer than two exposures share enough valid sky to be combined.")
     if not keep.all():
         ref_obs = exps[reference].obs_id
         sel_idx = np.nonzero(keep)[0]
@@ -522,8 +522,8 @@ def combine(exposures, ra: float, dec: float, field_deg: float, *, purpose: str 
     sel["kind"] = product_kind(float(worst))
     if sel["kind"] == "broadband":
         sel["warnings"].append(
-            "Producto de BANDA ANCHA: combina longitudes de onda distintas del mismo detector. Sirve para detectar "
-            "y situar fuentes; su brillo no es monocromático y no debe compararse entre fechas ni con un canal.")
+            "BROADBAND product: it combines different wavelengths of the same detector. It is useful for detecting "
+            "and locating sources; its brightness is not monochromatic and must not be compared between dates or with a channel.")
     stack = Stack(exposures=exps, selection=sel, wcs=wcs, shape=shape, oversample=oversample, field=in_field,
                   data=data, var=var, weights=w, index=index, native_var=native_var, offsets=offsets, image=image,
                   variance=variance, n=n, coverage=coverage, lam=lam_eff, lam_spread_bw=spread,
@@ -567,9 +567,9 @@ def _placement(stack: Stack) -> None:
         stack.registration["placement_rms_arcsec"] = float(np.sqrt(np.mean(r ** 2)))
         stack.registration["placement_max_arcsec"] = float(r.max())
         stack.registration["placement_note"] = (
-            "Desplazamiento medio ponderado entre el centro de cada píxel de la combinación y los centros de los "
-            "píxeles nativos copiados en él (vecino más próximo). Es el error de registro propio del producto: "
-            "una posición medida en la imagen combinada lo hereda si no se corrige.")
+            "Weighted mean displacement between the centre of each pixel of the combination and the centres of the "
+            "native pixels copied into it (nearest neighbour). It is the product's own registration error: "
+            "a position measured on the combined image inherits it unless it is corrected.")
 
 
 def placement_correction(stack: Stack, x: float, y: float) -> tuple[float, float]:
@@ -646,17 +646,17 @@ def measure_registration(exps, reference: int) -> dict:
                        scatter_arcsec=scatter, error_arcsec=float(scatter / math.sqrt(len(shifts))))
             radial.append(float(np.linalg.norm(med)))
             if np.linalg.norm(med) > MAX_REGISTRATION_PX * scale:
-                row["rejected"] = (f"Registro: desplazada {np.linalg.norm(med):.1f}″ respecto a la referencia según "
-                                   f"{len(shifts)} fuentes comunes (> {MAX_REGISTRATION_PX:g} píxeles).")
+                row["rejected"] = (f"Registration: shifted {np.linalg.norm(med):.1f}″ with respect to the reference according to "
+                                   f"{len(shifts)} common sources (> {MAX_REGISTRATION_PX:g} pixels).")
         frames.append(row)
     verified = [f for f in frames if "shift_arcsec" in f and not f.get("reference")]
     return {"checked": True, "frames": frames, "n_verified": len(verified),
             "max_shift_arcsec": max(radial) if radial else None,
             "rms_shift_arcsec": float(np.sqrt(np.mean(np.square(radial)))) if radial else None,
-            "note": "Desplazamiento mediano de fuentes compactas comunes (ajuste ePSF, máscara estricta) respecto a la "
-                    "exposición de referencia. No se aplica ninguna corrección." if verified else
-                    "Sin fuentes compactas comunes suficientes: el registro descansa en el WCS oficial (FINAST = 0) "
-                    "y no se ha podido verificar con estrellas."}
+            "note": "Median displacement of common compact sources (ePSF fit, strict mask) with respect to the "
+                    "reference exposure. No correction is applied." if verified else
+                    "Not enough common compact sources: the registration relies on the official WCS (FINAST = 0) "
+                    "and could not be verified with stars."}
 
 
 # ----------------------------------------------------------------------------- noise: null image
@@ -701,11 +701,11 @@ def _null_image(stack: Stack) -> None:
         "single_scale": single, "single_pairs": [float(v) for v in pairs],
         "single": float(max(1.0, single)) if np.isfinite(single) else None,
         "null_scale_all_pixels": _robust_std(z[region]) if region.sum() >= 50 else float("nan"),
-        "note": "Dispersión robusta de la imagen nula (mitad A − mitad B)/2 dividida por su error formal, en los "
-                "píxeles sin fuente brillante: 1 = las varianzas oficiales describen el ruido real. «single_scale» "
-                "es la misma prueba con diferencias de dos exposiciones individuales. Los errores publicados de "
-                "la combinación y de cada exposición se multiplican por su factor cuando es mayor que 1; nunca "
-                "se reducen."}
+        "note": "Robust scatter of the null image (half A − half B)/2 divided by its formal error, over the "
+                "pixels without a bright source: 1 = the official variances describe the real noise. «single_scale» "
+                "is the same test with differences of two individual exposures. The published errors of "
+                "the combination and of each exposure are multiplied by that factor when it is greater than 1; they are never "
+                "reduced."}
 
 
 def _local_median(img, half: int = 5):
@@ -1032,8 +1032,8 @@ def evaluate(stack: Stack, *, threshold: float = DETECTION_SIGMA, bright_snr: fl
         "astrometry": {"n_sources": int(len(shifts)),
                        "median_shift_arcsec": [float(v) * px for v in np.median(shifts, axis=0)] if len(shifts) else None,
                        "rms_shift_arcsec": float(np.sqrt(np.mean(np.sum(shifts ** 2, axis=1)))) * px if len(shifts) else None,
-                       "note": "Centroide en la combinación menos la media de los centroides de las exposiciones "
-                               "individuales en la misma rejilla."},
+                       "note": "Centroid in the combination minus the mean of the centroids of the individual exposures "
+                               "on the same grid."},
         "registration": stack.registration, "sources": sources,
     }
     return out
@@ -1045,10 +1045,10 @@ def verdict(metrics: dict, *, min_gain: float = 1.2) -> dict:
     g = metrics["gain"]["median"]
     if g is None or metrics["gain"]["n_sources"] < 3:
         ok = False
-        reasons.append("No hay al menos tres fuentes medibles para cuantificar la ganancia.")
+        reasons.append("There are not at least three measurable sources to quantify the gain.")
     elif g < min_gain:
         ok = False
-        reasons.append(f"Ganancia S/N mediana {g:.2f} < {min_gain:g}: la combinación no aporta una mejora medible.")
+        reasons.append(f"Median S/N gain {g:.2f} < {min_gain:g}: the combination does not provide a measurable improvement.")
     else:
         # The demanding reference: the best single exposure, not the typical one. A set in which one
         # exposure alone is nearly as good as the combination is not an improvement.
@@ -1057,36 +1057,36 @@ def verdict(metrics: dict, *, min_gain: float = 1.2) -> dict:
             b = metrics["pixel_noise_mjysr"]["ratio_vs_best"]
         if b < min_gain:
             ok = False
-            reasons.append(f"Frente a la mejor exposición individual la ganancia es solo {b:.2f} (< {min_gain:g}): "
-                           "la combinación no aporta una mejora medible sobre ella.")
+            reasons.append(f"Compared with the best individual exposure the gain is only {b:.2f} (< {min_gain:g}): "
+                           "the combination does not provide a measurable improvement over it.")
     det = metrics["detections"]
     limit = max(1, 0.05 * det["combined"])
     if det["null_image_spurious"] > limit:
         ok = False
-        reasons.append(f"La imagen nula contiene {det['null_image_spurious']} detecciones lejos de toda fuente y sin "
-                       "origen en una exposición concreta: el ruido o el registro producen estructuras espurias.")
+        reasons.append(f"The null image contains {det['null_image_spurious']} detections far from any source and with no "
+                       "origin in a specific exposure: noise or registration produces spurious structures.")
     if det["negative_image"] > limit:
         ok = False
-        reasons.append(f"La imagen combinada invertida contiene {det['negative_image']} detecciones: hay estructura "
-                       "negativa que el ruido no explica.")
+        reasons.append(f"The inverted combined image contains {det['negative_image']} detections: there is negative "
+                       "structure that the noise does not explain.")
     res = metrics["resolution"]
     if res["width_ratio"] is not None and res["width_ratio"] > 1.25:
         ok = False
-        reasons.append(f"La PSF se ensancha un {100 * (res['width_ratio'] - 1):.0f} %: pérdida material de resolución.")
+        reasons.append(f"The PSF broadens by {100 * (res['width_ratio'] - 1):.0f} %: material loss of resolution.")
     ast = metrics["astrometry"]
     if ast["median_shift_arcsec"] is not None and np.hypot(*ast["median_shift_arcsec"]) > 0.25 * config.NOMINAL_PIXEL_SCALE_ARCSEC:
         ok = False
-        reasons.append("Las posiciones de la combinación se desplazan respecto a las exposiciones individuales.")
+        reasons.append("The positions in the combination shift with respect to the individual exposures.")
     ph = metrics["photometry"]
     if ph["flux_ratio_median"] is not None and abs(ph["flux_ratio_median"] - 1) > 0.05:
         ok = False
-        reasons.append(f"El flujo de las fuentes brillantes cambia un {100 * (ph['flux_ratio_median'] - 1):+.1f} %.")
+        reasons.append(f"The flux of the bright sources changes by {100 * (ph['flux_ratio_median'] - 1):+.1f} %.")
     if ok:
-        reasons.append(f"Ganancia S/N mediana {g:.2f} en {metrics['gain']['n_sources']} fuentes "
+        reasons.append(f"Median S/N gain {g:.2f} over {metrics['gain']['n_sources']} sources "
                        f"({metrics['gain']['vs_best_exposure_median'] or metrics['pixel_noise_mjysr']['ratio_vs_best']:.2f} "
-                       "frente a la mejor exposición), sin detecciones "
-                       "espurias en la imagen nula por encima del control y sin degradación material de resolución, "
-                       "posiciones ni flujos.")
+                       "against the best exposure), with no spurious detections "
+                       "in the null image above the control and no material degradation of resolution, "
+                       "positions or fluxes.")
     return {"accepted": bool(ok), "reasons": reasons}
 
 
@@ -1145,8 +1145,8 @@ def summary(stack: Stack, metrics: dict) -> dict:
             "best_exposure": stack.exposures[stack.best].obs_id,
             "grid": {"oversample": stack.oversample, "pixel_arcsec": stack.pixel_scale_arcsec,
                      "shape": list(stack.shape),
-                     "note": "rejilla nativa de la exposición de referencia" if stack.oversample == 1 and
-                             stack.selection.get("purpose") == "deep" else "rejilla norte arriba"},
+                     "note": "native grid of the reference exposure" if stack.oversample == 1 and
+                             stack.selection.get("purpose") == "deep" else "grid with north up"},
             "metrics": {k: v for k, v in metrics.items() if k != "sources"},
             "sources": metrics.get("sources", []), "verdict": verdict(metrics)}
 
@@ -1185,6 +1185,6 @@ def repeatability(stack: Stack, sources, *, max_snr: float = 30.0) -> dict | Non
     return {"n_sources": len(d_half), "n_single_pairs": len(pairs),
             "scatter_half_mjy": _flux_mjy(stack, sh), "scatter_single_mjy": _flux_mjy(stack, ss),
             "ratio": float(ss / sh) if sh > 0 else None, "expected_ratio": float(math.sqrt(stack.n_exposures / 2)),
-            "note": "Dispersión robusta de la diferencia de flujo de apertura entre dos exposiciones individuales, "
-                    "dividida por la de dos mitades independientes del conjunto, en fuentes con S/N combinada "
-                    f"< {max_snr:g}. Sin modelo de varianza."}
+            "note": "Robust scatter of the aperture-flux difference between two individual exposures, "
+                    "divided by that of two independent halves of the set, for sources with combined S/N "
+                    f"< {max_snr:g}. No variance model."}

@@ -1,4 +1,4 @@
-"""«Buscar algo que se mueve»: observed positions on individual SPHEREx Level-2 images.
+"""«Find something that moves»: observed positions on individual SPHEREx Level-2 images.
 
 This module measures where a source *is* in each original exposure (IMAGE − ZODI,
 VARIANCE, FLAGS, the official EPSF extension and the celestial WCS of the file) and
@@ -61,10 +61,10 @@ INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
 INCOMPATIBLE = "INCOMPATIBLE_OBSERVATIONS"
 INSUFFICIENT_DATA = "INSUFFICIENT_DATA"
 OUTCOME_LABELS = {
-    MOTION_MEASURED: "Movimiento medido",
-    INSUFFICIENT_EVIDENCE: "Evidencia insuficiente",
-    INCOMPATIBLE: "Observaciones incompatibles",
-    INSUFFICIENT_DATA: "Datos insuficientes",
+    MOTION_MEASURED: "Motion measured",
+    INSUFFICIENT_EVIDENCE: "Insufficient evidence",
+    INCOMPATIBLE: "Incompatible observations",
+    INSUFFICIENT_DATA: "Insufficient data",
 }
 METHOD_VERSION = "skyclues-motion 1.0 (2026-11-14)"
 
@@ -153,7 +153,7 @@ def psf_for(img, x: float, y: float) -> PSF:
     if tab is None:
         fwhm = float(img.meta.get("PSF_FWHM") or 2 * 6.15) / 6.15
         return PSF(None, sigma_px=fwhm / 2.3548,
-                   description=f"Gaussiana PSF_FWHM={img.meta.get('PSF_FWHM')}″ (sin extensión EPSF)")
+                   description=f"Gaussian PSF_FWHM={img.meta.get('PSF_FWHM')}″ (no EPSF extension)")
     ox, oy = img.detector_offset()
     xf, yf = x + ox - 1.0, y + oy - 1.0     # full-detector, 0-based
     k = int(np.argmin((tab["xc"] - xf) ** 2 + (tab["yc"] - yf) ** 2))
@@ -359,7 +359,7 @@ def measure_image(img, frame_info: dict, start_radec, ra0, dec0, refs: list[dict
            "pixel_scale_arcsec": float(np.sqrt(abs(np.linalg.det(_jacobian_arcsec(img, x0, y0, ra0, dec0))))),
            "target": None, "references": {}}
     if not (0 <= x0 < data.shape[1] and 0 <= y0 < data.shape[0]):
-        out["warnings"].append("La posición buscada queda fuera del recorte.")
+        out["warnings"].append("The requested position falls outside the cutout.")
         return out
     # Locate: strongest matched-filter peak within the search radius of the *selection*, never of a prediction.
     smap = matched_filter(data, var, usable, psf)
@@ -367,13 +367,13 @@ def measure_image(img, frame_info: dict, start_radec, ra0, dec0, refs: list[dict
     rad_px = search_radius_arcsec / scale
     peaks = [p for p in find_peaks(smap, DETECTION_SIGMA) if math.hypot(p[0] - x0, p[1] - y0) <= rad_px]
     if not peaks:
-        out["warnings"].append(f"Sin detección ≥ {DETECTION_SIGMA:g}σ a menos de {search_radius_arcsec:g}″ de la "
-                               "posición seleccionada.")
+        out["warnings"].append(f"No detection ≥ {DETECTION_SIGMA:g}σ within {search_radius_arcsec:g}″ of the "
+                               "selected position.")
     else:
         px, py, ps = peaks[0]
         fit = fit_psf(data, var, usable, psf_for(img, px, py), px, py, saturation=sat)
         if fit is None:
-            out["warnings"].append("El ajuste PSF no convergió o el sello toca el borde/máscara.")
+            out["warnings"].append("The PSF fit did not converge or the stamp touches the edge/mask.")
         else:
             fit["peak_significance"] = ps
             fit["confusion"] = len(peaks) > 1 and peaks[1][2] >= CONFUSION_RATIO * ps
@@ -383,9 +383,9 @@ def measure_image(img, frame_info: dict, start_radec, ra0, dec0, refs: list[dict
             xi, eta = _tangent(ra, dec, ra0, dec0)
             fit.update(ra=ra, dec=dec, xi=xi, eta=eta, cov_arcsec2=cov.tolist())
             if fit["confusion"]:
-                out["warnings"].append("Otra fuente comparable dentro del radio de búsqueda: posible confusión.")
+                out["warnings"].append("Another comparable source within the search radius: possible confusion.")
             if fit["saturated_core"]:
-                out["warnings"].append("Núcleo saturado (OVERFLOW/NONLINEAR): posición medida con las alas de la PSF.")
+                out["warnings"].append("Saturated core (OVERFLOW/NONLINEAR): position measured with the wings of the PSF.")
             out["target"] = fit
     for s in refs:
         (exi, eeta), (era, edec) = _gaia_shift(s, frame_info["mjd"], ra0, dec0)
@@ -672,7 +672,7 @@ def season_fit(entries, track, ra0, dec0, radius: float, coarse: float | None = 
     why = why if why is not None else []
     model = _SeasonModel(entries, track, ra0, dec0, radius)
     if not model.parts:
-        why.append("el círculo de búsqueda toca el borde del recorte o la máscara en todas las imágenes")
+        why.append("the search circle touches the edge of the cutout or the mask in all images")
         return None
     coarse = coarse or (1.0 if radius > 6 else 0.5)
     g = np.arange(-radius, radius + 1e-9, coarse)
@@ -712,11 +712,11 @@ def season_fit(entries, track, ra0, dec0, radius: float, coarse: float | None = 
         if np.hypot(*step) < 0.002:
             break
     if H is None:
-        why.append("el χ² del ajuste no tiene un mínimo definido (curvatura no positiva; típico de un núcleo "
-                   "saturado o enmascarado)")
+        why.append("the fit χ² has no well-defined minimum (non-positive curvature; typical of a saturated or "
+                   "masked core)")
         return None
     if np.hypot(*best) > radius + 1:
-        why.append("el mínimo del ajuste queda fuera del círculo de búsqueda")
+        why.append("the fit minimum lies outside the search circle")
         return None
     chi_b, null_b, per = model.chi2([best[0]], [best[1]], detail=True)
     cov = 2 * np.linalg.inv(H)
@@ -737,7 +737,7 @@ def season_fit(entries, track, ra0, dec0, radius: float, coarse: float | None = 
     # registration: offsets errors are independent between images; weight by S/N²
     wts = np.array([max(i["snr"], 0) ** 2 for i in images])
     if wts.sum() <= 0:
-        why.append("flujo ajustado nulo en todas las imágenes")
+        why.append("fitted flux is zero in all images")
         return None
     wn = wts / wts.sum()
     ents = {p["e"].k: p["e"] for p in model.parts}
@@ -793,45 +793,45 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
     from .targets import validate_coordinates
     ra0, dec0 = validate_coordinates(*source_radec)
     if not math.isfinite(search_radius_arcsec) or not 3 <= search_radius_arcsec <= 60:
-        raise MotionInputError("Radio de búsqueda fuera de 3–60″.")
+        raise MotionInputError("Search radius outside 3–60″.")
     frames = list(frames)
     base = {"method": METHOD_VERSION, "source": {"label": source_label, "selected_ra": ra0, "selected_dec": dec0,
                                                   "search_radius_arcsec": search_radius_arcsec},
-            "data_rule": "Imágenes individuales SPHEREx L2 originales (IMAGE − ZODI, VARIANCE, FLAGS, EPSF, WCS). "
-                         "Sin cubo, sin remuestreo, sin capturas.",
+            "data_rule": "Original individual SPHEREx L2 images (IMAGE − ZODI, VARIANCE, FLAGS, EPSF, WCS). "
+                         "No cube, no resampling, no screenshots.",
             "thresholds": {"significance": SIGNIFICANCE, "min_season_detection": MIN_SEASON_SNR,
                            "min_refs": MIN_REFS, "min_snr_reference": MIN_SNR_REF,
                            "season_gap_days": SEASON_GAP_DAYS},
             "gaia": None if not gaia else {k: gaia.get(k) for k in ("endpoint", "table", "query", "retrieved_utc",
                                                                        "sha256", "truncated", "catalogue_epoch")}}
     if len(frames) < 2:
-        return Investigation(INSUFFICIENT_DATA, ["Se necesitan al menos dos imágenes de fechas distintas."], base)
+        return Investigation(INSUFFICIENT_DATA, ["At least two images from different dates are needed."], base)
     infos = [_frame_info(f) for f in frames]
     dets = sorted({i["detector"] for i in infos})
     if len(dets) > 1:
-        return Investigation(INCOMPATIBLE, [f"Detectores distintos ({', '.join(f'D{d}' for d in dets)}): PSF y "
-                                            "distorsión diferentes; se exige el mismo detector."], {**base, "images": infos})
+        return Investigation(INCOMPATIBLE, [f"Different detectors ({', '.join(f'D{d}' for d in dets)}): different PSF and "
+                                            "distortion; the same detector is required."], {**base, "images": infos})
     bad = [i["obs_id"] for f, i in zip(frames, infos) if f.image.meta.get("FINAST") not in (0, None)]
     keep = [j for j, i in enumerate(infos) if i["obs_id"] not in bad]
     frames, infos = [frames[j] for j in keep], [infos[j] for j in keep]
-    warns = [f"Excluidas por astrometría fina no válida (FINAST ≠ 0): {', '.join(bad)}."] if bad else []
+    warns = [f"Excluded because of invalid fine astrometry (FINAST ≠ 0): {', '.join(bad)}."] if bad else []
     if len(seasons([i["mjd"] for i in infos])) < 2:
-        return Investigation(INSUFFICIENT_DATA, ["Las imágenes válidas no abarcan dos temporadas (separación > "
-                                                 f"{SEASON_GAP_DAYS:g} días)."], {**base, "images": infos, "warnings": warns})
+        return Investigation(INSUFFICIENT_DATA, ["The valid images do not span two seasons (separation > "
+                                                 f"{SEASON_GAP_DAYS:g} days)."], {**base, "images": infos, "warnings": warns})
     refs = _gaia_references(gaia, ra0, dec0, (ra0, dec0))
     meas = [measure_image(f.image, i, (ra0, dec0), ra0, dec0, refs, search_radius_arcsec)
             for f, i in zip(frames, infos)]
     reg = solve_registration(meas)
     if not gaia:
-        warns.append("Sin catálogo Gaia: no hay registro con fuentes estacionarias ni control de falsos positivos.")
+        warns.append("No Gaia catalogue: there is no registration with stationary sources and no false-positive control.")
     rows = []
     for k, m in enumerate(meas):
         nref = int(reg["n_refs"][k])
         rows.append({"index": k, "obs_id": m["obs_id"], "date_utc": m["date_utc"], "mjd": m["mjd"],
                      "lambda_um": m["lambda_um"], "n_refs": nref, "psf_model": m["psf_model"],
                      "registration_mode": (f"{nref} estrellas Gaia" if nref >= MIN_REFS else
-                                           f"{nref} estrella(s) Gaia · error empírico" if nref else
-                                           "solo WCS del archivo · error empírico del WCS"),
+                                           f"{nref} Gaia star(s) · empirical error" if nref else
+                                           "file WCS only · empirical WCS error"),
                      "wcs_offset_vs_gaia_arcsec": [_f(reg["absolute_xi"][k]), _f(reg["absolute_eta"][k])],
                      "registration_offset_arcsec": [_f(reg["offset_xi"][k]), _f(reg["offset_eta"][k])],
                      "registration_err_arcsec": [_f(reg["err_xi"][k]), _f(reg["err_eta"][k])],
@@ -840,7 +840,7 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
     result = {**base, "detector": dets[0], "images": rows,
               "lambda_range_um": [_f(np.nanmin([r["lambda_um"] for r in rows])),
                                   _f(np.nanmax([r["lambda_um"] for r in rows]))],
-              "registration": {"method": "Gaia DR3 (movimiento propio aplicado; punto cero libre por estrella)" if refs
+              "registration": {"method": "Gaia DR3 (proper motion applied; free zero point per star)" if refs
                                else "ninguno", "stars": len(reg["stars"]), "chi2_red": list(reg["chi2_red"]),
                                "rms_arcsec": list(reg["rms_arcsec"]),
                                "wcs_scatter_arcsec": list(reg["wcs_scatter_arcsec"])},
@@ -848,13 +848,13 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
     ents = _entries(frames, meas, reg)
     unregistered = [rows[k]["obs_id"] for k in range(len(rows)) if k not in {e.k for e in ents}]
     if unregistered:
-        warns.append(f"Sin registro posible (ni estrellas ni error empírico del WCS): {', '.join(unregistered)}.")
+        warns.append(f"No registration possible (neither stars nor an empirical WCS error): {', '.join(unregistered)}.")
     if not ents:
-        why = ("Gaia DR3 no disponible: sin estrellas estacionarias no se pueden registrar las imágenes ni controlar "
-               "falsos positivos." if not gaia else
-               f"Ninguna imagen tiene estrellas Gaia estacionarias medibles ({len(refs)} candidatas aisladas con "
-               f"G ≤ {REF_MAX_G:g} y movimiento propio): no se puede registrar ni estimar el error del WCS. Un campo "
-               "mayor suele contener más estrellas de referencia.")
+        why = ("Gaia DR3 not available: without stationary stars the images cannot be registered and "
+               "false positives cannot be controlled." if not gaia else
+               f"No image has measurable stationary Gaia stars ({len(refs)} isolated candidates with "
+               f"G ≤ {REF_MAX_G:g} and proper motion): neither the registration nor the WCS error can be estimated. A larger "
+               "field usually contains more reference stars.")
         return Investigation(INSUFFICIENT_EVIDENCE, [why], result)
     groups = seasons([e.mjd for e in ents])
     xs, ys = _tangent(ra0, dec0, ra0, dec0)
@@ -866,8 +866,8 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
         if sf is None:
             date = _mjd_date(min(ents[i].mjd for i in g))
             failed.append({"date_utc": date, "obs_ids": [rows[ents[i].k]["obs_id"] for i in g],
-                           "reason": "; ".join(why) or "sin ajuste válido"})
-            warns.append(f"Temporada {date} ({len(g)} imágenes) sin ajuste válido: {'; '.join(why) or '—'}.")
+                           "reason": "; ".join(why) or "no valid fit"})
+            warns.append(f"Season {date} ({len(g)} images) has no valid fit: {'; '.join(why) or '—'}.")
             continue
         sf["date_utc"] = _mjd_date(min(ents[i].mjd for i in g))
         sf["obs_ids"] = [rows[ents[i].k]["obs_id"] for i in g]
@@ -882,13 +882,13 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
         for im in s["images"]:
             rows[im["k"]]["usable"] = s["usable"]
     if not good:
-        reason = ("La fuente no se detecta con significación ≥ "
-                  f"{MIN_SEASON_SNR:g}σ en ninguna temporada (ajuste conjunto de sus exposiciones).")
+        reason = ("The source is not detected at a significance ≥ "
+                  f"{MIN_SEASON_SNR:g}σ in any season (joint fit of its exposures).")
         return Investigation(INSUFFICIENT_DATA if not fits_ else INSUFFICIENT_EVIDENCE, [reason], result)
     if len(good) < 2:
         weak = [f"{s['date_utc']} ({s['significance']:.1f}σ)" for s in fits_ if s not in good]
-        return Investigation(INSUFFICIENT_EVIDENCE, [f"Solo una temporada con detección ≥ {MIN_SEASON_SNR:g}σ; "
-                                                     f"débil o ausente en: {', '.join(weak) or '—'}."], result)
+        return Investigation(INSUFFICIENT_EVIDENCE, [f"Only one season with a detection ≥ {MIN_SEASON_SNR:g}σ; "
+                                                     f"weak or absent in: {', '.join(weak) or '—'}."], result)
     a, b = good[0], good[-1]
     disp = _season_disp(a, b)
     control = _control(frames, meas, reg, refs, ra0, dec0, (a["mjd"], b["mjd"]))
@@ -908,29 +908,29 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
     sig = disp["significance_calibrated"]
     worst = control.get("max_significance_calibrated", 0.0)
     if a["confusion"] or b["confusion"]:
-        reasons.append("Otra fuente comparable dentro del radio de búsqueda: posible confusión.")
+        reasons.append("Another comparable source within the search radius: possible confusion.")
     sat_seasons = [s for s in (a, b) if s["saturated_core"]]
     if sat_seasons and any(s["n_single_fits"] < 3 for s in sat_seasons):
-        reasons.append("Núcleo saturado y menos de tres medidas individuales por temporada: no se puede estimar "
-                       "empíricamente el sesgo de un ajuste con las alas de la PSF.")
+        reasons.append("Saturated core and fewer than three individual measurements per season: the bias of a fit "
+                       "with the PSF wings cannot be estimated empirically.")
     if control.get("n", 0) < MIN_REFS:
-        reasons.append(f"Control estacionario con {control.get('n', 0)} estrellas (< {MIN_REFS}): no se pueden "
-                       "calibrar las incertidumbres ni estimar falsos positivos.")
+        reasons.append(f"Stationary control with {control.get('n', 0)} stars (< {MIN_REFS}): the uncertainties cannot "
+                       "be calibrated and false positives cannot be estimated.")
     if sig >= SIGNIFICANCE and sig > worst and not reasons:
         outcome = MOTION_MEASURED
-        reasons.append(f"Desplazamiento de {disp['total_arcsec']:.2f} ± {disp['total_err_arcsec']:.2f}″ entre "
-                       f"{a['date_utc']} y {b['date_utc']} ({disp['delta_t_days']:.0f} d): {sig:.1f}σ tras calibrar "
-                       f"con {control['n']} estrellas estacionarias (máximo de control {worst:.1f}σ).")
+        reasons.append(f"Displacement of {disp['total_arcsec']:.2f} ± {disp['total_err_arcsec']:.2f}″ between "
+                       f"{a['date_utc']} and {b['date_utc']} ({disp['delta_t_days']:.0f} d): {sig:.1f}σ after calibrating "
+                       f"with {control['n']} stationary stars (control maximum {worst:.1f}σ).")
         if sat_seasons:
-            reasons.append("Núcleo saturado: posición medida con las alas de la PSF; el error incluye la dispersión "
-                           "entre exposiciones.")
+            reasons.append("Saturated core: position measured with the PSF wings; the error includes the scatter "
+                           "between exposures.")
     else:
         outcome = INSUFFICIENT_EVIDENCE
         if sig < SIGNIFICANCE:
-            reasons.append(f"Desplazamiento {disp['total_arcsec']:.2f} ± {disp['total_err_arcsec']:.2f}″ en "
-                           f"{disp['delta_t_days']:.0f} d: {sig:.1f}σ, por debajo de {SIGNIFICANCE:g}σ.")
+            reasons.append(f"Displacement {disp['total_arcsec']:.2f} ± {disp['total_err_arcsec']:.2f}″ in "
+                           f"{disp['delta_t_days']:.0f} d: {sig:.1f}σ, below {SIGNIFICANCE:g}σ.")
         elif sig <= worst:
-            reasons.append(f"{sig:.1f}σ no supera el máximo alcanzado por una estrella de control ({worst:.1f}σ).")
+            reasons.append(f"{sig:.1f}σ does not exceed the maximum reached by a control star ({worst:.1f}σ).")
     return Investigation(outcome, reasons, result)
 
 
@@ -987,9 +987,9 @@ def _control(frames, meas, reg, refs, ra0, dec0, epochs) -> dict:
             "max_significance_calibrated": max(c["significance_calibrated"] for c in out),
             "n_above_threshold": sum(c["significance_calibrated"] >= SIGNIFICANCE for c in out),
             "median_offset_arcsec": float(np.median([math.hypot(c["dxi"], c["deta"]) for c in out])),
-            "rule": "Cada estrella de referencia se registra sin sí misma (leave-one-out) y se mide con el mismo "
-                    "ajuste conjunto por temporada que el objetivo. Debe seguir su trayectoria Gaia (desplazamiento "
-                    "residual nulo). El factor de calibración ≥ 1 lleva la mediana de sus χ² (2 g.l.) a 1.386."}
+            "rule": "Each reference star is registered without itself (leave-one-out) and measured with the same "
+                    "joint fit per season as the target. It must follow its Gaia track (zero residual "
+                    "displacement). The calibration factor ≥ 1 brings the median of their χ² (2 d.o.f.) to 1.386."}
 
 
 def _compare_catalogue(astro, disp, a, b, ra0, dec0) -> dict:
@@ -1003,8 +1003,8 @@ def _compare_catalogue(astro, disp, a, b, ra0, dec0) -> dict:
     return {"source": astro.source, "name": astro.name, "predicted_dxi": pdx, "predicted_deta": pdy,
             "predicted_total_arcsec": math.hypot(pdx, pdy),
             "difference_sigma": diff, "consistent_3sigma": diff <= 3.0,
-            "note": "Predicción calculada con la astrometría del catálogo (incluye paralaje si existe). Solo se "
-                    "compara al final; no interviene en la búsqueda, el ajuste ni la decisión."}
+            "note": "Prediction computed with the catalogue astrometry (including parallax if there is one). It is only "
+                    "compared at the end; it plays no part in the search, the fit or the decision."}
 
 
 def to_jsonable(inv: Investigation) -> dict:
@@ -1056,9 +1056,9 @@ def select_epochs(records, ra: float, dec: float, detector: int, *, field_deg: f
     """
     from .pairing import build_candidates
     if detector not in range(1, 7):
-        raise MotionInputError("Detector fuera de 1–6.")
+        raise MotionInputError("Detector outside 1–6.")
     if not 1 <= per_season <= 8 or not 2 <= max_seasons <= 4:
-        raise MotionInputError("Entre 1 y 8 imágenes por temporada y entre 2 y 4 temporadas.")
+        raise MotionInputError("Between 1 and 8 images per season and between 2 and 4 seasons.")
     cands = [c for c in build_candidates(records, ra, dec, field_deg) if c.rec.detector == detector]
     groups = seasons([c.rec.mjd_mid for c in cands])
     # Seasons with enough images for an internal-consistency check, then the longest baseline.
@@ -1076,9 +1076,9 @@ def select_epochs(records, ra: float, dec: float, detector: int, *, field_deg: f
             "season_dates": [[_mjd_date(cands[g[0]].rec.mjd_mid), _mjd_date(cands[g[-1]].rec.mjd_mid), len(g)]
                              for g in groups],
             "selected": picks, "field_deg": field_deg, "detector": detector,
-            "rule": f"Mismo detector D{detector}; temporadas separadas > {SEASON_GAP_DAYS:g} d; primera, intermedia(s) "
-                    f"y última (máx. {max_seasons}); hasta {per_season} imágenes por temporada, las más alejadas del "
-                    "borde del detector."}
+            "rule": f"Same detector D{detector}; seasons separated by > {SEASON_GAP_DAYS:g} d; first, intermediate(s) "
+                    f"and last (max. {max_seasons}); up to {per_season} images per season, the ones furthest from the "
+                    "detector edge."}
 
 
 def _mjd_date(mjd):

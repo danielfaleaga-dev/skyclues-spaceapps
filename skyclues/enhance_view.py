@@ -86,8 +86,8 @@ def comparison_png(stack, *, index: int | None = None, marks=(), simple: bool = 
     fig = Figure(figsize=(9.6, 5.2), dpi=dpi, facecolor="white")
     axes = [fig.add_axes([0.02, 0.15, 0.47, 0.78]), fig.add_axes([0.51, 0.15, 0.47, 0.78])]
     date = str(stack.exposures[i].image.meta.get("DATE-AVG") or "")[:10]
-    titles = (single_title or f"Una exposición · {date}",
-              combined_title or f"Combinación · {stack.n_exposures} exposiciones")
+    titles = (single_title or f"One exposure · {date}",
+              combined_title or f"Combination · {stack.n_exposures} exposures")
     for ax, data, title in zip(axes, (single, stack.image), titles):
         ax.imshow(render.to_rgba(data, norm), origin="lower", interpolation="nearest")
         _decorate(ax, stack, title, window)
@@ -96,8 +96,8 @@ def comparison_png(stack, *, index: int | None = None, marks=(), simple: bool = 
     _compass(axes[1], stack, window)
     cb = fig.colorbar(ScalarMappable(norm=norm, cmap=render._cmap()), cax=fig.add_axes([0.25, 0.075, 0.5, 0.022]),
                       orientation="horizontal")
-    cb.set_label("Brillo (misma escala en las dos imágenes)" if simple else
-                 "IMAGE − ZODI − constante de cielo · MJy/sr · escala asinh común", fontsize=8.5, color=INK)
+    cb.set_label("Brightness (same scale in both images)" if simple else
+                 "IMAGE − ZODI − sky constant · MJy/sr · common asinh scale", fontsize=8.5, color=INK)
     cb.ax.tick_params(labelsize=7.5, colors=INK)
     return render.figure_png(fig)
 
@@ -112,18 +112,18 @@ def diagnostic_png(stack, dpi: int = 120) -> bytes:
     rgba = __import__("matplotlib").colormaps["RdBu_r"](zn(np.where(np.isfinite(z), z, 0)))
     rgba[~np.isfinite(z)] = __import__("matplotlib").colors.to_rgba(render.MASK_COLOR)
     a1.imshow(rgba, origin="lower", interpolation="nearest")
-    _decorate(a1, stack, "Imagen nula · (mitad A − mitad B) / 2")
+    _decorate(a1, stack, "Null image · (half A − half B) / 2")
     cb = fig.colorbar(ScalarMappable(norm=zn, cmap="RdBu_r"), cax=fig.add_axes([0.08, 0.075, 0.35, 0.022]),
                       orientation="horizontal")
-    cb.set_label("desviación / error formal (σ)", fontsize=8.5, color=INK)
+    cb.set_label("deviation / formal error (σ)", fontsize=8.5, color=INK)
     cb.ax.tick_params(labelsize=7.5, colors=INK)
     nn = Normalize(0, stack.n_exposures)
     a2.imshow(np.where(stack.n > 0, stack.n, np.nan), origin="lower", interpolation="nearest", cmap="viridis", norm=nn)
     a2.set_facecolor(render.MASK_COLOR)
-    _decorate(a2, stack, "Exposiciones válidas por píxel")
+    _decorate(a2, stack, "Valid exposures per pixel")
     cb = fig.colorbar(ScalarMappable(norm=nn, cmap="viridis"), cax=fig.add_axes([0.57, 0.075, 0.35, 0.022]),
                       orientation="horizontal")
-    cb.set_label("número de exposiciones", fontsize=8.5, color=INK)
+    cb.set_label("number of exposures", fontsize=8.5, color=INK)
     cb.ax.tick_params(labelsize=7.5, colors=INK)
     return render.figure_png(fig)
 
@@ -147,7 +147,7 @@ def zoom_png(stack, x: float, y: float, half_px: int = 9, title: str = "", dpi: 
         data = stack.image if last else stack.data[k]
         ax.imshow(render.to_rgba(data, norm), origin="lower", interpolation="nearest")
         date = "" if last else str(stack.exposures[k].image.meta.get("DATE-AVG") or "")[:16].replace("T", " ")
-        _decorate(ax, stack, f"Combinación · {stack.n_exposures}" if last else date, window)
+        _decorate(ax, stack, f"Combination · {stack.n_exposures}" if last else date, window)
         ax.title.set_fontsize(8.5)
         ax.add_patch(Circle((x, y), 3.2 * o, fill=False, edgecolor=EMBER, linewidth=1.0))
         if last:
@@ -156,7 +156,7 @@ def zoom_png(stack, x: float, y: float, half_px: int = 9, title: str = "", dpi: 
                 s.set_linewidth(1.4)
     if title:
         fig.suptitle(title, fontsize=10.5, color=INK, x=0.02, ha="left")
-    fig.text(0.02, 0.012, "IMAGE − ZODI − constante de cielo (MJy/sr), escala asinh común a todos los paneles. "
-             "Rosa: sin dato válido. Círculo: posición examinada.", fontsize=7.5, color=MUTED)
+    fig.text(0.02, 0.012, "IMAGE − ZODI − sky constant (MJy/sr), asinh scale common to all panels. "
+             "Pink: no valid data. Circle: position examined.", fontsize=7.5, color=MUTED)
     fig.subplots_adjust(left=0.02, right=0.98, top=0.90 if title else 0.95, bottom=0.07, wspace=0.06, hspace=0.18)
     return render.figure_png(fig)

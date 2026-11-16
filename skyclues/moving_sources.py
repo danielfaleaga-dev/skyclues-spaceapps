@@ -41,18 +41,18 @@ def _request(url, params=None, refresh=False, ttl=86400):
         with requests.get(url, params=params, timeout=(10, 90), stream=True,
                           headers=config.HTTP_HEADERS) as r:
             if r.status_code != 200:
-                raise solar_system.ServiceError(f'IRSA respondió HTTP {r.status_code}: {r.text[:200]}')
+                raise solar_system.ServiceError(f'IRSA responded HTTP {r.status_code}: {r.text[:200]}')
             parts, size = [], 0
             for block in r.iter_content(65536):
                 size += len(block)
                 if size > 16*1024*1024:
-                    raise solar_system.ServiceError('Consulta demasiado grande. Reduzca el intervalo de fechas.')
+                    raise solar_system.ServiceError('Query too large. Reduce the date interval.')
                 parts.append(block)
             b = b''.join(parts)
             p = {'url': r.url, 'queried_utc': datetime.now(timezone.utc).isoformat(),
                  'sha256': hashlib.sha256(b).hexdigest(), 'cache': False}
     except requests.RequestException as e:
-        raise solar_system.ServiceError('IRSA no respondió. Puede reintentar la consulta.') from e
+        raise solar_system.ServiceError('IRSA did not respond. You can retry the query.') from e
     archive.atomic_write(path, b)
     archive.atomic_write(meta, json.dumps(p))
     return b, p
@@ -62,11 +62,11 @@ def parse_most(blob):
     text = blob.decode('utf-8')
     if '|    ra_obj' not in text and 'ra_obj|' not in text:
         if re.search(r'ephem_step reset to the time range:\s*-',text):
-            raise solar_system.ServiceError('MOST no pudo calcular la efeméride en ese intervalo. '
-                'Puede quedar fuera de la cobertura orbital del observador; pruebe otras fechas.')
+            raise solar_system.ServiceError('MOST could not compute the ephemeris in that interval. '
+                'It may lie outside the observer\'s orbital coverage; try other dates.')
         if re.search(r'no (?:records|images|matches|data).*found|no matching', text, re.I):
             return Table()
-        raise solar_system.ServiceError('MOST no devolvió una tabla de exposiciones: ' + text[:180])
+        raise solar_system.ServiceError('MOST did not return an exposure table: ' + text[:180])
     return Table.read(text, format='ascii.ipac')
 
 
@@ -78,12 +78,12 @@ def discover(identity, start, end, *, refresh=False, step_days=0.02):
     """
     a, b = Time(start), Time(end)
     if not 0 < b.mjd-a.mjd <= 366:
-        raise ValueError('El intervalo debe abarcar entre un instante y 366 días.')
+        raise ValueError('The interval must span between one instant and 366 days.')
     if not np.isfinite(step_days) or not 0 < step_days <= .25:
-        raise ValueError('Paso de efemérides inválido (0 < días ≤ 0,25).')
+        raise ValueError('Invalid ephemeris step (0 < days ≤ 0.25).')
     sid = str(identity['spkid'])
     if not re.fullmatch(r'\d{1,12}', sid):
-        raise ValueError('Identificador JPL inválido')
+        raise ValueError('Invalid JPL identifier')
     params = {'catalog': 'spherex', 'input_type': 'naifid_input', 'obj_naifid': sid,
               'obs_begin': a.strftime('%Y %m %d %H:%M:%S'),
               'obs_end': b.strftime('%Y %m %d %H:%M:%S'),
@@ -99,7 +99,7 @@ def discover(identity, start, end, *, refresh=False, step_days=0.02):
             excluded.append(str(r['uri'])); continue
         obs = str(r['observationid'])
         if m['obsid'] != obs:
-            raise solar_system.ServiceError('Identidad de exposición inconsistente en MOST.')
+            raise solar_system.ServiceError('Inconsistent exposure identity in MOST.')
         ra, dec = float(r['ra_obj']), float(r['dec_obj'])
         if not (np.isfinite(ra) and np.isfinite(dec) and -90 <= dec <= 90):
             continue
@@ -111,7 +111,7 @@ def discover(identity, start, end, *, refresh=False, step_days=0.02):
                      'exptime_s': float(r['exposure_time']), 's_region': poly,
                      'prediction': {'ra': ra, 'dec': dec, 'source': MOST, 'frame': 'J2000 (MOST)',
                          'observer': 'MOST/SPHEREx (NAIF -453)', 'uncertainty_arcsec': None,
-                         'mjd': float(r['mjd_start']), 'time_basis': 'inicio de exposición (MOST)',
+                         'mjd': float(r['mjd_start']), 'time_basis': 'exposure start (MOST)',
                          'requested_time_sampling_s': step_days*86400, 'refined': False},
                      'discovery': provenance})
     # Deterministic version choice. Keep distinct releases explicit, prefer DR1 counterpart.
@@ -135,7 +135,7 @@ def published_predictions(url, *, ra_column='comet_ra', dec_column='comet_dec', 
     for r in tab:
         out[(str(r['obs_id']), int(str(r['spherex_detector']).lstrip('D')))] = {
             'ra': float(r[ra_column]), 'dec': float(r[dec_column]), 'source': url,
-            'frame': 'ICRS (tabla IRSA)', 'observer': 'predicción por exposición publicada por IRSA',
+            'frame': 'ICRS (tabla IRSA)', 'observer': 'per-exposure prediction published by IRSA',
             'uncertainty_arcsec': None, 'refined': True,
             'mjd_start': float(r['t_min']), 'mjd_end': float(r['t_max']),
             'original_product': str(r['access_url']), 'provenance': p}
@@ -165,23 +165,23 @@ def track_position(tab, mjd):
     """
     required={'Date','RA_obs','Dec_obs','segment'}
     if not required <= set(tab.colnames) or len(tab)<2:
-        raise solar_system.ServiceError('MOST no devolvió una trayectoria temporal utilizable.')
+        raise solar_system.ServiceError('MOST did not return a usable time trajectory.')
     from astropy.coordinates import SkyCoord
     import astropy.units as u
     times=np.array([Time(datetime.strptime(str(x),'%Y-%b-%d %H:%M:%S.%f')).mjd for x in tab['Date']])
     if not np.all(np.diff(times)>0):
-        raise solar_system.ServiceError('Efeméride MOST con tiempos no ordenados.')
+        raise solar_system.ServiceError('MOST ephemeris with unordered times.')
     i=int(np.clip(np.searchsorted(times,mjd)-1,0,len(times)-2))
     gap=(times[i+1]-times[i])*86400
     if not times[i]<=mjd<=times[i+1] or gap>2 or tab['segment'][i]!=tab['segment'][i+1]:
-        raise solar_system.ServiceError('La efeméride fina no cubre el instante de esta exposición.')
+        raise solar_system.ServiceError('The fine ephemeris does not cover the instant of this exposure.')
     coords=SkyCoord(np.asarray(tab['RA_obs'][i:i+2],float)*u.deg,
                     np.asarray(tab['Dec_obs'][i:i+2],float)*u.deg)
     frac=(mjd-times[i])/(times[i+1]-times[i])
     v=coords.cartesian.xyz.value @ np.array([1-frac,frac])
     pos=SkyCoord(x=v[0],y=v[1],z=v[2],representation_type='cartesian').spherical
     return {'ra':float(pos.lon.deg),'dec':float(pos.lat.deg),'mjd':float(mjd),
-            'sample_gap_s':float(gap),'interpolation':'vector unitario entre muestras MOST ≤2 s'}
+            'sample_gap_s':float(gap),'interpolation':'unit vector between MOST samples ≤2 s'}
 
 
 def refine_prediction(identity, row):
@@ -195,7 +195,7 @@ def refine_prediction(identity, row):
         url=out.get('workspace_url') or ''
         parsed=urlparse(url)
         if parsed.scheme!='https' or parsed.hostname!='irsa.ipac.caltech.edu' or not parsed.path.startswith('/workspace/'):
-            raise solar_system.ServiceError('MOST no proporcionó una efeméride espacial verificable.')
+            raise solar_system.ServiceError('MOST did not provide a verifiable spatial ephemeris.')
         try:
             raw,provenance=_request(url.rstrip('/')+'/orbital_path.tbl',refresh=refresh)
             track=Table.read(raw.decode(),format='ascii.ipac')
@@ -206,10 +206,10 @@ def refine_prediction(identity, row):
             # Workspace URLs expire; regenerate only this bounded metadata query.
     return {**row, 'prediction': {**row['prediction'], **predicted, 'refined': True,
              'observer':'MOST/SPHEREx (NAIF -453)',
-             'time_basis':'punto medio de exposición UTC', 'source':provenance['url'],
+             'time_basis':'exposure midpoint UTC', 'source':provenance['url'],
              'requested_time_sampling_s':1.,'provenance':provenance,
              'discovery_provenance':out['provenance'],
-             'limitation': 'Sin covarianza orbital publicada por MOST; interpolación temporal identificada.'}}
+             'limitation': 'No orbital covariance published by MOST; temporal interpolation identified.'}}
 
 
 def estimate_bands(rows):
@@ -269,8 +269,8 @@ def stellar_context(row):
             nearby.append({'source_id':star['source_id'],'separation_arcsec':float(sep),
                            'G':star['phot_g_mean_mag'],'proper_motion_available':expected is not None})
     return {'nearby':sorted(nearby,key=lambda x:x['separation_arcsec']), 'truncated':truncated,
-            'provenance':provenance,'note':'Gaia DR3, movimiento angular propagado desde J2016.0; '
-            'sin paralaje ni comparación fotométrica con infrarrojo. No excluye fuentes ausentes de Gaia.'}
+            'provenance':provenance,'note':'Gaia DR3, angular motion propagated from J2016.0; '
+            'no parallax or photometric comparison with the infrared. It does not exclude sources absent from Gaia.'}
 
 
 def _separation_deg(a, b):

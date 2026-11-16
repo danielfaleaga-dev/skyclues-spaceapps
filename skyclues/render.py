@@ -213,7 +213,7 @@ def frame_figure(data: np.ndarray, wcs, norm, title: str, ra: float, dec: float,
     return fig
 
 
-COVERAGE_LABELS = ["Fuera del campo", "Válido en A y B", "Solo válido en A", "Solo válido en B", "Sin datos válidos"]
+COVERAGE_LABELS = ["Outside the field", "Valid in A and B", "Valid only in A", "Valid only in B", "No valid data"]
 COVERAGE_COLORS = ["#ffffff", "#2e7d32", "#f2b134", "#5b8def", MASK_COLOR]
 
 
@@ -235,7 +235,7 @@ def coverage_figure(ev: PairEvaluation, wcs, ra, dec, field_deg):
               interpolation="nearest")
     _style_axes(ax)
     _mark_target(ax, ra, dec, field_deg)
-    ax.set_title("Cobertura válida común (rejilla de A)", color=INK, fontsize=10, loc="left")
+    ax.set_title("Common valid coverage (grid of A)", color=INK, fontsize=10, loc="left")
     from matplotlib.patches import Patch
 
     ax.legend(handles=[Patch(facecolor=c, edgecolor="#cfd5dd", label=l)
@@ -266,7 +266,7 @@ def sequence_coverage_figure(seq):
     im = ax.imshow(count, origin="lower", cmap=cm, vmin=-0.5, vmax=n + 0.5, interpolation="nearest")
     _style_axes(ax)
     _mark_sequence_target(ax, seq, 0)
-    ax.set_title(f"Épocas con dato válido (verde = las {n})", color=INK, fontsize=10, loc="left")
+    ax.set_title(f"Epochs with valid data (green = all {n})", color=INK, fontsize=10, loc="left")
     cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, ticks=range(0, n + 1))
     cb.ax.tick_params(labelsize=7, colors=INK)
     fig.tight_layout()
@@ -281,7 +281,7 @@ def sequence_spread_figure(seq, limit=0.5):
     im = ax.imshow(seq.lambda_spread_bw, origin="lower", cmap=cm, vmin=0, vmax=limit, interpolation="nearest")
     _style_axes(ax)
     _mark_sequence_target(ax, seq, 0)
-    ax.set_title("Dispersión de λ entre épocas / ancho de banda", color=INK, fontsize=10, loc="left")
+    ax.set_title("λ dispersion between epochs / bandwidth", color=INK, fontsize=10, loc="left")
     cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     cb.ax.tick_params(labelsize=7, colors=INK)
     fig.tight_layout()

@@ -39,69 +39,69 @@ _HTML = f"""
 <div class="sc-region" data-level="simple">
   <div class="rg-panel">
     <div class="rg-field rg-search">
-      <label for="rg-q">Buscar un objeto <span>nombre o catálogo</span></label>
+      <label for="rg-q">Search for an object <span>name or catalogue</span></label>
       <div class="rg-combo">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.6"
           stroke="currentColor" stroke-width="1.5"/><path d="m10 10 3.4 3.4" stroke="currentColor" stroke-width="1.5"
           stroke-linecap="round"/></svg>
         <input id="rg-q" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="rg-list"
-               placeholder="M101, Andrómeda, Barnard, WISE 0855…" maxlength="100" autocomplete="off" spellcheck="false">
-        <ul id="rg-list" role="listbox" aria-label="Objetos sugeridos" hidden></ul>
+               placeholder="M101, Andromeda, Barnard, WISE 0855…" maxlength="100" autocomplete="off" spellcheck="false">
+        <ul id="rg-list" role="listbox" aria-label="Suggested objects" hidden></ul>
       </div>
       <p class="rg-search-status" role="status" aria-live="polite" hidden></p>
       <p class="rg-object" role="status" aria-live="polite"></p>
       <div class="rg-notes"></div>
     </div>
     <div class="rg-group">
-    <p class="rg-label rg-grouptitle">Posición en el cielo <span class="rg-sci">ICRS · grados</span></p>
-    <p class="rg-help rg-simple">Ascensión recta (RA) y declinación (Dec) son la «longitud» y la «latitud» del cielo.
-      Se rellenan solas al buscar o al mover el mapa; también puedes escribirlas.</p>
+    <p class="rg-label rg-grouptitle">Position in the sky <span class="rg-sci">ICRS · degrees</span></p>
+    <p class="rg-help rg-simple">Right ascension (RA) and declination (Dec) are the «longitude» and «latitude» of the sky.
+      They fill in by themselves when you search or move the map; you can also type them.</p>
     <div class="rg-coords">
       <div class="rg-field">
-        <label for="rg-ra">RA <span>grados · ICRS</span></label>
+        <label for="rg-ra">RA <span>degrees · ICRS</span></label>
         <input id="rg-ra" class="rg-num" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"
-               aria-label="Ascensión recta en grados" aria-describedby="rg-ra-sexa">
+               aria-label="Right ascension in degrees" aria-describedby="rg-ra-sexa">
         <span class="rg-sexa rg-sexa-ra" id="rg-ra-sexa"></span><span class="rg-err" role="alert"></span>
       </div>
       <div class="rg-field">
-        <label for="rg-dec">Dec <span>grados · ICRS</span></label>
+        <label for="rg-dec">Dec <span>degrees · ICRS</span></label>
         <input id="rg-dec" class="rg-num" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"
-               aria-label="Declinación en grados" aria-describedby="rg-dec-sexa">
+               aria-label="Declination in degrees" aria-describedby="rg-dec-sexa">
         <span class="rg-sexa rg-sexa-dec" id="rg-dec-sexa"></span><span class="rg-err" role="alert"></span>
       </div>
     </div>
     </div>
     <div class="rg-field rg-group">
-      <label for="rg-fov"><b class="rg-simple">Tamaño de la región</b><b class="rg-sci">Campo de visión</b>
-        <span>diámetro · minutos de arco</span></label>
+      <label for="rg-fov"><b class="rg-simple">Region size</b><b class="rg-sci">Field of view</b>
+        <span>diameter · arcminutes</span></label>
       <div class="rg-fovrow">
-        <input id="rg-fov" type="range" aria-label="Campo de visión en minutos de arco">
+        <input id="rg-fov" type="range" aria-label="Field of view in arcminutes">
         <div class="rg-fovbox"><input id="rg-fovn" class="rg-num" type="text" inputmode="decimal" autocomplete="off"
-             aria-label="Campo de visión, valor en minutos de arco"><span aria-hidden="true">′</span></div>
+             aria-label="Field of view, value in arcminutes"><span aria-hidden="true">′</span></div>
       </div>
       <div class="rg-scale" aria-hidden="true"><span class="rg-fovmin"></span><span class="rg-fovmax"></span></div>
       <p class="rg-fovhint"></p><span class="rg-err" role="alert"></span>
     </div>
   </div>
   <div class="rg-actions">
-    <p class="rg-label rg-actions-title">Investiga esta zona</p>
-    <button type="button" class="rg-cta rg-time" data-view="time">{_FRAMES}<b>Ver en el tiempo</b>
-      <small>Imágenes reales de distintas fechas: ¿algo cambia o se mueve?</small>{_ARROW}</button>
-    <button type="button" class="rg-cta rg-spectrum" data-view="spectrum">{_WAVE}<b>Explorar el espectro</b>
-      <small>Su luz en 102 colores infrarrojos: ¿qué emite o absorbe?</small>{_ARROW}</button>
+    <p class="rg-label rg-actions-title">Investigate this area</p>
+    <button type="button" class="rg-cta rg-time" data-view="time">{_FRAMES}<b>View over time</b>
+      <small>Real images from different dates: does anything change or move?</small>{_ARROW}</button>
+    <button type="button" class="rg-cta rg-spectrum" data-view="spectrum">{_WAVE}<b>Explore the spectrum</b>
+      <small>Its light in 102 infrared colours: what does it emit or absorb?</small>{_ARROW}</button>
   </div>
   <div class="rg-mapcol">
-    <p class="rg-label rg-maptitle"><span class="rg-maptag">Mapa de referencia</span>
-      <span class="rg-simple">Arrastra para moverte por el cielo; la rueda o los botones acercan la vista sin cambiar la zona.</span>
-      <span class="rg-sci">Atlas de contexto (otras misiones): orientación y elección de centro, no datos SPHEREx.</span></p>
+    <p class="rg-label rg-maptitle"><span class="rg-maptag">Reference map</span>
+      <span class="rg-simple">Drag to move around the sky; the wheel or the buttons zoom the view without changing the area.</span>
+      <span class="rg-sci">Context atlas (other missions): orientation and choice of centre, not SPHEREx data.</span></p>
     <div class="rg-mapwrap">
-      <div class="rg-map" role="application" aria-label="Atlas del cielo: arrastre para mover la región"></div>
+      <div class="rg-map" role="application" aria-label="Sky atlas: drag to move the region"></div>
       <div class="rg-tools">
-        <select id="rg-layer" class="rg-tool" aria-label="Mapa de contexto"></select>
+        <select id="rg-layer" class="rg-tool" aria-label="Context map"></select>
         <label class="rg-tool"><input id="rg-gaia" type="checkbox"> Gaia DR3</label>
         <label class="rg-tool"><input id="rg-constellations" type="checkbox"> Constelaciones</label>
-        <button type="button" class="rg-tool rg-wide" title="Ver 60 grados sin cambiar el campo científico">Orientación</button>
-        <button type="button" class="rg-tool rg-frame" title="Ajustar el zoom del mapa a la región (no cambia el campo)">Encuadrar</button>
+        <button type="button" class="rg-tool rg-wide" title="View 60 degrees without changing the scientific field">Orientation</button>
+        <button type="button" class="rg-tool rg-frame" title="Fit the map zoom to the region (does not change the field)">Frame</button>
       </div>
       <div class="rg-chip" aria-hidden="true"></div>
       <div class="rg-status" role="status" hidden><div class="rg-loading-card">
@@ -109,8 +109,8 @@ _HTML = f"""
       </div></div>
       <div class="rg-gaia-status" role="status" aria-live="polite" hidden>
         <div class="rg-loading-card"><span class="rg-activity" aria-hidden="true"></span>
-          <span class="rg-gaia-message"></span><span class="rg-loading-detail">Buscando estrellas en esta zona del cielo.<br>Puede seguir moviendo el mapa.</span>
-          <button type="button" class="rg-gaia-retry" hidden>Reintentar</button></div>
+          <span class="rg-gaia-message"></span><span class="rg-loading-detail">Searching for stars in this area of the sky.<br>You can keep moving the map.</span>
+          <button type="button" class="rg-gaia-retry" hidden>Retry</button></div>
       </div>
     </div>
     <p class="rg-layerinfo"></p>
@@ -134,10 +134,10 @@ LOCAL_INDEX = [{"id": x["id"], "aliases": x["aliases"], "type": x["type"]} for x
 @st.cache_data(ttl=3600, max_entries=128, show_spinner=False)
 def suggestions(q: str):
     if object_search.normalize(object_search.canonical_name(q)) == 'm 102':
-        return [{'id': 'NGC 5866', 'type': 'M102: identificación habitual, históricamente discutida', 'aliases': []},
-                {'id': 'M101', 'type': 'M102: posible duplicado histórico', 'aliases': []}], 'Identificación ambigua'
+        return [{'id': 'NGC 5866', 'type': 'M102: usual identification, historically disputed', 'aliases': []},
+                {'id': 'M101', 'type': 'M102: possible historical duplicate', 'aliases': []}], 'Ambiguous identification'
     rows, status = object_search.remote_suggestions(q)
-    failed = status.startswith("Sugerencias remotas no disponibles")
+    failed = status.startswith("Remote suggestions not available")
     solar_rows, solar_failed = [], False
     if not object_search.catalogue_prefix(q) and not re.match(r'^(gaia|wise|2mass)\b', object_search.normalize(q)):
         try:
@@ -147,7 +147,7 @@ def suggestions(q: str):
     if failed and (solar_failed or not solar_rows):
         raise RuntimeError(status)          # never cache a total outage as an empty catalogue
     # Partial failures are surfaced too; valid results from the other service remain selectable.
-    return solar_rows + rows, ('Un catálogo no responde; puedes buscar el nombre completo.' if failed or solar_failed else '')
+    return solar_rows + rows, ('A catalogue is not responding; you can search for the full name.' if failed or solar_failed else '')
 
 
 SUGGESTIONS = gaia_atlas.Jobs(suggestions, ttl=3600, capacity=128, workers=2)
@@ -176,7 +176,7 @@ def _on_region() -> None:
         navigation.move_region(st.session_state, st.query_params, v["ra"], v["dec"], v["fov"])
         st.session_state.pop("region_notice", None)
     except (ValueError, KeyError, TypeError) as err:
-        st.session_state["region_notice"] = f"Región no válida: {err}"
+        st.session_state["region_notice"] = f"Invalid region: {err}"
 
 
 def _on_pick() -> None:
@@ -205,7 +205,7 @@ def _on_pick() -> None:
                      [object_search.normalize(v) for v in [x['name'], x.get('pdes') or '', *x['aliases']]]]
             if len(candidates) > 1 and len(exact) != 1:
                 st.session_state['solar_choices'] = candidates
-                st.session_state['region_notice'] = 'Hay varias identidades JPL; elija el objeto debajo del atlas.'
+                st.session_state['region_notice'] = 'There are several JPL identities; choose the object below the atlas.'
                 return
             identity = exact[0] if len(exact) == 1 else candidates[0]
             position = solar_position(identity, datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:00'))
@@ -228,7 +228,7 @@ def _on_open() -> None:
     try:
         navigation.move_region(st.session_state, st.query_params, v["ra"], v["dec"], v["fov"])
     except (ValueError, KeyError, TypeError) as err:
-        st.session_state["region_notice"] = f"Región no válida: {err}"
+        st.session_state["region_notice"] = f"Invalid region: {err}"
         return
     if v.get("view") in ("time", "spectrum"):
         st.session_state["view_request"] = v["view"]
@@ -258,7 +258,7 @@ def _on_gaia_pick() -> None:
         navigation.move_region(state, st.query_params, old['ra'], old['dec'], fov)
         region = navigation.set_gaia(state, st.query_params, source, displayed['provenance'])
     except (ValueError, KeyError, TypeError) as err:
-        state['region_notice'] = f'No se pudo seleccionar la fuente Gaia: {err}'
+        state['region_notice'] = f'The Gaia source could not be selected: {err}'
         return
     # Reuse the loaded field when recentering on one of its sources. Dragging later queries as usual.
     state['atlas_gaia_anchor'] = {k: region[k] for k in ('ra', 'dec', 'fov')}
@@ -285,37 +285,37 @@ def object_card(region: dict) -> dict | None:
     if not region.get("name"):
         return None
     astro = Astrometry.from_dict(region["astrometry"]) if region.get("astrometry") else None
-    notes, detail, marker_note = list(region.get("notes") or []), "", "Posición de catálogo."
+    notes, detail, marker_note = list(region.get("notes") or []), "", "Catalogue position."
     if region.get('gaia'):
         alias = (region['gaia'].get('alias') or {}).get('name')
-        detail = 'catálogo Gaia DR3 · ICRS · J2016.0' + (f' · {alias} (SIMBAD)' if alias else '')
+        detail = 'Gaia DR3 catalogue · ICRS · J2016.0' + (f' · {alias} (SIMBAD)' if alias else '')
         if astro.has_proper_motion:
-            notes.append('Los exploradores calculan la posición esperada para sus propias fechas con la astrometría Gaia; ese cálculo no es una detección.')
+            notes.append('The explorers compute the expected position for their own dates with Gaia astrometry; that calculation is not a detection.')
         else:
-            notes.append('Sin movimiento propio disponible: los exploradores conservan la posición de catálogo, sin inferir movimiento.')
+            notes.append('No proper motion available: the explorers keep the catalogue position, without inferring motion.')
         return {'name': region['name'], 'detail': detail, 'anchor': region['anchor'], 'notes': notes,
                 'marker_note': notes[0], 'gaia_source_id': region['gaia']['source_id'],
                 'short_detail': 'J2016.0' + (f' · {alias}' if alias else ''),
-                'short_notes': ['Fuente de catálogo; no confirma una detección SPHEREx.']}
+                'short_notes': ['Catalogue source; it does not confirm a SPHEREx detection.']}
     if region.get('solar'):
         p = region['solar']
         detail = f"{p['utc']} UTC · {p['observer_label']}"
-        marker_note = 'Posición calculada, no detección.'
-        notes.append('Identidad resuelta. Posición calculada para esta fecha y observador; no demuestra datos SPHEREx disponibles.')
+        marker_note = 'Calculated position, not a detection.'
+        notes.append('Identity resolved. Position calculated for this date and observer; it does not show that SPHEREx data are available.')
         return {'name': region['name'], 'detail': detail, 'anchor': region['anchor'], 'notes': notes, 'marker_note': marker_note,
-                'short_detail': p['utc'][:10], 'short_notes': ['Posición calculada para esta fecha, no una detección.']}
+                'short_detail': p['utc'][:10], 'short_notes': ['Position calculated for this date, not a detection.']}
     if region.get("report"):
-        detail = "secuencia verificada · centro y campo fijos"
+        detail = "verified sequence · fixed centre and field"
     elif astro is not None:
-        detail = f"catálogo J{astro.epoch_jyear:.1f}"
+        detail = f"catalogue J{astro.epoch_jyear:.1f}"
         if astro.has_proper_motion:
-            detail = f"movimiento propio {astro.total_pm_arcsec_yr:.2f}″/año"
-            marker_note = ("Posición calculada para hoy con la astrometría del catálogo; los mapas son de otras "
-                           "épocas y el objeto puede aparecer desplazado.")
-            notes.insert(0, "El mapa muestra la posición calculada para hoy. Cada explorador la calcula para las "
-                            "fechas de sus propias observaciones; una posición calculada no es una detección.")
+            detail = f"proper motion {astro.total_pm_arcsec_yr:.2f}″/yr"
+            marker_note = ("Position calculated for today with the catalogue astrometry; the maps are from other "
+                           "epochs and the object may appear shifted.")
+            notes.insert(0, "The map shows the position calculated for today. Each explorer calculates it for the "
+                            "dates of its own observations; a calculated position is not a detection.")
     if region.get("extended"):
-        notes.append("Centro catalogado de un objeto extenso: el campo puede mostrar solo una parte.")
+        notes.append("Catalogued centre of an extended object: the field may show only a part of it.")
     return {"name": region["name"], "detail": detail, "anchor": region.get("anchor"), "notes": notes,
             "marker_note": marker_note}
 
@@ -344,9 +344,9 @@ def _gaia(region: dict):
                                    'provenance': {k: g[k] for k in ('sha256', 'retrieved_utc', 'endpoint')}}
     rows = [{"ra": s["ra"], "dec": s["dec"], "source_id": s["source_id"], "G": s.get("phot_g_mean_mag")}
             for s in g["sources"]]
-    note = (f"Gaia DR3 (ESA, posiciones J2016.0): {len(rows)} fuentes en un círculo de {held['fov'] * 60:g}′ centrado en "
-            f"RA {held['ra']:.5f}°, Dec {held['dec']:+.5f}°" + (" · truncado a 500 por magnitud G" if g["truncated"] else "")
-            + ". Pulse un marcador azul para seleccionar su fuente; no confirma una detección SPHEREx.")
+    note = (f"Gaia DR3 (ESA, J2016.0 positions): {len(rows)} sources in a circle of {held['fov'] * 60:g}′ centred on "
+            f"RA {held['ra']:.5f}°, Dec {held['dec']:+.5f}°" + (" · truncated to 500 by G magnitude" if g["truncated"] else "")
+            + ". Press a blue marker to select its source; it does not confirm a SPHEREx detection.")
     return rows, g["sha256"], note
 
 
@@ -368,7 +368,7 @@ def render(level: str) -> None:
         elif search_state == 'ready':
             remote, search_message = job['result']
         else:
-            search_message = 'Las sugerencias no están disponibles. Pulsa Intro para buscar el nombre completo.'
+            search_message = 'Suggestions are not available. Press Enter to search for the full name.'
     gaia_on = bool(state.get("atlas_gaia"))
     gaia_rows, gaia_key, gaia_note = ([], None, "")
     if gaia_on:
@@ -396,7 +396,7 @@ def render(level: str) -> None:
               "constellations_on": bool(state.get('atlas_constellations')),
               "constellations": json.loads((config.ROOT / 'data/constellations.json').read_text(encoding='utf8'))['figures'],
               "gaia_on": gaia_on, "gaia": gaia_rows, "gaia_key": gaia_key, "gaia_note": gaia_note,
-              "gaia_note_simple": f"{len(gaia_rows)} objetos de catálogo. Pulsa un punto azul para seleccionarlo." if gaia_rows else '',
+              "gaia_note_simple": f"{len(gaia_rows)} catalogue objects. Press a blue dot to select it." if gaia_rows else '',
               "gaia_status": state.get('atlas_gaia_status', 'off'),
               "gaia_region": {k: region[k] for k in ('ra', 'dec', 'fov')},
               "fov_min": config.FOV_MIN_DEG, "fov_max": config.FOV_MAX_DEG,
@@ -441,10 +441,10 @@ def solar_controls(region, level='scientific'):
     sci = level == 'scientific'
     choices = st.session_state.get('solar_choices')
     if choices:
-        chosen = st.selectbox('Identidad del objeto', choices, format_func=lambda x: f"{x['name']} · {x['type']} · {x['spkid']}")
-        if st.button('Usar esta identidad'):
+        chosen = st.selectbox('Object identity', choices, format_func=lambda x: f"{x['name']} · {x['type']} · {x['spkid']}")
+        if st.button('Use this identity'):
             try:
-                with st.spinner('Calculando la posición con JPL Horizons…', show_time=True):
+                with st.spinner('Computing the position with JPL Horizons…', show_time=True):
                     position = solar_position(chosen, datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:00'))
                 navigation.set_solar(st.session_state, st.query_params, position)
                 st.session_state.pop('solar_choices', None)
@@ -455,42 +455,42 @@ def solar_controls(region, level='scientific'):
     p = region.get('solar')
     if not p:
         return
-    with st.expander('Fecha y procedencia de la posición' if sci else 'Fecha del objeto', expanded=True):
+    with st.expander('Date and provenance of the position' if sci else 'Date of the object', expanded=True):
         st.caption(f"{p['identity']['name']} · {p['utc']} UTC · {p['observer_label']}" + (f" · {p['frame']}" if sci else ''))
         with st.form('solar_epoch'):
-            utc = st.text_input('Fecha y hora UTC', value=p['utc'])
+            utc = st.text_input('UTC date and time', value=p['utc'])
             if sci:
-                st.caption('Horizons: observador fijo en el geocentro terrestre (500@399). No es la posición aparente desde SPHEREx.')
-            if st.form_submit_button('Calcular posición para esta fecha'):
+                st.caption('Horizons: observer fixed at the Earth\'s geocentre (500@399). This is not the apparent position from SPHEREx.')
+            if st.form_submit_button('Calculate position for this date'):
                 try:
-                    with st.spinner('Calculando la posición para la fecha indicada…', show_time=True):
+                    with st.spinner('Calculating the position for the given date…', show_time=True):
                         position = solar_position(p['identity'], utc)
                     navigation.set_solar(st.session_state, st.query_params, position)
                     st.rerun()
                 except (ValueError, solar_system.ServiceError) as e:
                     st.error(str(e))
-        st.caption('Tiempo busca exposiciones a lo largo de la trayectoria del objeto. Espectro mantiene el campo fijo: '
-                   'el cubo combina fechas y no es un espectro del cuerpo móvil. Compartir coordenadas no conserva la efeméride.' if sci else
-                   'En Tiempo puede buscar imágenes que sigan el recorrido del objeto. Espectro muestra esta zona fija del cielo.')
+        st.caption('Time looks for exposures along the object\'s trajectory. Spectrum keeps the field fixed: '
+                   'the cube combines dates and is not a spectrum of the moving body. Sharing coordinates does not keep the ephemeris.' if sci else
+                   'In Time you can look for images that follow the path of the object. Spectrum shows this fixed area of the sky.')
         if p['identity'].get('spkid') == '1004083':
             st.markdown(f"[Observaciones oficiales de 3I/ATLAS]({solar_system.ATLAS_DOC}) · [Tabla original]({solar_system.ATLAS_TABLE})")
-            if st.button('Consultar exposiciones oficiales de 3I/ATLAS'):
+            if st.button('Query the official 3I/ATLAS exposures'):
                 try:
-                    with st.spinner('Consultando las exposiciones oficiales de 3I/ATLAS en IRSA…', show_time=True):
+                    with st.spinner('Querying the official 3I/ATLAS exposures at IRSA…', show_time=True):
                         st.session_state['comet_rows'] = comet_table()
                 except (solar_system.ServiceError, ValueError) as e:
                     st.error(str(e))
             t = st.session_state.get('comet_rows')
             if t is not None:
-                row = st.selectbox('Exposición histórica', list(range(len(t))), format_func=lambda i: str(t[i]['obs_title']))
+                row = st.selectbox('Historical exposure', list(range(len(t))), format_func=lambda i: str(t[i]['obs_title']))
                 r = t[row]
-                st.caption(f"{len(t)} exposiciones publicadas. Posición predicha comet_ra/comet_dec, no detección confirmada. Colección {r['obs_collection']}. IRSA advierte señal/ruido baja en muchas longitudes de onda." if sci else
-                           f"{len(t)} observaciones publicadas. La posición prevista no confirma que el cometa sea visible en la imagen.")
-                st.markdown(f"[Acceso oficial a esta observación (DataLink)]({r['access_url']})")
-                if st.button('Centrar en la posición histórica de esta exposición'):
+                st.caption(f"{len(t)} exposures published. Predicted position comet_ra/comet_dec, not a confirmed detection. Collection {r['obs_collection']}. IRSA warns of low signal-to-noise at many wavelengths." if sci else
+                           f"{len(t)} observations published. The predicted position does not confirm that the comet is visible in the image.")
+                st.markdown(f"[Official access to this observation (DataLink)]({r['access_url']})")
+                if st.button('Centre on the historical position of this exposure'):
                     from astropy.time import Time
                     historical = dict(p, ra=float(r['comet_ra']), dec=float(r['comet_dec']), utc=Time(float(r['t_min']), format='mjd').isot,
-                                      kind='irsa_exposure_prediction', observer_label='predicción por exposición publicada por IRSA',
+                                      kind='irsa_exposure_prediction', observer_label='per-exposure prediction published by IRSA',
                                       observer=None, frame='ICRS (tabla IRSA)', source=solar_system.ATLAS_TABLE,
                                       exposure=str(r['obs_id']), access_url=str(r['access_url']))
                     navigation.set_solar(st.session_state, st.query_params, historical)
@@ -502,13 +502,13 @@ def provenance() -> None:
     for L in atlas.LAYERS:
         st.markdown(f"- **{L['label']}** — {L['mission']} · `{L['product']}` · {L['bands']} · {L['epoch']} · "
                     f"[HiPS IRSA]({L['url']}/properties)")
-    st.markdown('Constelaciones: 88 nombres IAU, figuras tradicionales y posiciones J2000 de '
-                '[D3-Celestial / Olaf Frohn](https://github.com/ofrohn/d3-celestial), licencia BSD. '
-                'Serpens se dibuja en dos partes. Las líneas unen estrellas y **no son los límites oficiales IAU**. '
-                'Se ocultan por debajo de 3° de vista para no saturar el campo científico.')
+    st.markdown('Constellations: 88 IAU names, traditional figures and J2000 positions from '
+                '[D3-Celestial / Olaf Frohn](https://github.com/ofrohn/d3-celestial), BSD licence. '
+                'Serpens is drawn in two parts. The lines join stars and **are not the official IAU boundaries**. '
+                'They are hidden below 3° of view so as not to crowd the scientific field.')
     sx = atlas.SPHEREX_HIPS
     st.markdown(f"- **SPHEREx**: IRSA publica `{sx['did']}` ({sx['kind']}, versión {sx['release']}). Sus teselas por "
                 "plano no siguen la ruta HiPS estándar que carga Aladin Lite 3.8.1, así que no se ofrece como mapa. "
-                "El cubo combinado se explora en «Espectro»; ningún mapa del atlas es una secuencia temporal.")
-    st.caption("Gaia: catálogo ESA consultado en el servidor para la región. Las posiciones de otras misiones y épocas "
-               "no deben compararse con SPHEREx para inferir movimiento o variabilidad.")
+                "El cubo combinado se explora en «Spectrum»; ningún mapa del atlas es una secuencia temporal.")
+    st.caption("Gaia: ESA catalogue queried on the server for the region. Positions from other missions and epochs "
+               "must not be compared with SPHEREx to infer motion or variability.")

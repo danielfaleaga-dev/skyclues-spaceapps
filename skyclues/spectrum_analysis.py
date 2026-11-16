@@ -2,7 +2,7 @@
 
 Everything here attaches to the one image and the one spectrum plot of the page; there is no
 comparison mode, page or panel. Presentation only: every number comes from
-``spectral_features`` and is the same in both levels (Sencillo / Científico).
+``spectral_features`` and is the same in both levels (Simple / Scientific).
 """
 
 from __future__ import annotations
@@ -19,8 +19,8 @@ from . import spectral_quality as sq
 from . import spectral_view as sv
 from . import spectrum_interpretation as sxi
 
-POINTS = ["Punto A", "Punto B"]
-DERIVED = {"Diferencia A − B": "diferencia", "Relación A / B": "relacion"}
+POINTS = ["Point A", "Point B"]
+DERIVED = {"Difference A − B": "diferencia", "A / B ratio": "relacion"}
 B_KEY, INSPECT_KEY, CHART_KEY = "sx_b", "sx_inspect", "sx_spectrum_chart"
 RANK = {sf.QUANTIFIABLE: 3, sf.VISIBLE: 2, sf.NO_FEATURE: 1, sf.NOT_EVALUABLE: 0}
 BADGE = {sf.QUANTIFIABLE: "sc-ok", sf.VISIBLE: "sc-warn", sf.NOT_EVALUABLE: "", sf.NO_FEATURE: ""}  # theme.py classes
@@ -62,18 +62,18 @@ def _point_controls(sci: bool, region_key) -> None:
     left, right = st.columns([3, 2], vertical_alignment="bottom")
     with left:
         st.segmented_control(
-            "El clic en la imagen coloca" if sci else "Al pulsar la imagen eliges", POINTS, required=True,
+            "A click on the image places" if sci else "Pressing the image chooses", POINTS, required=True,
             key=theme.bind("sx_active", POINTS[0]), on_change=theme.keep, args=("sx_active",),
-            help="A es la posición del espectro. B es un segundo punto: su espectro se dibuja sobre los mismos ejes, "
-                 "extraído exactamente igual que el de A.")
+            help="A is the spectrum position. B is a second point: its spectrum is drawn on the same axes, "
+                 "extracted in exactly the same way as A's.")
     if has_b:
-        right.button("Quitar el punto B", key="sx_b_remove", on_click=_remove_b,
-                     help="Vuelve a trabajar con una sola posición. No cambia el punto A ni su espectro.")
-        st.caption("A: rombo negro · B: cuadrado cobrizo, con los colores de sus espectros. Línea continua: apertura; "
-                   "discontinua: anillo de fondo (los mismos radios en ambos)." if sci else
-                   "A: rombo negro · B: cuadrado cobrizo, con los mismos colores que sus curvas.")
+        right.button("Remove point B", key="sx_b_remove", on_click=_remove_b,
+                     help="Back to working with a single position. It does not change point A or its spectrum.")
+        st.caption("A: black diamond · B: copper square, with the colours of their spectra. Solid line: aperture; "
+                   "dashed: background annulus (the same radii for both)." if sci else
+                   "A: black diamond · B: copper square, with the same colours as their curves.")
     elif st.session_state.get("opt_sx_active") == POINTS[1]:
-        st.caption("Pulsa la imagen para colocar el punto B y comparar su espectro con el de A.")
+        st.caption("Press the image to place point B and compare its spectrum with A's.")
 
 
 # ----------------------------------------------------------------------------- features (cached)
@@ -146,18 +146,18 @@ def _num(v, unit: str = "", signed: bool = False) -> str:
 def _plain(f: sf.Feature) -> str:
     """One sentence of everyday language for a measured interval (same result as the scientific table)."""
     if f.klass == sf.NOT_EVALUABLE:
-        return "no se puede valorar: faltan datos en ese color o a su alrededor."
+        return "cannot be assessed: data are missing in that colour or around it."
     if f.klass == sf.NO_FEATURE or f.kind is None:
-        return "no destaca sobre los colores vecinos."
+        return "does not stand out from the neighbouring colours."
     up = f.kind == "pico"
     size = (f"un {abs(f.relative):.0%}" if f.relative is not None and abs(f.relative) < 10
             else f"{abs(f.contrast):.3g} {f.unit}")
-    text = f"{'pico' if up else 'valle'}: {size} {'más brillante' if up else 'más débil'} que los colores vecinos"
-    return text + (". Se distingue con claridad." if f.klass == sf.QUANTIFIABLE else
-                   ". Es una variación leve o con datos dudosos.")
+    text = f"{'peak' if up else 'valley'}: {size} {'brighter' if up else 'fainter'} than the neighbouring colours"
+    return text + (". It stands out clearly." if f.klass == sf.QUANTIFIABLE else
+                   ". It is a slight variation or based on doubtful data.")
 
 
-NOT_IDENTIFIED, NOT_APPLICABLE = "No identificada", "No aplica"
+NOT_IDENTIFIED, NOT_APPLICABLE = "Not identified", "Not applicable"
 
 
 def _labelled(f: sf.Feature) -> bool:
@@ -192,8 +192,8 @@ def _where(f: sf.Feature, series: sf.Series | None = None) -> str:
 
 def _heading(f: sf.Feature, sci: bool, series: sf.Series | None) -> str:
     if not sci:
-        return "Lo que has señalado · " + _where(f, series)
-    return ("Característica examinada · " if _labelled(f) else "Intervalo examinado · ") + _where(f, series)
+        return "What you have flagged · " + _where(f, series)
+    return ("Feature examined · " if _labelled(f) else "Interval examined · ") + _where(f, series)
 
 
 def _science_rows(fs: dict, series: sf.Series | None = None) -> pd.DataFrame:
@@ -222,12 +222,12 @@ def _science_rows(fs: dict, series: sf.Series | None = None) -> pd.DataFrame:
                 f"{f.env_left[0]}–{f.env_left[-1]} y {f.env_right[0]}–{f.env_right[-1]}",
                 ", ".join(f"D{d}" for d in f.detectors),
                 "—" if f.nhits_feature is None else f"{f.nhits_feature:.0f} / {f.nhits_env:.0f}"]
-    names = ["Clase", "Tipo", "Intervalo examinado (µm)", "Centro de la característica (µm)",
-             "Intervalo a media altura (µm)", "Canales: a media altura · fuera del ajuste",
-             "Valor de mayor contraste en el intervalo", "Continuo local", "Contraste", "Contraste relativo",
-             "Contraste / dispersión de referencia", "Dispersión de referencia", "Canales del entorno", "Detectores",
-             "NHITS del intervalo / entorno"]
-    return pd.DataFrame({"Magnitud": names, **{f"Espectro {k}": col(f) for k, f in fs.items()}})
+    names = ["Class", "Type", "Interval examined (µm)", "Centre of the feature (µm)",
+             "Interval at half height (µm)", "Channels: at half height · outside the fit",
+             "Highest-contrast value in the interval", "Local continuum", "Contrast", "Relative contrast",
+             "Contrast / reference scatter", "Reference scatter", "Surrounding channels", "Detectors",
+             "NHITS of the interval / surroundings"]
+    return pd.DataFrame({"Quantity": names, **{f"Espectro {k}": col(f) for k, f in fs.items()}})
 
 
 def _feature_list(fs: list) -> str:
@@ -248,11 +248,11 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
     spec_b, b_pos = None, point_b(region_key)
     if b_pos is not None:
         try:
-            with theme.loading("Leyendo los 102 canales alrededor del punto B…" if sci else
-                               "Preparando el espectro del punto B…", "spectrum_b"):
+            with theme.loading("Reading the 102 channels around point B…" if sci else
+                               "Preparing the spectrum of point B…", "spectrum_b"):
                 spec_b = extract(*b_pos)
         except Exception as err:  # noqa: BLE001
-            show_error(err, "No se pudo obtener el espectro del punto B")
+            show_error(err, "The spectrum of point B could not be obtained")
     quals = {"A": sq.spectrum_quality(spec_a), **({"B": sq.spectrum_quality(spec_b)} if spec_b is not None else {})}
     sa = sf.series_from_spectrum(spec_a, quantity, "A")
     sb = sf.series_from_spectrum(spec_b, quantity, "B") if spec_b is not None else None
@@ -281,7 +281,7 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
         for issue in cmp.issues:
             st.warning(f"A y B no se restan ni se dividen: {issue}")
         if cmp.comparable:
-            label = st.segmented_control("Comparación canal a canal", list(DERIVED), required=True,
+            label = st.segmented_control("Channel-by-channel comparison", list(DERIVED), required=True,
                                          key=theme.bind("sx_derived", next(iter(DERIVED))), on_change=theme.keep,
                                          args=("sx_derived",), label_visibility="collapsed")
             kind = DERIVED[label]
@@ -289,15 +289,15 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
                             width="stretch", key="sx_derived_chart")
             _comparison_text(cmp, spec_a, spec_b, kind, sci)
     elif not sci:
-        st.caption("Para comparar con otro punto, elige «Punto B» junto a la imagen y púlsala.")
+        st.caption("To compare with another point, choose «Point B» next to the image and press it.")
 
     # ------------------------------------------------------------ the selected channel or interval
     if found:
         head = st.columns([5, 1], vertical_alignment="center")
         with head[0]:
             theme.eyebrow(_heading(max(found.values(), key=lambda f: (RANK[f.klass], abs(f.ratio or 0.0))), sci, sa))
-        head[1].button("Quitar", key="sx_inspect_clear", on_click=_clear_inspection,
-                       help="Deja de examinar este intervalo. El espectro no cambia.")
+        head[1].button("Remove", key="sx_inspect_clear", on_click=_clear_inspection,
+                       help="Stop examining this interval. The spectrum does not change.")
         if sci:
             st.html("".join(f'<p style="margin:.1rem 0">Espectro {k}: {theme.badge(f.label, BADGE[f.klass])} '
                             f'<span class="sc-muted">{sf.CLASS_MEANING[f.klass]}.</span></p>' for k, f in found.items()))
@@ -307,18 +307,18 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
                 notes = f.reasons + f.limitations
                 if notes:
                     st.markdown(f"**{k}** · " + " ".join(notes))
-            st.caption("Contraste = valor original − continuo local (polinomio de grado 2 por los tres canales válidos "
-                       "de cada lado, sin la característica). La dispersión de referencia es un umbral descriptivo: "
-                       "no es una incertidumbre del flujo ni una significación estadística.")
+            st.caption("Contrast = original value − local continuum (degree-2 polynomial through the three valid channels "
+                       "on each side, without the feature). The reference scatter is a descriptive threshold: "
+                       "it is not a flux uncertainty or a statistical significance.")
         else:
             for k, f in found.items():
                 st.markdown(f"**{k}** — {_plain(f)}")
-            st.caption("Un pico o un valle no identifica por sí solo un material.")
+            st.caption("A peak or a valley does not by itself identify a material.")
         _interval_quality(quals, found, sci)
     else:
-        st.caption("Pulsa un punto del gráfico, o arrastra sobre un intervalo, para examinar ese pico o valle." if not sci
-                   else "Pulse un punto del gráfico o arrastre sobre un intervalo de longitudes de onda para "
-                        "caracterizarlo respecto a su entorno. Doble clic deshace la selección.")
+        st.caption("Press a point on the chart, or drag over an interval, to examine that peak or valley." if not sci
+                   else "Press a point on the chart or drag over a wavelength interval to "
+                        "characterise it against its surroundings. Double-click undoes the selection.")
 
     # ------------------------------------------------------------ what the scan marked
     marked = [(s, f) for s, f in ((sa, fa), (sb, fb)) if s is not None]
@@ -326,15 +326,15 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
         if sci:
             parts = [f"{s.label}: {sum(x.klass == sf.QUANTIFIABLE for x in f)} cuantificables y "
                      f"{sum(x.klass == sf.VISIBLE for x in f)} visibles" for s, f in marked]
-            st.caption("Marcas del gráfico (▼ pico, ▲ valle; relleno = cuantificable, hueco = visible). " +
-                       " · ".join(parts) + ". Ninguna es una detección: el cubo no tiene incertidumbres.")
+            st.caption("Chart marks (▼ peak, ▲ valley; filled = quantifiable, hollow = visible). " +
+                       " · ".join(parts) + ". None is a detection: the cube has no uncertainties.")
         else:
-            st.markdown("Señalado en el gráfico (▼ pico, ▲ valle): " + " · ".join(
+            st.markdown("Flagged on the chart (▼ peak, ▲ valley): " + " · ".join(
                 f"**{s.label}**: {_feature_list(f) or 'nada destacable'}" for s, f in marked) + ".")
     elif sci:
-        st.caption("El método no señala ningún pico ni valle en este espectro por encima de sus criterios.")
+        st.caption("The method flags no peak or valley in this spectrum above its criteria.")
     if sci:
-        with st.expander("Picos y valles: tabla, método y criterios"):
+        with st.expander("Peaks and valleys: table, method and criteria"):
             rows = [{"espectro": f.serie, "tipo": f.kind, "clase": f.label.lower(), "canal": f.canal,
                      "lambda_um": round(f.lam, 4), "intervalo_um": f"{f.lam_lo:.3f}–{f.lam_hi:.3f}",
                      "canales": f.n_channels, "valor": f.value, "continuo": f.continuum, "contraste": f.contrast,
@@ -345,21 +345,21 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
             m = sf.method_summary()
             small = " · ".join(f"{s.label}: {sf.unlabelled_extrema(s, f)}" for s, f in marked)
             st.markdown(
-                f"- **Continuo local:** polinomio de grado {m['grado_del_continuo']} ajustado a los "
-                f"{m['canales_entorno_por_lado']} canales con valor a cada lado del intervalo, contiguos a él; la "
-                "característica y las ya señaladas quedan fuera del ajuste. Se ajusta ln(valor) frente a ln(λ) si el "
-                "entorno es positivo. Junto a un canal sin datos o en el borde del intervalo espectral no hay "
-                "continuo: la característica es *no evaluable*.\n"
-                "- **Sin suavizado.** Las marcas se calculan con los valores originales; nada se interpola.\n"
-                f"- **Criterios:** contraste ≥ {m['umbral_visible']:g} veces la dispersión de referencia para "
-                f"*visible* y ≥ {m['umbral_cuantificable']:g} para *cuantificable*, que además exige un solo detector, "
-                "ningún OVERFLOW/OUTLIER y cobertura (NHITS) estable. Por debajo del "
-                f"{m['contraste_relativo_minimo']:.0%} del continuo no se señala nada.\n"
-                "- **Dispersión de referencia:** la mayor entre la del entorno, la robusta del detector y la del anillo "
-                "de fondo propagada a la apertura. Es un umbral descriptivo, no un error fotométrico.\n"
-                f"- **Oscilaciones no señaladas** (máximos y mínimos locales por debajo de los criterios): {small}.\n"
-                "- **Qué no es:** ni una detección ni una identificación. Un pico cerca de una banda conocida no "
-                f"demuestra esa banda. Método: {m['metodo']}.")
+                f"- **Local continuum:** polynomial of degree {m['grado_del_continuo']} fitted to the "
+                f"{m['canales_entorno_por_lado']} channels with a value on each side of the interval, adjacent to it; the "
+                "feature and those already flagged are left out of the fit. ln(value) is fitted against ln(λ) if the "
+                "surroundings are positive. Next to a channel without data or at the edge of the spectral interval there is no "
+                "continuum: the feature is *not evaluable*.\n"
+                "- **No smoothing.** The marks are computed from the original values; nothing is interpolated.\n"
+                f"- **Criteria:** contrast ≥ {m['umbral_visible']:g} times the reference scatter for "
+                f"*visible* and ≥ {m['umbral_cuantificable']:g} for *quantifiable*, which also requires a single detector, "
+                "no OVERFLOW/OUTLIER and stable coverage (NHITS). Below "
+                f"{m['contraste_relativo_minimo']:.0%} of the continuum nothing is flagged.\n"
+                "- **Reference scatter:** the largest of that of the surroundings, the robust one of the detector and that of the background annulus "
+                "propagated to the aperture. It is a descriptive threshold, not a photometric error.\n"
+                f"- **Unflagged oscillations** (local maxima and minima below the criteria): {small}.\n"
+                "- **What it is not:** neither a detection nor an identification. A peak near a known band does not "
+                f"prove that band. Method: {m['metodo']}.")
     sxi.render(interp, sci, INSPECT_KEY)
     _quality_section(quals, sci)
 
@@ -382,19 +382,19 @@ def _interval_quality(quals: dict, found: dict, sci: bool) -> None:
             if text:
                 st.markdown(f"**{k}** — {text}")
         return
-    st.markdown("**Calidad de la apertura en el intervalo y su entorno**")
+    st.markdown("**Aperture quality in the interval and its surroundings**")
     _quality_table(_quality_rows(window))
-    st.caption(f"{sq.CAUSE_TEXT[sq.INCOMPLETE]} Las causas pueden coexistir: no son categorías excluyentes. Se muestran "
-               f"los canales {lo}–{hi} que tienen algo que contar.")
+    st.caption(f"{sq.CAUSE_TEXT[sq.INCOMPLETE]} The causes can coexist: they are not mutually exclusive categories. The "
+               f"channels {lo}–{hi} that have something to report are shown.")
 
 
-QUALITY_WIDTHS = {"Espectro": 70, "Canal": 55, "λ (µm)": 60, "Detector": 65, "Píxeles válidos": 130,
-                  "Píxeles sin datos": 170, "Peso perdido": 90, "BLOOM": 60, "OVERFLOW": 80, "Estado": 200, "Causas": 260}
+QUALITY_WIDTHS = {"Spectrum": 70, "Channel": 55, "λ (µm)": 60, "Detector": 65, "Valid pixels": 130,
+                  "Pixels without data": 170, "Lost weight": 90, "BLOOM": 60, "OVERFLOW": 80, "Status": 200, "Causes": 260}
 
 
 def _quality_rows(parts: dict) -> list:
     """Rows of the coverage table for {label: [ChannelQuality]}; the spectrum column only when there are two."""
-    return [({"Espectro": k} if len(parts) > 1 else {}) | r for k, qs in parts.items()
+    return [({"Spectrum": k} if len(parts) > 1 else {}) | r for k, qs in parts.items()
             for r in sq.table_rows([q for q in qs if q.affected])]
 
 
@@ -411,21 +411,21 @@ def _plain_quality(window: list, channel: int | None) -> str | None:
         parts = [sq.plain(one)] if one is not None and (not one.valid_for_extraction or one.caution) else []
         near = [q for q in window if q.canal != channel and not q.valid_for_extraction and q.status != "blank"]
         if near:                            # the neighbours decide whether the environment of the channel exists
-            parts.append(f"Cerca de este color, {len(near)} {'no puede' if len(near) == 1 else 'no pueden'} analizarse "
-                         "porque parte de la región seleccionada no tiene datos utilizables.")
+            parts.append(f"Near this colour, {len(near)} {'colour' if len(near) == 1 else 'colours'} cannot be analysed "
+                         "because part of the selected region has no usable data.")
         return " ".join(parts) or None
     lost = [q for q in window if not q.valid_for_extraction and q.status != "blank"]
     blank = [q for q in window if q.status == "blank"]
     caution = [q for q in window if q.caution]
     parts = []
     if lost:
-        parts.append(f"{len(lost)} de {len(window)} colores de esta zona {'no puede' if len(lost) == 1 else 'no pueden'} "
-                     "analizarse porque parte de la región seleccionada no tiene datos utilizables.")
+        parts.append(f"{len(lost)} of {len(window)} {'colour' if len(lost) == 1 else 'colours'} in this area cannot be "
+                     "analysed because part of the selected region has no usable data.")
     if blank:
-        parts.append("Algún color de esta zona no tiene datos en el catálogo de SPHEREx.")
+        parts.append("Some colour in this area has no data in the SPHEREx catalogue.")
     if caution:
-        parts.append(f"En {len(caution)} {'color' if len(caution) == 1 else 'colores'} hay datos, pero parte de la luz "
-                     f"pudo saturarse: {'tómalo' if len(caution) == 1 else 'tómalos'} con cautela.")
+        parts.append(f"In {len(caution)} {'colour' if len(caution) == 1 else 'colours'} there are data, but part of the light "
+                     f"may have saturated: {'take it' if len(caution) == 1 else 'take them'} with caution.")
     return " ".join(parts) or None
 
 
@@ -436,85 +436,85 @@ def _quality_section(quals: dict, sci: bool) -> None:
         for k, qs in quals.items():
             lost = [(q.canal, q.lambda_um) for q in qs if not q.valid_for_extraction and q.status != "blank"]
             if lost:
-                lines.append(f"- **{k}:** {len(lost)} {'color' if len(lost) == 1 else 'colores'} sin analizar "
+                lines.append(f"- **{k}:** {len(lost)} {'colour' if len(lost) == 1 else 'colours'} not analysed "
                              f"({sq.ranges_text(lost)}).")
         if not lines:
             return
-        with st.expander("¿Por qué faltan algunos colores?"):
-            st.markdown("En esos colores, parte de la región seleccionada no tiene datos utilizables en el catálogo de "
-                        "SPHEREx, así que SkyClues no los analiza. No se rellenan ni se inventan valores.\n" + "\n".join(lines))
+        with st.expander("Why are some colours missing?"):
+            st.markdown("In those colours, part of the selected region has no usable data in the SPHEREx "
+                        "catalogue, so SkyClues does not analyse them. Values are not filled in or invented.\n" + "\n".join(lines))
         return
-    with st.expander("Calidad de los canales: cobertura de la apertura y máscaras"):
+    with st.expander("Channel quality: aperture coverage and masks"):
         for k, qs in quals.items():
             s = sq.summary(qs)
             first = next((q for q in qs if q.available and q.px_total), None)
             st.markdown(
-                f"**{k}** — {s['con_valor']} de {s['canales']} canales con valor"
-                + (f" (apertura de {first.px_total} píxeles)" if first else "")
-                + f". Sin valor: {s['rechazados_apertura_incompleta']} por apertura incompleta, {s['vacios_dr1']} vacíos "
-                  f"en DR1 y {s['sin_fondo']} por fondo insuficiente. Con BLOOM en la apertura: {s['con_bloom']}; con "
-                  f"OVERFLOW: {s['con_overflow']}; con precaución (OVERFLOW/OUTLIER) y valor: {s['con_precaucion']}. "
-                  "Los grupos se solapan." + (f" Sin información de cobertura: {s['sin_informacion']}."
+                f"**{k}** — {s['con_valor']} of {s['canales']} channels with a value"
+                + (f" (aperture of {first.px_total} pixels)" if first else "")
+                + f". No value: {s['rechazados_apertura_incompleta']} because of incomplete aperture, {s['vacios_dr1']} empty "
+                  f"in DR1 and {s['sin_fondo']} because of insufficient background. With BLOOM in the aperture: {s['con_bloom']}; with "
+                  f"OVERFLOW: {s['con_overflow']}; with caution (OVERFLOW/OUTLIER) and a value: {s['con_precaucion']}. "
+                  "The groups overlap." + (f" No coverage information: {s['sin_informacion']}."
                                               if s["sin_informacion"] else ""))
         rows = _quality_rows(quals)
         if rows:
             _quality_table(rows)
         else:
-            st.caption("Ningún canal tiene píxeles sin datos, máscaras BLOOM/OVERFLOW ni valores con precaución.")
+            st.caption("No channel has pixels without data, BLOOM/OVERFLOW masks or values with caution.")
         st.caption(
-            f"{sq.CAUSE_TEXT[sq.INCOMPLETE]} La cobertura cuenta los píxeles de la apertura (los que tienen peso > 0); "
-            "«peso perdido» es la parte del área de la apertura que ocupan los píxeles sin datos. BLOOM y OVERFLOW son "
-            "máscaras del FITS (extensión FLAGS) contadas en esos píxeles; no se interpreta su origen. Las causas "
-            "pueden coexistir. Solo se muestran los canales con algo que contar; la tabla del espectro lista los 102.")
+            f"{sq.CAUSE_TEXT[sq.INCOMPLETE]} Coverage counts the aperture pixels (those with weight > 0); "
+            "«lost weight» is the part of the aperture area occupied by pixels without data. BLOOM and OVERFLOW are "
+            "FITS masks (FLAGS extension) counted in those pixels; their origin is not interpreted. The causes "
+            "can coexist. Only channels with something to report are shown; the spectrum table lists all 102.")
 
 
 def _comparison_text(cmp: sf.Comparison, spec_a, spec_b, kind: str, sci: bool) -> None:
     s, unit = cmp.summary, cmp.unit
     if not s["n_ambos"]:
-        st.warning("A y B no tienen ningún canal con valor en común: no hay nada que comparar.")
+        st.warning("A and B have no channel with a value in common: there is nothing to compare.")
         return
     more = round(s["fraccion_a_mayor"] * s["n_ambos"])
     sep = "" if cmp.separation_arcsec is None else f"{cmp.separation_arcsec:.0f}″"
-    close = [n for n in cmp.notes if "solapan" in n or "anillo de fondo de la otra" in n or "misma posición" in n]
+    close = [n for n in cmp.notes if "solapan" in n or "background annulus of the other" in n or "same position" in n]
     if not sci:
-        text = f"A es más brillante que B en **{more} de {s['n_ambos']}** colores infrarrojos con dato en ambos."
+        text = f"A is brighter than B in **{more} of {s['n_ambos']}** infrared colours with data in both."
         if s.get("n_relacion", 0) >= sf.MIN_RESIDUALS:
-            text += (f" En conjunto, A brilla unas **{s['relacion_mediana']:.2g} veces** lo que B, y esa proporción "
-                     f"cambia alrededor de un {s['relacion_dispersion'] / s['relacion_mediana']:.0%} según el color.")
+            text += (f" Overall, A shines about **{s['relacion_mediana']:.2g} times** as much as B, and that ratio "
+                     f"varies by about {s['relacion_dispersion'] / s['relacion_mediana']:.0%} depending on the colour.")
         st.markdown(text)
         if close:
-            st.warning("Los dos puntos están muy cerca: sus medidas se mezclan y la comparación es menos fiable.")
-        st.caption("Una diferencia entre dos puntos no indica por sí sola materiales distintos.")
+            st.warning("The two points are very close: their measurements are mixed and the comparison is less reliable.")
+        st.caption("A difference between two points does not by itself indicate different materials.")
         return
     ap = spec_a.aperture
     st.caption(
-        f"A: RA {spec_a.ra:.5f}°, Dec {spec_a.dec:+.5f}° · B: RA {spec_b.ra:.5f}°, Dec {spec_b.dec:+.5f}° · separación "
-        f"{sep}. Misma extracción en ambos: apertura {ap.r_ap:g} px, anillo {ap.r_in:g}–{ap.r_out:g} px, "
-        f"{spec_a.subpixels}×{spec_a.subpixels} submuestras, unidad {unit}. Canales con valor en ambos: {s['n_ambos']} "
-        f"de {s['n_canales']} (solo A {s['n_solo_a']}, solo B {s['n_solo_b']}, ninguno {s['n_ninguno']}).")
-    facts = [("A − B, mediana", f"{s['diferencia_mediana']:+.4g} {unit}",
+        f"A: RA {spec_a.ra:.5f}°, Dec {spec_a.dec:+.5f}° · B: RA {spec_b.ra:.5f}°, Dec {spec_b.dec:+.5f}° · separation "
+        f"{sep}. Same extraction for both: aperture {ap.r_ap:g} px, annulus {ap.r_in:g}–{ap.r_out:g} px, "
+        f"{spec_a.subpixels}×{spec_a.subpixels} subsamples, unit {unit}. Channels with a value in both: {s['n_ambos']} "
+        f"of {s['n_canales']} (A only {s['n_solo_a']}, B only {s['n_solo_b']}, neither {s['n_ninguno']}).")
+    facts = [("A − B, median", f"{s['diferencia_mediana']:+.4g} {unit}",
               f"de {s['diferencia_min']:+.3g} a {s['diferencia_max']:+.3g}"),
-             ("A > B", f"{more} de {s['n_ambos']}", "canales con valor en ambos")]
+             ("A > B", f"{more} de {s['n_ambos']}", "channels with a value in both")]
     if s.get("n_relacion"):
-        facts.append(("A / B, mediana", f"{s['relacion_mediana']:.3g}",
-                      f"dispersión robusta {s['relacion_dispersion']:.2g} · {s['n_relacion']} canales válidos"))
+        facts.append(("A / B, median", f"{s['relacion_mediana']:.3g}",
+                      f"robust scatter {s['relacion_dispersion']:.2g} · {s['n_relacion']} valid channels"))
     theme.facts(facts)
     for n in cmp.notes:
-        st.caption("Aviso: " + n)
+        st.caption("Warning: " + n)
     away = s.get("canales_apartados") or []
     if away:
-        st.caption("Canales donde A/B se aparta más de su mediana (descriptivo): " + ", ".join(
+        st.caption("Channels where A/B departs most from its median (descriptive): " + ", ".join(
             f"{c['canal']} ({c['lambda_um']:.3f} µm, A/B {c['relacion']:.3g})" for c in away) + ".")
-    st.caption("A/B solo se calcula donde A > 0, B > 0 y B supera "
-               f"{sf.RATIO_MIN_DENOMINATOR:g} veces la dispersión del fondo propagada a la apertura; en el resto se "
-               "marca en gris sobre el eje con su motivo. Una diferencia o una relación distinta de 1 no implica una "
-               "composición distinta: también la producen la extinción, el fondo local y la mezcla de fuentes.")
-    with st.expander("Tabla de la comparación (valores por canal)"):
+    st.caption("A/B is only computed where A > 0, B > 0 and B exceeds "
+               f"{sf.RATIO_MIN_DENOMINATOR:g} times the background scatter propagated to the aperture; elsewhere it is "
+               "marked in grey on the axis with its reason. A difference or a ratio other than 1 does not imply a different "
+               "composition: extinction, the local background and the mixing of sources also produce it.")
+    with st.expander("Comparison table (values per channel)"):
         df = cmp.table()[["canal", "lambda_um", "lambda_min_um", "lambda_max_um", "detector", "a", "b", "estado_a",
                           "estado_b", "diferencia", "relacion", "estado_relacion", "precaucion"]]
         st.dataframe(df, hide_index=True, width="stretch")
         meta = {"producto": "SPHEREx DR1 All-Sky spectral cube", "doi": config.CUBE_DOI,
-                "metodo": "comparación de dos espectros exploratorios extraídos igual; solo visualización",
+                "metodo": "comparison of two exploratory spectra extracted the same way; display only",
                 "magnitud": sf.QUANTITY_NAMES[cmp.quantity], "unidad": unit,
                 "a": {"ra_deg": spec_a.ra, "dec_deg": spec_a.dec}, "b": {"ra_deg": spec_b.ra, "dec_deg": spec_b.dec},
                 "separacion_arcsec": cmp.separation_arcsec, "apertura_px": ap.r_ap, "anillo_px": [ap.r_in, ap.r_out],
@@ -522,6 +522,6 @@ def _comparison_text(cmp: sf.Comparison, spec_a, spec_b, kind: str, sci: bool) -
                 "criterios": sf.method_summary(), "teselas": sorted({str(t.get("tile")) for t in
                                                                      spec_a.tiles + spec_b.tiles})}
         csv = "".join(f"# {k}: {json.dumps(v, ensure_ascii=False)}\n" for k, v in meta.items()) + df.to_csv(index=False)
-        st.download_button("Descargar CSV de la comparación", csv.encode("utf-8"), mime="text/csv",
+        st.download_button("Download the comparison CSV", csv.encode("utf-8"), mime="text/csv",
                            file_name=f"skyclues_comparacion_{spec_a.ra:.4f}_{spec_a.dec:+.4f}__"
                                      f"{spec_b.ra:.4f}_{spec_b.dec:+.4f}.csv", key="sx_cmp_csv")

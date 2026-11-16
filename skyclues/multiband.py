@@ -45,8 +45,8 @@ DEFAULT_LAMBDAS_UM = {"R": 4.5, "G": 2.2, "B": 1.2}
 PERCENTILES = (1.0, 99.5)
 ASINH_A = 0.1
 STRETCH_MODES = {
-    "independiente": "límites propios de cada canal (percentiles 1–99.5, asinh)",
-    "comun": "mismos límites en MJy/sr para los tres canales (percentiles 1–99.5 del conjunto, asinh)",
+    "independiente": "each channel's own limits (percentiles 1–99.5, asinh)",
+    "comun": "same limits in MJy/sr for the three channels (percentiles 1–99.5 of the set, asinh)",
 }
 #: display intensity (0-1, after the stretch) below which a colour is practically black on screen.
 DARK_LEVEL = 0.10
@@ -86,20 +86,20 @@ def default_numbers(channels: list[sc.Channel]) -> dict[str, int]:
 def select_channels(channels: list[sc.Channel], numbers: dict[str, int]) -> dict[str, sc.Channel]:
     """{R, G, B: Channel}. Refuses missing roles, unknown or repeated channels and BLANKCH channels."""
     if set(numbers) != set(ROLES):
-        raise ValueError("la composición necesita exactamente un canal para R, G y B")
+        raise ValueError("the composite needs exactly one channel for each of R, G and B")
     by_number = {c.number: c for c in channels}
     out = {}
     for role in ROLES:
         n = numbers[role]
         if not isinstance(n, (int, np.integer)) or int(n) not in by_number:
-            raise ValueError(f"canal {n!r} inexistente para {role}")
+            raise ValueError(f"channel {n!r} does not exist for {role}")
         c = by_number[int(n)]
         if c.blank:
-            raise ValueError(f"el canal {c.number} ({c.wavelength_um:.3f} µm) no tiene datos en DR1 (BLANKCH); "
-                             "no puede formar parte de una composición")
+            raise ValueError(f"channel {c.number} ({c.wavelength_um:.3f} µm) has no data in DR1 (BLANKCH); "
+                             "it cannot be part of a composite")
         out[role] = c
     if len({c.number for c in out.values()}) != 3:
-        raise ValueError("los tres canales deben ser distintos")
+        raise ValueError("the three channels must be different")
     return out
 
 
@@ -136,7 +136,7 @@ class StretchSpec:
     def to_dict(self) -> dict:
         d = asdict(self)
         d["description"] = STRETCH_MODES[self.mode]
-        d["note"] = "solo afecta a la visualización; los valores del cubo no se modifican"
+        d["note"] = "it only affects the display; the cube values are not modified"
         return d
 
     @classmethod
@@ -152,7 +152,7 @@ def compute_stretch(samples: dict[str, np.ndarray], mode: str) -> StretchSpec:
         raise ValueError(f"modo de escala desconocido: {mode!r}")
     n = {len(v) for v in samples.values()}
     if len(n) != 1:
-        raise ValueError("las muestras de los tres canales deben ser los mismos píxeles")
+        raise ValueError("the samples of the three channels must be the same pixels")
     lo_p, hi_p = PERCENTILES
     vmin, vmax, flat = {}, {}, []
     if mode == "comun":
@@ -229,7 +229,7 @@ class Composite:
             tiles[ps[0].tile.ipix] = ps[0].tile.provenance()
         return {
             "producto": "SPHEREx DR1 All-Sky spectral cube", "doi": config.CUBE_DOI,
-            "tipo": "composición de falso color (convención de visualización); no es color visible ni una medida",
+            "tipo": "false-colour composite (display convention); it is not visible colour or a measurement",
             "centro_ra_deg": self.ra, "centro_dec_deg": self.dec, "campo_deg": self.field_deg,
             "canales": {r: {"canal": c.number, "plano": c.plane, "detector": c.detector, "subcanal": c.subchannel,
                             "lambda_um": c.wavelength_um, "lambda_min_um": c.wl_min_um, "lambda_max_um": c.wl_max_um,
@@ -237,8 +237,8 @@ class Composite:
                         for r, c in self.channels.items()},
             "escala": self.stretch.to_dict(), "visualizacion": self.display_stats(),
             "alineacion": self.alignment, "cobertura": self.coverage,
-            "remuestreo": "ninguno: los tres planos comparten la rejilla HEALPix nativa de cada tesela",
-            "valores": "IMAGE original del cubo en MJy/sr (sin modificar); sin datos = NaN o NHITS = 0",
+            "remuestreo": "none: the three planes share each tile's native HEALPix grid",
+            "valores": "original IMAGE of the cube in MJy/sr (unmodified); no data = NaN or NHITS = 0",
             "teselas": list(tiles.values()), "avisos": list(self.warnings)}
 
 
@@ -248,9 +248,9 @@ def check_alignment(maps: dict[str, sc.ChannelMap]) -> dict:
     for r in ROLES[1:]:
         m = maps[r]
         if (m.ra, m.dec, m.field_deg) != (m0.ra, m0.dec, m0.field_deg):
-            raise MultibandAlignmentError("los canales no corresponden al mismo centro y campo")
+            raise MultibandAlignmentError("the channels do not correspond to the same centre and field")
         if len(m.patches) != len(m0.patches):
-            raise MultibandAlignmentError("los canales cubren teselas distintas")
+            raise MultibandAlignmentError("the channels cover different tiles")
     tiles, solid = [], set()
     for ps in zip(*(maps[r].patches for r in ROLES)):
         a = ps[0]
@@ -258,30 +258,30 @@ def check_alignment(maps: dict[str, sc.ChannelMap]) -> dict:
         for b in ps[1:]:
             if (b.tile.ipix, b.tile.order, b.tile.url, b.tile.size, b.tile.etag) != \
                     (a.tile.ipix, a.tile.order, a.tile.url, a.tile.size, a.tile.etag):
-                raise MultibandAlignmentError(f"tesela {a.tile.ipix}: los canales proceden de archivos o "
-                                              "versiones distintas (ETag)")
+                raise MultibandAlignmentError(f"tile {a.tile.ipix}: the channels come from different files or "
+                                              "versions (ETag)")
             if (b.x0, b.y0, b.image.shape) != (a.x0, a.y0, a.image.shape):
-                raise MultibandAlignmentError(f"tesela {a.tile.ipix}: recuadros de píxeles distintos")
+                raise MultibandAlignmentError(f"tile {a.tile.ipix}: different pixel boxes")
             if b.tile.wcs.to_header_string() != wcs0:
-                raise MultibandAlignmentError(f"tesela {a.tile.ipix}: WCS celeste distinto entre canales")
+                raise MultibandAlignmentError(f"tile {a.tile.ipix}: different celestial WCS between channels")
             if b.nhits.shape != b.image.shape or b.flags.shape != b.image.shape:
-                raise MultibandAlignmentError(f"tesela {a.tile.ipix}: extensiones con forma distinta")
+                raise MultibandAlignmentError(f"tile {a.tile.ipix}: extensions with a different shape")
         # Same WCS and box imply the same centres; checked numerically once per tile and channel set.
         ca = a.centres_world()
         for b in ps[1:]:
             if b.tile is not a.tile:
                 for u, v in zip(ca, b.centres_world()):
                     if not np.array_equal(u, v):
-                        raise MultibandAlignmentError(f"tesela {a.tile.ipix}: centros de píxel distintos")
+                        raise MultibandAlignmentError(f"tile {a.tile.ipix}: different pixel centres")
         solid.add(a.tile.pixel_solid_angle_sr)
         tiles.append({"tesela": int(a.tile.ipix), "x0": int(a.x0), "y0": int(a.y0),
                       "nx": int(a.image.shape[1]), "ny": int(a.image.shape[0]), "etag": a.tile.etag})
     if len(solid) != 1:
-        raise MultibandAlignmentError("teselas con ángulos sólidos de píxel distintos")
+        raise MultibandAlignmentError("tiles with different pixel solid angles")
     return {"verificada": True, "teselas": tiles, "varias_teselas": len(tiles) > 1,
             "pixel_arcsec": m0.patches[0].tile.pixel_scale_arcsec,
-            "criterio": "mismo archivo y ETag, mismo WCS celeste, mismo recuadro y mismos centros de píxel "
-                        "en los tres canales"}
+            "criterio": "same file and ETag, same celestial WCS, same box and same pixel centres "
+                        "in the three channels"}
 
 
 def _coverage(maps, field_masks) -> tuple[dict, dict[str, np.ndarray]]:
@@ -316,15 +316,15 @@ def build(ra: float, dec: float, field_deg: float, channels: list[sc.Channel], n
     maps = {r: map_fn(ra, dec, field_deg, chosen[r].plane) for r in ROLES}
     for r in ROLES:
         if maps[r].channel.number != chosen[r].number:
-            raise MultibandAlignmentError(f"{r}: se leyó el canal {maps[r].channel.number} en lugar del "
+            raise MultibandAlignmentError(f"{r}: channel {maps[r].channel.number} was read instead of "
                                           f"{chosen[r].number}")
     alignment = check_alignment(maps)
     field_masks = [maps[ROLES[0]].in_field(p) for p in maps[ROLES[0]].patches]
     cov, samples = _coverage(maps, field_masks)
     if cov["tres_canales"] < MIN_COMMON_PIXELS:
         raise InsufficientDataError(
-            f"solo {cov['tres_canales']} píxeles del campo tienen datos en los tres canales (mínimo "
-            f"{MIN_COMMON_PIXELS}); no se construye la composición")
+            f"only {cov['tres_canales']} pixels of the field have data in all three channels (minimum "
+            f"{MIN_COMMON_PIXELS}); the composite is not built")
     stretch = compute_stretch(samples, mode)
     comp = Composite(ra, dec, field_deg, chosen, maps, stretch, alignment, cov, field_masks)
     comp.warnings = _warnings(comp, samples)
@@ -335,49 +335,49 @@ def _warnings(comp: Composite, samples: dict[str, np.ndarray]) -> list[str]:
     w = []
     ch, cov, st = comp.channels, comp.coverage, comp.stretch
     if st.mode == "independiente":
-        w.append("Escala independiente: cada canal usa todo su contraste, de modo que los colores NO reflejan "
-                 "los cocientes de brillo entre canales (un canal mucho más débil puede verse tan intenso como "
-                 "los demás). Para comparar intensidades use la escala común o el espectro.")
+        w.append("Independent scale: each channel uses its full contrast, so the colours do NOT reflect "
+                 "the brightness ratios between channels (a much fainter channel can look as intense as "
+                 "the others). To compare intensities use the common scale or the spectrum.")
     else:
         lo, hi = st.vmin["R"], st.vmax["R"]
         for r in ROLES:
             own = float(np.percentile(samples[r], PERCENTILES[1]))
             if own < lo + 0.05 * (hi - lo):
-                w.append(f"Escala común: el canal {ch[r].number} ({ROLE_NAMES[r]}) es mucho más débil que los demás "
-                         "en MJy/sr y apenas aporta color; no significa que carezca de datos.")
+                w.append(f"Common scale: channel {ch[r].number} ({ROLE_NAMES[r]}) is much fainter than the others "
+                         "in MJy/sr and contributes little colour; that does not mean it lacks data.")
         ds = comp.display_stats()
         if ds["poco_contraste"]:
-            w.append(f"Escala común con poco contraste útil: en el {ds['fraccion_oscura']:.0%} del campo los tres colores "
-                     f"quedan por debajo del {DARK_LEVEL:.0%} de la escala (casi negro), porque el cielo de fondo es "
-                     f"mucho más tenue en MJy/sr que los píxeles más brillantes que fijan el límite común "
-                     f"({lo:.4g}–{hi:.4g} MJy/sr). Es la consecuencia correcta de comparar intensidades físicas, no un "
-                     "fallo ni falta de datos. Para ver la forma en cada canal use «Resaltar cada color».")
+            w.append(f"Common scale with little useful contrast: over {ds['fraccion_oscura']:.0%} of the field all three colours "
+                     f"fall below {DARK_LEVEL:.0%} of the scale (almost black), because the background sky is "
+                     f"much fainter in MJy/sr than the brightest pixels that set the common limit "
+                     f"({lo:.4g}–{hi:.4g} MJy/sr). This is the correct consequence of comparing physical intensities, not a "
+                     "failure or missing data. To see the shape in each channel use «Stretch each colour».")
     for r in st.degenerate:
-        w.append(f"El canal {ch[r].number} ({ROLE_NAMES[r]}) no tiene contraste en el campo (percentiles iguales): "
-                 "su componente de color es uniforme.")
+        w.append(f"Channel {ch[r].number} ({ROLE_NAMES[r]}) has no contrast in the field (equal percentiles): "
+                 "its colour component is uniform.")
     lam = [ch[r].wavelength_um for r in ROLES]
     if not lam[0] > lam[1] > lam[2]:
-        w.append("La asignación no sigue el orden cromático habitual (R = longitud de onda más larga, "
-                 "B = más corta); es válida, pero los colores no siguen el orden de λ.")
+        w.append("The assignment does not follow the usual chromatic order (R = longest wavelength, "
+                 "B = shortest); it is valid, but the colours do not follow the order of λ.")
     differ = len(set(cov["con_datos"].values())) > 1 or cov["parcial"] > 0
     if differ:
-        w.append(f"Cobertura distinta entre canales: {cov['parcial']} píxeles del campo tienen datos en uno o dos "
-                 "canales pero no en los tres; en la composición se muestran como sin datos (rosa), nunca con un "
-                 "color parcial.")
+        w.append(f"Different coverage between channels: {cov['parcial']} pixels of the field have data in one or two "
+                 "channels but not in all three; in the composite they are shown as no data (pink), never with a "
+                 "partial colour.")
     if cov["fraccion_tres_canales"] < COVERAGE_WARN_FRACTION:
-        w.append(f"Solo el {cov['fraccion_tres_canales']:.0%} del campo tiene datos en los tres canales.")
+        w.append(f"Only {cov['fraccion_tres_canales']:.0%} of the field has data in all three channels.")
     if comp.alignment["varias_teselas"]:
-        w.append("El campo abarca varias teselas HEALPix: se dibujan los píxeles nativos de cada una (misma "
-                 "rejilla, mismo ángulo sólido); no hay remuestreo ni costura interpolada.")
+        w.append("The field spans several HEALPix tiles: the native pixels of each are drawn (same "
+                 "grid, same solid angle); there is no resampling or interpolated seam.")
     for r in ROLES:
         lines = striping_lines(ch[r])
         if lines:
-            w.append(f"El canal {ch[r].number} ({ROLE_NAMES[r]}) contiene {', '.join(lines)}: el mosaico DR1 puede "
-                     "mostrar rayado cerca de líneas intensas (problema conocido del LVF); no es estructura del cielo.")
+            w.append(f"Channel {ch[r].number} ({ROLE_NAMES[r]}) contains {', '.join(lines)}: the DR1 mosaic may "
+                     "show striping near intense lines (a known LVF issue); it is not sky structure.")
     flagged = {r: comp.maps[r].summary()["flag_pixels"] for r in ROLES}
     sat = {r: f["OVERFLOW"] for r, f in flagged.items() if f.get("OVERFLOW")}
     if sat:
-        w.append("Píxeles con OVERFLOW (entradas saturadas) en el campo: " +
+        w.append("Pixels with OVERFLOW (saturated inputs) in the field: " +
                  ", ".join(f"canal {ch[r].number}: {n}" for r, n in sat.items()) + ".")
     return w
 

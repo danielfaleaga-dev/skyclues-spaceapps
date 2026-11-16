@@ -172,11 +172,11 @@ def _parse_content_range(value: str | None) -> tuple[int, int, int]:
     """'bytes a-b/total' -> (a, b + 1, total); total -1 when '*'."""
     m = re.fullmatch(r"\s*bytes\s+(\d+)-(\d+)/(\d+|\*)\s*", value or "")
     if not m:
-        raise CubeFormatError(f"Content-Range no válido: {value!r}")
+        raise CubeFormatError(f"Invalid Content-Range: {value!r}")
     a, b = int(m[1]), int(m[2]) + 1
     total = int(m[3]) if m[3] != "*" else -1
     if not (0 <= a < b <= total):
-        raise CubeFormatError(f"Content-Range sin tamaño verificable o fuera del archivo: {value!r}")
+        raise CubeFormatError(f"Content-Range without a verifiable size or outside the file: {value!r}")
     return a, b, total
 
 
@@ -190,20 +190,20 @@ def _parse_multipart(body: bytes, boundary: bytes) -> list[tuple[int, int, int, 
             return parts
         hdr_end = body.find(b"\r\n\r\n", pos)
         if hdr_end < 0:
-            raise CubeFormatError("respuesta multipart truncada (cabecera de parte)")
+            raise CubeFormatError("truncated multipart response (part header)")
         m = re.search(rb"(?im)^content-range:\s*([^\r\n]+)", body[pos:hdr_end])
         if not m:
-            raise CubeFormatError("parte multipart sin Content-Range")
+            raise CubeFormatError("multipart part without Content-Range")
         start, stop, total = _parse_content_range(m.group(1).decode("latin-1"))
         data = body[hdr_end + 4: hdr_end + 4 + (stop - start)]
         if len(data) != stop - start:
-            raise CubeFormatError("respuesta multipart truncada (datos)")
+            raise CubeFormatError("truncated multipart response (data)")
         parts.append((start, stop, total, data))
         pos = hdr_end + 4 + len(data)
         if body[pos:pos + 2] != b"\r\n" or not body.startswith(delim, pos + 2):
-            raise CubeFormatError("respuesta multipart sin delimitador de cierre")
+            raise CubeFormatError("multipart response without a closing delimiter")
         pos += 2
-    raise CubeFormatError("respuesta multipart sin delimitador")
+    raise CubeFormatError("multipart response without a delimiter")
 
 
 def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
@@ -211,7 +211,7 @@ def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
     """One GET with a Range header for ``spec`` ([start, stop) pairs). Returns
     ({(a, b): bytes}, etag, total size, last-modified). Never reads a 200 body."""
     if not spec or len(spec) > config.CUBE_MAX_RANGES_PER_REQUEST:
-        raise ValueError(f"entre 1 y {config.CUBE_MAX_RANGES_PER_REQUEST} rangos por petición ({len(spec)})")
+        raise ValueError(f"between 1 and {config.CUBE_MAX_RANGES_PER_REQUEST} ranges per request ({len(spec)})")
     header = "bytes=" + ",".join(f"{a}-{b - 1}" for a, b in spec)
     expected = sum(b - a for a, b in spec)
     cap = expected + 256 * len(spec) + 8192          # multipart headers are small
@@ -223,28 +223,28 @@ def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
     with resp:
         code = resp.status_code
         if code == 200:
-            raise RangeNotHonoured("IRSA ignoró la petición por rangos (HTTP 200: enviaría el archivo completo); "
-                                   "no se ha leído nada")
+            raise RangeNotHonoured("IRSA ignored the range request (HTTP 200: it would send the whole file); "
+                                   "nothing has been read")
         if code != 206:
             if archive.is_transient_status(code):
                 raise archive.ArchiveTransientError(f"HTTP {code} de IRSA (cubo espectral)")
             raise archive.ArchivePermanentError(f"HTTP {code} de IRSA (cubo espectral, no se reintenta)")
         got_etag = resp.headers.get("ETag")
         if etag and got_etag != etag:
-            raise FileChangedError(f"El cubo cambió en IRSA (ETag {got_etag} ≠ {etag})")
+            raise FileChangedError(f"The cube changed at IRSA (ETag {got_etag} ≠ {etag})")
         try:
             clen = int(resp.headers.get("Content-Length", "-1"))
         except ValueError:
             clen = -1
         if clen > cap:
-            raise RangeNotHonoured(f"respuesta de {clen} B para {expected} B pedidos; no se lee")
+            raise RangeNotHonoured(f"response of {clen} B for {expected} B requested; it is not read")
         chunks, got = [], 0
         try:
             for chunk in resp.iter_content(1 << 16):
                 _count("bytes_network", len(chunk))
                 got += len(chunk)
                 if got > cap:
-                    raise RangeNotHonoured("respuesta mayor que lo pedido; lectura interrumpida")
+                    raise RangeNotHonoured("response larger than requested; read interrupted")
                 chunks.append(chunk)
         except (requests.Timeout, requests.ConnectionError, requests.exceptions.ChunkedEncodingError) as err:
             raise archive.ArchiveTransientError(f"transferencia interrumpida: {str(err)[:120]}") from err
@@ -253,7 +253,7 @@ def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
         if "multipart/byteranges" in ctype:
             m = re.search(r'boundary="?([^";]+)"?', ctype)
             if not m:
-                raise CubeFormatError("multipart sin boundary")
+                raise CubeFormatError("multipart without boundary")
             parts = _parse_multipart(body, m.group(1).encode("latin-1"))
         else:
             start, stop, total = _parse_content_range(resp.headers.get("Content-Range"))
@@ -263,7 +263,7 @@ def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
         last_modified = resp.headers.get("Last-Modified")
     totals = {p[2] for p in parts if p[2] >= 0}
     if len(totals) > 1 or (size is not None and totals and totals != {size}):
-        raise FileChangedError(f"Tamaño del cubo distinto del registrado ({totals} ≠ {size})")
+        raise FileChangedError(f"Cube size differs from the recorded one ({totals} ≠ {size})")
     out = {}
     for a, b in spec:
         for s, e, _, data in parts:
@@ -271,7 +271,7 @@ def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
                 out[(a, b)] = data[a - s:b - s]
                 break
         else:
-            raise CubeFormatError(f"IRSA no devolvió el rango {a}-{b - 1}")
+            raise CubeFormatError(f"IRSA did not return range {a}-{b - 1}")
     total = next(iter(totals)) if totals else (size or -1)
     return out, got_etag, total, last_modified
 
@@ -294,7 +294,7 @@ def _with_retries(fn, sleep=None):
         if time.monotonic() + delay > deadline:
             break
         (sleep or time.sleep)(delay)
-    raise archive.ArchiveTransientError(f"Cubo espectral: sin respuesta válida tras {attempt + 1} intentos: {last}")
+    raise archive.ArchiveTransientError(f"Spectral cube: no valid response after {attempt + 1} attempts: {last}")
 
 
 # Verbatim disk cache of byte ranges (exact bytes served by IRSA, keyed by URL + ETag).
@@ -330,10 +330,10 @@ def read_ranges(url: str, ranges: list[tuple[int, int]], size: int, etag: str | 
     """
     want = sorted(set((int(a), int(b)) for a, b in ranges))
     if any(a < 0 or b <= a or b > size for a, b in want):
-        raise ValueError("rango fuera del archivo")
+        raise ValueError("range outside the file")
     total = sum(b - a for a, b in want)
     if total > config.CUBE_MAX_BYTES_PER_CALL:
-        raise ValueError(f"lectura de {total / 2**20:.1f} MB > límite {config.CUBE_MAX_BYTES_PER_CALL / 2**20:.0f} MB")
+        raise ValueError(f"read of {total / 2**20:.1f} MB > limit {config.CUBE_MAX_BYTES_PER_CALL / 2**20:.0f} MB")
     out, todo = {}, []
     for r in want:
         p = _chunk_path(url, etag, *r)
@@ -391,7 +391,7 @@ class Channel:
     @property
     def label(self) -> str:
         return (f"Canal {self.number} · {self.wavelength_um:.3f} µm · D{self.detector} subcanal "
-                f"{self.subchannel}" + (" · SIN DATOS" if self.blank else ""))
+                f"{self.subchannel}" + (" · NO DATA" if self.blank else ""))
 
 
 def _end_card(buf: bytes) -> int | None:
@@ -542,7 +542,7 @@ class CubeTile:
         out = []
         for p in planes:
             if not (0 <= p < nz and 0 <= y0 <= y1 < ny):
-                raise ValueError(f"plano {p} o filas {y0}-{y1} fuera del cubo")
+                raise ValueError(f"plane {p} or rows {y0}-{y1} outside the cube")
             a = base + ((p * ny + y0) * nx) * item
             out.append((a, a + (y1 - y0 + 1) * nx * item))
         return out
@@ -569,14 +569,14 @@ class CubeTile:
 def _validate_layout(t: CubeTile) -> None:
     for ext in CUBE_EXTENSIONS:
         if ext not in t.headers:
-            raise CubeFormatError(f"falta la extensión {ext}")
+            raise CubeFormatError(f"extension {ext} is missing")
         h = t.header(ext)
         if int(h.get("NAXIS", 0)) != 3:
             raise CubeFormatError(f"{ext} no es un cubo 3D")
         if (int(h["NAXIS1"]), int(h["NAXIS2"]), int(h["NAXIS3"])) != t.shape[::-1]:
-            raise CubeFormatError(f"{ext} con forma distinta de IMAGE")
+            raise CubeFormatError(f"{ext} has a different shape from IMAGE")
         if float(h.get("BSCALE", 1)) != 1 or float(h.get("BZERO", 0)) != 0:
-            raise CubeFormatError(f"{ext} con BSCALE/BZERO (no previsto)")
+            raise CubeFormatError(f"{ext} with BSCALE/BZERO (not expected)")
         if int(h["BITPIX"]) not in _BITPIX_DTYPE:
             raise CubeFormatError(f"BITPIX {h['BITPIX']} no previsto")
     hi = t.header("IMAGE")
@@ -587,16 +587,16 @@ def _validate_layout(t: CubeTile) -> None:
         raise CubeFormatError(f"BUNIT {t.bunit!r} ≠ 'MJy/sr'")
     nz = t.shape[0]
     if nz != 102 or t.blank_spec != {(3, 17), (4, 1)}:
-        raise CubeFormatError("DR1 requiere 102 planos y BLANKCH D3:17,D4:01")
+        raise CubeFormatError("DR1 requires 102 planes and BLANKCH D3:17,D4:01")
     if len(t.channels_table) != nz:
-        raise CubeFormatError(f"SPECTRAL_CHANNELS tiene {len(t.channels_table)} filas para {nz} planos")
+        raise CubeFormatError(f"SPECTRAL_CHANNELS has {len(t.channels_table)} rows for {nz} planes")
     nx = t.shape[2]
     if nx & (nx - 1) or t.shape[1] != nx:
-        raise CubeFormatError("la tesela no es cuadrada de lado potencia de 2 (HEALPix)")
+        raise CubeFormatError("the tile is not square with a power-of-2 side (HEALPix)")
     for c in t.channels:
         if c.number != 17 * (c.detector - 1) + c.subchannel:
-            raise CubeFormatError(f"plano {c.plane}: D{c.detector} subcanal {c.subchannel} no sigue "
-                                  "índice = 17·(banda−1) + (canal−1)")
+            raise CubeFormatError(f"plane {c.plane}: D{c.detector} subchannel {c.subchannel} does not follow "
+                                  "index = 17·(band−1) + (channel−1)")
         if not (c.wl_min_um <= c.wavelength_um <= c.wl_max_um):
             raise CubeFormatError(f"canal {c.number}: λ fuera de [WL_MIN, WL_MAX]")
 
@@ -612,9 +612,9 @@ def read_layout(ipix: int, order: int = config.CUBE_ORDER, url: str | None = Non
         buf = b""
         while (end := _end_card(buf)) is None:
             if off + len(buf) >= rd.size:
-                raise CubeFormatError("cabecera FITS truncada, sin END")
+                raise CubeFormatError("FITS header truncated, no END")
             if len(buf) > 40 * BLOCK:
-                raise CubeFormatError("cabecera FITS sin END")
+                raise CubeFormatError("FITS header without END")
             buf += rd.read(off + len(buf), min(off + len(buf) + BLOCK, rd.size))
         hlen = (end + 80 + BLOCK - 1) // BLOCK * BLOCK
         text = buf[:hlen].decode("ascii")
@@ -634,9 +634,9 @@ def read_layout(ipix: int, order: int = config.CUBE_ORDER, url: str | None = Non
                 wcs_wave = [float(v) for v in np.asarray(tab["WAVELENGTHS"]).ravel()]
         off += hlen + (n + BLOCK - 1) // BLOCK * BLOCK
     if off != rd.size:
-        raise CubeFormatError(f"estructura FITS ({off} B) ≠ tamaño del archivo ({rd.size} B)")
+        raise CubeFormatError(f"FITS structure ({off} B) ≠ file size ({rd.size} B)")
     if channels is None:
-        raise CubeFormatError("falta la tabla SPECTRAL_CHANNELS")
+        raise CubeFormatError("the SPECTRAL_CHANNELS table is missing")
     t = CubeTile(ipix=int(ipix), order=order, url=url, size=rd.size, etag=rd.etag,
                  last_modified=rd.last_modified, headers=headers, data_offset=offsets, data_nbytes=nbytes,
                  channels_table=channels, wcs_wave_um=wcs_wave or [])
@@ -753,8 +753,8 @@ def tile_boxes(ra: float, dec: float, radius_deg: float, order: int = config.CUB
         x, y = t.wcs.world_to_pixel_values(r[sel], d[sel])
         nz, ny, nx = t.shape
         if np.any((x < -0.51) | (x > nx - 0.49) | (y < -0.51) | (y > ny - 0.49)) or not np.all(np.isfinite(x)):
-            raise CubeFormatError(f"posiciones asignadas a la tesela {ipix} caen fuera de su WCS "
-                                  "(índice HEALPix y WCS no concuerdan)")
+            raise CubeFormatError(f"positions assigned to tile {ipix} fall outside its WCS "
+                                  "(HEALPix index and WCS do not agree)")
         out.append(TileBox(t, int(max(0, math.floor(x.min()) - 1)), int(min(nx - 1, math.ceil(x.max()) + 1)),
                            int(max(0, math.floor(y.min()) - 1)), int(min(ny - 1, math.ceil(y.max()) + 1))))
     return out
@@ -850,7 +850,7 @@ def channel_map(ra: float, dec: float, field_deg: float, plane: int) -> ChannelM
     patches, ch = [], None
     for b in boxes:
         if ch is not None and b.tile.channels != boxes[0].tile.channels:
-            raise CubeFormatError("teselas con definiciones espectrales distintas")
+            raise CubeFormatError("tiles with different spectral definitions")
         try:
             got = b.tile.read_rows({e: [plane] for e in CUBE_EXTENSIONS}, b.y0, b.y1, b.x0, b.x1)
         except FileChangedError:
@@ -859,7 +859,7 @@ def channel_map(ra: float, dec: float, field_deg: float, plane: int) -> ChannelM
         patches.append(Patch(b.tile, b.x0, b.y0, got["IMAGE"][0].astype(np.float64), got["NHITS"][0],
                              got["FLAGS"][0]))
         if b.tile.channels[plane].blank and (np.isfinite(got["IMAGE"]).any() or np.any(got["NHITS"] != 0)):
-            raise CubeFormatError("canal BLANKCH con datos inesperados; no se muestra")
+            raise CubeFormatError("BLANKCH channel with unexpected data; it is not shown")
         ch = ch or b.tile.channels[plane]
     return ChannelMap(ch, ra, dec, field_deg, patches)
 
@@ -877,16 +877,16 @@ class Aperture:
         mx = config.CUBE_APERTURE_MAX_PX
         if not (0 < self.r_ap <= mx[0] and self.r_ap < self.r_in < self.r_out and self.r_in <= mx[1]
                 and self.r_out <= mx[2]):
-            raise ValueError(f"Radios no válidos (apertura {self.r_ap}, anillo {self.r_in}–{self.r_out} px): "
-                             f"se requiere 0 < apertura ≤ {mx[0]} < … y apertura < interior < exterior ≤ {mx[2]}.")
+            raise ValueError(f"Invalid radii (aperture {self.r_ap}, annulus {self.r_in}–{self.r_out} px): "
+                             f"0 < aperture ≤ {mx[0]} < … and aperture < inner < outer ≤ {mx[2]} are required.")
         return self
 
 
 STATUS_TEXT = {
     "ok": "medido",
-    "blank": "canal sin datos en DR1 (BLANKCH)",
-    "no_data_aperture": "apertura con píxeles sin datos (NHITS = 0)",
-    "no_background": "fondo insuficiente en el anillo",
+    "blank": "channel without data in DR1 (BLANKCH)",
+    "no_data_aperture": "aperture with pixels without data (NHITS = 0)",
+    "no_background": "insufficient background in the annulus",
 }
 
 
@@ -949,7 +949,7 @@ def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, su
 
     ap = (aperture or Aperture()).validate()
     if not isinstance(subpixels, int) or not 1 <= subpixels <= 25:
-        raise ValueError("subpixels debe ser un entero entre 1 y 25")
+        raise ValueError("subpixels must be an integer between 1 and 25")
     home = tile_for(ra, dec)
     pix = home.pixel_scale_arcsec
     boxes = tile_boxes(ra, dec, (ap.r_out + 1) * pix / 3600)
@@ -974,7 +974,7 @@ def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, su
     for b in boxes:
         t = b.tile
         if t.channels != home.channels or t.pixel_solid_angle_sr != home.pixel_solid_angle_sr:
-            raise CubeFormatError("teselas con canales o ángulos sólidos distintos")
+            raise CubeFormatError("tiles with different channels or solid angles")
         ny, nx = b.y1 - b.y0 + 1, b.x1 - b.x0 + 1
         yy, xx = np.mgrid[0:ny, 0:nx]
         rc, dc = t.wcs.pixel_to_world_values(xx + b.x0, yy + b.y0)
@@ -1052,8 +1052,8 @@ def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, su
         if c.blank:
             row["status"] = "blank"
             if a.size or np.isfinite(pixel_val[p]) or not ap_bad[p]:
-                warn.append(f"El canal {c.number} figura en BLANKCH pero contiene valores en esta región; "
-                            "se muestra como sin datos según la documentación.")
+                warn.append(f"Channel {c.number} is listed in BLANKCH but contains values in this region; "
+                            "it is shown as no data according to the documentation.")
         elif ap_bad[p] or ap_w_total == 0:
             row["status"] = "no_data_aperture"
         elif a.size < max(10, config.CUBE_ANNULUS_MIN_VALID * n_ann):
@@ -1066,8 +1066,8 @@ def extract_spectrum(ra: float, dec: float, aperture: Aperture | None = None, su
         row["estado"] = STATUS_TEXT[row["status"]]
         rows.append(row)
     if len({t["tile"] for t in tiles}) > 1:
-        warn.append("La apertura o el anillo abarcan varias teselas HEALPix: se combinan sus píxeles (misma "
-                    "rejilla HEALPix, mismo ángulo sólido por píxel).")
+        warn.append("The aperture or the annulus spans several HEALPix tiles: their pixels are combined (same "
+                    "HEALPix grid, same solid angle per pixel).")
     return Spectrum(ra=ra, dec=dec, aperture=ap, pixel_scale_arcsec=pix,
                     pixel_solid_angle_sr=home.pixel_solid_angle_sr, rows=rows, tiles=tiles,
                     n_aperture_px=ap_w_total, n_annulus_px=n_ann, subpixels=subpixels, warnings=warn)
@@ -1090,8 +1090,8 @@ def cube_epoch_position(astrometry, ra: float | None = None, dec: float | None =
     beg, end = t.mjd_range
     def missing_dates():
         return ra0, dec0, {"propagated": False, "reference_epoch_jyear": astrometry.epoch_jyear,
-                          "warning": "La tesela no declara un intervalo MJD-BEG/END válido. Se conserva la "
-                          "posición de catálogo; no se calcula una posición para una fecha arbitraria."}
+                          "warning": "The tile does not declare a valid MJD-BEG/END interval. The catalogue "
+                          "position is kept; no position is calculated for an arbitrary date."}
     if beg is None or end is None or not np.isfinite([beg, end]).all() or beg > end:
         return missing_dates()
     mid = 0.5 * (beg + end)

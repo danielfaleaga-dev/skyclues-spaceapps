@@ -22,11 +22,11 @@ FOV_SLOW_DEG = 0.2            # warn about longer processing above this
 
 # Validated example sequences offered as quick access in the app (results/<name>.json).
 VALIDATED_EXAMPLES = {
-    "sequence_m101": "M101 · 4 épocas · 1.42 µm",
+    "sequence_m101": "M101 · 4 epochs · 1.42 µm",
     # Centred on the position propagated with SIMBAD proper motion (audit SC-01).
     # sequence_wise0855_mwir (centred on the challenge coordinates, epoch ~2010.4,
     # ~130 arcsec from the 2026 position) stays among the saved results.
-    "sequence_wise0855_pm": "WISE 0855 · 2 épocas · 4.86 µm · Δt 1 año",
+    "sequence_wise0855_pm": "WISE 0855 · 2 epochs · 4.86 µm · Δt 1 year",
 }
 
 # NASA/IPAC IRSA, IVOA Simple Image Access v2 (verified 2026-11-14).

@@ -2,7 +2,7 @@
 
 Presentation and orchestration only. The temporal engine (``sequence``, ``player``, ``motion``,
 ``quality``) is called exactly as before: same functions, same arguments, same thresholds. The
-level (Sencillo / Científico) changes which explanations and tables are shown, never an argument.
+level (Simple / Scientific) changes which explanations and tables are shown, never an argument.
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ GEOMETRY_OPTIONS = {
     "Rejilla común: vecino más próximo (remuestreado)": "nearest",
 }
 ALL_DETECTORS = [1, 2, 3, 4, 5, 6]
-TABS = ["Secuencia", "Movimiento", "Calidad", "Procedencia"]
+TABS = ["Sequence", "Motion", "Quality", "Provenance"]
 #: Display and search options. Stored apart from their widgets so that hiding the controls (Sencillo,
 #: another view) never changes them: both levels always use the same values.
 DEFAULTS = {"geometry": "exact", "subtract": True, "restrict": False, "halo": False, "enhance": False,
@@ -133,7 +133,7 @@ def _refresh_saved() -> None:
 
 def search_options() -> None:
     with st.popover("Opciones de búsqueda", help="Qué observaciones se consideran al buscar una secuencia comparable."):
-        st.multiselect("Detectores", ALL_DETECTORS, key=theme.bind("dets", DEFAULTS["dets"]), on_change=theme.keep,
+        st.multiselect("Detectors", ALL_DETECTORS, key=theme.bind("dets", DEFAULTS["dets"]), on_change=theme.keep,
                        args=("dets",), help="D1–D3: 0.75–2.41 µm (SWIR) · D4–D6: 2.42–5.0 µm (MWIR)")
         st.slider("Máximo de épocas", 2, 8, key=theme.bind("max_frames", DEFAULTS["max_frames"]),
                   on_change=theme.keep, args=("max_frames",))
@@ -200,7 +200,7 @@ def run_search(inp: dict, refresh: bool) -> dict | None:
     except Exception as err:  # noqa: BLE001 - classified for the user
         box.update(label="La búsqueda no pudo completarse", state="error", expanded=True)
         st.error(irsa_error(err))
-        with st.expander("Detalle técnico"):
+        with st.expander("Technical detail"):
             st.code(f"{type(err).__name__}: {err}", language=None)
         return None
     box.update(label=f"Búsqueda completada en {rep['elapsed_s']} s", state="complete", expanded=False)
@@ -215,7 +215,7 @@ def run_search(inp: dict, refresh: bool) -> dict | None:
 def pending(inp: dict, sci: bool) -> None:
     """The region has not been searched yet in this session (for instance, opened from a link)."""
     if not sci:
-        theme.hero("time", "Tiempo · observaciones en fechas distintas", "¿Ha cambiado algo en esta zona del cielo?",
+        theme.hero("time", "Time · observations on different dates", "¿Ha cambiado algo en esta zona del cielo?",
                    "SPHEREx observa el mismo cielo varias veces. SkyClues busca esas imágenes reales, las ordena por "
                    "fecha y las prepara para compararlas: podrás reproducirlas como una secuencia, alternar dos fechas "
                    "y comprobar si algo se movió.")
@@ -226,7 +226,7 @@ def pending(inp: dict, sci: bool) -> None:
             '<div class="sc-empty"><b>Aún no hemos buscado imágenes de esta zona.</b> La búsqueda consulta el archivo '
             'de la NASA y puede tardar uno o dos minutos.</div>')
     with st.container(horizontal=True, vertical_alignment="center"):
-        st.button("Buscar observaciones", type="primary", key="time_search", on_click=_request_search,
+        st.button("Find observations", type="primary", key="time_search", on_click=_request_search,
                   disabled=not opt("dets"))
         if sci:
             search_options()
@@ -239,7 +239,7 @@ def render(level: str) -> None:
     region = navigation.get_region(state, params)
     inp = navigation.explorer_inputs(region)
     if region.get("gaia"):
-        st.caption("Fuente seleccionada en Gaia DR3 (ICRS, J2016.0). Las posiciones para las fechas SPHEREx son cálculos, no detecciones." if sci else 'Fuente de catálogo; no confirma una detección SPHEREx.')
+        st.caption("Fuente seleccionada en Gaia DR3 (ICRS, J2016.0). Las posiciones para las fechas SPHEREx son cálculos, no detecciones." if sci else 'Catalogue source; it does not confirm a SPHEREx detection.')
     if region.get('solar'):
         from . import moving_page
         moving_page.render(region,sci)
@@ -268,7 +268,7 @@ def render(level: str) -> None:
             theme.region_strip(inp["label"], inp["ra"], inp["dec"], inp["fov"])
             new = run_search(inp, refresh)
             if new is None:
-                st.button("Reintentar", key="time_retry", on_click=_request_search)
+                st.button("Retry", key="time_retry", on_click=_request_search)
                 return
             report = reports[key] = new
             st.rerun()
@@ -300,10 +300,10 @@ def render(level: str) -> None:
         if failed:
             box.update(label="No se pudieron obtener todos los recortes", state="error", expanded=True)
             st.error(irsa_error(failed[0]))
-            with st.expander("Detalle técnico"):
+            with st.expander("Technical detail"):
                 st.code("\n".join(str(e) for e in failed), language=None)
             return
-        box.update(label="Recortes FITS obtenidos", state="complete", expanded=False)
+        box.update(label="FITS cutouts obtained", state="complete", expanded=False)
 
     with theme.loading("Verificando la integridad de los FITS y alineando épocas…" if sci else "Preparando las imágenes…", "time_sequence"):
         try:
@@ -319,7 +319,7 @@ def render(level: str) -> None:
 
     # ---------------------------------------------------------------- summary
     status_cls = "sc-ok" if seq.admissible and not seq.warnings else ("sc-warn" if seq.admissible else "sc-fail")
-    status_txt = ("Comparable" if not seq.warnings else "Comparable con avisos") if seq.admissible else "No comparable"
+    status_txt = ("Comparable" if not seq.warnings else "Comparable con avisos") if seq.admissible else "Not comparable"
     theme.region_strip(inp["label"], float(seq.ra), float(seq.dec), float(seq.field_deg), theme.badge(status_txt, status_cls))
     _download_warning(report, retrieval, n_failed)
 
@@ -333,7 +333,7 @@ def render(level: str) -> None:
             f'{p1[0]:.5f}°, Dec {p1[1]:+.5f}°. La cruz del reproductor sigue ese cálculo; no es una detección de '
             'SPHEREx. Centro del campo: ' + (centre_rule or "—") + '.')
     elif seq.target_moves:
-        st.caption('La cruz marca una posición calculada, no una detección.')
+        st.caption('The cross marks a calculated position, not a detection.')
     elif centre_rule and sci:
         st.caption(f"Centro del campo: {centre_rule}.")
 
@@ -342,16 +342,16 @@ def render(level: str) -> None:
     if sci:
         theme.facts([
             ("Épocas", str(seq.n), ""),
-            ("Intervalo total", f"{m['span_days']:.1f} d", ""),
+            ("Total interval", f"{m['span_days']:.1f} d", ""),
             (theme.unit("λ") + " en el objetivo", f"{f0.lambda_target_um:.3f} µm",
              f"dispersión {m['lambda_spread_target_bw']:.2f} BW"),
             ("Cobertura común válida", f"{m['coverage_common_valid']:.1%}", ""),
             ("Detector", f"D{det}", f"{config.BANDS_UM[det][0]}–{config.BANDS_UM[det][1]} µm")])
     else:
         theme.facts([
-            ("Fechas observadas", str(seq.n), "imágenes reales de SPHEREx"),
+            ("Observed dates", str(seq.n), "imágenes reales de SPHEREx"),
             ("De la primera a la última", f"{m['span_days']:.0f} días", ""),
-            ("Mismo color infrarrojo", f"{f0.lambda_target_um:.2f} µm", "para que el brillo sea comparable")])
+            ("Same infrared colour", f"{f0.lambda_target_um:.2f} µm", "para que el brillo sea comparable")])
         theme.reading_guide([
             ("Qué estás viendo", "La misma zona del cielo fotografiada en fechas distintas, una imagen por fecha. No "
                                  "hay imágenes inventadas entre medias."),
@@ -371,7 +371,7 @@ def render(level: str) -> None:
                 if sci:
                     display_options()
                     search_options()
-                st.toggle("Mejora infrarroja", key=theme.bind("enhance", False), on_change=theme.keep,
+                st.toggle("Infrared enhancement", key=theme.bind("enhance", False), on_change=theme.keep,
                           args=("enhance",),
                           help="Combina varias exposiciones reales de la misma zona para reducir el ruido y "
                                "distinguir fuentes más débiles. No suaviza ni rellena la imagen.")
@@ -426,7 +426,7 @@ def _download_warning(report, retrieval, n_failed) -> None:
     st.warning(f"Descarga incompleta: {n_failed} de {retrieval.get('n_requested', '?')} recortes FITS no se pudieron "
                f"obtener de IRSA ({', '.join(sorted(kinds))}). La selección se hizo sin ellos, así que podría existir "
                "una secuencia mejor; repita la búsqueda más tarde para completarla.")
-    with st.expander("Recortes no obtenidos"):
+    with st.expander("Cutouts not obtained"):
         st.dataframe(pd.DataFrame(report.get("retrieval_failures") or []).astype(str), hide_index=True)
 
 
@@ -435,7 +435,7 @@ def _quality(seq, m, sci: bool) -> None:
         st.markdown('### Calidad de las imágenes')
         st.markdown('Estas fechas se pueden comparar entre sí.' if seq.admissible and not seq.warnings else
                     'Hay limitaciones al comparar estas fechas. Consulta el modo Científico para conocer los motivos.')
-        theme.facts([('Zona comparable', f"{m['coverage_common_valid']:.0%}", 'con datos en todas las fechas')])
+        theme.facts([('Comparable area', f"{m['coverage_common_valid']:.0%}", 'con datos en todas las fechas')])
         return
     st.markdown("### Criterios de comparabilidad")
     st.caption("Se evalúan todas las épocas a la vez, siempre con la máscara estricta. Son los mismos en los dos niveles.")
@@ -460,10 +460,10 @@ def _quality(seq, m, sci: bool) -> None:
                     f"({m['n_common_px']} píxeles). Dispersión máxima de λ en esa región: "
                     f"**{m['lambda_spread_common_max_bw']:.2f}** anchos de banda.")
         gain = pd.DataFrame({"época": [i + 1 for i in range(seq.n)], "fecha": [f.date_utc[:16] for f in seq.frames],
-                             "cobertura ganada si se excluye (puntos)":
+                             "coverage gained if excluded (points)":
                                  [round(100 * g, 1) for g in m["coverage_gain_if_frame_removed"]]})
         st.dataframe(gain, hide_index=True, width="stretch")
-        q = pd.DataFrame([{"época": i + 1, "fecha (UTC)": f.date_utc[:16], **{
+        q = pd.DataFrame([{"época": i + 1, "date (UTC)": f.date_utc[:16], **{
             "L2 DQA": f.quality["L2DQAFLG"], "FINAST": f.quality["FINAST"],
             "válido en campo (%)": round(100 * f.quality["valid_fraction_in_field"], 1),
             "solo HALO (%)": round(100 * f.quality.get("halo_only_fraction_in_field", float("nan")), 2),
@@ -520,33 +520,33 @@ def _provenance(seq, report: dict, is_saved: bool, sci: bool) -> None:
         release_ui.discovery(report)
     with st.container(horizontal=True, vertical_alignment="center"):
         if is_saved:
-            st.button("Actualizar observaciones", key="refresh_saved", on_click=_refresh_saved,
+            st.button("Update observations", key="refresh_saved", on_click=_refresh_saved,
                       help="Consulta de nuevo el archivo (SIA2) para esta región y repite la búsqueda.")
         else:
-            st.button("Actualizar observaciones", key="refresh_observations", on_click=_request_search,
+            st.button("Update observations", key="refresh_observations", on_click=_request_search,
                       kwargs={"refresh": True}, disabled=not opt("dets"),
                       help="Consulta de nuevo el archivo (SIA2) para esta región y repite la búsqueda.")
     rows = []
     for i, f in enumerate(seq.frames):
         s = f.summary()
         tp = seq.target_position(i)
-        rows.append({"época": i + 1, "fecha media (UTC)": s["date_utc"], "MJD": round(s["mjd"], 5),
-                     "obs_id": s["obs_id"], "colección": s["collection"], "detector": s["detector"],
-                     "objetivo calculado (RA, Dec °)": f"{tp[0]:.5f}, {tp[1]:+.5f}",
+        rows.append({"época": i + 1, "mean date (UTC)": s["date_utc"], "MJD": round(s["mjd"], 5),
+                     "obs_id": s["obs_id"], "collection": s["collection"], "detector": s["detector"],
+                     "computed target (RA, Dec °)": f"{tp[0]:.5f}, {tp[1]:+.5f}",
                      "λ objetivo (µm)": round(s["lambda_target_um"], 4),
-                     "ancho de banda (µm)": round(s["bandwidth_target_um"], 4),
+                     "bandwidth (µm)": round(s["bandwidth_target_um"], 4),
                      "exposición (s)": s["exptime_s"], "software": s["software_version"],
                      "archivo": s["file_name"], "SHA-256": s["sha256"][:16] + "…"})
     df = pd.DataFrame(rows).astype(str)
     st.markdown("### Observaciones de esta secuencia")
-    simple_cols = ["época", "fecha media (UTC)"]
+    simple_cols = ["época", "mean date (UTC)"]
     st.dataframe(df if sci else df[simple_cols], hide_index=True, width="stretch")
     if not sci:
         st.caption('Imágenes reales de SPHEREx, disponibles en NASA/IPAC IRSA.')
         return
     st.caption("Fuente: NASA/IPAC Infrared Science Archive. SPHEREx DR1 Spectral Images, doi:10.26131/IRSA678; "
                "SPHEREx QR3. Integridad: SHA-256 de cada FITS comprobado frente al informe.")
-    with st.expander("Recortes IRSA (reproducibles)", expanded=sci):
+    with st.expander("IRSA cutouts (reproducible)", expanded=sci):
         st.code("\n".join(f"{i + 1}: {f.cutout_url}" for i, f in enumerate(seq.frames)), language=None)
     with st.expander("Opciones evaluadas al elegir la secuencia"):
         if report.get("options"):
@@ -564,8 +564,8 @@ def _provenance(seq, report: dict, is_saved: bool, sci: bool) -> None:
     if obs:
         with st.expander(f"Observaciones disponibles en el archivo ({len(obs)})"):
             odf = pd.DataFrame(obs)
-            odf["fecha (UTC)"] = pd.Series(Time(odf["mjd_mid"].to_numpy(), format="mjd").isot).str.slice(0, 16)
-            cols_obs = [c for c in ["fecha (UTC)", "collection", "detector", "obs_id", "lambda_est_um",
+            odf["date (UTC)"] = pd.Series(Time(odf["mjd_mid"].to_numpy(), format="mjd").isot).str.slice(0, 16)
+            cols_obs = [c for c in ["date (UTC)", "collection", "detector", "obs_id", "lambda_est_um",
                                     "bandwidth_est_um", "exptime_s", "field_margin_px", "file_name"] if c in odf]
             st.caption(f"{len(odf)} imágenes con el campo completo dentro del detector (de {report.get('n_records')} "
                        "que contienen el objetivo). λ estimada desde metadatos; la decisión final usa el FITS.")
@@ -579,9 +579,9 @@ def _footer(ra: float, dec: float, fov: float, refs: dict[str, str], sci: bool) 
         reference_page.render(ra, dec, fov, key="time_ref")
     release_ui.share(ra, dec, fov)
     if sci and refs:
-        with st.expander("Resultados guardados"):
-            st.selectbox("Abrir un resultado guardado (results/)", list(refs), index=None, key="time_saved",
-                         placeholder="Elegir un resultado…", on_change=_open_saved_from_select, args=(refs,))
+        with st.expander("Saved results"):
+            st.selectbox("Open a saved result (results/)", list(refs), index=None, key="time_saved",
+                         placeholder="Choose a result…", on_change=_open_saved_from_select, args=(refs,))
             st.caption("Abre la región del resultado con su centro y campo exactos, sin repetir la búsqueda.")
     st.caption("Datos: NASA/IPAC IRSA · SPHEREx DR1 y QR3 (SIA2). Cada fotograma es una observación real; la escala de "
-               "intensidad es solo de visualización." if sci else 'Datos: SPHEREx · NASA/IPAC IRSA.')
+               "intensidad es solo de visualización." if sci else 'Data: SPHEREx · NASA/IPAC IRSA.')

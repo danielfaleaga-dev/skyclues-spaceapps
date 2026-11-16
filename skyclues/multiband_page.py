@@ -16,8 +16,8 @@ from . import multiband as mb
 from . import multiband_view as mv
 from . import spectral_cube as sc
 
-MODES = ["Un canal", "Composición multibanda (RGB)"]
-STRETCH_LABELS = {"Independiente por canal": "independiente", "Común a los tres canales (MJy/sr)": "comun"}
+MODES = ["Single channel", "Multiband composite (RGB)"]
+STRETCH_LABELS = {"Independent per channel": "independiente", "Common to the three channels (MJy/sr)": "comun"}
 #: widget keys of this section kept while the single-channel mode is shown.
 STATE_KEYS = ("mb_R", "mb_G", "mb_B", "mb_stretch")
 ROLE_KEYS = {r: f"mb_{r}" for r in mb.ROLES}
@@ -97,45 +97,45 @@ def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel]
         if st.session_state.get(ROLE_KEYS[r]) not in numbers:
             st.session_state[ROLE_KEYS[r]] = defaults[r]
 
-    st.markdown("### Composición multibanda · falso color" if sci else "### Imagen en color")
+    st.markdown("### Multiband composite · false colour" if sci else "### Imagen en color")
     st.markdown((
-        '<div class="sc-note"><b>Convención de visualización, no color real.</b> Tres canales infrarrojos del cubo '
-        '(0.75–5.0 µm, invisibles para el ojo) se asignan a rojo, verde y azul. Los valores son los del FITS, sin '
-        'modificar; solo cambia su representación. Los canales 51 y 52 (sin datos en DR1) no pueden elegirse.</div>') if sci else
-        'Tres colores representan luz infrarroja invisible al ojo: es **falso color**.',
+        '<div class="sc-note"><b>Display convention, not real colour.</b> Three infrared channels of the cube '
+        '(0.75–5.0 µm, invisible to the eye) are assigned to red, green and blue. The values are those of the FITS, '
+        'unmodified; only their representation changes. Channels 51 and 52 (no data in DR1) cannot be chosen.</div>') if sci else
+        'Three colours represent infrared light that is invisible to the eye: this is **false colour**.',
         unsafe_allow_html=True)
     cols = st.columns(3)
     for col, r in zip(cols, mb.ROLES):
         with col:
             st.selectbox(f"{r} · {mb.ROLE_NAMES[r]}", numbers, key=ROLE_KEYS[r],
                          format_func=lambda n: f"Canal {n} · {by_number[n].wavelength_um:.3f} µm",
-                         help="Solo canales con datos en DR1. Convención habitual: R = λ más larga, B = λ más corta.")
+                         help="Only channels with data in DR1. Usual convention: R = longest λ, B = shortest λ.")
             c = by_number[st.session_state[ROLE_KEYS[r]]]
             if sci:
                 st.caption(f"λ {c.wavelength_um:.3f} µm · ancho {c.bandwidth_um:.3f} µm "
                            f"({c.wl_min_um:.3f}–{c.wl_max_um:.3f}) · D{c.detector} subcanal {c.subchannel}")
     # Stable labels keep the browser's radio selection intact when changing detail level.
-    mode = STRETCH_LABELS[st.radio("Contraste", list(STRETCH_LABELS), horizontal=True, key="mb_stretch",
-                                   format_func=lambda x: 'Resaltar cada color' if STRETCH_LABELS[x] == 'independiente' else 'Mismo contraste',
-                                   help="Independiente: cada canal con su propio contraste (los colores no reflejan "
-                                        "cocientes de brillo). Común: mismos límites en MJy/sr para los tres.")]
+    mode = STRETCH_LABELS[st.radio("Contrast", list(STRETCH_LABELS), horizontal=True, key="mb_stretch",
+                                   format_func=lambda x: 'Stretch each colour' if STRETCH_LABELS[x] == 'independiente' else 'Same contrast',
+                                   help="Independent: each channel with its own contrast (the colours do not reflect "
+                                        "brightness ratios). Common: same limits in MJy/sr for all three.")]
     chosen = tuple(int(st.session_state[ROLE_KEYS[r]]) for r in mb.ROLES)
     try:
         mb.select_channels(channels, dict(zip(mb.ROLES, chosen)))
     except ValueError as err:
-        st.error(f"Selección no válida: {err}. No se ha leído nada del cubo.")
+        st.error(f"Invalid selection: {err}. Nothing has been read from the cube.")
         return
     key = (ra, dec, fov, chosen, mode)
-    with theme.loading("Combinando los tres colores infrarrojos…", "rgb"):
+    with theme.loading("Combining the three infrared colours…", "rgb"):
         try:
             comp = cached_composite(*key, channels, map_fn)
             png, info = cached_png(*key, comp)
             pixels = cached_pixels(*key, comp)
         except mb.InsufficientDataError as err:
-            st.error(f"Datos insuficientes: {err}. Elija otros canales u otra región.")
+            st.error(f"Insufficient data: {err}. Choose other channels or another region.")
             return
         except Exception as err:  # noqa: BLE001 - shown to the user, nothing partial is drawn
-            show_error(err, "No se pudo construir la composición")
+            show_error(err, "The composite could not be built")
             return
 
     left, right = st.columns([1.25, 1])
@@ -146,64 +146,64 @@ def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel]
             st.altair_chart(mv.composite_chart(png, info, pixels, comp, target=target), width="content",
                             key="mb_field")
         st.caption((
-            "Geometría WCS exacta: cada píxel nativo (12.9″) en su posición, sin remuestreo; norte arriba, este a la "
-            "izquierda. Color solo donde los tres canales tienen datos. Rosa/morado con rayado blanco: valor no finito o NHITS = 0 en al "
-            "menos un canal (nunca un color parcial). Un tono morado sin rayado puede ser falso color válido; negro puede ser brillo bajo válido. Punteado gris: fuera de la región leída. Círculo discontinuo: "
-            "campo de visión; cruz: objetivo. Pase el cursor para ver los valores originales (MJy/sr) de cada canal.") if sci else
-            'Rosa con rayado: faltan datos. Morado sin rayado puede ser un color válido; negro puede ser una zona tenue.')
+            "Exact WCS geometry: each native pixel (12.9″) at its position, without resampling; north up, east on the "
+            "left. Colour only where the three channels have data. Pink/purple with white hatching: non-finite value or NHITS = 0 in at "
+            "least one channel (never a partial colour). A purple tone without hatching can be a valid false colour; black can be valid low brightness. Grey dotted: outside the region read. Dashed circle: "
+            "field of view; cross: target. Hover to see the original values (MJy/sr) of each channel.") if sci else
+            'Pink with hatching: data missing. Purple without hatching can be a valid colour; black can be a faint area.')
     with right:
         cov = comp.coverage
         if not sci:
-            theme.facts([('Zona con datos', f"{cov['fraccion_tres_canales']:.0%}", 'en los tres colores')])
-            st.markdown('Cambia los canales de arriba para explorar otras combinaciones.')
+            theme.facts([('Area with data', f"{cov['fraccion_tres_canales']:.0%}", 'in all three colours')])
+            st.markdown('Change the channels above to explore other combinations.')
             if cov['fraccion_tres_canales'] < mb.COVERAGE_WARN_FRACTION:
-                st.warning('Solo parte de esta zona tiene datos en los tres colores. Prueba otros canales.')
+                st.warning('Only part of this area has data in all three colours. Try other channels.')
             if comp.display_stats()['poco_contraste']:
-                st.info('Con el mismo contraste, casi toda la zona se ve oscura: el cielo de fondo es mucho más tenue '
-                        'que sus puntos más brillantes. No es un fallo ni faltan datos. Para ver la forma en cada '
-                        'color, elige «Resaltar cada color».')
+                st.info('With the same contrast, almost the whole area looks dark: the background sky is much fainter '
+                        'than its brightest points. This is not a failure and no data are missing. To see the shape in each '
+                        'colour, choose «Stretch each colour».')
             if comp.stretch.degenerate:
-                st.info('Algún color es uniforme porque no cambia de brillo en esta zona.')
+                st.info('Some colour is uniform because its brightness does not change in this area.')
             if any(mb.striping_lines(c) for c in comp.channels.values()):
-                st.warning('Estos canales pueden mostrar rayas producidas por el instrumento.')
+                st.warning('These channels can show stripes produced by the instrument.')
             if any('OVERFLOW' in w for w in comp.warnings):
-                st.warning('Hay zonas demasiado brillantes para el detector; sus colores pueden ser poco fiables.')
+                st.warning('Some areas are too bright for the detector; their colours may be unreliable.')
             return
         st.dataframe(mv.assignment_table(comp), hide_index=True, width="stretch")
         c1, c2 = st.columns(2)
-        c1.metric("Píxeles con datos en los 3 canales", f"{cov['fraccion_tres_canales']:.1%}",
+        c1.metric("Pixels with data in all 3 channels", f"{cov['fraccion_tres_canales']:.1%}",
                   f"{cov['tres_canales']} de {cov['n_campo']}", delta_color="off")
-        c2.metric("Con datos solo en 1–2 canales", f"{cov['parcial']}", "se muestran sin datos", delta_color="off")
+        c2.metric("With data in only 1–2 channels", f"{cov['parcial']}", "are shown as no data", delta_color="off")
         st.caption(
-            f"Escala: asinh (a = {comp.stretch.asinh_a:g}) entre los percentiles {comp.stretch.percentiles[0]:g} y "
-            f"{comp.stretch.percentiles[1]:g} de los {comp.stretch.n_pixels} píxeles del campo con datos en los tres "
-            f"canales; {mb.STRETCH_MODES[comp.stretch.mode]}. El contraste solo afecta a la visualización. "
-            "Alineación verificada: mismo archivo y ETag, mismo WCS y mismos centros de píxel en los tres canales.")
+            f"Scale: asinh (a = {comp.stretch.asinh_a:g}) between percentiles {comp.stretch.percentiles[0]:g} and "
+            f"{comp.stretch.percentiles[1]:g} of the {comp.stretch.n_pixels} pixels of the field with data in all three "
+            f"channels; {mb.STRETCH_MODES[comp.stretch.mode]}. The contrast only affects the display. "
+            "Alignment verified: same file and ETag, same WCS and same pixel centres in the three channels.")
     panel_cols = st.columns(3)
     for col, r in zip(panel_cols, mb.ROLES):
         c = comp.channels[r]
         col.image(cached_panel(*key, r, comp),
-                  caption=f"{r}: canal {c.number} · {c.wavelength_um:.3f} µm (gris, misma escala que en la composición; "
-                          "rosa: sin datos en este canal)", width="stretch")
+                  caption=f"{r}: channel {c.number} · {c.wavelength_um:.3f} µm (grey, same scale as in the composite; "
+                          "pink: no data in this channel)", width="stretch")
     for w in comp.warnings:
         st.warning(w)
     st.markdown(
-        '<div class="sc-note"><b>Qué no permite esta composición.</b> Es una ayuda visual para comparar la forma '
-        'del cielo en tres longitudes de onda del cubo combinado (fechas promediadas). Por sí sola no detecta '
-        'exoplanetas ni confirma objetos en movimiento, no mide temperaturas ni composición química, no detecta '
-        'variabilidad (el cubo no es temporal) y no mejora la relación señal/ruido: no suma ni promedia canales. '
-        'Un color se debe a la escala elegida tanto como al cielo; para intensidades, use el espectro del modo de '
-        'un canal.</div>', unsafe_allow_html=True)
-    with st.expander("Procedencia de la composición"):
+        '<div class="sc-note"><b>What this composite does not allow.</b> It is a visual aid for comparing the shape '
+        'of the sky at three wavelengths of the combined cube (averaged dates). On its own it does not detect '
+        'exoplanets or confirm moving objects, does not measure temperatures or chemical composition, does not detect '
+        'variability (the cube is not temporal) and does not improve the signal-to-noise ratio: it does not add or average channels. '
+        'A colour is due to the chosen scale as much as to the sky; for intensities, use the spectrum in single-channel '
+        'mode.</div>', unsafe_allow_html=True)
+    with st.expander("Provenance of the composite"):
         prov = comp.provenance()
         stats = sc.io_stats()
         st.markdown(
-            f"- **Producto:** SPHEREx DR1 All-Sky spectral cube, doi:{config.CUBE_DOI}; FITS por tesela HEALPix de "
-            f"orden 5 leídos por rangos HTTP (lector del modo de un canal, misma caché verificada con SHA-256).\n"
-            f"- **Teselas:** {', '.join(str(t['tesela']) for t in comp.alignment['teselas'])}; remuestreo: ninguno.\n"
-            f"- **Este proceso** ha leído {stats['bytes_network'] / 2**20:.1f} MiB de cuerpos HTTP en "
-            f"{stats['requests']} intentos y {stats['bytes_cache'] / 2**20:.1f} MiB de la caché local.")
-        st.download_button("Descargar procedencia (JSON)", json.dumps(prov, ensure_ascii=False, indent=1,
+            f"- **Product:** SPHEREx DR1 All-Sky spectral cube, doi:{config.CUBE_DOI}; FITS per HEALPix tile of "
+            f"order 5 read by HTTP ranges (single-channel mode reader, same cache verified with SHA-256).\n"
+            f"- **Tiles:** {', '.join(str(t['tesela']) for t in comp.alignment['teselas'])}; resampling: none.\n"
+            f"- **This process** has read {stats['bytes_network'] / 2**20:.1f} MiB of HTTP bodies in "
+            f"{stats['requests']} attempts and {stats['bytes_cache'] / 2**20:.1f} MiB from the local cache.")
+        st.download_button("Download provenance (JSON)", json.dumps(prov, ensure_ascii=False, indent=1,
                                                                      default=str).encode("utf-8"),
                            file_name=f"skyclues_rgb_{ra:.4f}_{dec:+.4f}_{'-'.join(map(str, chosen))}.json",
                            mime="application/json", key="mb_prov")

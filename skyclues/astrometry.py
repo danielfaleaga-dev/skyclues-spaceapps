@@ -62,15 +62,15 @@ class Astrometry:
         """Limitations of the available astrometry, in plain language."""
         out = []
         if not self.has_proper_motion:
-            out.append("Sin movimiento propio en el catálogo: se usa la posición de catálogo para todas las fechas "
-                       "(correcto para objetos lejanos; incorrecto si el objeto se mueve).")
+            out.append("No proper motion in the catalogue: the catalogue position is used for all dates "
+                       "(correct for distant objects; wrong if the object moves).")
         else:
             if not self.has_parallax:
-                out.append("Sin paralaje: la posición se propaga solo con el movimiento propio (sin efecto de "
-                           "paralaje anual).")
+                out.append("No parallax: the position is propagated with proper motion only (no annual parallax "
+                           "effect).")
             if not _ok(self.rv_kms):
-                out.append("Sin velocidad radial: se desprecia la aceleración de perspectiva "
-                           "(efecto mínimo en pocas décadas).")
+                out.append("No radial velocity: perspective acceleration is neglected "
+                           "(a minimal effect over a few decades).")
         return out
 
     # -- positions --------------------------------------------------------
@@ -174,7 +174,7 @@ def query_simbad(name: str, timeout: float = 30.0) -> Astrometry:
             errors.append(f"{url}: {type(err).__name__}: {str(err)[:120]}")
             continue
         if len(tab) == 0:
-            raise LookupError(f"SIMBAD no conoce el objeto «{name}»")
+            raise LookupError(f"SIMBAD does not know the object «{name}»")
         r = tab[0]
 
         def val(col):
@@ -196,7 +196,7 @@ def query_simbad(name: str, timeout: float = 30.0) -> Astrometry:
             pmra_masyr=val("pmra"), pmdec_masyr=val("pmdec"), parallax_mas=val("plx_value"),
             rv_kms=val("rvz_radvel"),
             source=f"SIMBAD ({url.split('/')[2]}, {Time.now().isot[:10]}); refs: {', '.join(refs) or '—'}")
-    raise RuntimeError("SIMBAD no responde: " + " | ".join(errors))
+    raise RuntimeError("SIMBAD is not responding: " + " | ".join(errors))
 
 
 __all__ = ["Astrometry", "query_simbad", "to_time", "SIMBAD_TAP_URLS"]

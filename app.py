@@ -2,10 +2,10 @@
 
 Run:  streamlit run app.py
 
-One active sky region (``skyclues.navigation``), chosen in the «Región» view by name, coordinates or
-on the Atlas, and two scientific explorers that read it: «Tiempo» (individual observations of
-different dates) and «Espectro» (the combined DR1 cube in 102 channels). The presentation level
-(Sencillo / Científico) changes wording and how much detail is shown; it is never an input of a
+One active sky region (``skyclues.navigation``), chosen in the «Region» view by name, coordinates or
+on the Atlas, and two scientific explorers that read it: «Time» (individual observations of
+different dates) and «Spectrum» (the combined DR1 cube in 102 channels). The presentation level
+(Simple / Scientific) changes wording and how much detail is shown; it is never an input of a
 calculation.
 """
 
@@ -27,26 +27,26 @@ state, qp = st.session_state, st.query_params
 
 # ---------------------------------------------------------------- link parameters (checked once, never clamped)
 if qp.get("explorer", "temporal") not in ("temporal", "espectral"):
-    st.error("Explorador de URL desconocido")
+    st.error("Unknown explorer in URL")
     st.stop()
 if "canal" in qp and (not str(qp["canal"]).isdigit() or not 1 <= int(qp["canal"]) <= 102):
-    st.error("Canal de URL fuera de 1–102")
+    st.error("URL channel outside 1–102")
     st.stop()
 
 # ---------------------------------------------------------------- view and level (plain session state)
 if "nav" not in state:
     state["nav"] = theme.NAV_LABEL[navigation.initial_view(qp)]
 if "level" not in state:
-    state["level"] = "Científico" if qp.get("nivel") == "cientifico" else "Sencillo"
+    state["level"] = "Scientific" if qp.get("nivel") == "cientifico" else "Simple"
 request = state.pop("view_request", None)
 if request in navigation.VIEWS:
-    if request == "time" and state["nav"] != "Tiempo":
+    if request == "time" and state["nav"] != "Time":
         state["time_autorun"] = True          # an explicit action: opening Time searches the region
     state["nav"] = theme.NAV_LABEL[request]
 
 
 def _nav_changed() -> None:
-    if state.get("nav") == "Tiempo":
+    if state.get("nav") == "Time":
         state["time_autorun"] = True
 
 
@@ -54,12 +54,12 @@ region = navigation.get_region(state, qp)
 
 with st.container(horizontal=True, vertical_alignment="center", horizontal_alignment="distribute", key="sc_header"):
     st.html(theme.brand_html(), width="content")
-    st.segmented_control("Vista", list(theme.NAV), key="nav", required=True, label_visibility="collapsed",
+    st.segmented_control("View", list(theme.NAV), key="nav", required=True, label_visibility="collapsed",
                          on_change=_nav_changed, width="content")
-    st.segmented_control("Nivel de detalle", list(theme.LEVELS), key="level", required=True,
+    st.segmented_control("Detail level", list(theme.LEVELS), key="level", required=True,
                          label_visibility="collapsed", width="content",
-                         help="Sencillo explica lo esencial. Científico añade parámetros, unidades, tablas y métodos. "
-                              "Los datos, la región y los resultados son los mismos.")
+                         help="Simple explains the essentials. Scientific adds parameters, units, tables and methods. "
+                              "The data, the region and the results are the same.")
 
 view = theme.NAV.get(state.get("nav"), "region")
 level = theme.level()
@@ -82,32 +82,32 @@ if view == "region":
         st.error(e)
     if level == "simple":
         theme.hero(
-            "region", "Región · elige dónde mirar", "¿Qué zona del cielo quieres investigar?",
-            "SkyClues abre observaciones infrarrojas reales del telescopio espacial SPHEREx (NASA). Elige un objeto o "
-            "una zona del cielo y descubre si algo cambió entre fechas o qué luz infrarroja emite.",
-            '<ol class="sc-steps" aria-label="Qué puedes hacer">'
-            '<li data-v="region"><i></i>Busca un nombre o mueve el mapa</li>'
-            '<li data-v="time"><i></i>Tiempo: ¿algo cambia entre fechas?</li>'
-            '<li data-v="spectrum"><i></i>Espectro: ¿qué luz infrarroja emite?</li></ol>')
+            "region", "Region · choose where to look", "Which area of the sky do you want to investigate?",
+            "SkyClues opens real infrared observations from NASA's SPHEREx space telescope. Pick an object or "
+            "an area of the sky and find out whether something changed between dates or what infrared light it emits.",
+            '<ol class="sc-steps" aria-label="What you can do">'
+            '<li data-v="region"><i></i>Search for a name or move the map</li>'
+            '<li data-v="time"><i></i>Time: does anything change between dates?</li>'
+            '<li data-v="spectrum"><i></i>Spectrum: what infrared light does it emit?</li></ol>')
     else:
         theme.hero(
-            "region", "Región del cielo", "Centro y campo de la exploración",
-            "Nombre, coordenadas y atlas editan una única región (centro ICRS y campo de visión). El círculo es el "
-            "campo científico, de diámetro angular fijo; el zoom del mapa no lo modifica.")
+            "region", "Sky region", "Centre and field of the exploration",
+            "Name, coordinates and atlas edit a single region (ICRS centre and field of view). The circle is the "
+            "scientific field, of fixed angular diameter; zooming the map does not change it.")
     region_ui.render(level)
 
     examples = [(stem, title) for stem, title in config.VALIDATED_EXAMPLES.items() if time_page.saved_path(stem)]
     if examples:
         st.html('<div style="height:1.4rem"></div><p class="sc-eyebrow">'
-                + ("Ejemplos listos para explorar" if level == "simple" else "Secuencias verificadas") + "</p>")
+                + ("Examples ready to explore" if level == "simple" else "Verified sequences") + "</p>")
         with st.container(horizontal=True, vertical_alignment="center"):
             for stem, title in examples:
                 st.button(title, key=f"example_{stem}", on_click=time_page.open_saved, args=(stem, title.split(" · ")[0]))
-        st.caption("Observaciones reales ya comprobadas: se abren en «Tiempo» sin repetir la búsqueda en el archivo."
+        st.caption("Real observations already checked: they open in «Time» without repeating the archive search."
                    if level == "scientific" else
-                   "Imágenes reales de SPHEREx ya comprobadas: se abren en «Tiempo» al instante.")
+                   "Real SPHEREx images already checked: they open in «Time» instantly.")
     if level == "scientific":
-        with st.expander("Procedencia de los mapas del atlas"):
+        with st.expander("Provenance of the atlas maps"):
             region_ui.provenance()
 elif view == "time":
     navigation.write_url(qp, region, view)
@@ -115,5 +115,5 @@ elif view == "time":
 else:
     spectrum_page.render(level)
     if level == "scientific":
-        st.caption(f"Cubo publicado: {config.CUBE_RELEASE_ID} · DOI {config.CUBE_DOI}. Actualizar observaciones SIA2 no "
-                   "modifica este cubo.")
+        st.caption(f"Published cube: {config.CUBE_RELEASE_ID} · DOI {config.CUBE_DOI}. Updating SIA2 observations does not "
+                   "modify this cube.")

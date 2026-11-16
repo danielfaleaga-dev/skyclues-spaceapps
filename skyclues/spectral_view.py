@@ -114,8 +114,8 @@ def colorbar_png(info: dict, width_in: float = 3.0) -> bytes:
     cb.set_ticks(np.asarray(norm.inverse(np.linspace(0.0, 1.0, 5)), float))
     cb.ax.xaxis.set_major_formatter(mpl.ticker.FormatStrFormatter("%.3g"))
     cb.ax.tick_params(labelsize=9, colors=INK)
-    cb.set_label("MJy/sr (IMAGE, zodiacal ya restado)" if info["layer"] == "image"
-                 else "NHITS: píxeles de entrada promediados", fontsize=8, color=INK)
+    cb.set_label("MJy/sr (IMAGE, zodiacal light already subtracted)" if info["layer"] == "image"
+                 else "NHITS: input pixels averaged", fontsize=8, color=INK)
     buf = io.BytesIO()
     with render.RENDER_LOCK:
         fig.savefig(buf, format="png", dpi=130, facecolor="white")
@@ -179,7 +179,7 @@ def field_chart(png: bytes, info: dict, pixels: pd.DataFrame, cmap: sc.ChannelMa
     # measures: a vertical domain derived from ``height/width`` became infinite (blank chart: no
     # image, no circle, no vertical ticks) when the chart was built while its column had no width.
     ys = alt.Scale(domain=[-R, R], nice=False, zero=False)
-    tx, ty = "Desplazamiento al este (″) · este a la izquierda", "Desplazamiento al norte (″)"
+    tx, ty = "Offset to the east (″) · east to the left", "Offset to the north (″)"
     X = alt.X("este:Q", scale=xs, title=tx)
     Y = alt.Y("norte:Q", scale=ys, title=ty)
     uri = "data:image/png;base64," + base64.b64encode(png).decode()
@@ -189,27 +189,27 @@ def field_chart(png: bytes, info: dict, pixels: pd.DataFrame, cmap: sc.ChannelMa
         aspect=False).encode(x=alt.X("e1:Q", scale=xs, title=tx), x2="e2:Q",
                              y=alt.Y("n1:Q", scale=ys, title=ty), y2="n2:Q", url="url:N")
     frame = frame_for(cmap)
-    curves = [_circle(0.0, 0.0, cmap.field_deg / 2 * 3600, "campo de visión")]
+    curves = [_circle(0.0, 0.0, cmap.field_deg / 2 * 3600, "field of view")]
     if pick is not None and aperture is not None:
         e0, n0 = offsets_arcsec(frame, *pick)
         e0, n0 = float(e0), float(n0)
         curves += [_circle(e0, n0, aperture.r_ap * pixel_arcsec, "apertura"),
-                   _circle(e0, n0, aperture.r_in * pixel_arcsec, "anillo de fondo"),
-                   _circle(e0, n0, aperture.r_out * pixel_arcsec, "anillo de fondo (ext.)")]
+                   _circle(e0, n0, aperture.r_in * pixel_arcsec, "background annulus"),
+                   _circle(e0, n0, aperture.r_out * pixel_arcsec, "background annulus (ext.)")]
     cdf = pd.concat(curves, ignore_index=True)
     lines = alt.Chart(cdf).mark_line(strokeWidth=1.4, clip=True).encode(
         x=X, y=Y, order="orden:Q", detail="curva:N",
         color=alt.Color("curva:N", scale=alt.Scale(
-            domain=["campo de visión", "apertura", "anillo de fondo", "anillo de fondo (ext.)"],
+            domain=["field of view", "apertura", "background annulus", "background annulus (ext.)"],
             range=["#1f5fbf", "#eda100", "#eb6834", "#eb6834"]), legend=None),
-        strokeDash=alt.condition(alt.datum.curva == "campo de visión", alt.value([5, 4]), alt.value([1, 0])))
+        strokeDash=alt.condition(alt.datum.curva == "field of view", alt.value([5, 4]), alt.value([1, 0])))
     sel = alt.selection_point(name="pick", on="click", nearest=True, fields=["ra", "dec"], empty=False)
     px = max(4.0, size * pixel_arcsec / (2 * R))
     pts = alt.Chart(pixels).mark_square(size=px * px, opacity=0.001).encode(
         x=X, y=Y,
         tooltip=[alt.Tooltip("ra:Q", title="RA (°)", format=".5f"), alt.Tooltip("dec:Q", title="Dec (°)", format="+.5f"),
-                 alt.Tooltip("valor:Q", title="valor (MJy/sr)", format=".4g"), alt.Tooltip("nhits:Q", title="NHITS"),
-                 alt.Tooltip("flags:N", title="FLAGS"), alt.Tooltip("tesela:Q", title="tesela HEALPix")]
+                 alt.Tooltip("valor:Q", title="value (MJy/sr)", format=".4g"), alt.Tooltip("nhits:Q", title="NHITS"),
+                 alt.Tooltip("flags:N", title="FLAGS"), alt.Tooltip("tesela:Q", title="HEALPix tile")]
     ).add_params(sel)
     marks = []
     if target is not None:
@@ -217,13 +217,13 @@ def field_chart(png: bytes, info: dict, pixels: pd.DataFrame, cmap: sc.ChannelMa
         marks.append({"este": float(e), "norte": float(n), "m": "objetivo"})
     if pick is not None:
         e, n = offsets_arcsec(frame, *pick)
-        marks.append({"este": float(e), "norte": float(n), "m": "posición del espectro"})
+        marks.append({"este": float(e), "norte": float(n), "m": "spectrum position"})
     layers = [bg, lines, pts]
     if marks:
         layers.append(alt.Chart(pd.DataFrame(marks)).mark_point(size=140, strokeWidth=2, filled=False).encode(
-            x=X, y=Y, shape=alt.Shape("m:N", scale=alt.Scale(domain=["objetivo", "posición del espectro"],
+            x=X, y=Y, shape=alt.Shape("m:N", scale=alt.Scale(domain=["objetivo", "spectrum position"],
                                                              range=["cross", "diamond"]), legend=None),
-            color=alt.Color("m:N", scale=alt.Scale(domain=["objetivo", "posición del espectro"],
+            color=alt.Color("m:N", scale=alt.Scale(domain=["objetivo", "spectrum position"],
                                                    range=["#1f5fbf", "#eda100"]), legend=None),
             tooltip=[alt.Tooltip("m:N", title="marca")]))
     return alt.layer(*layers).properties(width=size, height=size)
@@ -236,7 +236,7 @@ def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pix
     R = info["half_arcsec"]
     xs = alt.Scale(domain=[-R, R], reverse=True, nice=False, zero=False)
     ys = alt.Scale(domain=[-R, R], nice=False, zero=False)       # fixed square frame, see ``field_chart``
-    tx, ty = "Desplazamiento al este (″) · este a la izquierda", "Desplazamiento al norte (″)"
+    tx, ty = "Offset to the east (″) · east to the left", "Offset to the north (″)"
     X = alt.X("este:Q", scale=xs, title=tx)
     Y = alt.Y("norte:Q", scale=ys, title=ty)
     uri = "data:image/png;base64," + base64.b64encode(png).decode()
@@ -244,20 +244,20 @@ def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pix
         aspect=False).encode(x=alt.X("e1:Q", scale=xs, title=tx), x2="e2:Q",
                              y=alt.Y("n1:Q", scale=ys, title=ty), y2="n2:Q", url="url:N")
     frame = frame_for(cmap)
-    curves = [_circle(0.0, 0.0, cmap.field_deg / 2 * 3600, "campo de visión").assign(trazo="campo")]
+    curves = [_circle(0.0, 0.0, cmap.field_deg / 2 * 3600, "field of view").assign(trazo="campo")]
     marks = []
     if target is not None:
         e, n = offsets_arcsec(frame, *target)
         marks.append({"este": float(e), "norte": float(n), "m": "objetivo", "letra": "", "nota": "objetivo"})
-    for letter, pos, role in (("A", pick, "posición del espectro"), ("B", pick_b, "punto de comparación")):
+    for letter, pos, role in (("A", pick, "spectrum position"), ("B", pick_b, "comparison point")):
         e0, n0 = (float(v) for v in offsets_arcsec(frame, *pos))
         curves += [_circle(e0, n0, aperture.r_ap * pixel_arcsec, f"apertura {letter}").assign(trazo="continuo"),
                    _circle(e0, n0, aperture.r_in * pixel_arcsec, f"anillo {letter}").assign(trazo="anillo"),
                    _circle(e0, n0, aperture.r_out * pixel_arcsec, f"anillo {letter} (ext.)").assign(trazo="anillo")]
         marks.append({"este": e0, "norte": n0, "m": letter, "letra": letter, "nota": f"{letter} · {role}"})
-    names = ["campo de visión"] + [f"{k} {s}" for s in "AB" for k in ("apertura", "anillo")] + [
+    names = ["field of view"] + [f"{k} {s}" for s in "AB" for k in ("apertura", "anillo")] + [
         f"anillo {s} (ext.)" for s in "AB"]
-    colour = {"campo de visión": "#1f5fbf", **{n: (SERIES if " A" in n else SERIES_B) for n in names[1:]}}
+    colour = {"field of view": "#1f5fbf", **{n: (SERIES if " A" in n else SERIES_B) for n in names[1:]}}
     lines = alt.Chart(pd.concat(curves, ignore_index=True)).mark_line(strokeWidth=1.5, clip=True).encode(
         x=X, y=Y, order="orden:Q", detail="curva:N",
         color=alt.Color("curva:N", scale=alt.Scale(domain=names, range=[colour[n] for n in names]), legend=None),
@@ -268,8 +268,8 @@ def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pix
     pts = alt.Chart(pixels).mark_square(size=px * px, opacity=0.001).encode(
         x=X, y=Y,
         tooltip=[alt.Tooltip("ra:Q", title="RA (°)", format=".5f"), alt.Tooltip("dec:Q", title="Dec (°)", format="+.5f"),
-                 alt.Tooltip("valor:Q", title="valor (MJy/sr)", format=".4g"), alt.Tooltip("nhits:Q", title="NHITS"),
-                 alt.Tooltip("flags:N", title="FLAGS"), alt.Tooltip("tesela:Q", title="tesela HEALPix")]
+                 alt.Tooltip("valor:Q", title="value (MJy/sr)", format=".4g"), alt.Tooltip("nhits:Q", title="NHITS"),
+                 alt.Tooltip("flags:N", title="FLAGS"), alt.Tooltip("tesela:Q", title="HEALPix tile")]
     ).add_params(sel)
     mdf = pd.DataFrame(marks)
     # White under-stroke: a dark marker (A is drawn in the ink of its curve) stays visible on any sky.
@@ -292,12 +292,12 @@ def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pix
 
 
 QUANTITIES = {
-    "flux": ("flujo_mjy", "Flujo en apertura (mJy)"),
-    "pixel": ("pixel_mjysr", "Brillo del píxel (MJy/sr)"),
+    "flux": ("flujo_mjy", "Aperture flux (mJy)"),
+    "pixel": ("pixel_mjysr", "Pixel brightness (MJy/sr)"),
 }
 SERIES_B = "#c06a2b"                         # second spectrum (comparison point B)
 FOCUS = "#c4411c"                            # selection accent of the interface
-CAUTION = "OVERFLOW/OUTLIER en la apertura"
+CAUTION = "OVERFLOW/OUTLIER in the aperture"
 Y_AXIS_EXTENT = 62                           # same left margin in the spectrum and in the A−B / A/B panel
 X_DOMAIN = [0.70, 5.05]
 GLYPHS = {("pico", True): "▼", ("pico", False): "▽", ("valle", True): "▲", ("valle", False): "△"}
@@ -307,9 +307,9 @@ def _series_frame(spec: sc.Spectrum, quantity: str, label: str) -> pd.DataFrame:
     df = spec.table()
     df["valor"] = df[QUANTITIES[quantity][0]]
     df["serie"] = label
-    df["contorno"] = np.where(df["precaucion"], CAUTION, "sin precaución")
+    df["contorno"] = np.where(df["precaucion"], CAUTION, "no caution")
     if quantity == "pixel":
-        df["estado"] = np.where(df["valor"].isna() & (df["status"] != "blank"), "píxel sin datos (NHITS = 0)",
+        df["estado"] = np.where(df["valor"].isna() & (df["status"] != "blank"), "pixel without data (NHITS = 0)",
                                 df["estado"])
     return df
 
@@ -385,15 +385,15 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
     else:
         missing = df[df["valor"].isna()].copy()
     xsc = alt.Scale(domain=X_DOMAIN, nice=False, zero=False)
-    X = alt.X("lambda_um:Q", scale=xsc, title="Longitud de onda (µm)")
+    X = alt.X("lambda_um:Q", scale=xsc, title="Wavelength (µm)")
     band, band_lbl = _detector_bands(df, xsc)
     zero = alt.Chart(pd.DataFrame({"y": [0.0]})).mark_rule(color=MUTED, strokeDash=[3, 3]).encode(y="y:Q")
     tip = [alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
            alt.Tooltip("detector:Q"), alt.Tooltip("subcanal:Q"),
            alt.Tooltip("valor:Q", title=title, format=".4g"),
-           alt.Tooltip("fondo_mjysr:Q", title="fondo del anillo (MJy/sr)", format=".4g"),
-           alt.Tooltip("nhits_min_apertura:Q", title="NHITS mín. en apertura"),
-           alt.Tooltip("flags_apertura:N", title="FLAGS en apertura"), alt.Tooltip("estado:N")]
+           alt.Tooltip("fondo_mjysr:Q", title="annulus background (MJy/sr)", format=".4g"),
+           alt.Tooltip("nhits_min_apertura:Q", title="min. NHITS in aperture"),
+           alt.Tooltip("flags_apertura:N", title="FLAGS in aperture"), alt.Tooltip("estado:N")]
     axis = alt.Axis(minExtent=Y_AXIS_EXTENT, maxExtent=Y_AXIS_EXTENT) if two else alt.Axis()
     Y = alt.Y("valor:Q", title=title, scale=alt.Scale(zero=False, nice=True), axis=axis)
     by_series = alt.Scale(domain=["A", "B"], range=[SERIES, SERIES_B])
@@ -416,7 +416,7 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
             x=alt.X("lambda_min_um:Q", scale=xsc), x2="lambda_max_um:Q", y=Y)
         pts = alt.Chart(ok).mark_point(size=64, strokeWidth=1.6).encode(
             x=X, y=Y, color=alt.value(SERIES),
-            fill=alt.Fill("contorno:N", scale=alt.Scale(domain=["sin precaución", CAUTION], range=[SERIES, "#ffffff"]),
+            fill=alt.Fill("contorno:N", scale=alt.Scale(domain=["no caution", CAUTION], range=[SERIES, "#ffffff"]),
                           legend=alt.Legend(title=None, orient="bottom", labelLimit=400)),
             tooltip=tip)
     if interactive:
@@ -444,10 +444,10 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
             "glifo": GLYPHS[(f.kind, f.klass == "cuantificable")],
             "nota": f"{f.kind.capitalize()} · {f.label.lower()}", "canal": f.canal, "contraste": f.contrast,
             "relativo": f.relative} for f in marks])
-        ftip = [alt.Tooltip("nota:N", title="característica"), alt.Tooltip("serie:N", title="espectro"),
+        ftip = [alt.Tooltip("nota:N", title="feature"), alt.Tooltip("serie:N", title="espectro"),
                 alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
-                alt.Tooltip("contraste:Q", title="contraste respecto al entorno", format=".4g"),
-                alt.Tooltip("relativo:Q", title="contraste relativo", format="+.1%")]
+                alt.Tooltip("contraste:Q", title="contrast relative to the surroundings", format=".4g"),
+                alt.Tooltip("relativo:Q", title="relative contrast", format="+.1%")]
         for kind, dy in (("pico", -15), ("valle", 16)):
             part = fdf[fdf.tipo == kind]
             if len(part):
@@ -473,16 +473,16 @@ def derived_chart(rows: list[dict], kind: str, unit: str, focus=None, selected_c
     import altair as alt
 
     if kind not in ("diferencia", "relacion"):
-        raise ValueError("kind debe ser 'diferencia' o 'relacion'")
+        raise ValueError("kind must be 'difference' or 'ratio'")
     df = pd.DataFrame(rows)
     df["valor"] = df[kind]
     df["motivo"] = np.where(df["a"].isna() | df["b"].isna(),
                             "A: " + df["estado_a"] + " · B: " + df["estado_b"], df["estado_relacion"])
-    df["contorno"] = np.where(df["precaucion"], CAUTION, "sin precaución")
+    df["contorno"] = np.where(df["precaucion"], CAUTION, "no caution")
     ok, gone = df[df["valor"].notna()], df[df["valor"].isna()]
-    title = f"A − B ({unit})" if kind == "diferencia" else "A / B (adimensional)"
+    title = f"A − B ({unit})" if kind == "diferencia" else "A / B (dimensionless)"
     xsc = alt.Scale(domain=X_DOMAIN, nice=False, zero=False)
-    X = alt.X("lambda_um:Q", scale=xsc, title="Longitud de onda (µm)")
+    X = alt.X("lambda_um:Q", scale=xsc, title="Wavelength (µm)")
     Y = alt.Y("valor:Q", title=title, scale=alt.Scale(zero=False, nice=True),
               axis=alt.Axis(minExtent=Y_AXIS_EXTENT, maxExtent=Y_AXIS_EXTENT))
     band, _ = _detector_bands(df, xsc)
@@ -501,7 +501,7 @@ def derived_chart(rows: list[dict], kind: str, unit: str, focus=None, selected_c
     layers.append(alt.Chart(ok).mark_rule(color=INK_2, strokeWidth=1.2, opacity=0.5).encode(
         x=alt.X("lambda_min_um:Q", scale=xsc), x2="lambda_max_um:Q", y=Y))
     layers.append(alt.Chart(ok).mark_point(size=46, strokeWidth=1.5, color=INK_2).encode(
-        x=X, y=Y, fill=alt.Fill("contorno:N", scale=alt.Scale(domain=["sin precaución", CAUTION],
+        x=X, y=Y, fill=alt.Fill("contorno:N", scale=alt.Scale(domain=["no caution", CAUTION],
                                                             range=[INK_2, "#ffffff"]), legend=None), tooltip=tip))
     for part, colour in ((gone[gone["a"].isna() | gone["b"].isna()], MASK_COLOR),
                          (gone[gone["a"].notna() & gone["b"].notna()], MUTED)):
@@ -509,7 +509,7 @@ def derived_chart(rows: list[dict], kind: str, unit: str, focus=None, selected_c
             layers.append(alt.Chart(part).mark_tick(color=colour, thickness=2, size=12).encode(
                 x=X, y=alt.value(alt.ExprRef(expr="height - 6")),
                 tooltip=[alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
-                         alt.Tooltip("motivo:N", title="sin valor")]))
+                         alt.Tooltip("motivo:N", title="no value")]))
     return alt.layer(*layers).properties(
         width="container", height=height, autosize=alt.AutoSizeParams(type="fit", contains="padding"),
         padding={"left": 5, "right": 18, "top": 5, "bottom": 5}).resolve_scale(color="independent",

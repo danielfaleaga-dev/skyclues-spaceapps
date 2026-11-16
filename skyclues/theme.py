@@ -29,8 +29,8 @@ def unit(text: str) -> str:
     """A unit or symbol inside a label set in capitals (µ and λ must never become M and Λ)."""
     return f'<span class="sc-unit">{text}</span>'
 BRAND_DIR = Path(__file__).resolve().parent.parent / "assets" / "brand"
-LEVELS = {"Sencillo": "simple", "Científico": "scientific"}
-NAV = {"Región": "region", "Tiempo": "time", "Espectro": "spectrum"}
+LEVELS = {"Simple": "simple", "Scientific": "scientific"}
+NAV = {"Región": "region", "Time": "time", "Spectrum": "spectrum"}
 NAV_LABEL = {v: k for k, v in NAV.items()}
 
 

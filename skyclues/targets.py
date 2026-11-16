@@ -17,10 +17,10 @@ from .astrometry import Astrometry, query_simbad
 WISE0855 = Astrometry(
     name="WISEA J085510.74-071442.5", ra_deg=133.81890825, dec_deg=-7.247048, epoch_jyear=2000.0,
     pmra_masyr=-8123.7, pmdec_masyr=673.2, parallax_mas=439.0, rv_kms=None,
-    source="SIMBAD 2026-11-14; astrometría 2021ApJS..253....7K (Kirkpatrick et al. 2021)")
+    source="SIMBAD 2026-11-14; astrometry 2021ApJS..253....7K (Kirkpatrick et al. 2021)")
 M101 = Astrometry(
     name="M 101", ra_deg=210.80242916666668, dec_deg=54.34875, epoch_jyear=2000.0,
-    source="SIMBAD 2026-11-14 (galaxia: sin movimiento propio medible)")
+    source="SIMBAD 2026-11-14 (galaxy: no measurable proper motion)")
 
 #: Coordinates printed in the NASA Space Apps 2026 challenge text for WISE 0855
 #: (08h55m10.831s -07d14m42.53s). They are not J2000.0 positions: the SIMBAD
@@ -28,10 +28,10 @@ M101 = Astrometry(
 CHALLENGE_WISE0855 = {"ra_deg": 133.7951292, "dec_deg": -7.2451472, "epoch_jyear_estimated": 2010.40}
 
 PRESETS = {
-    "M101 (galaxia, campo de control estático)": {
+    "M101 (galaxy, static control field)": {
         "ra": M101.ra_deg, "dec": M101.dec_deg, "astrometry": M101, "high_pm": False,
     },
-    "WISE 0855−0714 (enana marrón, 8.2″/año)": {
+    "WISE 0855−0714 (brown dwarf, 8.2″/yr)": {
         "ra": WISE0855.ra_deg, "dec": WISE0855.dec_deg, "astrometry": WISE0855, "high_pm": True,
     },
 }
@@ -46,7 +46,7 @@ def resolve_name(name: str) -> tuple[Astrometry, list[str]]:
     """
     name = (name or "").strip()
     if not name:
-        raise ValueError("Escribe el nombre de un objeto.")
+        raise ValueError("Type the name of an object.")
     try:
         a = query_simbad(name)
         return a, a.warnings()
@@ -57,9 +57,9 @@ def resolve_name(name: str) -> tuple[Astrometry, list[str]]:
 
         c = SkyCoord.from_name(name)
         a = Astrometry(name=name, ra_deg=float(c.ra.deg), dec_deg=float(c.dec.deg), epoch_jyear=2000.0,
-                       source="CDS Sesame (solo posición; SIMBAD no disponible)")
-        return a, [f"SIMBAD no disponible ({str(err)[:80]}): sin movimiento propio. "
-                   "Si el objeto se mueve, la posición para las fechas SPHEREx será incorrecta."]
+                       source="CDS Sesame (position only; SIMBAD not available)")
+        return a, [f"SIMBAD not available ({str(err)[:80]}): no proper motion. "
+                   "If the object moves, the position for the SPHEREx dates will be wrong."]
 
 
 # ----------------------------------------------------------------------------- validation
@@ -72,7 +72,7 @@ def validate_coordinates(ra, dec) -> tuple[float, float]:
     try:
         r, d = float(ra), float(dec)
     except (TypeError, ValueError):
-        raise ValueError(f"Coordenadas no numéricas: RA={ra!r}, Dec={dec!r}.") from None
+        raise ValueError(f"Non-numeric coordinates: RA={ra!r}, Dec={dec!r}.") from None
     if not (math.isfinite(r) and math.isfinite(d)):
         raise ValueError(f"Coordenadas no finitas: RA={r}, Dec={d}.")
     if not 0.0 <= r < 360.0:

@@ -30,29 +30,29 @@ ENGINE_VERSION = "skyclues-interprete 1.0 (2026-11-15)"
 
 # ----------------------------------------------------------------------------- verdicts
 COMPATIBLE, SEVERAL, WEAK, NONE, NOT_EVALUABLE = "compatible", "varias", "insuficiente", "ninguna", "no_evaluable"
-VERDICT_LABELS = {COMPATIBLE: "Referencia compatible", SEVERAL: "Varias referencias compatibles",
-                  WEAK: "Coincidencia insuficientemente respaldada", NONE: "Ninguna referencia compatible",
-                  NOT_EVALUABLE: "No evaluable"}
+VERDICT_LABELS = {COMPATIBLE: "Compatible reference", SEVERAL: "Several compatible references",
+                  WEAK: "Match insufficiently supported", NONE: "No compatible reference",
+                  NOT_EVALUABLE: "Not evaluable"}
 VERDICT_MEANING = {
-    COMPATIBLE: "una sola referencia coincide en posición y tipo, con datos sin reservas; no es una identificación",
-    SEVERAL: "varias referencias coinciden en posición y tipo: SkyClues no puede distinguirlas y conserva todas",
-    WEAK: "alguna referencia coincide en posición y tipo, pero la señal o los datos no bastan para sostenerla",
-    NONE: "ninguna referencia de la biblioteca coincide; no excluye otras sustancias ni procesos",
-    NOT_EVALUABLE: "los datos de este intervalo no permiten valorar ninguna referencia"}
+    COMPATIBLE: "a single reference matches in position and type, with data without reservations; it is not an identification",
+    SEVERAL: "several references match in position and type: SkyClues cannot tell them apart and keeps all of them",
+    WEAK: "some reference matches in position and type, but the signal or the data are not enough to support it",
+    NONE: "no reference in the library matches; this does not exclude other substances or processes",
+    NOT_EVALUABLE: "the data in this interval do not allow any reference to be assessed"}
 VERDICT_BADGE = {COMPATIBLE: "sc-ok", SEVERAL: "sc-ok", WEAK: "sc-warn", NONE: "", NOT_EVALUABLE: ""}  # theme.py classes
 
 # status of one reference against one feature
 MATCH, MATCH_WEAK = "compatible", "insuficiente"
 OPPOSITE, WIDTH, ADJACENT, ORIENTATIVE = "naturaleza_opuesta", "anchura_incoherente", "contigua", "orientativa"
-STATUS_LABELS = {MATCH: "Compatible", MATCH_WEAK: "Coincide, insuficientemente respaldada",
-                 OPPOSITE: "No compatible: tipo opuesto", WIDTH: "No compatible: anchura",
-                 ADJACENT: "No compatible: canal contiguo", ORIENTATIVE: "Solo orientativa"}
+STATUS_LABELS = {MATCH: "Compatible", MATCH_WEAK: "Matches, insufficiently supported",
+                 OPPOSITE: "Not compatible: opposite type", WIDTH: "Not compatible: width",
+                 ADJACENT: "Not compatible: adjacent channel", ORIENTATIVE: "Indicative only"}
 
 # coverage of a reference over the whole spectrum
 COV_FEATURE, COV_NO_SIGNAL, COV_NO_DATA, COV_OUTSIDE = ("con_caracteristica", "sin_senal", "sin_cobertura",
                                                         "fuera_de_rango")
-COVERAGE_LABELS = {COV_FEATURE: "Hay una característica señalada", COV_NO_SIGNAL: "Nada señalado",
-                   COV_NO_DATA: "Sin cobertura válida", COV_OUTSIDE: "Fuera del intervalo de SPHEREx"}
+COVERAGE_LABELS = {COV_FEATURE: "There is one feature flagged", COV_NO_SIGNAL: "Nothing flagged",
+                   COV_NO_DATA: "No valid coverage", COV_OUTSIDE: "Outside the SPHEREx range"}
 
 KIND_NATURE = {"pico": sr.EMISSION, "valle": sr.ABSORPTION}
 LABELLED = (sf.QUANTIFIABLE, sf.VISIBLE)
@@ -226,12 +226,12 @@ def observe(f: sf.Feature | None, table: dict[int, ChannelInfo]) -> dict:
 def _window(f: sf.Feature, table: dict[int, ChannelInfo], labelled: bool) -> Window:
     if labelled:
         lo, hi, a, b = f.lam_lo, f.lam_hi, f.canal_lo, f.canal_hi
-        basis = ("intervalo a media altura de la característica (unión de WL_MIN–WL_MAX de sus canales), ampliado "
-                 "por el error documentado del centro de banda")
+        basis = ("half-height interval of the feature (union of WL_MIN–WL_MAX of its channels), widened "
+                 "by the documented error of the band centre")
     else:
         a, b = f.trial_lo, f.trial_hi
         lo, hi = table[a].lam_min, table[b].lam_max
-        basis = "intervalo examinado (no es una característica clasificada): solo orientativo"
+        basis = "interval examined (not a classified feature): indicative only"
     return Window(float(lo), float(hi), sr.BAND_CENTRE_ERROR_UM[table[a].detector],
                   sr.BAND_CENTRE_ERROR_UM[table[b].detector], int(a), int(b), basis)
 
@@ -242,40 +242,40 @@ def _evidence(f: sf.Feature, series: sf.Series, qualities) -> tuple[list[str], l
     and the coverage diagnosis, never recomputed."""
     hard, weak, codes = [], [], []
     if f.klass == sf.NOT_EVALUABLE:
-        hard.append("El analizador no puede valorar este intervalo: " + " ".join(f.reasons or ["faltan datos."]))
+        hard.append("The analyser cannot assess this interval: " + " ".join(f.reasons or ["data missing."]))
         return hard, weak, ["no_evaluable"]
     if f.klass == sf.NO_FEATURE or f.kind not in KIND_NATURE:
-        hard.append("El analizador no señala ningún pico ni valle en este intervalo, así que no hay nada que "
-                    "interpretar. Que no se vea una característica no demuestra que una sustancia falte: el espectro "
-                    "no tiene incertidumbres.")
+        hard.append("The analyser flags no peak or valley in this interval, so there is nothing to "
+                    "interpret. Not seeing a feature does not prove that a substance is absent: the spectrum "
+                    "has no uncertainties.")
         return hard, weak, ["sin_caracteristica"]
     if len(f.detectors) > 1:
         codes.append("detectores")
-        hard.append(f"El intervalo y su entorno abarcan los detectores {', '.join(f'D{d}' for d in f.detectors)}: "
-                    "un salto de calibración o de resolución entre detectores produce picos y valles que no son "
-                    "sustancias. No se interpreta.")
+        hard.append(f"The interval and its surroundings span detectors {', '.join(f'D{d}' for d in f.detectors)}: "
+                    "a calibration or resolution jump between detectors produces peaks and valleys that are not "
+                    "substances. It is not interpreted.")
     if f.klass == sf.VISIBLE:
         codes.append("visible")
-        weak.append(f"Señal «visible», no «cuantificable»: contraste de {abs(f.ratio):.1f} veces la dispersión de "
-                    f"referencia (entre {sf.Q_VISIBLE:g} y {sf.Q_QUANTIFIABLE:g}, o con alguna reserva del analizador). "
-                    "Es un umbral descriptivo, no una significación estadística.")
+        weak.append(f"«Visible» signal, not «quantifiable»: contrast of {abs(f.ratio):.1f} times the "
+                    f"reference scatter (between {sf.Q_VISIBLE:g} and {sf.Q_QUANTIFIABLE:g}, or with some reservation from the analyser). "
+                    "It is a descriptive threshold, not a statistical significance.")
     if f.caution_channels:
         codes.append("precaucion")
-        weak.append("OVERFLOW u OUTLIER en los canales " + ", ".join(map(str, f.caution_channels)) +
-                    ": el valor puede no ser fiable.")
+        weak.append("OVERFLOW or OUTLIER in channels " + ", ".join(map(str, f.caution_channels)) +
+                    ": the value may not be reliable.")
     env = [c for c in list(f.env_left) + list(f.env_right)]
     env_caution = [c for c in env if series.caution[series.index(c)]]
     if env_caution:
         codes.append("entorno")
-        weak.append("OVERFLOW u OUTLIER en el entorno (canales " + ", ".join(map(str, env_caution)) +
-                    "): el continuo local puede estar afectado.")
+        weak.append("OVERFLOW or OUTLIER in the surroundings (channels " + ", ".join(map(str, env_caution)) +
+                    "): the local continuum may be affected.")
     if qualities:
         lo, hi = f.trial_lo - sf.N_SIDE, f.trial_hi + sf.N_SIDE
         bloom = [q.canal for q in qualities if lo <= q.canal <= hi and q.valid_for_extraction and q.bloom]
         if bloom:
             codes.append("bloom")
-            weak.append("Píxeles con BLOOM en la apertura (canales " + ", ".join(map(str, bloom)) +
-                        "): luz desbordada de una fuente brillante puede contaminar el valor.")
+            weak.append("Pixels with BLOOM in the aperture (channels " + ", ".join(map(str, bloom)) +
+                        "): light spilling over from a bright source may contaminate the value.")
     return hard, weak, codes
 
 
@@ -301,35 +301,35 @@ def _evaluate(ref: sr.Reference, f: sf.Feature, win: Window, table: dict[int, Ch
         if dist > element or (labelled and KIND_NATURE[f.kind] != ref.nature):
             return None                     # far away, or nearby but of the opposite nature: not worth listing
         m.status, m.z_range = ADJACENT, None    # no z is ever suggested by a near miss
-        m.reasons.append(f"Su posición esperada ({lam_obs:.3f} µm, canal {_channels(predicted)}) queda a "
-                         f"{dist:.3f} µm del intervalo de la característica, menos de un elemento de resolución "
-                         f"({element:.3f} µm): una línea ahí haría máximo en el canal contiguo.")
+        m.reasons.append(f"Its expected position ({lam_obs:.3f} µm, channel {_channels(predicted)}) lies "
+                         f"{dist:.3f} µm from the interval of the feature, less than one resolution element "
+                         f"({element:.3f} µm): a line there would peak in the adjacent channel.")
         return m
     if not labelled:
         m.status = ORIENTATIVE
-        m.reasons.append("Cae en el intervalo examinado, que no es una característica evaluable.")
+        m.reasons.append("It falls in the interval examined, which is not an assessable feature.")
         return m
     nature = KIND_NATURE[f.kind]
     if nature != ref.nature:
         m.status, m.z_range = OPPOSITE, None
-        m.reasons.append(f"La referencia es una {sr.NATURE_TEXT[ref.nature]} y aquí hay un {f.kind}: no son "
-                         "compatibles.")
+        m.reasons.append(f"The reference is an {sr.NATURE_TEXT[ref.nature]} and here there is a {f.kind}: they are not "
+                         "compatible.")
         return m
     if ref.fwhm_um is not None:
         span = ref.fwhm_um / table[predicted[0]].element_um
         if span >= 3 and f.width != "amplia":
             m.status, m.z_range = WIDTH, None
-            m.reasons.append(f"La banda documentada mide unos {ref.fwhm_um:.2f} µm (≈ {span:.0f} canales) y aquí la "
-                             f"característica ocupa {f.n_channels} canal{'es' if f.n_channels != 1 else ''} a media "
-                             "altura: un mínimo aislado no es coherente con ella.")
+            m.reasons.append(f"The documented band is about {ref.fwhm_um:.2f} µm wide (≈ {span:.0f} channels) and here the "
+                             f"feature spans {f.n_channels} channel{'s' if f.n_channels != 1 else ''} at half "
+                             "height: an isolated minimum is not consistent with it.")
             return m
-    m.reasons.append(f"Su posición esperada ({lam_obs:.3f} µm) cae dentro del intervalo a media altura "
-                     f"({win.lo_um:.3f}–{win.hi_um:.3f} µm) y el tipo coincide ({sr.NATURE_TEXT[ref.nature]}).")
+    m.reasons.append(f"Its expected position ({lam_obs:.3f} µm) falls inside the half-height interval "
+                     f"({win.lo_um:.3f}–{win.hi_um:.3f} µm) and the type matches ({sr.NATURE_TEXT[ref.nature]}).")
     if ref.needs_absorption_model:
         m.status = MATCH_WEAK
-        m.reasons.append("Para un hielo hace falta una depresión coherente frente a un continuo fiable que abarque la "
-                         "banda y una fuente infrarroja detrás. El continuo local del analizador (tres canales a cada "
-                         "lado) no lo garantiza y V1 no tiene un modelo de absorción: solo referencia orientativa.")
+        m.reasons.append("For an ice a coherent depression is needed against a reliable continuum that spans the "
+                         "band, and an infrared source behind it. The local continuum of the analyser (three channels on each "
+                         "side) does not guarantee it and V1 has no absorption model: indicative reference only.")
     if weak:
         m.status = MATCH_WEAK
     return m
@@ -349,12 +349,12 @@ def interpret(series: sf.Series, feature: sf.Feature | None, *, redshift: sr.Red
     limitations = _limitations(series, feature, table, redshift, aperture_arcsec, resolution)
     if feature is None:
         return Interpretation(series.label, NOT_EVALUABLE, None, obs, None, redshift, [], [], [],
-                              ["No hay ningún intervalo examinado."], limitations, ["sin_intervalo"])
+                              ["There is no interval examined."], limitations, ["sin_intervalo"])
     labelled = _labelled(feature)
     hard, weak, codes = _evidence(feature, series, None if feature.trial_lo is None else qualities)
     if feature.trial_lo is None:
         return Interpretation(series.label, NOT_EVALUABLE, feature, obs, None, redshift, [], [], [],
-                              hard or ["Intervalo sin canales."], limitations, codes or ["no_evaluable"])
+                              hard or ["Interval without channels."], limitations, codes or ["no_evaluable"])
     win = _window(feature, table, labelled)
     found = [m for m in (_evaluate(r, feature, win, table, redshift, weak or hard, labelled) for r in references) if m]
     matches = [m for m in found if m.status in (MATCH, MATCH_WEAK)]
@@ -370,8 +370,8 @@ def interpret(series: sf.Series, feature: sf.Feature | None, *, redshift: sr.Red
     blockers = hard + weak
     if len(matches) > 1:
         codes.append("varias")
-        blockers.append("Varias referencias caen en el mismo intervalo y SPHEREx no las separa a esta resolución: se "
-                        "conservan todas como hipótesis.")
+        blockers.append("Several references fall in the same interval and SPHEREx does not separate them at this resolution: "
+                        "all are kept as hypotheses.")
     if any(m.reference.needs_absorption_model for m in matches):
         codes.append("hielo")
     if matches and not redshift.known:
@@ -381,29 +381,29 @@ def interpret(series: sf.Series, feature: sf.Feature | None, *, redshift: sr.Red
 
 
 def _limitations(series, f, table, rs: sr.Redshift, aperture_arcsec, resolution) -> list[str]:
-    out = ["Coincidir en posición y tipo no identifica una sustancia: es una hipótesis compatible con los datos.",
-           "El espectro del cubo es exploratorio y no tiene incertidumbres; «contraste / dispersión de referencia» "
-           "es descriptivo, no una significación estadística. No se dan probabilidades: no hay un modelo calibrado.",
-           f"Solo se compara con las {len(sr.REFERENCES)} referencias de la biblioteca ({sr.LIBRARY_VERSION}); que "
-           "ninguna coincida no excluye otras sustancias ni procesos."]
+    out = ["Matching in position and type does not identify a substance: it is a hypothesis consistent with the data.",
+           "The cube spectrum is exploratory and has no uncertainties; «contrast / reference scatter» "
+           "is descriptive, not a statistical significance. No probabilities are given: there is no calibrated model.",
+           f"It is only compared with the {len(sr.REFERENCES)} references of the library ({sr.LIBRARY_VERSION}); the fact that "
+           "none matches does not exclude other substances or processes."]
     if f is not None and _labelled(f):
         ch = table[f.canal]
-        out.append(f"Resolución en el canal {ch.canal} (D{ch.detector}): R = {ch.R:.0f}"
-                   + ("" if ch.R_from_fits else " (estimada con la anchura del canal; la tabla del FITS no la da)")
-                   + f", un elemento de resolución ≈ {ch.element_um:.3f} µm. Las líneas estrechas no se resuelven y "
-                     "no se exige que se resuelvan; solo se compara su posición.")
+        out.append(f"Resolution in channel {ch.canal} (D{ch.detector}): R = {ch.R:.0f}"
+                   + ("" if ch.R_from_fits else " (estimated from the channel width; the FITS table does not give it)")
+                   + f", one resolution element ≈ {ch.element_um:.3f} µm. Narrow lines are not resolved and "
+                     "they are not required to be resolved; only their position is compared.")
     if rs.known:
         out.append(f"Desplazamiento al rojo z = {rs.z:.6f} ({rs.object_name}, {rs.source.upper()}): λ esperada = "
                    "λ en reposo × (1 + z). " + rs.note)
     else:
         out.append(rs.note)
     if aperture_arcsec:
-        out.append(f"La apertura (radio {aperture_arcsec:.0f}″) mezcla toda la luz que contiene, menos el anillo de "
-                   "fondo: la interpretación describe esa mezcla, no un objeto concreto dentro de ella, y una emisión "
-                   "extendida que también llene el anillo queda en parte restada.")
-    out.append("Ventana de compatibilidad (aproximación conservadora declarada, sin la respuesta espectral completa de "
-               "cada píxel): intervalo a media altura de la característica, ampliado solo por el error documentado "
-               "del centro de banda (1 nm en D1–D4, 10 nm en D5–D6; Hui et al. 2026).")
+        out.append(f"The aperture (radius {aperture_arcsec:.0f}″) mixes all the light it contains, minus the background "
+                   "annulus: the interpretation describes that mixture, not a specific object inside it, and extended "
+                   "emission that also fills the annulus is partly subtracted.")
+    out.append("Compatibility window (declared conservative approximation, without the full spectral response of "
+               "each pixel): half-height interval of the feature, widened only by the documented error "
+               "of the band centre (1 nm in D1–D4, 10 nm in D5–D6; Hui et al. 2026).")
     return out
 
 
@@ -413,8 +413,8 @@ def interpret_features(series: sf.Series, features, **kw) -> list[Interpretation
 
 
 # extraction status of a channel without value, in words (same wording as spectral_cube.STATUS_TEXT)
-_STATUS_TEXT = {"blank": "canal sin datos en DR1, BLANKCH", "no_data_aperture": "apertura con píxeles sin datos, NHITS = 0",
-                "no_background": "fondo insuficiente en el anillo"}
+_STATUS_TEXT = {"blank": "channel without data in DR1, BLANKCH", "no_data_aperture": "aperture with pixels without data, NHITS = 0",
+                "no_background": "insufficient background in the annulus"}
 
 
 def survey(series: sf.Series, features=(), scatter: dict | None = None, *, redshift: sr.Redshift = sr.UNKNOWN_Z,
@@ -433,10 +433,10 @@ def survey(series: sf.Series, features=(), scatter: dict | None = None, *, redsh
         chans = channels_at(table, lam_obs)
         valued = [c for c in chans if np.isfinite(series.value[series.index(c)])]
         if not valued:
-            why = sorted({_STATUS_TEXT.get(series.status[series.index(c)], "sin valor") for c in chans})
+            why = sorted({_STATUS_TEXT.get(series.status[series.index(c)], "no value") for c in chans})
             out.append(Coverage(ref, COV_NO_DATA, lam_obs, chans, None,
-                                [f"Canal {_channels(chans)} sin valor ({'; '.join(why)}): no se puede concluir ni "
-                                 "presencia ni ausencia."]))
+                                [f"Channel {_channels(chans)} has no value ({'; '.join(why)}): neither presence nor absence "
+                                 "can be concluded."]))
             continue
         try:
             f = sf.inspect_channel(series, valued[0], features, scatter)
@@ -445,23 +445,23 @@ def survey(series: sf.Series, features=(), scatter: dict | None = None, *, redsh
             continue
         if f.klass == sf.NOT_EVALUABLE:
             out.append(Coverage(ref, COV_NO_DATA, lam_obs, chans, f,
-                                ["El analizador no puede valorar ese canal: " + " ".join(f.reasons)]))
+                                ["The analyser cannot assess that channel: " + " ".join(f.reasons)]))
         elif _labelled(f):
             out.append(Coverage(ref, COV_FEATURE, lam_obs, chans, f,
                                 [f"{f.kind.capitalize()} {f.label.lower()} en {f.lam:.3f} µm."]))
         else:
             out.append(Coverage(ref, COV_NO_SIGNAL, lam_obs, chans, f,
-                                ["El analizador no señala nada ahí. No demuestra ausencia: el espectro no tiene "
-                                 "incertidumbres y la señal podría estar por debajo de sus criterios."]))
+                                ["The analyser flags nothing there. This does not prove absence: the spectrum has no "
+                                 "uncertainties and the signal could be below its criteria."]))
     return out
 
 
 def method_summary() -> dict:
     return {"motor": ENGINE_VERSION, "biblioteca": sr.LIBRARY_VERSION,
-            "ventana": "intervalo a media altura (WL_MIN–WL_MAX de sus canales) ± error del centro de banda",
-            "error_centro_banda_um": sr.BAND_CENTRE_ERROR_UM, "contigua": "a menos de λ/R del intervalo",
+            "ventana": "half-height interval (WL_MIN–WL_MAX of its channels) ± band-centre error",
+            "error_centro_banda_um": sr.BAND_CENTRE_ERROR_UM, "contigua": "within λ/R of the interval",
             "naturaleza": {"pico": sr.EMISSION, "valle": sr.ABSORPTION},
-            "anchura": "una banda documentada de ≥ 3 elementos de resolución exige una característica «amplia»",
-            "hielos": "como máximo «insuficientemente respaldada» (sin modelo de absorción en V1)",
-            "z": "solo de la tabla curada (NED, dentro de la isofota D25) o del usuario; nunca estimado",
+            "anchura": "a documented band of ≥ 3 resolution elements requires a «broad» feature",
+            "hielos": "at most «insufficiently supported» (no absorption model in V1)",
+            "z": "only from the curated table (NED, inside the D25 isophote) or from the user; never estimated",
             "veredictos": VERDICT_LABELS}

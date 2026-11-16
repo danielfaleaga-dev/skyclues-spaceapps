@@ -117,14 +117,14 @@ def read_flag_definitions(flags_header) -> FlagDefinitions:
             if dkey in flags_header:
                 desc[bit] = str(flags_header[dkey]).strip()
     if not bits:
-        return FlagDefinitions(bits=dict(DOCUMENTED_BITS), source="documentación (cabecera sin MSKN)")
+        return FlagDefinitions(bits=dict(DOCUMENTED_BITS), source="documentation (header without MSKN)")
     conflicts = {b: (bits[b], DOCUMENTED_BITS[b]) for b in bits
                  if b in DOCUMENTED_BITS and bits[b] != DOCUMENTED_BITS[b]}
     added = {b: n for b, n in DOCUMENTED_BITS.items() if b not in bits}
     for b, n in added.items():
         bits[b] = n
-        desc.setdefault(b, "definido en la documentación oficial (ausente en la cabecera)")
-    source = "cabecera" + (f" + documentación (bits {', '.join(map(str, sorted(added)))})" if added else "")
+        desc.setdefault(b, "defined in the official documentation (absent from the header)")
+    source = "cabecera" + (f" + documentation (bits {', '.join(map(str, sorted(added)))})" if added else "")
     return FlagDefinitions(bits=bits, descriptions=desc, source=source, conflicts=conflicts)
 
 
@@ -163,7 +163,7 @@ def flag_census(flags, defs: FlagDefinitions, region: np.ndarray | None = None) 
             cls, desc = defs.classify(name), defs.descriptions.get(bit, "")
         elif count:
             name, cls = f"{UNDEFINED_PREFIX}{bit}", "artifact"
-            desc = "bit activo sin definición en la cabecera ni en la documentación: enmascarado por prudencia"
+            desc = "bit active with no definition in the header or in the documentation: masked as a precaution"
         else:
             continue
         rows.append({"bit": bit, "name": name, "class": cls, "pixels": count,

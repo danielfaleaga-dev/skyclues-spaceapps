@@ -37,7 +37,7 @@ def gaia_query(ra: float, dec: float, fov: float, limit: int = MAX_SOURCES) -> s
     ra, dec = validate_coordinates(ra, dec)
     fov = validate_fov_deg(fov)
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= MAX_SOURCES:
-        raise ValueError(f"Límite Gaia: entero entre 1 y {MAX_SOURCES}.")
+        raise ValueError(f"Gaia limit: integer between 1 and {MAX_SOURCES}.")
     return (f"SELECT TOP {limit + 1} {','.join(COLUMNS)} FROM {GAIA_TABLE} "
             f"WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{ra:.10f},{dec:.10f},{fov / 2:.10f})) "
             "ORDER BY phot_g_mean_mag ASC, source_id ASC")
@@ -46,31 +46,31 @@ def gaia_query(ra: float, dec: float, fov: float, limit: int = MAX_SOURCES) -> s
 def parse_gaia(raw: bytes, limit: int) -> tuple[list[dict], bool]:
     """Validate the entire result, preserving 64-bit source identifiers as strings."""
     if len(raw) > MAX_BYTES:
-        raise ReferenceError("Gaia excedió el límite de respuesta (2 MiB).")
+        raise ReferenceError("Gaia exceeded the response limit (2 MiB).")
     try:
         reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig")))
         if tuple(reader.fieldnames or ()) != COLUMNS:
-            raise ValueError("columnas inesperadas")
+            raise ValueError("unexpected columns")
         rows = []
         for r in reader:
             if len(rows) >= limit + 1 or None in r:
-                raise ValueError("más filas/columnas que las solicitadas")
+                raise ValueError("more rows/columns than requested")
             sid = r["source_id"]
             if not sid.isdecimal() or not 0 < int(sid) < 2**63:
-                raise ValueError("source_id inválido")
+                raise ValueError("invalid source_id")
             row = {"source_id": sid}
             for k in COLUMNS[1:]:
                 v = float(r[k]) if r[k] and r[k].strip() else None
                 row[k] = v if v is not None and math.isfinite(v) else None
             validate_coordinates(row["ra"], row["dec"])
             if row["ref_epoch"] != 2016.0:
-                raise ValueError("época inesperada para DR3")
+                raise ValueError("unexpected epoch for DR3")
             rows.append(row)
         if len({r["source_id"] for r in rows}) != len(rows):
-            raise ValueError("identificadores repetidos")
+            raise ValueError("repeated identifiers")
         return rows[:limit], len(rows) > limit
     except (ValueError, TypeError, KeyError, AttributeError, UnicodeError, csv.Error) as err:
-        raise ReferenceError(f"Respuesta Gaia inválida: {err}") from err
+        raise ReferenceError(f"Invalid Gaia response: {err}") from err
 
 
 def fetch_gaia(ra: float, dec: float, fov: float, limit: int = MAX_SOURCES) -> dict:
@@ -84,11 +84,11 @@ def fetch_gaia(ra: float, dec: float, fov: float, limit: int = MAX_SOURCES) -> d
             for chunk in response.iter_content(65536):
                 n += len(chunk)
                 if n > MAX_BYTES:
-                    raise ReferenceError("Gaia excedió el límite de respuesta (2 MiB).")
+                    raise ReferenceError("Gaia exceeded the response limit (2 MiB).")
                 chunks.append(chunk)
         raw = b"".join(chunks)
     except requests.RequestException as err:
-        raise ReferenceError(f"Gaia DR3 no disponible: {type(err).__name__}. Puede reintentar; WISE es independiente.") from err
+        raise ReferenceError(f"Gaia DR3 not available: {type(err).__name__}. You can retry; WISE is independent.") from err
     rows, truncated = parse_gaia(raw, limit)
     return {"sources": rows, "truncated": truncated, "limit": limit, "query": query,
             "endpoint": GAIA_TAP, "table": GAIA_TABLE, "ra": float(ra), "dec": float(dec),
@@ -106,7 +106,7 @@ def expected_position(source: dict, epoch: float) -> tuple[float, float] | None:
     astrometry. Missing proper motion remains missing, never implicitly zero.
     """
     if not math.isfinite(epoch) or not 2000 <= epoch <= 2050:
-        raise ValueError("Época calculada fuera de 2000–2050 (año juliano TCB).")
+        raise ValueError("Computed epoch outside 2000–2050 (Julian year TCB).")
     if any(source.get(k) is None for k in ("ra", "dec", "ref_epoch", "pmra", "pmdec")):
         return None
     a, d = np.deg2rad([source["ra"], source["dec"]])

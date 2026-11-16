@@ -43,7 +43,7 @@ def frame_png(frame,fov,norm,centre=None,measured=None):
     ticks=np.linspace(0,shape[0]-1,5)
     ax.set_xticks(ticks,[f'{(t-(shape[1]-1)/2)*-6.15:.0f}' for t in ticks])
     ax.set_yticks(ticks,[f'{(t-(shape[0]-1)/2)*6.15:.0f}' for t in ticks])
-    ax.set_xlabel('Este (″)');ax.set_ylabel('Norte (″)')
+    ax.set_xlabel('East (″)');ax.set_ylabel('North (″)')
     ax.set_title(Time(frame.row['mjd'],format='mjd').isot[:19]+' UTC',fontsize=12)
     ax.tick_params(labelsize=9)
     cb=fig.colorbar(ScalarMappable(norm=norm,cmap=render._cmap()),cax=fig.add_axes([.22,.055,.6,.025]),orientation='horizontal')
@@ -65,12 +65,12 @@ def build(frames,fov,follow=True,simple=True,animate=True,positions=None):
            'collection':f.row['collection'],'detector':f.row['detector'],
            'lambda_um':f.row['lambda_um'],'valid_pct':float(np.isfinite(arrays[i])[ns.requested_field(arrays[i].shape,fov)].mean()*100),
            'file':f.row['url'].rsplit('/',1)[-1]} for i,f in enumerate(frames)]
-    legend=('Cruz terracota: posición prevista, no detección. '
-            +('Anillo blanco: posición medida en los píxeles; dentro se muestran los píxeles del objeto que la cadena '
-               'oficial marca como atípicos por no estar en su catálogo. ' if any(m and m.get('measured') for m in positions) else '')
-            +'Rosa: píxeles enmascarados; lila: sin cobertura. '
-            +('Cada imagen sigue la posición prevista del objeto.' if follow else 'Fondo fijo según WCS.')+
-            ' Imágenes originales, misma escala de brillo; sin suavizado.' )
+    legend=('Terracotta cross: predicted position, not a detection. '
+            +('White ring: position measured in the pixels; inside it are shown the pixels of the object that the official '
+               'pipeline flags as outliers because they are not in its catalogue. ' if any(m and m.get('measured') for m in positions) else '')
+            +'Pink: masked pixels; lilac: no coverage. '
+            +('Each image follows the predicted position of the object.' if follow else 'Fixed background according to the WCS.')+
+            ' Original images, same brightness scale; no smoothing.' )
     return player.observation_player(pngs,meta,legend,simple,animate)
 
 
@@ -78,9 +78,9 @@ def build(frames,fov,follow=True,simple=True,animate=True,positions=None):
 def stack_figure(follow,control):
     fig=Figure(figsize=(10,4.8),dpi=110,facecolor='white')
     norm=render.shared_norm([follow['image'],control['image']],lo=5,hi=99)
-    for i,(product,title) in enumerate(((follow,'Siguiendo la predicción'),(control,'Control: fondo fijo'))):
+    for i,(product,title) in enumerate(((follow,'Following the prediction'),(control,'Control: fixed background'))):
         ax=fig.add_subplot(1,2,i+1)
         ax.imshow(product['image'],origin='lower',interpolation='nearest',norm=norm,cmap=render._cmap())
-        ax.set_title(title,fontsize=11);ax.set_xlabel('Píxel de la rejilla común')
-    fig.suptitle('Apilamientos exploratorios · remuestreados · IMAGE − ZODI − fondo',fontsize=11)
+        ax.set_title(title,fontsize=11);ax.set_xlabel('Pixel of the common grid')
+    fig.suptitle('Exploratory stacks · resampled · IMAGE − ZODI − background',fontsize=11)
     return fig

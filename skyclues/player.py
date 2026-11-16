@@ -44,13 +44,13 @@ AX_RECT = [0.15, 0.11, 0.66, 0.85]
 CB_RECT = [0.86, 0.11, 0.03, 0.85]
 GEOMETRIES = ("exact", "nearest")
 GEOMETRY_LABEL = {
-    "exact": ("geometría WCS: cada píxel nativo se dibuja donde lo sitúa su WCS (TAN-SIP), con su valor original "
-              "(sin remuestreo de valores)"),
-    "nearest": "REMUESTREADO por vecino más próximo (error de posición hasta ½ px por eje, ≈0.7 px)",
+    "exact": ("WCS geometry: each native pixel is drawn where its WCS places it (TAN-SIP), with its original value "
+              "(no resampling of values)"),
+    "nearest": "RESAMPLED by nearest neighbour (position error up to ½ px per axis, ≈0.7 px)",
 }
 FRAME_STAMP = {
-    "exact": "Píxeles nativos en su posición WCS · sin remuestreo de valores",
-    "nearest": "REMUESTREADO · vecino más próximo en la rejilla de la época 1",
+    "exact": "Native pixels at their WCS position · no resampling of values",
+    "nearest": "RESAMPLED · nearest neighbour on the epoch 1 grid",
 }
 
 
@@ -75,11 +75,11 @@ def precision_note(seq: TemporalSequence) -> str:
     psf = [f.quality.get("psf_fwhm_arcsec") for f in seq.frames]
     psf = [float(p) for p in psf if p is not None and np.isfinite(float(p))]
     s = screen_scale_arcsec(seq)
-    return (f"Precisión de posición: (1) WCS: cálculo exacto de cada esquina de píxel (TAN-SIP); "
-            f"(2) pantalla: 1 píxel de pantalla ≈ {s:.1f}″, así que lo dibujado se redondea ±{s / 2:.1f}″; "
-            f"(3) instrumento: píxel SPHEREx ≈ {config.NOMINAL_PIXEL_SCALE_ARCSEC}″"
+    return (f"Position accuracy: (1) WCS: exact computation of each pixel corner (TAN-SIP); "
+            f"(2) screen: 1 screen pixel ≈ {s:.1f}″, so what is drawn is rounded by ±{s / 2:.1f}″; "
+            f"(3) instrument: SPHEREx pixel ≈ {config.NOMINAL_PIXEL_SCALE_ARCSEC}″"
             + (f", PSF ≈ {min(psf):.1f}–{max(psf):.1f}″ FWHM" if psf else "")
-            + "; (4) remuestreo: ninguno en geometría WCS; hasta ≈0.7 px nativos en la rejilla común.")
+            + "; (4) resampling: none in WCS geometry; up to ≈0.7 native pixels on the common grid.")
 
 
 def sequence_norm(seq: TemporalSequence, subtract_zodi: bool = True):
@@ -282,21 +282,21 @@ tbody tr{cursor:pointer}tbody tr:hover{background:var(--surface)}
 _BODY = """
 <div class="sc">
   <div class="stage">
-    <img id="frame" alt="Observación SPHEREx">
+    <img id="frame" alt="SPHEREx observation">
     <div class="badge" id="badge"></div>
   </div>
   <div class="side">
     <div class="row transport">
-      <button id="prev" title="Época anterior (←)">◀ Anterior</button>
-      <button id="play" class="primary" title="Reproducir / pausa (espacio)">▶ Reproducir</button>
-      <button id="next" title="Época siguiente (→)">Siguiente ▶</button>
+      <button id="prev" title="Previous epoch (←)"◀ Previous</button>
+      <button id="play" class="primary" title="Play / pause (space)"▶ Play</button>
+      <button id="next" title="Next epoch (→)"Next ▶</button>
     </div>
     <div class="row">
-      <input type="range" id="scrub" min="0" step="1" aria-label="Época">
+      <input type="range" id="scrub" min="0" step="1" aria-label="Epoch">
       <span id="pos" class="kbd"></span>
     </div>
     <div class="row">
-      <label>Velocidad
+      <label>Speed
         <select id="fps">
           <option value="0.5">0.5 fps</option><option value="1" selected>1 fps</option>
           <option value="2">2 fps</option><option value="4">4 fps</option>
@@ -307,18 +307,18 @@ _BODY = """
       <h4>Blink</h4>
       <div class="row">
         <label><input type="checkbox" id="blink"> Alternar</label>
-        <select id="ba" aria-label="Primera época de blink"></select><span>↔</span><select id="bb" aria-label="Segunda época de blink"></select>
-        <select id="bfps" aria-label="Frecuencia de blink"><option value="1">1 Hz</option><option value="2" selected>2 Hz</option><option value="4">4 Hz</option></select>
+        <select id="ba" aria-label="First blink epoch"></select><span>↔</span><select id="bb" aria-label="Second blink epoch"></select>
+        <select id="bfps" aria-label="Blink frequency"><option value="1">1 Hz</option><option value="2" selected>2 Hz</option><option value="4">4 Hz</option></select>
       </div>
     </div>
     <div class="box">
-      <h4>Épocas (observaciones auténticas)</h4>
-      <div class="table-scroll"><table><thead><tr><th>#</th><th>Fecha</th><th>Δt (d)</th><th>λ (µm)</th><th>válido</th></tr></thead>
+      <h4>Epochs (authentic observations)</h4>
+      <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Δt (d)</th><th>λ (µm)</th><th>valid</th></tr></thead>
       <tbody id="rows"></tbody></table></div>
     </div>
     <div class="legend">%(legend)s</div>
-    <div class="kbd">Teclado (con el foco fuera de los controles): espacio = reproducir/pausa · ← → = paso.
-      Con un control seleccionado, las teclas actúan solo sobre ese control.</div>
+    <div class="kbd">Keyboard (with focus outside the controls): space = play/pause · ← → = step.
+      With a control selected, the keys act only on that control.</div>
   </div>
 </div>
 """
@@ -337,8 +337,8 @@ _GLUE_JS = r"""
     $('badge').innerHTML = (i+1) + '/' + FR.length + ' · ' + m.date +
       ' <span class="sub">· Δt +' + m.dt_days.toFixed(1) + ' d · ' + m.obs_id + ' · D' + m.detector +
       ' · λ ' + fmt(m) + ' µm' + (s.blink ? ' · BLINK' : '') + '</span>';
-    $('scrub').value = i; $('pos').textContent = 'época ' + (i+1) + ' de ' + FR.length;
-    $('play').textContent = s.playing ? '❚❚ Pausa' : '▶ Reproducir';
+    $('scrub').value = i; $('pos').textContent = 'epoch ' + (i+1) + ' of ' + FR.length;
+    $('play').textContent = s.playing ? '❚❚ Pause' : '▶ Play';
     document.querySelectorAll('#rows tr').forEach((tr, k) => tr.classList.toggle('on', k === i));
     $('blink').checked = s.blink;
   }
@@ -382,23 +382,23 @@ _GLUE_JS = r"""
 
 def legend_html(subtract_zodi: bool = True, restrict_to_common: bool = False, geometry: str = "exact",
                 show_halo: bool = False, moving: bool = False, precision: str = "") -> str:
-    legend = (f'Magnitud: {"IMAGE − ZODI" if subtract_zodi else "IMAGE"} (MJy/sr), misma escala en todas las épocas.'
-              f'<span class="sw" style="background:{render.MASK_COLOR}"></span>sin datos válidos en esa época')
+    legend = (f'Quantity: {"IMAGE − ZODI" if subtract_zodi else "IMAGE"} (MJy/sr), same scale in all epochs.'
+              f'<span class="sw" style="background:{render.MASK_COLOR}"></span>no valid data in that epoch')
     if restrict_to_common:
         legend += (f'<span class="sw" style="background:{render.OUTSIDE_COMMON_COLOR}"></span>'
-                   'válido solo en algunas épocas')
+                   'valid only in some epochs')
     if show_halo:
         legend += (f'<span class="sw" style="background:{render.CAUTION_SWATCH}"></span>'
-                   'HALO (modo exploratorio: precaución recomendada; excluido de las métricas)')
+                   'HALO (exploratory mode: caution recommended; excluded from the metrics)')
     if moving:
-        legend += (' · Círculo azul: campo de comparación. <b>+ azul: posición CALCULADA del objetivo para la fecha de '
-                   'cada época</b> (movimiento propio y paralaje del catálogo; es un cálculo, no una detección de '
-                   'SPHEREx). × gris: posición de catálogo en su época (si cae dentro del campo).')
+        legend += (' · Blue circle: comparison field. <b>+ blue: CALCULATED position of the target for the date of '
+                   'each epoch</b> (catalogue proper motion and parallax; it is a calculation, not a SPHEREx '
+                   'detection). × grey: catalogue position at its epoch (if it falls inside the field).')
     else:
-        legend += (' · Círculo azul: campo de comparación; + azul: posición del objetivo (sin movimiento propio '
-                   'conocido: la misma en todas las fechas; no es una detección).')
-    legend += (' Fotogramas = observaciones reales, sin interpolación '
-               f'temporal. Ejes: rejilla de la época 1; {GEOMETRY_LABEL[geometry]}.')
+        legend += (' · Blue circle: comparison field; + blue: position of the target (no known proper motion: '
+                   'the same on all dates; it is not a detection).')
+    legend += (' Frames = real observations, with no temporal '
+               f'interpolation. Axes: epoch 1 grid; {GEOMETRY_LABEL[geometry]}.')
     if precision:
         legend += ' ' + precision
     return legend
@@ -414,7 +414,7 @@ def observation_player(pngs: list[bytes], metadata: list[dict], legend: str, sim
                        animate=True) -> str:
     """Shared transport/palette for other authentic time-series products in Time Explorer."""
     if not pngs or len(pngs) != len(metadata):
-        raise ValueError('Imágenes y metadatos no coinciden')
+        raise ValueError('Images and metadata do not match')
     css = _CSS % {'mask': render.MASK_COLOR, 'outside': render.OUTSIDE_COMMON_COLOR}
     if simple:
         css += '.badge .sub,.kbd:not(#pos),td:nth-child(n+3),th:nth-child(n+3){display:none}'
@@ -440,12 +440,12 @@ def player_html(seq: TemporalSequence, pngs: list[bytes], subtract_zodi: bool = 
     glue = _GLUE_JS % {"frames": json.dumps(frames), "meta": json.dumps(frame_metadata(seq))}
     if simple:
         css += '.badge .sub,.kbd:not(#pos),td:nth-child(n+3),th:nth-child(n+3){display:none}.legend{font-size:14px;line-height:1.5}'
-        legend = 'Rosa: sin datos. Cruz azul: posición de referencia.'
+        legend = 'Pink: no data. Blue cross: reference position.'
         if show_halo:
             legend += ' Cobre: zonas de calidad limitada.'
         body = _BODY % {'legend': legend}
-        body = body.replace('Épocas (observaciones auténticas)', 'Fechas disponibles')
-        glue = glue.replace("'época '", "'fecha '")
+        body = body.replace('Epochs (authentic observations)', 'Available dates')
+        glue = glue.replace("'epoch '", "'fecha '")
     return (f"<!doctype html><html><head><meta charset='utf-8'><style>{css}</style></head>"
             f"<body>{body}<script>{PLAYER_CORE_JS}</script><script>{glue}</script></body></html>")
 

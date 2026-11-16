@@ -17,7 +17,7 @@ ACTIVE_CUBE = "dr1-hips_20261026"
 def validate_collections(collections):
     values = tuple(dict.fromkeys(collections))
     if not values or any(not COLLECTIONS.get(c, {}).get("enabled") for c in values):
-        raise ValueError("Colección no habilitada: requiere verificar formato y calibración antes de usarla.")
+        raise ValueError("Collection not enabled: it requires verifying the format and calibration before use.")
     return values
 
 
@@ -55,10 +55,10 @@ def configure_cube_release(release_id=ACTIVE_CUBE):
     cache for another published product so old tile IDs cannot cross releases.
     """
     if release_id not in CUBE_RELEASES:
-        raise ValueError('Version de cubo no verificada')
+        raise ValueError('Unverified cube version')
     p=CUBE_RELEASES[release_id]
     if (p['profile'],p['order'],p['planes']) != ('dr1-mef-102',5,102):
-        raise ValueError('Formato de cubo incompatible: requiere otro adaptador validado')
+        raise ValueError('Incompatible cube format: it requires another validated adapter')
     config.CUBE_DATA_URL=p['data_url'];config.CUBE_HIPS_URL=p['hips_url'];config.CUBE_DOI=p['doi']
     config.CUBE_RELEASE_ID=release_id
     if release_id!=ACTIVE_CUBE:

@@ -18,13 +18,13 @@ INCOMPLETE, BLANK, NO_BACKGROUND = "apertura_incompleta", "canal_vacio_dr1", "si
 NO_PIXELS = "sin_pixeles"
 
 CAUSE_TEXT = {
-    BLANK: "El canal figura sin datos en DR1 (BLANKCH).",
-    NO_DATA: "Píxeles de la apertura sin datos en el cubo (valor NaN o NHITS = 0).",
-    BLOOM: "Píxeles de la apertura con la máscara BLOOM de la extensión FLAGS del FITS.",
-    OVERFLOW: "Píxeles de la apertura con la máscara OVERFLOW (saturación).",
-    INCOMPLETE: "La extracción actual exige la apertura completa con datos; no rellena ni interpola píxeles.",
-    NO_BACKGROUND: "Menos de la mitad del anillo de fondo tiene datos.",
-    NO_PIXELS: "La apertura no contiene ningún píxel del cubo en esta posición.",
+    BLANK: "The channel is listed without data in DR1 (BLANKCH).",
+    NO_DATA: "Aperture pixels without data in the cube (NaN value or NHITS = 0).",
+    BLOOM: "Aperture pixels with the BLOOM mask of the FLAGS extension of the FITS.",
+    OVERFLOW: "Aperture pixels with the OVERFLOW mask (saturation).",
+    INCOMPLETE: "The current extraction requires the full aperture to have data; it does not fill or interpolate pixels.",
+    NO_BACKGROUND: "Less than half of the background annulus has data.",
+    NO_PIXELS: "The aperture contains no cube pixel at this position.",
 }
 REQUIRED = ("ap_pix_total", "ap_pix_invalidos", "ap_pix_nan", "ap_pix_nhits0", "ap_peso_total", "ap_peso_invalido",
             "ap_bloom", "ap_overflow")
@@ -114,40 +114,40 @@ def has_unreported_loss(qs: list[ChannelQuality]) -> bool:
 def plain(q: ChannelQuality) -> str | None:
     """One sentence for the Sencillo level; None when there is nothing to say."""
     if q.status == "blank":
-        return "Este color no tiene datos en el catálogo de SPHEREx."
+        return "This colour has no data in the SPHEREx catalogue."
     if q.status == "no_background":
-        return "Este canal no puede analizarse porque no hay suficiente información de fondo alrededor del punto."
+        return "This channel cannot be analysed because there is not enough background information around the point."
     if q.status == "no_data_aperture":
-        return "Este canal no puede analizarse porque parte de la región seleccionada no tiene datos utilizables."
+        return "This channel cannot be analysed because part of the selected region has no usable data."
     if q.caution:
-        return "Este canal tiene datos, pero parte de la luz pudo saturarse: tómalo con cautela."
+        return "This channel has data, but part of the light may have saturated: take it with caution."
     return None
 
 
 def status_text(q: ChannelQuality) -> str:
     """Short status for the scientific table."""
     if q.status == "blank":
-        return "Sin datos en DR1"
+        return "No data in DR1"
     if q.rejected_incomplete_aperture:
-        return "Rechazado: apertura incompleta"
+        return "Rejected: incomplete aperture"
     if q.status == "no_data_aperture":
-        return "Rechazado: apertura sin datos"
+        return "Rejected: aperture without data"
     if q.status == "no_background":
-        return "Rechazado: fondo insuficiente"
-    return "Válido, con precaución" if q.caution else "Válido"
+        return "Rejected: insufficient background"
+    return "Valid, with caution" if q.caution else "Valid"
 
 
 def cause_names(q: ChannelQuality) -> str:
-    names = {NO_DATA: "sin datos", BLOOM: "BLOOM", OVERFLOW: "OVERFLOW", INCOMPLETE: "apertura incompleta",
-             BLANK: "canal vacío en DR1", NO_BACKGROUND: "fondo insuficiente", NO_PIXELS: "apertura sin píxeles"}
+    names = {NO_DATA: "no data", BLOOM: "BLOOM", OVERFLOW: "OVERFLOW", INCOMPLETE: "incomplete aperture",
+             BLANK: "channel empty in DR1", NO_BACKGROUND: "insufficient background", NO_PIXELS: "aperture without pixels"}
     return " · ".join(names[c] for c in q.causes) or "—"
 
 
 def _pct(q: ChannelQuality) -> str:
     if not q.available or q.px_total is None:
-        return "no disponible"
+        return "not available"
     if not q.px_total:
-        return "0 píxeles en la apertura"
+        return "0 pixels in the aperture"
     return f"{q.px_valid} de {q.px_total} ({q.valid_pct:.0f} %)"
 
 
@@ -157,13 +157,13 @@ def table_rows(qs: list[ChannelQuality]) -> list[dict]:
     for q in qs:
         invalid = ("—" if not q.available or q.px_invalid is None else
                    f"{q.px_invalid} (NaN {q.px_nan} · NHITS = 0 {q.px_nhits0})")
-        out.append({"Canal": q.canal, "λ (µm)": round(q.lambda_um, 3), "Detector": f"D{q.detector}",
-                    "Píxeles válidos": _pct(q), "Píxeles sin datos": invalid,
-                    "Peso perdido": "—" if q.weight_lost_pct is None else f"{q.weight_lost_pct:.0f} %",
+        out.append({"Channel": q.canal, "λ (µm)": round(q.lambda_um, 3), "Detector": f"D{q.detector}",
+                    "Valid pixels": _pct(q), "Pixels without data": invalid,
+                    "Lost weight": "—" if q.weight_lost_pct is None else f"{q.weight_lost_pct:.0f} %",
                     # text, not numbers: blank channels have no counts and a mixed column cannot be serialised
                     "BLOOM": "—" if q.bloom is None else str(q.bloom),
                     "OVERFLOW": "—" if q.overflow is None else str(q.overflow),
-                    "Estado": status_text(q), "Causas": cause_names(q)})
+                    "Status": status_text(q), "Causes": cause_names(q)})
     return out
 
 

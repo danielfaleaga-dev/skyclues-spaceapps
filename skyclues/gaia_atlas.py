@@ -46,13 +46,13 @@ class Jobs:
             try:
                 return {'state': 'ready', 'result': future.result()}
             except Exception:
-                return {'state': 'error', 'message': 'Gaia DR3 no disponible. Puede reintentar.'}
+                return {'state': 'error', 'message': 'Gaia DR3 not available. You can retry.'}
 
 
 def verified_alias(source_id):
     """One optional exact-identifier SIMBAD match for the selected source, never a positional guess."""
     if not re.fullmatch(r'[0-9]{1,19}', source_id):
-        raise ValueError('source_id inválido')
+        raise ValueError('invalid source_id')
     query = ("SELECT TOP 2 basic.main_id FROM basic JOIN ident ON ident.oidref=basic.oid "
              f"WHERE ident.id = 'Gaia DR3 {source_id}'")
     base = SIMBAD_TAP_URLS[-1]
@@ -63,7 +63,7 @@ def verified_alias(source_id):
         for chunk in r.iter_content(8192):
             raw.extend(chunk)
             if len(raw) > 32768:
-                raise ValueError('Respuesta SIMBAD demasiado grande')
+                raise ValueError('SIMBAD response too large')
     data = json.loads(raw)['data']
     if len(data) == 1 and data[0][0] and str(data[0][0]).strip() != f'Gaia DR3 {source_id}':
         return {'name': str(data[0][0]).strip(), 'source': base, 'identifier': f'Gaia DR3 {source_id}'}

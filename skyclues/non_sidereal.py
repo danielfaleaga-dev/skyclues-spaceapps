@@ -35,8 +35,8 @@ MIN_SEPARATION_PX = 3.          # closer positions cannot be told apart from one
 MIN_SHIFT_PX = 2.               # an observed displacement never rests on sub-pixel precision
 ABSENT_FRACTION = .5            # "gone": less than half the flux, at 3 sigma
 MIN_COMMON_STARS = 4
-LABELS = {'predicted': 'Posición prevista', 'candidate': 'Señal candidata',
-          'observed': 'Movimiento observado', 'unevaluable': 'No evaluable', 'no_coverage': 'Sin cobertura'}
+LABELS = {'predicted': 'Predicted position', 'candidate': 'Candidate signal',
+          'observed': 'Motion observed', 'unevaluable': 'Not evaluable', 'no_coverage': 'No coverage'}
 SCALES_ARCSEC = (12., 24., 48., 96.)
 
 
@@ -91,12 +91,12 @@ def inside(img,x,y):
 
 def fetch_frames(identity, rows, fov, progress=None):
     if not 0.05 <= fov <= .5 or not 1 <= len(rows) <= 8:
-        raise ValueError('FOV o cantidad de exposiciones fuera de límites.')
+        raise ValueError('FOV or number of exposures out of bounds.')
     log = progress or (lambda message: None)
     frames, failures = [], []
     for n,row in enumerate(rows):
         try:
-            log(f'Calculando la posición para la exposición {n+1} de {len(rows)}…')
+            log(f'Computing the position for exposure {n+1} of {len(rows)}…')
             row = moving_sources.refine_prediction(identity, row)
             p = row['prediction']
             # Preserve requested FOV; extra context is explicit, used for local sky/control apertures.
@@ -107,10 +107,10 @@ def fetch_frames(identity, rows, fov, progress=None):
             img = fitsdata.load(path)
             det = int(str(img.meta['DETECTOR']).lstrip('D'))
             if det != row['detector'] or str(img.meta['OBSID']) != row['obs_id']:
-                raise ValueError('FITS y metadatos identifican exposiciones diferentes.')
+                raise ValueError('FITS and metadata identify different exposures.')
             mjd = float(img.meta['MJD-AVG'])
             if abs(mjd-row['mjd'])*86400 > 2:
-                raise ValueError('La fecha FITS no coincide con la predicción por exposición.')
+                raise ValueError('The FITS date does not match the per-exposure prediction.')
             f = MovingFrame({**row, 'mjd':mjd,'context_deg':size},img,path,url,archive.sha256(path))
             x,y = target_pixel(f)
             f.row['prediction_inside'] = bool(inside(img,x,y))
@@ -118,7 +118,7 @@ def fetch_frames(identity, rows, fov, progress=None):
                 ix,iy = int(np.clip(round(x),0,img.shape[1]-1)),int(np.clip(round(y),0,img.shape[0]-1))
                 f.row.update(lambda_um=float(img.wavelength_um[iy,ix]),
                              bandwidth_um=float(img.bandwidth_um[iy,ix]))
-            log('Comprobando estrellas de fondo próximas…')
+            log('Checking nearby background stars…')
             try:
                 f.row['stellar_context']=moving_sources.stellar_context(f.row)
             except (RuntimeError,ValueError,OSError) as e:
@@ -140,7 +140,7 @@ def _measure(img, x, y, radius, compact=False):
     independent noise floor. No clipping inside the source, no smoothing.
     """
     if not inside(img,x,y):
-        return {'evaluable':False,'reason':'posición fuera de cobertura'}
+        return {'evaluable':False,'reason':'position outside coverage'}
     scale = pixel_scale(img)
     r = radius/scale
     h = math.ceil(max(2.5*r,8))
@@ -163,7 +163,7 @@ def _measure(img, x, y, radius, compact=False):
     coverage=float(np.sum(ap&ok_ap)/max(expected,1))
     expected_ann=int(np.sum((fr>=max(1.6*r,5))&(fr<=max(2.5*r,8))))
     if coverage<.8 or np.sum(ann&ok)<max(30,.65*expected_ann):
-        return {'evaluable':False,'coverage':min(coverage,1.),'reason':'apertura o fondo con cobertura insuficiente'}
+        return {'evaluable':False,'coverage':min(coverage,1.),'reason':'aperture or background with insufficient coverage'}
     a=np.stack([np.ones_like(dx),dx/r,dy/r],axis=-1)
     bg=ann&ok
     for _ in range(4):
@@ -172,7 +172,7 @@ def _measure(img, x, y, radius, compact=False):
         scatter=max(_mad(resid[bg]),float(np.sqrt(np.median(var[bg]))))
         bg=ann&ok&(np.abs(resid)<3.5*scatter)
         if bg.sum()<30:
-            return {'evaluable':False,'reason':'fondo contaminado o insuficiente'}
+            return {'evaluable':False,'reason':'contaminated or insufficient background'}
     cov=np.linalg.pinv(a[bg].T@a[bg])*scatter**2
     support=ap&ok_ap
     noise=np.maximum(var,scatter**2)
@@ -183,7 +183,7 @@ def _measure(img, x, y, radius, compact=False):
         w=np.where(support,1/np.where(noise>0,noise,1),0.)
         den=float(np.sum(p*p*w))
         if not np.isfinite(den) or den<=0:
-            return {'evaluable':False,'reason':'PSF no evaluable'}
+            return {'evaluable':False,'reason':'PSF not evaluable'}
         weights=p*w/den
         psf_description=psf.description
     else:
@@ -194,7 +194,7 @@ def _measure(img, x, y, radius, compact=False):
     lam=img.wavelength_um[y0:y1,x0:x1][support]
     bw=img.bandwidth_um[y0:y1,x0:x1][support]
     spread=float(np.ptp(lam)/np.median(bw)) if len(lam) else np.inf
-    return {'evaluable':bool(spread<=1.),'reason':'' if spread<=1 else 'gradiente espectral excesivo en apertura',
+    return {'evaluable':bool(spread<=1.),'reason':'' if spread<=1 else 'excessive spectral gradient in the aperture',
             'response':flux,'error':err,'snr':flux/err,'background':float(beta[0]),
             'background_scatter':scatter,'background_pixels':int(bg.sum()),
             'coverage':min(coverage,1.),'spectral_span_bw':spread,'radius_arcsec':radius,
@@ -205,10 +205,10 @@ def evaluate_frame(frame, morphology='both'):
     img=frame.image
     x,y=target_pixel(frame)
     if not inside(img,x,y):
-        return {'status':'no_coverage','tests':[],'reason':'La posición prevista cae fuera del FITS.'}
+        return {'status':'no_coverage','tests':[],'reason':'The predicted position falls outside the FITS.'}
     from .compare import finast_status
     if str(img.meta.get('L2DQAFLG','')).strip()!='Pass' or finast_status([img.meta.get('FINAST')])=='fail':
-        return {'status':'unevaluable','tests':[],'reason':'Control de calidad o astrometría oficial no aptos.',
+        return {'status':'unevaluable','tests':[],'reason':'Official quality control or astrometry not suitable.',
                 'quality': {k:img.meta.get(k) for k in ('L2DQAFLG','FINAST')}}
     tests=[]
     configurations=[]
@@ -241,12 +241,12 @@ def evaluate_frame(frame, morphology='both'):
     candidates=[m for m in valid if m.get('candidate')]
     status='candidate' if candidates else 'predicted' if valid else 'unevaluable'
     return {'status':status,'tests':tests,'reason':
-            'Exceso compatible en la posición prevista; identificación y movimiento aún no confirmados.' if candidates else
-            'No hay evidencia suficiente de señal frente al ruido y los controles.' if valid else
-            'Máscara, fondo o cobertura impiden evaluar la señal.',
+            'Excess consistent with the predicted position; identification and motion not yet confirmed.' if candidates else
+            'There is not enough evidence of signal against the noise and the controls.' if valid else
+            'Mask, background or coverage prevent evaluating the signal.',
             'prediction_xy':[x,y], 'dqa':{k:img.meta.get(k) for k in
               ('L1DQAFLG','L2DQAFLG','FINAST','ASTRONETSOLVED','HE_AIRGLOW_CONT','AURORA_CONT')},
-            'stellar_context':frame.row.get('stellar_context',{'unavailable':'No solicitado'}),
+            'stellar_context':frame.row.get('stellar_context',{'unavailable':'Not requested'}),
             'position_measured':None}
 
 
@@ -302,9 +302,9 @@ def aligned(frames,fov,follow=True):
 
 def stack(frames,fov,follow=True):
     if len(frames)<2 or any(not moving_sources.compatible(a.row,b.row) for a in frames for b in frames):
-        raise ValueError('El apilamiento necesita al menos dos exposiciones del mismo detector, liberación y banda.')
+        raise ValueError('Stacking needs at least two exposures from the same detector, release and band.')
     if max(f.row['mjd'] for f in frames)-min(f.row['mjd'] for f in frames)>7:
-        raise ValueError('Más de siete días: no se presupone estabilidad para combinar estas exposiciones.')
+        raise ValueError('More than seven days: stability is not assumed in order to combine these exposures.')
     data,var,geom=aligned(frames,fov,follow)
     yy,xx=np.indices(data.shape[1:]);rr=np.hypot(xx-(data.shape[2]-1)/2,yy-(data.shape[1]-1)/2)*6.15
     backgrounds=[]
@@ -329,17 +329,17 @@ def stack(frames,fov,follow=True):
     n=keep.sum(axis=0)
     return {'image':mean,'variance':variance,'contributions':n,'geometric_contributions':geom.sum(axis=0),
             'backgrounds':backgrounds,'follow':follow,'n_frames':len(frames),
-            'method':'Vecino más próximo, fondo mediano exterior, media inversa de varianza; '+
-                     ('rechazo robusto 4σ.' if len(frames)>=3 else 'dos imágenes: sin rechazo de valores atípicos.'),
-            'limitation':'Producto exploratorio remuestreado; varianza diagonal sin covarianza de remuestreo ni de fondo. '
-                         'No se usa para declarar detección o movimiento.'}
+            'method':'Nearest neighbour, outer median background, inverse-variance mean; '+
+                     ('robust 4σ rejection.' if len(frames)>=3 else 'two images: no outlier rejection.'),
+            'limitation':'Exploratory resampled product; diagonal variance with no resampling or background covariance. '
+                         'It is not used to declare detection or motion.'}
 
 
 def assess(frames,fov,morphology='both',progress=None):
     log=progress or (lambda msg:None)
     results=[]
     for f in frames:
-        log('Evaluando señal, fondo y posiciones de control…')
+        log('Evaluating signal, background and control positions…')
         results.append(evaluate_frame(f,morphology))
     if not frames:
         return {'method':METHOD,'status':'no_coverage','frames':[]}
@@ -356,14 +356,14 @@ def assess(frames,fov,morphology='both',progress=None):
                        'wcs':f.image.wcs.to_header(relax=True).tostring(), 'analysis':r}
                       for f,r in zip(frames,results)],
             'observed_motion':False,
-            'motion_reason':'La predicción no es una medida. Sin registro independiente y posiciones medidas '
-                            'con incertidumbres verificadas no se declara movimiento observado.'}
+            'motion_reason':'The prediction is not a measurement. Without independent registration and positions measured '
+                            'with verified uncertainties, observed motion is not declared.'}
     report['stack_allowed']=(len(frames)>=2 and max(f.row['mjd'] for f in frames)-min(f.row['mjd'] for f in frames)<=7
                              and all(moving_sources.compatible(a.row,b.row) for a in frames for b in frames))
     report['joint_signal']=joint_signal(frames,results)
     if any(t.get('candidate') for t in report['joint_signal'].get('tests',[])):
         report['status']='candidate'
-    log('Comprobando posiciones medidas y controles del fondo estelar…')
+    log('Checking measured positions and star-field background controls…')
     report['motion'] = measure_motion(frames,results)
     for entry,position in zip(report['frames'],report['motion']['positions']):
         entry['analysis']['position_measured']=position
@@ -380,12 +380,12 @@ def joint_signal(frames,results):
     Images remain available separately. Empirical offset tracks calibrate the
     variance floor; this can only produce a candidate, never measured motion.
     """
-    out={'tests':[],'method':'Combinación inversa de varianza de respuestas nativas siguiendo las predicciones; '
-         'controles sobre ocho trayectorias desplazadas, suelo de dispersión empírica.',
-         'limitation':'No equivale a fotometría absoluta ni a probabilidad global calibrada de detección.'}
+    out={'tests':[],'method':'Inverse-variance combination of native responses following the predictions; '
+         'controls over eight displaced trajectories, empirical scatter floor.',
+         'limitation':'It is not equivalent to absolute photometry or to a calibrated global detection probability.'}
     if (len(frames)<3 or max(f.row['mjd'] for f in frames)-min(f.row['mjd'] for f in frames)>7 or
             not all(moving_sources.compatible(a.row,b.row) for a in frames for b in frames)):
-        out['reason']='Se necesitan al menos tres exposiciones compatibles dentro de siete días.'
+        out['reason']='At least three compatible exposures within seven days are needed.'
         return out
     keys={(t['morphology'],0 if t['morphology']=='compact' else round(t.get('radius_arcsec',0),1))
           for r in results for t in r['tests'] if t.get('evaluable')}
@@ -477,21 +477,21 @@ def locate(frame):
     out={'measured':False,'obs_id':frame.row.get('obs_id'),'mjd':frame.row.get('mjd')}
     x0,y0=target_pixel(frame)
     if not inside(img,x0,y0):
-        return {**out,'reason':'La posición prevista cae fuera de la imagen.'}
+        return {**out,'reason':'The predicted position falls outside the image.'}
     if img.meta.get('FINAST')!=0:
-        return {**out,'reason':'Astrometría oficial no fina (FINAST ≠ 0): la posición no se mide.'}
+        return {**out,'reason':'Official astrometry is not fine (FINAST ≠ 0): the position is not measured.'}
     fit=_fit_position(img,x0,y0,target_valid(img))
     if fit is None:
-        return {**out,'reason':'Sin fuente medible junto a la posición prevista (borde, máscara o ajuste sin solución).'}
+        return {**out,'reason':'No measurable source next to the predicted position (edge, mask or fit with no solution).'}
     if not fit['converged']:
-        return {**out,'reason':'El ajuste de la posición no converge.','snr':fit['snr']}
+        return {**out,'reason':'The position fit does not converge.','snr':fit['snr']}
     wings=bool(fit['n_masked_core'] or fit['saturated_core'])
     if wings and fit['snr']<MIN_WING_SNR:
-        return {**out,'reason':'Núcleo saturado o enmascarado: el ajuste con las alas de la PSF no es fiable '
-                               f"(S/N {fit['snr']:.1f} < {MIN_WING_SNR:g}, χ² reducido {fit['chi2_red']:.0f}). "
-                               'No se mide la posición.','snr':fit['snr'],'chi2_red':fit['chi2_red']}
+        return {**out,'reason':'Saturated or masked core: the fit with the PSF wings is not reliable '
+                               f"(S/N {fit['snr']:.1f} < {MIN_WING_SNR:g}, reduced χ² {fit['chi2_red']:.0f}). "
+                               'The position is not measured.','snr':fit['snr'],'chi2_red':fit['chi2_red']}
     if fit['snr']<MIN_POSITION_SNR:
-        return {**out,'reason':f"Señal insuficiente para medir una posición (S/N {fit['snr']:.1f} < {MIN_POSITION_SNR:g}).",
+        return {**out,'reason':f"Insufficient signal to measure a position (S/N {fit['snr']:.1f} < {MIN_POSITION_SNR:g}).",
                 'snr':fit['snr']}
     scale=pixel_scale(img)
     kind='saturated' if wings else 'compact' if fit['chi2_red']<=3 else 'extended'
@@ -513,8 +513,8 @@ def locate(frame):
             'offset_from_prediction_arcsec':[float(east*3600),float(north*3600)],
             'outlier_pixels_in_core':int((core&~strict&target_valid(img)).sum()),
             'known_source_pixels_in_core':known,'masked_core_pixels':int(fit['n_masked_core']),
-            'note':('Núcleo saturado o enmascarado: posición medida con las alas de la PSF, con un error mínimo de '
-                    'un píxel. ' if wings else '')+'Posición medida en los píxeles. La predicción solo sitúa la búsqueda.'}
+            'note':('Saturated or masked core: position measured with the PSF wings, with a minimum error of '
+                    'one pixel. ' if wings else '')+'Position measured in the pixels. The prediction only places the search.'}
 
 
 def _gone(pos,origin,other):
@@ -524,7 +524,7 @@ def _gone(pos,origin,other):
     here=_fixed_flux(origin.image,pos['x'],pos['y'],target_valid(origin.image),wings=pos['morphology']=='saturated')
     there=_fixed_flux(other.image,x,y,target_valid(other.image)) if inside(other.image,x,y) else None
     if here is None or there is None:
-        return {'testable':False,'reason':'La otra imagen no cubre esa posición del cielo con píxeles válidos.'}
+        return {'testable':False,'reason':'The other image does not cover that sky position with valid pixels.'}
     f0,e0=here
     f1,e1=there
     return {'testable':True,'flux_here':f0,'flux_there':f1,'error_there':e1,
@@ -561,7 +561,7 @@ def measure_motion(frames,results=None):
     """Observed motion of one source between two exposures, or the precise reason why not."""
     positions=[locate(f) for f in frames]
     out={'observed':False,'positions':positions,'controls':[],'pairs':[],'method':METHOD,
-         'reason':'Sin dos posiciones medidas en los píxeles, el movimiento no está demostrado.'}
+         'reason':'Without two positions measured in the pixels, the motion is not demonstrated.'}
     located=[i for i,p in enumerate(positions) if p['measured']]
     if len(located)<2:
         why=[p['reason'] for p in positions if not p['measured']]
@@ -577,21 +577,21 @@ def measure_motion(frames,results=None):
                   'same_detector':a.row.get('detector')==b.row.get('detector')}
             scale=max(pixel_scale(a.image),pixel_scale(b.image))
             if not pair['same_detector']:
-                pair['status']='Detectores distintos: no se comparan brillos de la misma posición.'
+                pair['status']='Different detectors: brightnesses at the same position are not compared.'
             elif sep<MIN_SEPARATION_PX*scale:
-                pair['status']='Posiciones demasiado próximas para distinguirlas de una fuente fija.'
+                pair['status']='Positions too close to be told apart from a fixed source.'
             else:
                 pair['first_in_second']=_gone(pa,a,b)
                 pair['second_in_first']=_gone(pb,b,a)
                 t1,t2=pair['first_in_second'],pair['second_in_first']
                 if t1.get('persistent') or t2.get('persistent'):
-                    pair['status']='Persiste una fuente en la misma posición del cielo: posible contaminación estelar.'
+                    pair['status']='A source persists at the same sky position: possible stellar contamination.'
                 elif not (t1['testable'] and t2['testable']):
-                    pair['status']='Sin cielo común para comprobar que la fuente no es estacionaria.'
+                    pair['status']='No common sky to check that the source is not stationary.'
                 elif t1['absent'] and t2['absent']:
                     pair['status']='ok'
                 else:
-                    pair['status']='La desaparición de la fuente en la otra fecha no es concluyente.'
+                    pair['status']='The disappearance of the source on the other date is not conclusive.'
             pairs.append(pair)
     out['pairs']=pairs
     good=[p for p in pairs if p['status']=='ok']
@@ -608,8 +608,8 @@ def measure_motion(frames,results=None):
     out['controls']=controls
     if len(controls)<MIN_COMMON_STARS:
         if chosen['status']=='ok':
-            out['reason']=(f'No hay {MIN_COMMON_STARS} estrellas comunes medibles para verificar el registro; '
-                           'se conserva la señal como candidata.')
+            out['reason']=(f'There are not {MIN_COMMON_STARS} measurable common stars to verify the registration; '
+                           'the signal is kept as a candidate.')
         return out
     c=np.array(controls)
     shift=np.median(c,axis=0)
@@ -637,15 +637,15 @@ def measure_motion(frames,results=None):
         'predicted_displacement_arcsec':predicted.tolist(),
         'difference_arcsec':float(np.linalg.norm(disp-predicted)),
         'difference_sigma':float(np.linalg.norm(disp-predicted)/err),
-        'note':'Comparación posterior con la efeméride. No interviene en la medida ni en la decisión.'}
+        'note':'Later comparison with the ephemeris. It plays no part in the measurement or the decision.'}
     if control_radius>2*scale:
-        out['reason']='Registro inconsistente entre las estrellas de control.'
+        out['reason']='Inconsistent registration among the control stars.'
         return out
     if chosen['status']!='ok':
         return out
     significant=size/err>=5 and size>3*control_radius and size>=MIN_SHIFT_PX*scale
     out['observed']=bool(significant)
-    out['reason']=('La fuente aparece en su posición en cada imagen y ha desaparecido de ella en la otra; el '
-                   'desplazamiento se midió en los píxeles tras registrar ambas imágenes con estrellas comunes.'
-                   if significant else 'Desplazamiento no significativo frente a los controles y errores.')
+    out['reason']=('The source appears at its position in each image and has disappeared from it in the other; the '
+                   'displacement was measured in the pixels after registering both images with common stars.'
+                   if significant else 'Displacement not significant against the controls and errors.')
     return out

@@ -1,7 +1,7 @@
-"""Spectrum Explorer: «¿Qué podría indicar este espectro?» (presentation of the spectral interpreter V1).
+"""Spectrum Explorer: «What could this spectrum indicate?» (presentation of the spectral interpreter V1).
 
 Presentation only. Every verdict, hypothesis and limitation comes from ``spectral_interpreter`` (engine) and
-``spectral_references`` (registry) and is the same in both levels: Sencillo says it in everyday words, Científico
+``spectral_references`` (registry) and is the same in both levels: Simple says it in everyday words, Scientific
 adds wavelengths, redshift and its source, resolution and detector, quality, alternatives and bibliography.
 A and B are always interpreted separately: a difference between them is never an identification.
 """
@@ -55,8 +55,8 @@ def chart_marks(ctx: Context) -> list[dict] | None:
     rs = ctx.redshifts.get("A", sr.UNKNOWN_Z)
     lit = {m.reference.id for it in ctx.selected.values() for m in it.matches}
     marks = [{"lambda_um": r.lam_um * (1 + (rs.z or 0.0)), "nombre": r.name, "naturaleza": sr.NATURE_TEXT[r.nature],
-              "nota": (f"desplazada con z = {rs.z:.6f} ({rs.object_name})" if rs.known else
-                       "en reposo: z desconocido"), "destacada": r.id in lit, "etiqueta": ""} for r in sr.REFERENCES]
+              "nota": (f"shifted with z = {rs.z:.6f} ({rs.object_name})" if rs.known else
+                       "at rest: z unknown"), "destacada": r.id in lit, "etiqueta": ""} for r in sr.REFERENCES]
     shown = [m for m, r in zip(marks, sr.REFERENCES) if r.id in lit]
     if shown:                                       # one short label for the compatible group, never one per mark
         shown[0]["etiqueta"] = " · ".join(r.short for r in sr.REFERENCES if r.id in lit)
@@ -71,12 +71,12 @@ def _um(v: float, digits: int = 1) -> str:
 def observed_text(it: si.Interpretation) -> str:
     f = it.feature
     if "sin_caracteristica" in it.codes:
-        return "Aquí no destaca ningún pico ni valle."
+        return "No peak or valley stands out here."
     if f is None or f.lam is None or "no_evaluable" in it.codes:
-        return "En esta zona no se puede valorar ningún pico ni valle: faltan datos o el entorno no es fiable."
+        return "No peak or valley can be assessed in this area: data are missing or the surroundings are not reliable."
     if f.kind == "pico":
-        return f"Detectamos un exceso de emisión cerca de {_um(f.lam)}."
-    return f"Detectamos una disminución de luz (posible absorción) cerca de {_um(f.lam)}."
+        return f"We detected an excess of emission near {_um(f.lam)}."
+    return f"We detected a decrease in light (possible absorption) near {_um(f.lam)}."
 
 
 def meaning_text(it: si.Interpretation) -> str:
@@ -84,74 +84,74 @@ def meaning_text(it: si.Interpretation) -> str:
     if ms:
         first = ms[0].reference
         if it.verdict == si.NOT_EVALUABLE:
-            return f"Cae donde se esperaría {first.plain_name}, pero estos datos no permiten interpretarlo."
-        text = f"Podría relacionarse con {first.plain_name}"
+            return f"It falls where {first.plain_name} would be expected, but these data do not allow it to be interpreted."
+        text = f"It could be related to {first.plain_name}"
         if len(ms) > 1:
             kind = "emisiones" if first.nature == sr.EMISSION else "absorciones"
-            text += f", aunque otras {kind} cercanas, como la del {ms[1].reference.plain_name}, también pueden contribuir"
+            text += f", although other nearby {kind}, such as that of {ms[1].reference.plain_name}, may also contribute"
         if it.verdict == si.WEAK:
-            text += ", pero esta vista no basta para sostenerlo"
+            text += ", but this view is not enough to support it"
         return text + "."
     if it.verdict == si.NONE:
         opposite = [m for m in it.others if m.status == si.OPPOSITE]
-        extra = (f" En esa posición, el {opposite[0].reference.plain_name} se vería como una disminución de luz, no "
-                 "como un exceso." if opposite and opposite[0].reference.nature == sr.ABSORPTION else "")
-        return (f"Sin coincidencias en la biblioteca actual ({len(sr.REFERENCES)} referencias). Esto no descarta otras "
-                "características físicas conocidas." + extra)
-    return "SkyClues no puede interpretarlo."
+        extra = (f" At that position, {opposite[0].reference.plain_name} would appear as a decrease in light, not "
+                 "as an excess." if opposite and opposite[0].reference.nature == sr.ABSORPTION else "")
+        return (f"No matches in the current library ({len(sr.REFERENCES)} references). This does not rule out other known "
+                "physical features." + extra)
+    return "SkyClues cannot interpret it."
 
 
 def why_text(it: si.Interpretation) -> str | None:
     if not it.matches:
         return None
     ref, rs = it.matches[0].reference, it.redshift
-    where = ("su posición coincide con la que tendría esa luz, una vez corregida la velocidad a la que se aleja la "
-             f"galaxia {rs.object_name}" if rs.known else "su posición coincide con la que tiene esa luz")
+    where = ("its position matches the one that light would have, once the speed at which the "
+             f"galaxy {rs.object_name} is receding has been corrected for" if rs.known else "its position matches the one that this light has")
     return f"{where[0].upper()}{where[1:]}. {ref.plain}"
 
 
 PLAIN_LIMITS = {
-    "visible": "La señal es leve.",
-    "precaucion": "Parte de la luz pudo saturarse en esta zona.",
-    "entorno": "Parte de la luz pudo saturarse junto a esta zona.",
-    "bloom": "La luz de una fuente brillante pudo desbordarse sobre esta zona.",
-    "detectores": "Coincide con el paso entre dos detectores, que puede crear picos y valles falsos.",
-    "varias": "SPHEREx no separa colores tan próximos.",
-    "hielo": "Para hablar de hielo hay que medir la banda completa y que haya una fuente de luz detrás; esta vista "
-             "no lo hace.",
-    "z_desconocido": "No sabemos si esta luz viene de una galaxia lejana que se aleja: se compara como si estuviera en "
-                     "reposo.",
-    "no_evaluable": "Faltan datos en esa zona o a su alrededor.",
-    "sin_caracteristica": "Que no se vea nada no demuestra que falte una sustancia.",
+    "visible": "The signal is slight.",
+    "precaucion": "Part of the light may have saturated in this area.",
+    "entorno": "Part of the light may have saturated next to this area.",
+    "bloom": "Light from a bright source may have spilled over onto this area.",
+    "detectores": "It coincides with the junction between two detectors, which can create false peaks and valleys.",
+    "varias": "SPHEREx does not separate colours this close.",
+    "hielo": "To talk about ice the whole band has to be measured and there has to be a light source behind it; this view "
+             "does not do that.",
+    "z_desconocido": "We do not know whether this light comes from a distant galaxy that is receding: it is compared as if it were at "
+                     "rest.",
+    "no_evaluable": "Data are missing in that area or around it.",
+    "sin_caracteristica": "Not seeing anything does not prove that a substance is absent.",
 }
 
 
 def limits_text(it: si.Interpretation) -> list[str]:
     out = [PLAIN_LIMITS[c] for c in dict.fromkeys(it.codes) if c in PLAIN_LIMITS]
     if it.matches or it.verdict == si.NONE:
-        out.append("Un pico o un valle no basta para identificar un material.")
+        out.append("A peak or a valley is not enough to identify a material.")
     return list(dict.fromkeys(out))
 
 
 def _z_text(rs: sr.Redshift) -> tuple[str, str]:
     if rs.known:
         return f"z = {rs.z:.6f}", f"{rs.object_name} · NED, dentro de su isofota D25 · ±{rs.sigma:.4f}"
-    return "desconocido", "se compara en reposo (z = 0); nunca se estima de una coincidencia"
+    return "desconocido", "it is compared at rest (z = 0); it is never estimated from a coincidence"
 
 
 def _match_rows(it: si.Interpretation) -> list[dict]:
     rows = []
     for m in it.matches + it.others + it.orientative:
         r = m.reference
-        rows.append({"Referencia": r.name, "Tipo": f"{sr.NATURE_TEXT[r.nature]} · {sr.FORM_TEXT[r.form]}",
+        rows.append({"Reference": r.name, "Type": f"{sr.NATURE_TEXT[r.nature]} · {sr.FORM_TEXT[r.form]}",
                      "λ en reposo (µm)": (f"{r.lam_range_um[0]:.3f}–{r.lam_range_um[1]:.3f}"
                                           if r.lam_range_um[0] != r.lam_range_um[1] else f"{r.lam_um:.4f}"),
                      "λ esperada (µm)": f"{m.lam_obs_um:.4f}",
-                     "Canal previsto": " y ".join(map(str, m.predicted_channels)),
-                     "Compatibilidad": si.STATUS_LABELS[m.status],
-                     "z para la que se mantiene": ("—" if m.z_range is None else
+                     "Expected channel": " y ".join(map(str, m.predicted_channels)),
+                     "Compatibility": si.STATUS_LABELS[m.status],
+                     "z for which it holds": ("—" if m.z_range is None else
                                                    f"{m.z_range[0]:+.4f} a {m.z_range[1]:+.4f}"),
-                     "Motivo": " ".join(m.reasons)})
+                     "Reason": " ".join(m.reasons)})
     return rows
 
 
@@ -162,12 +162,12 @@ def render(ctx: Context, sci: bool, inspect_key: str) -> None:
 
 
 def _render(ctx: Context, sci: bool, inspect_key: str) -> None:
-    theme.eyebrow("¿Qué podría indicar este espectro?")
-    st.toggle("Mostrar referencias en el gráfico" if sci else "Mostrar en el gráfico dónde caen las referencias",
+    theme.eyebrow("What could this spectrum indicate?")
+    st.toggle("Show references on the chart" if sci else "Show on the chart where the references fall",
               key=theme.bind(REFS_OPTION, False), on_change=theme.keep, args=(REFS_OPTION,),
-              help="Líneas punteadas en la posición esperada de cada referencia de la biblioteca (con el desplazamiento "
-                   "al rojo de A si se conoce). En terracota, las compatibles con lo que examinas. No cambia el "
-                   "espectro ni ningún resultado.")
+              help="Dotted lines at the expected position of each reference in the library (with the redshift "
+                   "of A if it is known). In terracotta, those compatible with what you are examining. It does not change the "
+                   "spectrum or any result.")
     if ctx.selected:
         for k, it in ctx.selected.items():
             (_scientific_block if sci else _simple_block)(k, it)
@@ -182,10 +182,10 @@ def _simple_block(k: str, it: si.Interpretation) -> None:
     st.markdown(f"{observed_text(it)} {meaning_text(it)}")
     why = why_text(it)
     if why:
-        st.markdown(f"**Por qué:** {why}")
+        st.markdown(f"**Why:** {why}")
     limits = limits_text(it)
     if limits:
-        st.markdown("**Qué impide estar seguros:** " + " ".join(limits))
+        st.markdown("**What prevents certainty:** " + " ".join(limits))
 
 
 def _scientific_block(k: str, it: si.Interpretation) -> None:
@@ -198,24 +198,24 @@ def _scientific_block(k: str, it: si.Interpretation) -> None:
             (theme.unit("λ") + " observada", f"{o['lambda_um']:.3f} µm",
              f"centroide {o['centroide_um']:.3f} · media altura {o['media_altura_um'][0]:.3f}–{o['media_altura_um'][1]:.3f}"
              f" (canales {o['canales_media_altura'][0]}–{o['canales_media_altura'][1]})"),
-            ("Detector · resolución", f"D{o['detector']} · R = {o['R']:.0f}",
-             f"elemento de resolución ≈ {o['elemento_resolucion_um']:.3f} µm" +
+            ("Detector · resolution", f"D{o['detector']} · R = {o['R']:.0f}",
+             f"resolution element ≈ {o['elemento_resolucion_um']:.3f} µm" +
              ("" if o["R_del_fits"] else " (R estimada)")),
-            ("Desplazamiento al rojo", z, zsrc),
-            ("Datos", f"{f.kind} · {f.label.lower()}",
-             f"contraste / dispersión {abs(o['contraste_sobre_dispersion']):.1f} (descriptivo, no significación)")])
+            ("Redshift", z, zsrc),
+            ("Data", f"{f.kind} · {f.label.lower()}",
+             f"contrast / scatter {abs(o['contraste_sobre_dispersion']):.1f} (descriptive, not significance)")])
     else:
-        theme.facts([("Intervalo examinado", f"canales {f.trial_lo}–{f.trial_hi}" if f is not None else "—",
-                      f.label.lower() if f is not None else ""), ("Desplazamiento al rojo", z, zsrc)])
+        theme.facts([("Interval examined", f"canales {f.trial_lo}–{f.trial_hi}" if f is not None else "—",
+                      f.label.lower() if f is not None else ""), ("Redshift", z, zsrc)])
     rows = _match_rows(it)
     if rows:
         st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", height="content")
     # the general limit that applies: a match is not an identification; no match does not exclude other substances
     general = it.limitations[:1] if it.matches else it.limitations[2:3]
-    st.markdown("**Qué impide la certeza**\n" + "\n".join(f"- {b}" for b in it.blockers + general))
+    st.markdown("**What prevents certainty**\n" + "\n".join(f"- {b}" for b in it.blockers + general))
     refs = list(dict.fromkeys(m.reference for m in it.matches + it.others))
     if refs:
-        with st.expander(f"Condiciones, confusiones y bibliografía · espectro {k}"):
+        with st.expander(f"Conditions, confusions and bibliography · spectrum {k}"):
             for r in refs:
                 st.markdown(f"**{r.name}** — {r.scientific} *{r.process}; {r.transition}.* {r.width_note}\n\n"
                             "Condiciones: " + " ".join(r.conditions) + "\n\nOtras causas posibles: " +
@@ -230,67 +230,67 @@ def _pick(inspect_key: str, canal: int) -> None:
 def _overview(ctx: Context, sci: bool, inspect_key: str) -> None:
     items = [(k, it) for k, its in ctx.overview.items() for it in its]
     if not items:
-        st.markdown("El analizador no señala picos ni valles en este espectro: no hay nada que interpretar. Eso no "
-                    "demuestra que falten sustancias." if not sci else
-                    "Sin características clasificadas por el analizador: no hay nada que interpretar. La ausencia de "
-                    "una característica no demuestra la ausencia de una sustancia (sin incertidumbres).")
+        st.markdown("The analyser flags no peaks or valleys in this spectrum: there is nothing to interpret. This does not "
+                    "prove that substances are missing." if not sci else
+                    "No features classified by the analyser: there is nothing to interpret. The absence of "
+                    "a feature does not prove the absence of a substance (no uncertainties).")
     else:
-        st.markdown(f"SkyClues compara cada pico o valle señalado con {len(sr.REFERENCES)} referencias conocidas "
-                    "(hielos, compuestos de carbono e hidrógeno). Elige uno para ver qué podría indicar." if not sci else
-                    f"Cada característica clasificada se compara con la biblioteca ({sr.LIBRARY_VERSION}). Pulse "
-                    "«Examinar» o seleccione el canal en el gráfico para ver hipótesis, pruebas y límites.")
+        st.markdown(f"SkyClues compares each peak or valley flagged with {len(sr.REFERENCES)} known references "
+                    "(ices, carbon compounds and hydrogen). Choose one to see what it could indicate." if not sci else
+                    f"Each classified feature is compared with the library ({sr.LIBRARY_VERSION}). Press "
+                    "«Examine» or select the channel on the chart to see hypotheses, evidence and limits.")
         for k, it in items:
             f = it.feature
             left, right = st.columns([4, 1], vertical_alignment="center")
             where = f"{f.lam:.3f} µm (canal {f.canal})" if sci else f"cerca de {_um(f.lam)}"
             left.html(f'<p style="margin:0"><b>{k}</b> · {f.kind} {where} '
                       f'{theme.badge(it.label, si.VERDICT_BADGE[it.verdict])}</p>')
-            right.button("Examinar", key=f"sx_interp_{k}_{f.canal}", on_click=_pick, args=(inspect_key, f.canal),
-                         help="Examina este pico o valle en el gráfico y muestra su interpretación.")
+            right.button("Examine", key=f"sx_interp_{k}_{f.canal}", on_click=_pick, args=(inspect_key, f.canal),
+                         help="Examine this peak or valley on the chart and show its interpretation.")
     if sci:
-        with st.expander("Dónde caería cada referencia en este espectro"):
-            rows = [{"Espectro": k, "Referencia": c.reference.name, "λ esperada (µm)": round(c.lam_obs_um, 4),
-                     "Canal": " y ".join(map(str, c.channels)) or "—", "Estado": si.COVERAGE_LABELS[c.status],
-                     "Motivo": " ".join(c.reasons)} for k, cs in ctx.surveys.items() for c in cs]
+        with st.expander("Where each reference would fall in this spectrum"):
+            rows = [{"Spectrum": k, "Reference": c.reference.name, "λ esperada (µm)": round(c.lam_obs_um, 4),
+                     "Channel": " y ".join(map(str, c.channels)) or "—", "Status": si.COVERAGE_LABELS[c.status],
+                     "Reason": " ".join(c.reasons)} for k, cs in ctx.surveys.items() for c in cs]
             st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
-            st.caption("Sin cobertura válida no se concluye ni presencia ni ausencia. «Nada señalado» tampoco demuestra "
-                       "ausencia: el espectro no tiene incertidumbres.")
+            st.caption("Without valid coverage neither presence nor absence is concluded. «Nothing flagged» does not prove "
+                       "absence either: the spectrum has no uncertainties.")
 
 
 def _library_expander(ctx: Context) -> None:
-    with st.expander("Biblioteca de referencias, ventana de compatibilidad y límites"):
-        lib = [{"Id": r.id, "Referencia": r.name, "Portador": r.carrier, "Transición": r.transition,
+    with st.expander("Library of references, compatibility window and limits"):
+        lib = [{"Id": r.id, "Reference": r.name, "Carrier": r.carrier, "Transition": r.transition,
                 "λ en reposo (µm)": (f"{r.lam_range_um[0]:.3f}–{r.lam_range_um[1]:.3f}"
                                      if r.lam_range_um[0] != r.lam_range_um[1] else f"{r.lam_um:.6f}"),
-                "Tipo": f"{sr.NATURE_TEXT[r.nature]} · {sr.FORM_TEXT[r.form]}",
-                "FWHM documentada (µm)": "—" if r.fwhm_um is None else f"{r.fwhm_um:.3f}",
-                "Fuentes": "; ".join(sr.short(s) for s in r.sources)} for r in sr.REFERENCES]
+                "Type": f"{sr.NATURE_TEXT[r.nature]} · {sr.FORM_TEXT[r.form]}",
+                "Documented FWHM (µm)": "—" if r.fwhm_um is None else f"{r.fwhm_um:.3f}",
+                "Sources": "; ".join(sr.short(s) for s in r.sources)} for r in sr.REFERENCES]
         st.dataframe(pd.DataFrame(lib), hide_index=True, width="stretch")
         m = si.method_summary()
-        rs_rows = [{"Galaxia": g.name, "NED": g.ned_name, "z": g.z, "Indicador": g.z_flag, "D25 (″)": g.d25_arcsec,
+        rs_rows = [{"Galaxy": g.name, "NED": g.ned_name, "z": g.z, "Indicator": g.z_flag, "D25 (″)": g.d25_arcsec,
                     "b/a": round(g.axis_ratio, 3), "PA (°)": "—" if g.pa_deg is None else f"{g.pa_deg:g}"}
                    for g in sr.GALAXIES]
         st.markdown(
-            f"- **Motor:** {m['motor']} · **biblioteca:** {m['biblioteca']}. Usa los resultados del analizador "
-            f"({sf.METHOD_VERSION}); no repite la extracción ni busca picos de nuevo.\n"
-            "- **Ventana:** intervalo a media altura de la característica (unión de WL_MIN–WL_MAX de sus canales, de la "
-            "tabla SPECTRAL_CHANNELS del FITS), ampliado solo por el error documentado del centro de banda (1 nm en "
-            "D1–D4, 10 nm en D5–D6; Hui et al. 2026). Sin tolerancia universal en µm. A menos de λ/R fuera de ella, "
-            "«canal contiguo»: nunca compatible.\n"
-            "- **Tipo:** pico ↔ emisión, valle ↔ absorción. Una banda documentada de 3 o más elementos de resolución "
-            "exige una característica «amplia»; un mínimo aislado no basta.\n"
-            "- **Hielos:** como máximo «insuficientemente respaldada»: V1 no tiene un modelo de absorción ni un "
-            "continuo que abarque la banda.\n"
-            "- **Desplazamiento al rojo:** λ esperada = λ en reposo × (1 + z), solo con un z trazable (tabla curada de "
-            "NED, si la posición está dentro de la isofota D25 del RC3; ±300 km/s por movimientos internos, supuesto). "
-            "Sin él, se compara en reposo y se declara. Nunca se estima z a partir de una coincidencia.\n"
-            "- **Veredictos:** cualitativos, sin probabilidades (no hay un modelo calibrado). Una diferencia entre A y "
-            "B no es una identificación: cada espectro se interpreta por separado.")
+            f"- **Engine:** {m['motor']} · **library:** {m['biblioteca']}. It uses the results of the analyser "
+            f"({sf.METHOD_VERSION}); it does not repeat the extraction or look for peaks again.\n"
+            "- **Window:** half-height interval of the feature (union of WL_MIN–WL_MAX of its channels, from the "
+            "SPECTRAL_CHANNELS table of the FITS), widened only by the documented error of the band centre (1 nm in "
+            "D1–D4, 10 nm in D5–D6; Hui et al. 2026). No universal tolerance in µm. Within λ/R outside it, "
+            "«adjacent channel»: never compatible.\n"
+            "- **Type:** peak ↔ emission, valley ↔ absorption. A documented band of 3 or more resolution elements "
+            "requires a «broad» feature; an isolated minimum is not enough.\n"
+            "- **Ices:** at most «insufficiently supported»: V1 has no absorption model or "
+            "continuum that spans the band.\n"
+            "- **Redshift:** expected λ = rest λ × (1 + z), only with a traceable z (curated table from "
+            "NED, if the position is inside the D25 isophote of RC3; ±300 km/s for internal motions, assumption). "
+            "Without it, it is compared at rest and this is declared. z is never estimated from a coincidence.\n"
+            "- **Verdicts:** qualitative, without probabilities (there is no calibrated model). A difference between A and "
+            "B is not an identification: each spectrum is interpreted separately.")
         st.dataframe(pd.DataFrame(rs_rows), hide_index=True, width="stretch")
         lims = next((it.limitations for it in ctx.selected.values()), None) or \
             next((its[0].limitations for its in ctx.overview.values() if its), [])
         if lims:
-            st.markdown("**Límites de esta interpretación**\n" + "\n".join(f"- {x}" for x in lims))
+            st.markdown("**Limits of this interpretation**\n" + "\n".join(f"- {x}" for x in lims))
         used = dict.fromkeys([s for r in sr.REFERENCES for s in r.sources] + list(sr.INSTRUMENT_SOURCES) +
                              list(sr.REDSHIFT_SOURCES))
         st.markdown("**Fuentes**\n" + "\n".join(f"- [{s.citation}]({s.url}): {s.used_for}" for s in used))

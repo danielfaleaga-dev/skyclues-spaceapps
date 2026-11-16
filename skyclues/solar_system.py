@@ -32,11 +32,11 @@ def read_bytes(url, params=None, limit=2 * 1024 * 1024):
             for p in r.iter_content(32768):
                 size += len(p)
                 if size > limit:
-                    raise ServiceError("Respuesta demasiado grande; acote la búsqueda.")
+                    raise ServiceError("Response too large; narrow the search.")
                 parts.append(p)
             return b''.join(parts)
     except requests.RequestException as e:
-        raise ServiceError("Servicio astronómico no disponible; vuelva a intentarlo.") from e
+        raise ServiceError("Astronomical service not available; try again.") from e
 
 
 def request_json(url, params):
@@ -46,7 +46,7 @@ def request_json(url, params):
             raise ServiceError(str(j['error'])[:250])
         return j
     except (ValueError, TypeError) as e:
-        raise ServiceError("Respuesta astronómica no válida.") from e
+        raise ServiceError("Invalid astronomical response.") from e
 
 
 def lookup(text, limit=12):
@@ -81,8 +81,8 @@ def suggestions(text):
         if x.get('pdes') and x['pdes'] not in label:
             label += f" ({x['pdes']})"
         kind = x['type']
-        kind = ('Cometa' if 'comet' in kind else 'Asteroide' if 'asteroid' in kind else
-                'Satélite natural' if 'satellite' in kind else 'Planeta' if 'planet' in kind else 'Sistema Solar')
+        kind = ('Comet' if 'comet' in kind else 'Asteroid' if 'asteroid' in kind else
+                'Natural satellite' if 'satellite' in kind else 'Planet' if 'planet' in kind else 'Solar System')
         out.append({'id': x['id'], 'label': label, 'type': kind, 'aliases': [a for a in aliases if a], 'source': LOOKUP})
     return out
 
@@ -90,19 +90,19 @@ def suggestions(text):
 def ephemeris(identity, utc):
     """Astrometric ICRF RA/Dec, light-time corrected, geocentre, single UTC instant."""
     if not re.fullmatch(r'\d{1,12}', identity['spkid']):
-        raise ValueError("Identificador JPL inválido")
+        raise ValueError("Invalid JPL identifier")
     try:
         t = Time(utc, scale='utc')
         if not t.isscalar or not 1900 <= t.datetime.year <= 2100:
             raise ValueError()
     except Exception as e:
-        raise ValueError("Fecha UTC inválida (1900–2100, AAAA-MM-DD HH:MM:SS).") from e
+        raise ValueError("Invalid UTC date (1900–2100, YYYY-MM-DD HH:MM:SS).") from e
     command = identity['spkid']
     if 'asteroid' in identity['type'] or 'comet' in identity['type']:
         command = 'DES=' + identity['spkid'] + ';'
     if 'comet' in identity['type'] and identity.get('pdes'):
         if not re.fullmatch(r'[A-Za-z0-9/ -]+', identity['pdes']):
-            raise ValueError('Designación cometaria inválida')
+            raise ValueError('Invalid comet designation')
         command = 'DES=' + identity['pdes'] + ';CAP'
     params = {'format': 'json', 'COMMAND': "'" + command + "'", 'OBJ_DATA': "'NO'",
               'MAKE_EPHEM': "'YES'", 'EPHEM_TYPE': "'OBSERVER'", 'CENTER': "'500@399'",
@@ -118,9 +118,9 @@ def ephemeris(identity, utc):
         from .targets import validate_coordinates
         ra, dec = validate_coordinates(float(row[3]), float(row[4]))
     except (ValueError, IndexError) as e:
-        raise ServiceError("Horizons no devolvió una efeméride única para esta fecha.") from e
+        raise ServiceError("Horizons did not return a unique ephemeris for this date.") from e
     return {'identity': identity, 'ra': ra, 'dec': dec, 'utc': t.isot, 'observer': '500@399',
-            'observer_label': 'geocentro terrestre', 'frame': 'ICRF astrométrico', 'source': HORIZONS,
+            'observer_label': 'Earth geocentre', 'frame': 'Astrometric ICRF', 'source': HORIZONS,
             'retrieved_utc': datetime.now(timezone.utc).isoformat(), 'kind': 'ephemeris', 'command': command}
 
 
@@ -130,5 +130,5 @@ def atlas_observations():
     t = Table.read(io.BytesIO(read_bytes(ATLAS_TABLE)), format='votable')
     required = {'comet_ra', 'comet_dec', 'access_url', 't_min'}
     if not required <= set(t.colnames):
-        raise ServiceError("La tabla oficial de 3I/ATLAS cambió de formato.")
+        raise ServiceError("The official 3I/ATLAS table changed format.")
     return t

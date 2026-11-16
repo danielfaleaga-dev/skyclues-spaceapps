@@ -118,7 +118,7 @@ BASIS_EFFECTIVE = "efectiva"
 #: IRSA only publishes images with L2DQA = PASS and FINAST = 0 (Explanatory
 #: Supplement §3.2.12): these checks re-read the header but cannot discriminate
 #: among archive products; they only protect against non-standard files.
-BASIS_ARCHIVE = "garantía del archivo"
+BASIS_ARCHIVE = "archive guarantee"
 
 
 def evaluate_pair(a: SpectralImage, b: SpectralImage, ra: float, dec: float,
@@ -158,41 +158,41 @@ def evaluate_pair(a: SpectralImage, b: SpectralImage, ra: float, dec: float,
     sat_b = float(np.count_nonzero((b.flags & sat_bits)[b_field]) / max(b_field.sum(), 1))
 
     criteria = [
-        {"id": "C1", "criterion": "Mismo detector (misma banda instrumental)",
+        {"id": "C1", "criterion": "Same detector (same instrument band)",
          "value": f"D{a.meta['DETECTOR']} / D{b.meta['DETECTOR']}", "threshold": "igual",
          "status": _status(a.meta["DETECTOR"] == b.meta["DETECTOR"])},
-        {"id": "C2", "criterion": "Fechas de observación diferentes",
+        {"id": "C2", "criterion": "Different observation dates",
          "value": f"Δt = {dt:.2f} d", "threshold": f"≥ {config.MIN_TIME_SEPARATION_DAYS} d",
          "status": _status(dt >= config.MIN_TIME_SEPARATION_DAYS)},
-        {"id": "C3", "criterion": "Mismo canal efectivo en el objetivo (LVF)",
+        {"id": "C3", "criterion": "Same effective channel at the target (LVF)",
          "value": f"|Δλ| = {abs(lam_a_t - lam_b_t) * 1000:.1f} nm = {dl_target:.2f} × ancho de banda",
-         "threshold": f"≤ {config.SPECTRAL_PASS_BW} (aviso ≤ {config.SPECTRAL_WARN_BW}; rechazo por encima)",
+         "threshold": f"≤ {config.SPECTRAL_PASS_BW} (warning ≤ {config.SPECTRAL_WARN_BW}; rejection above)",
          "status": spectral_status(dl_target)},
-        {"id": "C4", "criterion": "Desajuste espectral máximo en la zona común",
-         "value": (f"máx |Δλ| = {np.max(dl_common):.2f} × ancho de banda; "
-                   f"{np.mean(dl_common <= config.SPECTRAL_PASS_BW):.0%} de la zona común "
-                   f"≤ {config.SPECTRAL_PASS_BW}") if dl_common.size else "sin zona común",
-         "threshold": f"≤ {config.SPECTRAL_PASS_BW} (aviso ≤ {config.SPECTRAL_WARN_BW}; rechazo por encima)",
+        {"id": "C4", "criterion": "Maximum spectral mismatch in the common area",
+         "value": (f"max |Δλ| = {np.max(dl_common):.2f} × bandwidth; "
+                   f"{np.mean(dl_common <= config.SPECTRAL_PASS_BW):.0%} of the common area "
+                   f"≤ {config.SPECTRAL_PASS_BW}") if dl_common.size else "no common area",
+         "threshold": f"≤ {config.SPECTRAL_PASS_BW} (warning ≤ {config.SPECTRAL_WARN_BW}; rejection above)",
          "status": spectral_status(float(np.max(dl_common)) if dl_common.size else float("nan"))},
-        {"id": "C5", "criterion": "Cobertura común válida del campo",
-         "value": f"{coverage:.1%} ({n_common} px; solapamiento geométrico {geom_overlap:.1%})",
+        {"id": "C5", "criterion": "Valid common coverage of the field",
+         "value": f"{coverage:.1%} ({n_common} px; geometric overlap {geom_overlap:.1%})",
          "threshold": f"≥ {config.COVERAGE_PASS:.0%} (aviso ≥ {config.COVERAGE_WARN:.0%})",
          "status": _status(coverage >= config.COVERAGE_PASS and n_common >= config.MIN_COMMON_VALID_PIXELS,
                            coverage >= config.COVERAGE_WARN and n_common >= config.MIN_COMMON_VALID_PIXELS)},
-        {"id": "C6", "criterion": "Control de calidad oficial L2 (L2DQAFLG)",
+        {"id": "C6", "criterion": "Official L2 quality control (L2DQAFLG)",
          "value": f"{a.meta['L2DQAFLG']} / {b.meta['L2DQAFLG']}", "threshold": "Pass / Pass",
          "status": _status(str(a.meta["L2DQAFLG"]).strip() == "Pass" and str(b.meta["L2DQAFLG"]).strip() == "Pass"),
          "basis": BASIS_ARCHIVE},
-        {"id": "C7", "criterion": "Astrometría fina válida (FINAST)",
+        {"id": "C7", "criterion": "Valid fine astrometry (FINAST)",
          "value": f"{a.meta.get('FINAST')} / {b.meta.get('FINAST')}",
-         "threshold": "0 / 0 (1 = solución parcial: aviso; ≥ 2 = no utilizable: rechazo)",
+         "threshold": "0 / 0 (1 = partial solution: warning; ≥ 2 = unusable: rejection)",
          "status": finast_status([a.meta.get("FINAST"), b.meta.get("FINAST")]), "basis": BASIS_ARCHIVE},
-        {"id": "C8", "criterion": "Mismo procesamiento (colección y versión de software)",
+        {"id": "C8", "criterion": "Same processing (collection and software version)",
          "value": f"{(collections or ('?', '?'))[0]} v{a.meta['VERSION']} / {(collections or ('?', '?'))[1]} v{b.meta['VERSION']}",
-         "threshold": "iguales (si difieren: aviso de calibración)",
+         "threshold": "identical (if they differ: calibration warning)",
          "status": _status((collections is None or collections[0] == collections[1])
                            and a.meta["VERSION"] == b.meta["VERSION"], True)},
-        {"id": "C9", "criterion": "Saturación en el campo (OVERFLOW/NONLINEAR)",
+        {"id": "C9", "criterion": "Saturation in the field (OVERFLOW/NONLINEAR)",
          "value": f"{sat_a:.2%} / {sat_b:.2%}", "threshold": f"≤ {config.SATURATION_WARN_FRACTION:.1%}",
          "status": _status(max(sat_a, sat_b) <= config.SATURATION_WARN_FRACTION, True)},
     ]
@@ -226,11 +226,11 @@ def evaluate_pair(a: SpectralImage, b: SpectralImage, ra: float, dec: float,
     notes = []
     if abs(za - zb) > 0.05 * max(abs(za), abs(zb), 1e-9):
         notes.append(
-            f"El fondo zodiacal modelado difiere entre fechas ({za:.3f} vs {zb:.3f} MJy/sr): "
-            "compare IMAGE − ZODI, no IMAGE en bruto."
+            f"The modelled zodiacal background differs between dates ({za:.3f} vs {zb:.3f} MJy/sr): "
+            "compare IMAGE − ZODI, not raw IMAGE."
         )
     if a.meta.get("HE_AIRGLOW_CONT") or b.meta.get("HE_AIRGLOW_CONT"):
-        notes.append("Detectores 1–2: posible contaminación por airglow de He I (HE_AIRGLOW_CONT).")
+        notes.append("Detectors 1–2: possible contamination by He I airglow (HE_AIRGLOW_CONT).")
     dl_full = np.where(field_mask & in_b, dl, np.nan)
     return PairEvaluation(criteria=criteria, metrics=metrics, common=common, field_mask=field_mask,
                           valid_a=valid_a, valid_b_on_a=valid_b_on_a, in_b=in_b, b_index=(iy, ix),

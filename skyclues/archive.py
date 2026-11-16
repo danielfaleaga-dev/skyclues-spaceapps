@@ -122,7 +122,7 @@ def http_get(url: str, headers: dict | None = None, ok_status=(200,), validate=N
         (sleep or time.sleep)(delay)
     if isinstance(last, CorruptFitsError):
         raise last
-    raise ArchiveTransientError(f"Sin respuesta válida tras {attempt + 1} intentos: {last}")
+    raise ArchiveTransientError(f"No valid response after {attempt + 1} attempts: {last}")
 
 
 def _timeout_session(timeout=None):
@@ -170,9 +170,9 @@ def validate_fits_bytes(data: bytes, required=REQUIRED_EXTENSIONS) -> None:
     from astropy.utils.exceptions import AstropyUserWarning
 
     if data[:6] != b"SIMPLE":
-        raise CorruptFitsError("no es un FITS (falta la cabecera SIMPLE)")
+        raise CorruptFitsError("not a FITS file (SIMPLE header missing)")
     if len(data) % 2880:
-        raise CorruptFitsError(f"longitud {len(data)} B no múltiplo de 2880: archivo truncado")
+        raise CorruptFitsError(f"length {len(data)} B is not a multiple of 2880: truncated file")
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("error", AstropyUserWarning)
@@ -187,7 +187,7 @@ def validate_fits_bytes(data: bytes, required=REQUIRED_EXTENSIONS) -> None:
                 info = hdul.fileinfo(len(hdul) - 1)
                 expected = int(info["datLoc"]) + int(info["datSpan"])
                 if expected != len(data):
-                    raise CorruptFitsError(f"tamaño {len(data)} B distinto del declarado por las cabeceras "
+                    raise CorruptFitsError(f"size {len(data)} B differs from the one declared by the headers "
                                            f"({expected} B)")
     except CorruptFitsError:
         raise
@@ -214,8 +214,8 @@ def validate_fits_file(path: Path) -> None:
 def quarantine(path: Path) -> Path:
     """Move a corrupt CACHE file aside (``*.corrupt-<time>``); it is never deleted silently."""
     if config.REFERENCE_DIR.resolve() in path.resolve().parents:
-        raise CorruptFitsError(f"Archivo de referencia dañado {path.name}: no se modifica; restáurelo del "
-                               "repositorio o de IRSA")
+        raise CorruptFitsError(f"Reference file {path.name} is damaged: it is not modified; restore it from the "
+                               "repository or from IRSA")
     dest = path.with_name(f"{path.name}.corrupt-{time.strftime('%Y%m%dT%H%M%S')}-{uuid.uuid4().hex[:6]}")
     try:
         os.replace(path, dest)
@@ -323,7 +323,7 @@ def query_images(ra: float, dec: float, radius_deg: float = 1.0 / 3600,
     import math
     ra, dec = validate_coordinates(ra, dec)
     if not math.isfinite(radius_deg) or not 0 < radius_deg <= .5:
-        raise ValueError("Radio de consulta inválido")
+        raise ValueError("Invalid query radius")
     collections = validate_collections(collections)
     key = f"{ra:.7f}|{dec:.7f}|{radius_deg:.7f}|{','.join(collections)}"
     cpath = _meta_cache_path("sia", key)
@@ -374,7 +374,7 @@ def _with_retries(what: str, fn, sleep=None):
         if time.monotonic() + delay > deadline:
             break
         (sleep or time.sleep)(delay)
-    raise ArchiveTransientError(f"{what}: sin respuesta tras {attempt + 1} intentos: "
+    raise ArchiveTransientError(f"{what}: no response after {attempt + 1} attempts: "
                                 f"{type(last).__name__}: {str(last)[:200]}") from last
 
 
@@ -392,7 +392,7 @@ def sia2_service():
         return pyvo.dal.SIA2Service(config.SIA_URL, session=_timeout_session()), "capabilities"
     except Exception:  # noqa: BLE001 - any capabilities failure: use the known query endpoint
         return (pyvo.dal.SIA2Service(config.SIA_URL, session=_timeout_session(), check_baseurl=False),
-                "directo (capabilities no disponible)")
+                "direct (capabilities not available)")
 
 
 #: Route used by the last live SIA2 query ("capabilities" or "directo …"), for diagnostics.
@@ -412,9 +412,9 @@ def _query_images_live(ra, dec, radius_deg, collections) -> list[ObservationReco
             url = str(row["access_url"])
             m = _FILE_RE.search(url)
             if m is None or str(row['obs_collection']).strip() != coll:
-                raise ArchivePermanentError('Producto SIA2 fuera del perfil L2b verificado; no se interpreta.')
+                raise ArchivePermanentError('SIA2 product outside the verified L2b profile; it is not interpreted.')
             if 'calib_level' in tab.colnames and str(row['calib_level']) != '2':
-                raise ArchivePermanentError('Nivel de producto incompatible con imagen L2b.')
+                raise ArchivePermanentError('Product level incompatible with an L2b image.')
             records.append(ObservationRecord(
                 obs_id=str(row["obs_id"]),
                 collection=str(row["obs_collection"]) or coll,
@@ -488,7 +488,7 @@ def _valid_local(url: str) -> Path | None:
         return hit
     except CorruptFitsError as err:
         if is_reference(hit):
-            raise CorruptFitsError(f"Archivo de referencia dañado {hit.name} ({err}); no se modifica") from err
+            raise CorruptFitsError(f"Reference file {hit.name} is damaged ({err}); it is not modified") from err
         quarantine(hit)
         return None
 
@@ -515,7 +515,7 @@ def redownload(url: str, path: Path) -> Path:
     """Replace a CACHE copy that failed a check (e.g. SHA-256 against a report):
     the old file is quarantined, never deleted. Reference files are refused."""
     if is_reference(path):
-        raise CorruptFitsError(f"El archivo de referencia {path.name} no coincide con el informe; no se modifica")
+        raise CorruptFitsError(f"Reference file {path.name} does not match the report; it is not modified")
     with _lock_for(url):
         if path.exists():
             quarantine(path)
@@ -582,11 +582,11 @@ def records_table(records: list[ObservationRecord]):
     rows = []
     for r in records:
         rows.append({
-            "fecha (UTC)": Time(r.mjd_mid, format="mjd").isot[:19],
+            "date (UTC)": Time(r.mjd_mid, format="mjd").isot[:19],
             "MJD": round(r.mjd_mid, 5),
-            "colección": r.collection,
+            "collection": r.collection,
             "detector": r.detector,
-            "banda (µm)": f"{r.em_min_um:.2f}–{r.em_max_um:.2f}",
+            "band (µm)": f"{r.em_min_um:.2f}–{r.em_max_um:.2f}",
             "obs_id": r.obs_id,
             "exp (s)": round(r.exptime_s, 1),
         })

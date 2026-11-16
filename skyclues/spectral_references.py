@@ -17,8 +17,8 @@ CONSULTED = "2026-11-15"
 
 EMISSION, ABSORPTION = "emision", "absorcion"
 BAND, LINE = "banda", "linea"
-NATURE_TEXT = {EMISSION: "emisión", ABSORPTION: "absorción"}
-FORM_TEXT = {BAND: "banda", LINE: "línea"}
+NATURE_TEXT = {EMISSION: "emission", ABSORPTION: "absorption"}
+FORM_TEXT = {BAND: "banda", LINE: "line"}
 
 
 @dataclass(frozen=True)
@@ -66,52 +66,52 @@ def cm1_to_um(width_cm1: float, lam_um: float) -> float:
 
 
 # ----------------------------------------------------------------------------- sources
-NIST = Source("nist_asd", "Kramida, A., Ralchenko, Yu., Reader, J. y NIST ASD Team, NIST Atomic Spectra Database "
-              "(v5), H I, consulta del 15-11-2026", "https://physics.nist.gov/asd",
-              "Longitudes de onda de Ritz en el vacío: n = 9→5 (Pfund δ) 3,296991 µm y n = 5→4 (Brackett α) "
-              "4,052269 µm; otras líneas de H I entre 3,2 y 4,1 µm (series de Pfund y Humphreys).")
+NIST = Source("nist_asd", "Kramida, A., Ralchenko, Yu., Reader, J. and NIST ASD Team, NIST Atomic Spectra Database "
+              "(v5), H I, queried on 15-11-2026", "https://physics.nist.gov/asd",
+              "Ritz wavelengths in vacuum: n = 9→5 (Pfund δ) 3.296991 µm and n = 5→4 (Brackett α) "
+              "4.052269 µm; other H I lines between 3.2 and 4.1 µm (Pfund and Humphreys series).")
 BOOGERT = Source("boogert2015", "Boogert, A. C. A., Gerakines, P. A. y Whittet, D. C. B. 2015, ARA&A 53, 541, "
                  "«Observations of the Icy Universe»", "https://doi.org/10.1146/annurev-astro-082214-122348",
-                 "Tabla de bandas de hielo: H₂O 3,0 µm (3333 cm⁻¹, FWHM ≈ 390 cm⁻¹); CO₂ 4,27 µm (2341 cm⁻¹, "
-                 "FWHM ≈ 20 cm⁻¹); CO 4,67 µm (2141,3 cm⁻¹, FWHM 3–9 cm⁻¹). Las bandas se observan en absorción "
-                 "frente a una fuente infrarroja de fondo o embebida; exceso de absorción entre 3,3 y 3,7 µm (ala "
-                 "larga del hielo de agua). arXiv:1501.05317.")
+                 "Table of ice bands: H₂O 3.0 µm (3333 cm⁻¹, FWHM ≈ 390 cm⁻¹); CO₂ 4.27 µm (2341 cm⁻¹, "
+                 "FWHM ≈ 20 cm⁻¹); CO 4.67 µm (2141.3 cm⁻¹, FWHM 3–9 cm⁻¹). The bands are observed in absorption "
+                 "against a background or embedded infrared source; excess absorption between 3.3 and 3.7 µm (long "
+                 "wing of water ice). arXiv:1501.05317.")
 HORA = Source("hora2026", "Hora, J. L., Noh, J. K., Melnick, G. J. et al. 2026, ApJ (aceptado), «SPHEREx Wide-Field "
               "Infrared Spectral Mapping of Interstellar Ices and Polycyclic Aromatic Hydrocarbons»",
               "https://arxiv.org/abs/2603.12390",
-              "Con SPHEREx: hielos de H₂O (3,05 µm), CO₂ (4,27 µm) y CO (4,67 µm) y PAH de 3,28 µm (imagen "
-              "3,24–3,34 µm). Profundidad óptica τ = ln(F_C/F_I) con continuo interpolado entre longitudes de onda "
-              "vecinas; sin flujo de fondo detectable no se puede medir τ. La línea de H I de 3,297 µm contribuye "
-              "al flujo del PAH (el artículo la llama Pfγ; según NIST es Pfδ). La banda de CO está insuficientemente "
-              "muestreada. Efecto de bandeado del mosaico en el centro de la banda PAH (§II.1.2, tabla 1).")
+              "With SPHEREx: ices of H₂O (3.05 µm), CO₂ (4.27 µm) and CO (4.67 µm) and the PAH at 3.28 µm (image "
+              "3.24–3.34 µm). Optical depth τ = ln(F_C/F_I) with a continuum interpolated between neighbouring "
+              "wavelengths; without a detectable background flux τ cannot be measured. The H I line at 3.297 µm contributes "
+              "to the PAH flux (the paper calls it Pfγ; according to NIST it is Pfδ). The CO band is undersampled. "
+              "Striping effect of the mosaic at the centre of the PAH band (§II.1.2, table 1).")
 VAN_DIEDENHOVEN = Source("vandiedenhoven2004", "van Diedenhoven, B., Peeters, E., Van Kerckhoven, C. et al. 2004, "
                          "ApJ 611, 928, «The profiles of the 3–12 micron PAH features»",
                          "https://arxiv.org/abs/astro-ph/0405098",
-                         "La banda de 3,3 µm (estiramiento C–H aromático) varía poco de posición entre fuentes "
-                         "(4–6,5 cm⁻¹); su anchura varía sin explicación conocida.")
+                         "The 3.3 µm band (aromatic C–H stretch) varies little in position between sources "
+                         "(4–6.5 cm⁻¹); its width varies for no known reason.")
 TIELENS = Source("tielens2008", "Tielens, A. G. G. M. 2008, ARA&A 46, 289, «Interstellar Polycyclic Aromatic "
                  "Hydrocarbon Molecules»", "https://doi.org/10.1146/annurev.astro.46.060407.145211",
-                 "Revisión general de la emisión de PAH excitada por fotones ultravioleta.")
-VACCA = Source("vacca2011", "Vacca, W. D. y Sandell, G. 2011, espectro SpeX de 0,8–5 µm de TW Hya",
+                 "General review of PAH emission excited by ultraviolet photons.")
+VACCA = Source("vacca2011", "Vacca, W. D. & Sandell, G. 2011, SpeX 0.8–5 µm spectrum of TW Hya",
                "https://arxiv.org/abs/1102.0535",
-               "Líneas de H I medidas: Pfβ 4,6538 µm y Hu ε 4,6727 µm, junto a la banda del hielo de CO.")
+               "Measured H I lines: Pfβ 4.6538 µm and Hu ε 4.6727 µm, next to the CO ice band.")
 HUI = Source("hui2026", "Hui, H., Bock, J. et al. 2026, ApJS 284, 10, «Spectral response of SPHEREx»",
              "https://doi.org/10.3847/1538-4365/ae522c",
-             "R = λ/Δλ con Δλ la integral de la respuesta normalizada a su pico; R de diseño 41,4 (bandas 1–3), "
-             "35 (4), 110 (5) y 125 (6), medida al 5 %; respuesta no gaussiana y asimétrica cerca del divisor "
-             "dicroico; centro de banda con error < 1 nm en las bandas 1–4 y < 10 nm en las 5–6.")
-NED = Source("ned", "NASA/IPAC Extragalactic Database (NED), z heliocéntrico preferido, consulta del 15-11-2026",
-             "https://ned.ipac.caltech.edu", "Desplazamiento al rojo y posición de las galaxias de la tabla curada.")
-RC3 = Source("rc3", "de Vaucouleurs, G. et al. 1991, Third Reference Catalogue of Bright Galaxies (RC3), vía NED",
-             "https://ned.ipac.caltech.edu", "Diámetro D25, cociente de ejes y ángulo de posición de cada galaxia.")
-SPHEREX_CUBE = Source("spherex_cube", "SPHEREx DR1 All-Sky spectral cube, tabla SPECTRAL_CHANNELS del FITS "
+             "R = λ/Δλ with Δλ the integral of the response normalised to its peak; design R 41.4 (bands 1–3), "
+             "35 (4), 110 (5) and 125 (6), measured to 5 %; non-Gaussian, asymmetric response near the dichroic "
+             "splitter; band centre with error < 1 nm in bands 1–4 and < 10 nm in 5–6.")
+NED = Source("ned", "NASA/IPAC Extragalactic Database (NED), preferred heliocentric z, queried on 15-11-2026",
+             "https://ned.ipac.caltech.edu", "Redshift and position of the galaxies in the curated table.")
+RC3 = Source("rc3", "de Vaucouleurs, G. et al. 1991, Third Reference Catalogue of Bright Galaxies (RC3), via NED",
+             "https://ned.ipac.caltech.edu", "D25 diameter, axis ratio and position angle of each galaxy.")
+SPHEREX_CUBE = Source("spherex_cube", "SPHEREx DR1 All-Sky spectral cube, SPECTRAL_CHANNELS table of the FITS "
                       "(doi:10.26131/IRSA679)", "https://doi.org/10.26131/IRSA679",
-                      "λ central, límites WL_MIN–WL_MAX y R mediana de cada canal; se leen del propio archivo.")
+                      "Central λ, WL_MIN–WL_MAX limits and median R of each channel; they are read from the file itself.")
 
 INSTRUMENT_SOURCES = (HUI, SPHEREX_CUBE)
 SHORT = {"nist_asd": "NIST ASD", "boogert2015": "Boogert et al. 2015", "hora2026": "Hora et al. 2026",
          "vandiedenhoven2004": "van Diedenhoven et al. 2004", "tielens2008": "Tielens 2008",
-         "vacca2011": "Vacca y Sandell 2011", "hui2026": "Hui et al. 2026", "ned": "NED", "rc3": "RC3",
+         "vacca2011": "Vacca & Sandell 2011", "hui2026": "Hui et al. 2026", "ned": "NED", "rc3": "RC3",
          "spherex_cube": "SPHEREx DR1 (SPECTRAL_CHANNELS)"}
 
 
@@ -129,106 +129,106 @@ _CO_FWHM = (cm1_to_um(3, 4.67), cm1_to_um(9, 4.67))
 
 REFERENCES: tuple[Reference, ...] = (
     Reference(
-        id="h2o_hielo_3p0", name="Hielo de H₂O (3,0 µm)", plain_name="hielo de agua", carrier="H₂O sólida",
-        transition="estiramiento O–H (varias componentes)", process="absorción por mantos de hielo sobre granos de polvo",
+        id="h2o_hielo_3p0", name="H₂O ice (3.0 µm)", plain_name="water ice", carrier="Solid H₂O",
+        transition="O–H stretch (several components)", process="absorption by ice mantles on dust grains",
         family="hielo", lam_um=3.0, lam_range_um=(3.0, 3.05), nature=ABSORPTION, form=BAND, fwhm_um=_H2O_FWHM,
         width_note=f"FWHM ≈ 390 cm⁻¹ ≈ {_H2O_FWHM:.2f} µm (Boogert et al. 2015): abarca varios canales de D4. "
                    "Centro 3,0 µm en Boogert et al. 2015; 3,05 µm en Hora et al. 2026.",
-        conditions=("Absorción: necesita una fuente de continuo infrarrojo detrás del hielo (estrella de fondo o "
-                    "protoestrella embebida).",
-                    "Una depresión coherente con la anchura de la banda frente a un continuo fiable a ambos lados; "
-                    "nunca un mínimo aislado.",
-                    "Medida de profundidad con un continuo que abarque la banda completa (τ = ln F_C/F_I)."),
-        confounders=("Ala larga de la propia banda (3,3–3,7 µm) y, en la misma zona, la emisión de PAH de 3,3 µm.",
-                     "La forma del continuo de la fuente y el continuo local del analizador, que usa solo tres "
-                     "canales a cada lado y puede quedar dentro de la banda."),
-        plain="El hielo de agua que cubre los granos de polvo frío absorbe esta luz cuando hay una fuente "
-              "infrarroja detrás.",
-        scientific="Banda ancha de estiramiento O–H del hielo de agua, el componente principal de los mantos de "
-                   "hielo interestelares. Se observa en absorción contra un continuo infrarrojo.",
-        sources=(BOOGERT, HORA), needs_absorption_model=True, short="H₂O hielo"),
+        conditions=("Absorption: it needs an infrared continuum source behind the ice (background star or "
+                    "embedded protostar).",
+                    "A depression consistent with the width of the band against a reliable continuum on both sides; "
+                    "never an isolated minimum.",
+                    "Depth measurement with a continuum that spans the whole band (τ = ln F_C/F_I)."),
+        confounders=("Long wing of the band itself (3.3–3.7 µm) and, in the same area, the 3.3 µm PAH emission.",
+                     "The shape of the continuum of the source and the local continuum of the analyser, which uses only three "
+                     "channels on each side and may end up inside the band."),
+        plain="The water ice that covers cold dust grains absorbs this light when there is an infrared "
+              "source behind it.",
+        scientific="Broad O–H stretching band of water ice, the main component of interstellar ice "
+                   "mantles. It is observed in absorption against an infrared continuum.",
+        sources=(BOOGERT, HORA), needs_absorption_model=True, short="H₂O ice"),
     Reference(
-        id="pah_3p3", name="PAH aromático (3,3 µm)", plain_name="compuestos aromáticos de carbono (PAH)",
-        carrier="hidrocarburos aromáticos policíclicos (PAH)", transition="estiramiento C–H aromático",
-        process="emisión de moléculas excitadas por fotones ultravioleta", family="pah", lam_um=3.29,
+        id="pah_3p3", name="Aromatic PAH (3.3 µm)", plain_name="aromatic carbon compounds (PAH)",
+        carrier="polycyclic aromatic hydrocarbons (PAH)", transition="aromatic C–H stretch",
+        process="emission from molecules excited by ultraviolet photons", family="pah", lam_um=3.29,
         lam_range_um=(3.28, 3.30), nature=EMISSION, form=BAND, fwhm_um=None,
-        width_note="Posición 3,28–3,30 µm según la fuente (3,28 µm en Hora et al. 2026; ≈ 3,29 µm y variación de "
-                   "4–6,5 cm⁻¹ en van Diedenhoven et al. 2004). No se usa una anchura: no queda documentada aquí y, "
-                   "en cualquier caso, la banda es más estrecha que un canal de D4 (la imagen de Hora et al. 2026 "
-                   "integra 3,24–3,34 µm).",
-        conditions=("Emisión: necesita radiación ultravioleta que excite las moléculas (regiones de formación "
-                    "estelar, nebulosas, galaxias con formación estelar).",
-                    "Sin resolver a la resolución de SPHEREx: coincide en posición, no en perfil."),
-        confounders=("H I Pfund δ (3,297 µm) cae en el mismo canal de D4 (Hora et al. 2026).",
-                     "Rayado (bandeado) del mosaico del cubo cerca de líneas intensas, documentado en el centro de la "
-                     "banda PAH (Hora et al. 2026).",
-                     "Otros rasgos próximos de 3,4 µm caen en el canal contiguo: SPHEREx no separa 3,3 de 3,4 µm."),
-        plain="Moléculas de carbono con forma de anillos que brillan en este color cuando las ilumina la luz "
-              "ultravioleta de estrellas jóvenes.",
-        scientific="Banda de emisión del estiramiento C–H aromático de los PAH, la más corta de la familia de bandas "
-                   "infrarrojas de 3–12 µm.",
+        width_note="Position 3.28–3.30 µm depending on the source (3.28 µm in Hora et al. 2026; ≈ 3.29 µm and a variation of "
+                   "4–6.5 cm⁻¹ in van Diedenhoven et al. 2004). No width is used: it is not documented here and, "
+                   "in any case, the band is narrower than a D4 channel (the Hora et al. 2026 image "
+                   "integrates 3.24–3.34 µm).",
+        conditions=("Emission: it needs ultraviolet radiation to excite the molecules (star-forming "
+                    "regions, nebulae, star-forming galaxies).",
+                    "Unresolved at SPHEREx resolution: it matches in position, not in profile."),
+        confounders=("H I Pfund δ (3.297 µm) falls in the same D4 channel (Hora et al. 2026).",
+                     "Striping (banding) of the cube mosaic near intense lines, documented at the centre of the "
+                     "PAH band (Hora et al. 2026).",
+                     "Other nearby 3.4 µm features fall in the adjacent channel: SPHEREx does not separate 3.3 from 3.4 µm."),
+        plain="Ring-shaped carbon molecules that glow at this colour when illuminated by the ultraviolet "
+              "light of young stars.",
+        scientific="Emission band of the aromatic C–H stretch of PAHs, the shortest of the family of 3–12 µm "
+                   "infrared bands.",
         sources=(VAN_DIEDENHOVEN, HORA, TIELENS), short="PAH 3,3"),
     Reference(
-        id="hi_pfund_delta", name="H I Pfund δ (3,297 µm)", plain_name="hidrógeno ionizado (línea Pfund δ)",
-        carrier="hidrógeno atómico", transition="n = 9 → 5 (Pfund δ)",
-        process="emisión por recombinación en gas ionizado", family="hidrogeno", lam_um=3.296991,
+        id="hi_pfund_delta", name="H I Pfund δ (3,297 µm)", plain_name="ionised hydrogen (Pfund δ line)",
+        carrier="atomic hydrogen", transition="n = 9 → 5 (Pfund δ)",
+        process="recombination emission in ionised gas", family="hidrogeno", lam_um=3.296991,
         lam_range_um=(3.296991, 3.296991), nature=EMISSION, form=LINE, fwhm_um=None,
-        width_note="Línea mucho más estrecha que un canal: sin resolver en SPHEREx. No se exige que se resuelva.",
-        conditions=("Gas ionizado (regiones H II, nebulosas planetarias, acreción o vientos de estrellas jóvenes).",
-                    "Línea débil de la serie de Pfund: suele acompañarse de líneas más intensas de H I (p. ej. "
-                    "Brα), lo que V1 no comprueba."),
-        confounders=("La banda PAH de 3,3 µm cae en el mismo canal de D4.",
-                     "Otras líneas de H I próximas (series de Pfund y Humphreys) y el rayado del mosaico."),
-        plain="Luz que emite el hidrógeno cuando se recombina en gas ionizado, por ejemplo cerca de estrellas "
-              "calientes.",
-        scientific="Línea de recombinación de H I, transición n = 9 → 5. Longitud de onda de Ritz en el vacío "
+        width_note="Line much narrower than a channel: unresolved in SPHEREx. It is not required to be resolved.",
+        conditions=("Ionised gas (H II regions, planetary nebulae, accretion or winds from young stars).",
+                    "Weak line of the Pfund series: it is usually accompanied by more intense H I lines (e.g. "
+                    "Brα), which V1 does not check."),
+        confounders=("The 3.3 µm PAH band falls in the same D4 channel.",
+                     "Other nearby H I lines (Pfund and Humphreys series) and the striping of the mosaic."),
+        plain="Light that hydrogen emits when it recombines in ionised gas, for example near hot "
+              "stars.",
+        scientific="H I recombination line, transition n = 9 → 5. Ritz wavelength in vacuum "
                    "(NIST ASD).",
         sources=(NIST, HORA), short="Pfδ"),
     Reference(
-        id="hi_brackett_alpha", name="H I Brackett α (4,052 µm)", plain_name="hidrógeno ionizado (línea Brackett α)",
-        carrier="hidrógeno atómico", transition="n = 5 → 4 (Brackett α)",
-        process="emisión por recombinación en gas ionizado", family="hidrogeno", lam_um=4.052269,
+        id="hi_brackett_alpha", name="H I Brackett α (4,052 µm)", plain_name="ionised hydrogen (Brackett α line)",
+        carrier="atomic hydrogen", transition="n = 5 → 4 (Brackett α)",
+        process="recombination emission in ionised gas", family="hidrogeno", lam_um=4.052269,
         lam_range_um=(4.052269, 4.052269), nature=EMISSION, form=LINE, fwhm_um=None,
-        width_note="Línea mucho más estrecha que un canal de D5: sin resolver. No se exige que se resuelva.",
-        conditions=("Gas ionizado (regiones H II, nebulosas planetarias, acreción o vientos de estrellas jóvenes).",),
-        confounders=("Líneas débiles de la serie de Humphreys cercanas (p. ej. n = 14 → 6 a 4,0209 µm, NIST).",
-                     "Rayado del mosaico del cubo cerca de líneas intensas como Brα."),
-        plain="Luz que emite el hidrógeno cuando se recombina en gas ionizado, por ejemplo cerca de estrellas "
-              "calientes.",
-        scientific="Línea de recombinación de H I, transición n = 5 → 4. Longitud de onda de Ritz en el vacío "
+        width_note="Line much narrower than a D5 channel: unresolved. It is not required to be resolved.",
+        conditions=("Ionised gas (H II regions, planetary nebulae, accretion or winds from young stars).",),
+        confounders=("Nearby weak lines of the Humphreys series (e.g. n = 14 → 6 at 4.0209 µm, NIST).",
+                     "Striping of the cube mosaic near intense lines such as Brα."),
+        plain="Light that hydrogen emits when it recombines in ionised gas, for example near hot "
+              "stars.",
+        scientific="H I recombination line, transition n = 5 → 4. Ritz wavelength in vacuum "
                    "(NIST ASD).",
         sources=(NIST, HORA), short="Brα"),
     Reference(
-        id="co2_hielo_4p27", name="Hielo de CO₂ (4,27 µm)", plain_name="hielo de dióxido de carbono",
-        carrier="CO₂ sólido", transition="estiramiento asimétrico C=O",
-        process="absorción por mantos de hielo sobre granos de polvo", family="hielo", lam_um=4.27,
+        id="co2_hielo_4p27", name="CO₂ ice (4.27 µm)", plain_name="carbon dioxide ice",
+        carrier="Solid CO₂", transition="asymmetric C=O stretch",
+        process="absorption by ice mantles on dust grains", family="hielo", lam_um=4.27,
         lam_range_um=(4.27, 4.27), nature=ABSORPTION, form=BAND, fwhm_um=_CO2_FWHM,
-        width_note=f"FWHM ≈ 20 cm⁻¹ ≈ {_CO2_FWHM:.3f} µm (Boogert et al. 2015): del orden de un canal de D5.",
-        conditions=("Absorción: necesita una fuente de continuo infrarrojo detrás del hielo.",
-                    "Un continuo fiable a ambos lados de la banda; sin flujo de fondo detectable no se mide su "
-                    "profundidad (Hora et al. 2026)."),
-        confounders=("Al ocupar un solo canal, un canal bajo no se distingue de un valor atípico del mosaico.",),
-        plain="El hielo de dióxido de carbono sobre granos de polvo frío absorbe esta luz cuando hay una fuente "
-              "infrarroja detrás.",
-        scientific="Banda de estiramiento del hielo de CO₂, observada en absorción contra un continuo infrarrojo.",
-        sources=(BOOGERT, HORA), needs_absorption_model=True, short="CO₂ hielo"),
+        width_note=f"FWHM ≈ 20 cm⁻¹ ≈ {_CO2_FWHM:.3f} µm (Boogert et al. 2015): of the order of one D5 channel.",
+        conditions=("Absorption: it needs an infrared continuum source behind the ice.",
+                    "A reliable continuum on both sides of the band; without a detectable background flux its "
+                    "depth is not measured (Hora et al. 2026)."),
+        confounders=("Since it occupies a single channel, a low channel cannot be told apart from an outlier of the mosaic.",),
+        plain="Carbon dioxide ice on cold dust grains absorbs this light when there is an infrared "
+              "source behind it.",
+        scientific="Stretching band of CO₂ ice, observed in absorption against an infrared continuum.",
+        sources=(BOOGERT, HORA), needs_absorption_model=True, short="CO₂ ice"),
     Reference(
-        id="co_hielo_4p67", name="Hielo de CO (4,67 µm)", plain_name="hielo de monóxido de carbono",
-        carrier="CO sólido", transition="estiramiento C≡O (varias componentes)",
-        process="absorción por mantos de hielo sobre granos de polvo", family="hielo", lam_um=4.67,
+        id="co_hielo_4p67", name="CO ice (4.67 µm)", plain_name="carbon monoxide ice",
+        carrier="Solid CO", transition="C≡O stretch (several components)",
+        process="absorption by ice mantles on dust grains", family="hielo", lam_um=4.67,
         lam_range_um=(4.67, 4.67), nature=ABSORPTION, form=BAND, fwhm_um=_CO_FWHM[1],
-        width_note=f"FWHM 3–9 cm⁻¹ ≈ {_CO_FWHM[0]:.3f}–{_CO_FWHM[1]:.3f} µm (Boogert et al. 2015): más estrecha que "
-                   "un canal de D6 y muestreada de forma insuficiente (Hora et al. 2026). Su profundidad se diluye en "
-                   "el canal.",
-        conditions=("Absorción: necesita una fuente de continuo infrarrojo detrás del hielo.",
-                    "Un continuo fiable a ambos lados de la banda."),
-        confounders=("Las líneas de emisión de H I Pfβ (4,6538 µm) y Hu ε (4,6727 µm) caen en los mismos canales y "
-                     "pueden rellenar la banda (Vacca y Sandell 2011).",),
-        plain="El hielo de monóxido de carbono, que se forma en el polvo más frío y denso, absorbe esta luz cuando "
-              "hay una fuente infrarroja detrás.",
-        scientific="Banda de estiramiento del hielo de CO, estrecha; observada en absorción contra un continuo "
-                   "infrarrojo.",
-        sources=(BOOGERT, HORA, VACCA), needs_absorption_model=True, short="CO hielo"),
+        width_note=f"FWHM 3–9 cm⁻¹ ≈ {_CO_FWHM[0]:.3f}–{_CO_FWHM[1]:.3f} µm (Boogert et al. 2015): narrower than "
+                   "a D6 channel and insufficiently sampled (Hora et al. 2026). Its depth is diluted in "
+                   "the channel.",
+        conditions=("Absorption: it needs an infrared continuum source behind the ice.",
+                    "A reliable continuum on both sides of the band."),
+        confounders=("The H I emission lines Pfβ (4.6538 µm) and Hu ε (4.6727 µm) fall in the same channels and "
+                     "may fill in the band (Vacca & Sandell 2011).",),
+        plain="Carbon monoxide ice, which forms on the coldest and densest dust, absorbs this light when "
+              "there is an infrared source behind it.",
+        scientific="Stretching band of CO ice, narrow; observed in absorption against an infrared "
+                   "continuum.",
+        sources=(BOOGERT, HORA, VACCA), needs_absorption_model=True, short="CO ice"),
 )
 BY_ID = {r.id: r for r in REFERENCES}
 
@@ -303,8 +303,8 @@ class Redshift:
 
 
 UNKNOWN_Z = Redshift(None, 0.0, "desconocido",
-                     note="Sin desplazamiento al rojo documentado para esta posición: se compara en reposo (z = 0). "
-                          "Un z distinto movería las referencias; nunca se estima a partir de una coincidencia.")
+                     note="No documented redshift for this position: it is compared at rest (z = 0). "
+                          "A different z would shift the references; it is never estimated from a coincidence.")
 
 
 def redshift_at(ra: float, dec: float) -> Redshift:
@@ -322,14 +322,14 @@ def redshift_at(ra: float, dec: float) -> Redshift:
     _, g, sep = best
     sigma = INTERNAL_VELOCITY_KMS / C_KMS
     return Redshift(g.z, sigma, "ned", g.name, sep,
-                    note=f"z heliocéntrico de {g.ned_name} en NED ({g.z:.6f}, indicador {g.z_flag}); la posición está a "
-                         f"{sep:.0f}″ del centro, dentro de su isofota D25 (RC3). Se añade ±{sigma:.4f} por movimientos "
-                         f"internos de hasta {INTERNAL_VELOCITY_KMS:.0f} km/s (supuesto).",
+                    note=f"Heliocentric z of {g.ned_name} in NED ({g.z:.6f}, flag {g.z_flag}); the position is "
+                         f"{sep:.0f}″ from the centre, inside its D25 isophote (RC3). ±{sigma:.4f} is added for "
+                         f"internal motions of up to {INTERNAL_VELOCITY_KMS:.0f} km/s (assumption).",
                     references=REDSHIFT_SOURCES)
 
 
 def user_redshift(z: float, note: str = "") -> Redshift:
     """A redshift given by the user (kept apart from the curated table; its source is the user)."""
     if not math.isfinite(z) or z <= -1:
-        raise ValueError("z debe ser un número finito mayor que −1.")
-    return Redshift(float(z), 0.0, "usuario", note=note or "z introducido por el usuario; SkyClues no lo comprueba.")
+        raise ValueError("z must be a finite number greater than −1.")
+    return Redshift(float(z), 0.0, "usuario", note=note or "z entered by the user; SkyClues does not check it.")

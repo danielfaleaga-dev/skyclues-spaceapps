@@ -166,11 +166,11 @@ def find_pair(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD_DEG
               require_same_collection: bool = False, log=print):
     """Return (best_result | None, report) for the field centred on (ra, dec)."""
     records = archive.query_images(ra, dec, collections=collections)
-    log(f"SIA2: {len(records)} imágenes contienen el objetivo ({', '.join(collections)})")
+    log(f"SIA2: {len(records)} images contain the target ({', '.join(collections)})")
     if detectors:
         records = [r for r in records if r.detector in set(detectors)]
     cands = build_candidates(records, ra, dec, field_deg)
-    log(f"Con el campo completo dentro del detector: {len(cands)}")
+    log(f"With the full field inside the detector: {len(cands)}")
     tables = estimate_wavelengths(cands)
     pairs = rank_pairs(cands, require_same_collection)
     log(f"Parejas preseleccionadas (mismo detector, Δt ≥ {config.MIN_TIME_SEPARATION_DAYS} d, "
