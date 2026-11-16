@@ -224,7 +224,7 @@ def _show(p: dict, sci: bool) -> None:
             (f"Detector D{sel['detector']}", f"{lam[0]:.2f}–{lam[1]:.2f} µm" if broadband else f"{np.mean(lam):.3f} µm",
              "broadband" if broadband else "same channel"),
             ("Interval", f"{span:.1f} d" if span >= 1 else f"{span * 24:.1f} h", ""),
-            ("S/N gain", f"×{g['median']:.2f}", f"mediana de {g['n_sources']} fuentes · √N = {g['sqrt_n']:.2f}"),
+            ("S/N gain", f"×{g['median']:.2f}", f"median of {g['n_sources']} sources · √N = {g['sqrt_n']:.2f}"),
             ("Noise per pixel", f"{pn['combined']:.4f}", f"{pn['single_median']:.4f} MJy/sr in one exposure"),
             *target_fact])
     else:
@@ -292,7 +292,7 @@ def _controls(p: dict) -> None:
     shift = None if ast["median_shift_arcsec"] is None else float(np.hypot(*ast["median_shift_arcsec"]))
 
     def bright(k):
-        return f"{k} fuente brillante" if k == 1 else f"{k} fuentes brillantes"
+        return f"{k} bright source" if k == 1 else f"{k} bright sources"
     st.markdown(
         f"- **Noise:** the null image (half A − half B)/2 has a scatter of {num(stack.noise.get('null_scale'))} "
         f"times its formal error ({num(stack.noise.get('single_scale'))} in differences of individual exposures). "
@@ -322,11 +322,11 @@ def _details(p: dict) -> None:
                      "λ (µm)": round(sel["lambda_um"][i], 4), "relative weight": round(p["summary"]["weights_relative"][i], 2),
                      "sky (MJy/sr)": round(float(stack.offsets[i]), 4),
                      "registration (″)": "referencia" if r.get("reference") else (
-                         f"{math.hypot(*r['shift_arcsec']):.2f} ({r['n_sources']} fuentes)" if "shift_arcsec" in r
+                         f"{math.hypot(*r['shift_arcsec']):.2f} ({r['n_sources']} sources)" if "shift_arcsec" in r
                          else "unverified"),
                      "negatives discarded": sel["nonphysical_negative_pixels"][i],
                      "archivo": e.image.meta.get("FILE"), "SHA-256": (e.sha256 or "")[:16] + "…"})
-    with st.expander(f"Exposiciones combinadas ({stack.n_exposures})"):
+    with st.expander(f"Combined exposures ({stack.n_exposures})"):
         st.dataframe(pd.DataFrame(rows).astype(str), hide_index=True, width="stretch")
         if sel["rejected"]:
             st.markdown("**Rechazadas**")

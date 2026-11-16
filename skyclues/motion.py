@@ -162,7 +162,7 @@ def psf_for(img, x: float, y: float) -> PSF:
     cy, cx = (arr.shape[0] - 1) // 2, (arr.shape[1] - 1) // 2
     norm = arr[cy % ovy::ovy, cx % ovx::ovx].sum()
     return PSF(arr / norm, (ovx, ovy),
-               description=f"EPSF oficial zona ({tab['binx'][k]},{tab['biny'][k]}), {tab['nstar'][k]} estrellas, "
+               description=f"Official EPSF zone ({tab['binx'][k]},{tab['biny'][k]}), {tab['nstar'][k]} stars, "
                            f"λc {tab['cwave'][k]:.3f} µm · {tab['calib']}")
 
 
@@ -829,7 +829,7 @@ def investigate(frames, source_radec, *, gaia: dict | None = None, astrometry=No
         nref = int(reg["n_refs"][k])
         rows.append({"index": k, "obs_id": m["obs_id"], "date_utc": m["date_utc"], "mjd": m["mjd"],
                      "lambda_um": m["lambda_um"], "n_refs": nref, "psf_model": m["psf_model"],
-                     "registration_mode": (f"{nref} estrellas Gaia" if nref >= MIN_REFS else
+                     "registration_mode": (f"{nref} Gaia stars" if nref >= MIN_REFS else
                                            f"{nref} Gaia star(s) · empirical error" if nref else
                                            "file WCS only · empirical WCS error"),
                      "wcs_offset_vs_gaia_arcsec": [_f(reg["absolute_xi"][k]), _f(reg["absolute_eta"][k])],

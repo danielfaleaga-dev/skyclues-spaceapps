@@ -44,7 +44,7 @@ def test_atlas_suggestions_include_interstellar_identity_beyond_first_twelve(mon
     result = solar.suggestions('atlas')
     assert result[0]['id'] == 'JPL:1004083'
     assert result[0]['label'] == '3I/ATLAS (C/2025 N1)'
-    assert len(result) == 12 and result[0]['type'] == 'Cometa'
+    assert len(result) == 12 and result[0]['type'] == 'Comet'
 
 
 def test_universal_suggestions_query_jpl_but_catalogue_prefix_does_not(monkeypatch):

@@ -121,7 +121,7 @@ def test_contaminating_stationary_sources_prevent_motion_claim():
     yy,xx=np.indices(b.image.shape)
     b.image.image+=4000/(2*np.pi)*np.exp(-((xx-78)**2+(yy-90)**2)/2)
     r=n.assess([a,b],.2)
-    assert not r['observed_motion'] and 'contaminación' in r['motion_reason']
+    assert not r['observed_motion'] and 'contamination' in r['motion_reason']
 
 
 def test_prediction_does_not_supply_measured_displacement():
@@ -194,7 +194,7 @@ def test_cached_reference_keeps_each_exposure_time(monkeypatch):
     assert out['prediction']['ra']==pytest.approx(155,abs=1e-6) and out['prediction']['mjd']==row['mjd']
     assert out['prediction']['refined'] and calls[0][2]['step_days']==1/86400
     assert out['prediction']['sample_gap_s']==pytest.approx(1,abs=1e-5)
-    assert 'punto medio' in out['prediction']['time_basis']
+    assert 'midpoint' in out['prediction']['time_basis']
 
 
 def test_track_ra_wrap_and_no_extrapolation_or_coarse_gap():
@@ -218,10 +218,10 @@ def test_fits_dates_and_identity_verified(monkeypatch,tmp_path):
     monkeypatch.setattr(n.archive,'fetch',lambda u:tmp_path/'fixture.fits')
     monkeypatch.setattr(n.fitsdata,'load',lambda p:f.image)
     frames,fail=n.fetch_frames({'spkid':'999'},[row],.1)
-    assert not frames and 'diferentes' in fail[0]['error']
+    assert not frames and 'different' in fail[0]['error']
     f.image.meta.update(OBSID=row['obs_id'],**{'MJD-AVG':f.row['mjd']+1})
     frames,fail=n.fetch_frames({'spkid':'999'},[row],.1)
-    assert not frames and 'fecha' in fail[0]['error']
+    assert not frames and 'date' in fail[0]['error']
 
 
 def test_joint_native_weak_signal_and_negative_tracks():
@@ -285,7 +285,7 @@ def test_different_detectors_are_not_compared_for_disappearance():
     a,b=frame(shift=-12),frame(shift=12,seed=2)
     b.row['detector']=5
     r=n.assess([a,b],.2)
-    assert not r['observed_motion'] and 'Detectores distintos' in r['motion_reason']
+    assert not r['observed_motion'] and 'Different detectors' in r['motion_reason']
 
 
 @pytest.mark.parametrize('shift',[0,1,2])
@@ -309,7 +309,7 @@ def test_single_epoch_signal_is_not_motion():
 def test_too_few_common_stars_keeps_the_signal_as_candidate():
     a,b=frame(shift=-12,stars=False),frame(shift=12,seed=2,stars=False)
     r=n.assess([a,b],.2)
-    assert not r['observed_motion'] and 'estrellas comunes' in r['motion_reason']
+    assert not r['observed_motion'] and 'common stars' in r['motion_reason']
 
 
 def test_misregistered_stars_block_the_claim():
@@ -371,7 +371,7 @@ def test_saturated_bright_body_is_measured_from_its_wings_with_a_one_pixel_floor
 
 def test_faint_source_with_masked_core_is_not_measured():
     p=n.locate(saturated(frame(flux=80,stars=False)))
-    assert not p['measured'] and 'alas de la PSF no es fiable' in p['reason']
+    assert not p['measured'] and 'PSF wings is not reliable' in p['reason']
 
 
 def test_fixed_view_is_centred_between_both_ends_of_the_track():

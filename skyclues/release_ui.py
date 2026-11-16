@@ -30,8 +30,8 @@ def share(ra, dec, fov, explorer='temporal', canal=63):
 def discovery(report):
     d = report.get('discovery') or {}
     if d.get('queried_utc'):
-        st.caption(f"Observaciones: {d['origin']} · verificadas en IRSA {d['queried_utc']} · {d['selected_count']} "
-                   f"productos ({d['raw_count']} representaciones).")
+        st.caption(f"Observations: {d['origin']} · verified at IRSA {d['queried_utc']} · {d['selected_count']} "
+                   f"products ({d['raw_count']} representations).")
     else:
         st.caption('Historical result: IRSA query date not recorded. It is not equivalent to a current verification.')
     if d.get('replacements'):

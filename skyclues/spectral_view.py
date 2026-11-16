@@ -248,15 +248,15 @@ def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pix
     marks = []
     if target is not None:
         e, n = offsets_arcsec(frame, *target)
-        marks.append({"este": float(e), "norte": float(n), "m": "objetivo", "letra": "", "nota": "objetivo"})
+        marks.append({"este": float(e), "norte": float(n), "m": "objetivo", "letra": "", "nota": "target"})
     for letter, pos, role in (("A", pick, "spectrum position"), ("B", pick_b, "comparison point")):
         e0, n0 = (float(v) for v in offsets_arcsec(frame, *pos))
-        curves += [_circle(e0, n0, aperture.r_ap * pixel_arcsec, f"apertura {letter}").assign(trazo="continuo"),
-                   _circle(e0, n0, aperture.r_in * pixel_arcsec, f"anillo {letter}").assign(trazo="anillo"),
-                   _circle(e0, n0, aperture.r_out * pixel_arcsec, f"anillo {letter} (ext.)").assign(trazo="anillo")]
+        curves += [_circle(e0, n0, aperture.r_ap * pixel_arcsec, f"aperture {letter}").assign(trazo="continuo"),
+                   _circle(e0, n0, aperture.r_in * pixel_arcsec, f"ring {letter}").assign(trazo="anillo"),
+                   _circle(e0, n0, aperture.r_out * pixel_arcsec, f"ring {letter} (ext.)").assign(trazo="anillo")]
         marks.append({"este": e0, "norte": n0, "m": letter, "letra": letter, "nota": f"{letter} · {role}"})
-    names = ["field of view"] + [f"{k} {s}" for s in "AB" for k in ("apertura", "anillo")] + [
-        f"anillo {s} (ext.)" for s in "AB"]
+    names = ["field of view"] + [f"{k} {s}" for s in "AB" for k in ("aperture", "ring")] + [
+        f"ring {s} (ext.)" for s in "AB"]
     colour = {"field of view": "#1f5fbf", **{n: (SERIES if " A" in n else SERIES_B) for n in names[1:]}}
     lines = alt.Chart(pd.concat(curves, ignore_index=True)).mark_line(strokeWidth=1.5, clip=True).encode(
         x=X, y=Y, order="orden:Q", detail="curva:N",
@@ -281,7 +281,7 @@ def _field_chart_ab(png, info, pixels, cmap, target, pick, pick_b, aperture, pix
                                                          range=["cross", "diamond", "square"]), legend=None),
         color=alt.Color("m:N", scale=alt.Scale(domain=["objetivo", "A", "B"],
                                                range=["#1f5fbf", SERIES, SERIES_B]), legend=None),
-        tooltip=[alt.Tooltip("nota:N", title="marca")])
+        tooltip=[alt.Tooltip("nota:N", title="mark")])
     letters = mdf[mdf.letra != ""]
     # Identity is never colour alone: each position carries its letter (ink on a white halo).
     halo = alt.Chart(letters).mark_text(dx=14, dy=-13, fontSize=15, fontWeight="bold", stroke="#ffffff",
@@ -342,7 +342,7 @@ def _reference_layers(refs: list[dict], xsc):
 
     df = pd.DataFrame(refs)
     tip = [alt.Tooltip("nombre:N", title="referencia"), alt.Tooltip("naturaleza:N", title="tipo"),
-           alt.Tooltip("lambda_um:Q", title="λ esperada (µm)", format=".3f"), alt.Tooltip("nota:N", title="nota")]
+           alt.Tooltip("lambda_um:Q", title="λ expected (µm)", format=".3f"), alt.Tooltip("nota:N", title="note")]
     rule = alt.Chart(df).mark_rule(strokeDash=[1, 3], strokeWidth=1.4, strokeCap="round").encode(   # dotted: not the
                                                                                                    # dashed channel rule
         x=alt.X("lambda_um:Q", scale=xsc),
@@ -378,9 +378,9 @@ def spectrum_chart(spec: sc.Spectrum, quantity: str = "flux", selected_channel: 
     if two:
         gone = allrows[allrows["valor"].isna()]
         missing = gone.groupby(["canal", "lambda_um"], as_index=False).agg(
-            estado=("estado", lambda s: ""), serie=("serie", lambda s: " y ".join(sorted(s))))
+            estado=("estado", lambda s: ""), serie=("serie", lambda s: " and ".join(sorted(s))))
         why = {(r.canal, r.serie): r.estado for r in gone.itertuples()}
-        missing["estado"] = [" · ".join(f"{s}: {why[(c, s)]}" for s in ser.split(" y "))
+        missing["estado"] = [" · ".join(f"{s}: {why[(c, s)]}" for s in ser.split(" and "))
                              for c, ser in zip(missing.canal, missing.serie)]
     else:
         missing = df[df["valor"].isna()].copy()
@@ -497,7 +497,7 @@ def derived_chart(rows: list[dict], kind: str, unit: str, focus=None, selected_c
             x=alt.X("x:Q", scale=xsc)))
     tip = [alt.Tooltip("canal:Q"), alt.Tooltip("lambda_um:Q", title="λ (µm)", format=".3f"),
            alt.Tooltip("a:Q", title=f"A ({unit})", format=".4g"), alt.Tooltip("b:Q", title=f"B ({unit})", format=".4g"),
-           alt.Tooltip("valor:Q", title=title, format=".4g"), alt.Tooltip("motivo:N", title="estado")]
+           alt.Tooltip("valor:Q", title=title, format=".4g"), alt.Tooltip("motivo:N", title="status")]
     layers.append(alt.Chart(ok).mark_rule(color=INK_2, strokeWidth=1.2, opacity=0.5).encode(
         x=alt.X("lambda_min_um:Q", scale=xsc), x2="lambda_max_um:Q", y=Y))
     layers.append(alt.Chart(ok).mark_point(size=46, strokeWidth=1.5, color=INK_2).encode(

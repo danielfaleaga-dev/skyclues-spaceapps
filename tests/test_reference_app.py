@@ -15,7 +15,7 @@ def test_time_reference_region_and_gaia_outage(monkeypatch):
     def outage(ra,dec,fov): calls.append((ra,dec,fov));raise ref.ReferenceError('Gaia DR3 no disponible')
     monkeypatch.setattr(page,'cached_gaia',outage)
     at=AppTest.from_file(APP,default_timeout=30)
-    at.session_state['level']='Científico'
+    at.session_state['level']='Scientific'
     at.run()
     assert not at.exception
     at.button(key='example_sequence_m101').click().run()
@@ -43,6 +43,6 @@ def test_spectrum_reference_field_and_transfer(app_cube,monkeypatch):
     def result(inp,refresh):
         return {'target':{'ra_deg':inp['ra'],'dec_deg':inp['dec'],'field_deg':inp['fov']},'selected':None,'n_records':0}
     monkeypatch.setattr(time_page,'run_search',result)
-    at.button_group(key='nav').set_value('Tiempo').run()
+    at.button_group(key='nav').set_value('Time').run()
     at.toggle(key='time_ref_open').set_value(True).run()
     assert not at.exception and calls[-1]==pytest.approx(key)

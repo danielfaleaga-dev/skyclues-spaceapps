@@ -103,7 +103,7 @@ def test_remote_outage_local_remains(monkeypatch):
     def down(*a,**kw):raise search.requests.Timeout()
     monkeypatch.setattr(search.requests,'get',down)
     rows,status=search.remote_suggestions('HD20945')
-    assert not rows and 'no disponibles' in status
+    assert not rows and 'not available' in status
     assert search.resolve('M31')[0].ra_deg>10
 
 def test_collection_allowlist():
@@ -137,9 +137,9 @@ def test_refresh_ui_requests_new_query(monkeypatch):
     from skyclues import time_page
     monkeypatch.setattr(time_page,'find_sequence',find)
     at=AppTest.from_file(str(config.ROOT/'app.py'),default_timeout=30)
-    at.query_params={'ra':'10','dec':'0','fov':'.1','explorer':'temporal'};at.session_state['level']='Científico';at.run()
-    at.button_group(key='nav').set_value('Región').run()
-    at.session_state['time_tab']='Procedencia'
+    at.query_params={'ra':'10','dec':'0','fov':'.1','explorer':'temporal'};at.session_state['level']='Scientific';at.run()
+    at.button_group(key='nav').set_value('Region').run()
+    at.session_state['time_tab']='Provenance'
     at.button(key='example_sequence_m101').click().run()
     at.button(key='refresh_saved').click().run()
     assert not at.exception and calls[-1]['refresh'] is True

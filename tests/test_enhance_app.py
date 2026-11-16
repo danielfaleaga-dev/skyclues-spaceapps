@@ -13,7 +13,7 @@ pytestmark = pytest.mark.network
 APP = str(Path(__file__).resolve().parent.parent / "app.py")
 
 
-def open_example(stem="sequence_m101", level="Científico"):
+def open_example(stem="sequence_m101", level="Scientific"):
     at = AppTest.from_file(APP, default_timeout=180)
     at.session_state["level"] = level
     at.run()
@@ -50,7 +50,7 @@ def test_both_levels_show_the_same_product():
     at.toggle(key="w_enhance").set_value(True).run()
     product = enhance_page._sequence_product
     sci = html(at)
-    at.button_group(key="level").set_value("Sencillo").run()
+    at.button_group(key="level").set_value("Simple").run()
     assert not at.exception and at.session_state["opt_enhance"]
     simple = html(at)
     assert "Imagen mejorada" in simple and "Mejora de la señal" in simple
@@ -58,7 +58,7 @@ def test_both_levels_show_the_same_product():
     assert "Ganancia S/N" in sci
     assert not any("Exposiciones combinadas" in e.label for e in at.expander)
     assert enhance_page._sequence_product is product
-    at.button_group(key="level").set_value("Científico").run()
+    at.button_group(key="level").set_value("Scientific").run()
     assert not at.exception and "Ganancia S/N" in html(at)
 
 
@@ -90,7 +90,7 @@ def test_nearby_route_states_available_processing_result(monkeypatch):
     assert not at.exception and len(calls) >= 1
     assert calls[0][3] == 2 and calls[0][2] == pytest.approx(0.1)             # same detector, same FOV
     assert "Imagen mejorada" in html(at)
-    at.button_group(key="level").set_value("Sencillo").run()
+    at.button_group(key="level").set_value("Simple").run()
     assert not at.exception and "Imagen mejorada" in html(at)                 # no second request to press
     assert at.session_state["opt_enhance_what"] == "near0"
 
@@ -117,7 +117,7 @@ def test_new_peaks_are_not_called_sources_when_the_null_image_has_as_many(monkey
         at.button(key="enhance_run").click().run()
         assert not at.exception and "Imagen mejorada" in html(at)
         assert sci_text in text(at)
-        at.button_group(key="level").set_value("Sencillo").run()
+        at.button_group(key="level").set_value("Simple").run()
         assert not at.exception and simple_text in text(at)
 
 
@@ -126,9 +126,9 @@ def test_choice_of_dates_does_not_travel_to_another_region():
     at.toggle(key="w_enhance").set_value(True).run()
     at.selectbox(key="w_enhance_what").set_value("near1").run()
     assert not at.exception and at.session_state["opt_enhance_what"] == "near1"
-    at.button_group(key="level").set_value("Sencillo").run()                  # same sequence: the choice stays
+    at.button_group(key="level").set_value("Simple").run()                  # same sequence: the choice stays
     assert not at.exception and at.session_state["opt_enhance_what"] == "near1"
-    at.button_group(key="nav").set_value("Región").run()
+    at.button_group(key="nav").set_value("Region").run()
     at.button(key="example_sequence_wise0855_pm").click().run()
     assert not at.exception and at.session_state["opt_enhance"]
     # A new region starts from its own sequence, not from the index of a date of M101.

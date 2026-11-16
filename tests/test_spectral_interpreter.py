@@ -96,7 +96,7 @@ def test_redshift_only_inside_the_d25_isophote_of_a_curated_galaxy():
     across = (m82.ra_deg + 200 * math.cos(t) / 3600 / math.cos(math.radians(m82.dec_deg)),
               m82.dec_deg - 200 * math.sin(t) / 3600)
     assert m82.inside(*along)[0] and not m82.inside(*across)[0]     # ellipse, not a circle
-    assert not sr.redshift_at(60.81, 51.34).known and "nunca se estima" in sr.UNKNOWN_Z.note
+    assert not sr.redshift_at(60.81, 51.34).known and "never estimated" in sr.UNKNOWN_Z.note
     with pytest.raises(ValueError):
         sr.user_redshift(-1.5)
 
@@ -111,7 +111,7 @@ def test_quantifiable_peak_at_3p3_keeps_pah_and_pfund_delta_without_choosing():
     assert all(m.status == si.MATCH and m.predicted_channels == (63,) for m in it.matches)
     lo, hi = it.matches[0].z_range                                   # unknown z: the range where it would hold
     assert lo < 0 < hi and hi == pytest.approx((3.342 + 0.001) / 3.28 - 1, abs=1e-4)
-    assert any("no las separa" in b for b in it.blockers)
+    assert any("does not separate them" in b for b in it.blockers)
     assert not it.redshift.known and "z = 0" in " ".join(it.limitations)
     assert it.observation["R"] == 35.0 and it.observation["R_del_fits"]
 
@@ -122,7 +122,7 @@ def test_visible_peak_is_only_insufficiently_supported():
     assert f.klass == sf.VISIBLE
     it = si.interpret(s, f, resolution=RES)
     assert it.verdict == si.WEAK and {m.status for m in it.matches} == {si.MATCH_WEAK}
-    assert any("no una significación" in b for b in it.blockers)
+    assert any("not a statistical significance" in b for b in it.blockers)
 
 
 def test_single_brackett_alpha_is_one_compatible_reference():
@@ -157,7 +157,7 @@ def test_isolated_minimum_is_not_water_ice_and_a_broad_one_is_only_orientative()
     s = mk(bump(60, 0.7))
     it = si.interpret(s, feature_at(s, 60), resolution=RES)
     assert it.verdict == si.NONE and [m.status for m in it.others] == [si.WIDTH]
-    assert "mínimo aislado" in it.others[0].reasons[0]
+    assert "isolated minimum" in it.others[0].reasons[0]
     wide = BASE.copy()
     wide[57:62] *= np.array([0.9, 0.8, 0.7, 0.8, 0.9])               # SIMULATED broad depression, channels 58-62
     s2 = mk(wide)
@@ -188,7 +188,7 @@ def test_feature_outside_the_library_has_no_compatible_reference():
     s = mk(bump(40, 1.5))                                            # 1.876 µm (not in the V1 library)
     it = si.interpret(s, feature_at(s, 40), resolution=RES)
     assert it.verdict == si.NONE and not it.matches and not it.others
-    assert any("no excluye otras sustancias" in x for x in it.limitations)
+    assert any("does not exclude other substances" in x for x in it.limitations)
 
 
 def test_channels_without_data_are_not_evaluable_and_absence_is_not_concluded():
@@ -199,7 +199,7 @@ def test_channels_without_data_are_not_evaluable_and_absence_is_not_concluded():
     it = si.interpret(s, f, resolution=RES)
     assert it.verdict == si.NOT_EVALUABLE and not it.matches
     cov = {c.reference.id: c for c in si.survey(s)}
-    assert cov["pah_3p3"].status == si.COV_NO_DATA and "ni presencia ni ausencia" in cov["pah_3p3"].reasons[0]
+    assert cov["pah_3p3"].status == si.COV_NO_DATA and "neither presence nor absence" in cov["pah_3p3"].reasons[0]
     assert cov["hi_brackett_alpha"].status == si.COV_NO_SIGNAL
     assert "No demuestra ausencia" in cov["hi_brackett_alpha"].reasons[0]
 
@@ -222,7 +222,7 @@ def test_caution_in_the_environment_caps_the_verdict():
     f = feature_at(s, 75)
     assert f.klass == sf.QUANTIFIABLE
     it = si.interpret(s, f, resolution=RES)
-    assert it.verdict == si.WEAK and any("entorno" in b for b in it.blockers)
+    assert it.verdict == si.WEAK and any("surroundings" in b for b in it.blockers)
 
 
 def test_spectrum_without_features_gives_nothing_to_interpret():
@@ -238,7 +238,7 @@ def test_spectrum_without_features_gives_nothing_to_interpret():
 def test_without_the_fits_resolution_it_is_estimated_and_declared():
     s = mk(bump(63, 1.5))
     it = si.interpret(s, feature_at(s, 63))
-    assert not it.observation["R_del_fits"] and "estimada" in " ".join(it.limitations)
+    assert not it.observation["R_del_fits"] and "estimated" in " ".join(it.limitations)
 
 
 def test_output_is_deterministic_and_serialisable():
@@ -284,7 +284,7 @@ def test_m51_small_redshift_and_the_aperture_is_not_the_nucleus():
     it = si.interpret(s, an.features[0], **kw)
     assert it.verdict == si.WEAK and ids(it.matches) == ["pah_3p3", "hi_pfund_delta"]
     assert it.matches[0].lam_obs_um - 3.29 == pytest.approx(3.29 * 0.001745)       # < 0.006 µm: same channel 63
-    assert "no un objeto concreto" in " ".join(it.limitations)
+    assert "not a specific object" in " ".join(it.limitations)
     b = sr.redshift_at(202.49808, 47.26617)                                     # a B point on M51b
     assert b.z != kw["redshift"].z
 

@@ -108,7 +108,7 @@ def test_registration_error_rejects_the_exposure_instead_of_shifting_the_stack()
     good = [exposure(i) for i in (1, 2, 3)]
     st = en.combine(good + [exposure(4, wcs_error=1.6)], RA0, DEC0, FOV)
     assert st.n_exposures == 3
-    assert any("Registro" in r["reason"] for r in st.selection["rejected"])
+    assert any("Registration" in r["reason"] for r in st.selection["rejected"])
     for radec, _ in STARS[:3]:
         x, y = pix(st, radec)
         c = en._centroid(st.image, x, y, 3)
@@ -133,7 +133,7 @@ def test_no_gain_is_rejected():
     st = en.combine([exposure(1, sigma=1.0), exposure(2, sigma=30.0)], RA0, DEC0, FOV)
     m = en.evaluate(st)
     v = en.verdict(m)
-    assert not v["accepted"] and "no aporta" in " ".join(v["reasons"])
+    assert not v["accepted"] and "does not provide" in " ".join(v["reasons"])
     assert m["gain"]["vs_best_exposure_median"] == pytest.approx(1.0, abs=0.05)
 
 
@@ -173,7 +173,7 @@ def test_partial_coverage_is_propagated_and_tiny_overlap_is_rejected():
     far = exposure(5, dx=-74.0)                                     # shares almost nothing
     st2 = en.combine([exposure(1), exposure(2), far], RA0, DEC0, FOV)
     assert st2.n_exposures == 2
-    assert any("nivel de cielo" in r["reason"] for r in st2.selection["rejected"])
+    assert any("sky level" in r["reason"] for r in st2.selection["rejected"])
 
 
 def test_saturation_is_not_recovered_by_stacking():
@@ -204,7 +204,7 @@ def test_nonphysical_negatives_are_removed_but_bright_single_values_are_kept():
 def test_psf_incompatible_exposure_is_rejected():
     st = en.combine([exposure(1), exposure(2), exposure(3), exposure(4, psf_sigma=2.2)], RA0, DEC0, FOV)
     assert st.n_exposures == 3
-    assert any("PSF incompatible" in r["reason"] for r in st.selection["rejected"])
+    assert any("Incompatible PSF" in r["reason"] for r in st.selection["rejected"])
 
 
 def test_spectral_differences_change_the_product_not_the_method():
@@ -212,7 +212,7 @@ def test_spectral_differences_change_the_product_not_the_method():
     assert mono.selection["kind"] == "monochromatic" and not mono.selection["warnings"]
     broad = en.combine([exposure(1, lam=1.25), exposure(2, lam=1.31), exposure(3, lam=1.40)], RA0, DEC0, FOV)
     assert broad.selection["kind"] == "broadband"
-    assert "BANDA ANCHA" in broad.selection["warnings"][0] and "monocromático" in broad.selection["warnings"][0]
+    assert "BROADBAND" in broad.selection["warnings"][0] and "monochromatic" in broad.selection["warnings"][0]
     assert broad.selection["lambda_range_um"] == pytest.approx([1.25, 1.40])
     assert np.nanmax(broad.lam_spread_bw) == pytest.approx(5.0)
     assert broad.lam[40, 40] == pytest.approx(np.mean([1.25, 1.31, 1.40]))
@@ -220,7 +220,7 @@ def test_spectral_differences_change_the_product_not_the_method():
 
 def test_detectors_and_calibrations_are_never_mixed():
     sel = en.select([exposure(1, det=2), exposure(2, det=5)], RA0, DEC0, FOV)
-    assert not sel["ok"] and "detectores distintos" in sel["reason"]
+    assert not sel["ok"] and "different detectors" in sel["reason"]
     with pytest.raises(en.EnhanceError):
         en.combine([exposure(1, det=2), exposure(2, det=5)], RA0, DEC0, FOV)
     st = en.combine([exposure(1), exposure(2), exposure(3, collection="OTHER"), exposure(4, version="2")],
@@ -239,7 +239,7 @@ def test_temporal_differences_and_a_moving_target():
     exps = [exposure(1, mjd=60000.0), exposure(2, mjd=60200.0)]
     st = en.combine(exps, RA0, DEC0, FOV, target_motion_arcsec=1.0)
     assert st.selection["span_days"] == pytest.approx(200.0)
-    with pytest.raises(en.EnhanceError, match="emborronaría"):
+    with pytest.raises(en.EnhanceError, match="blur"):
         en.combine(exps, RA0, DEC0, FOV, target_motion_arcsec=8.0)
 
 
@@ -312,7 +312,7 @@ def test_moving_source_needs_a_comoving_stack_and_a_wrong_track_shows_nothing():
     follow = en.combine(exps, ra, dec, 0.06, purpose="comoving", centres=centres)
     snr, m = centre_snr(follow)
     assert snr > 6 and m["snr_single_median"] < 5                   # visible only when followed
-    assert "TRAYECTORIA PREVISTA" in " ".join(follow.selection["warnings"])
+    assert "PREDICTED TRAJECTORY" in " ".join(follow.selection["warnings"])
     wrong = [(r, d + 40 / 3600) for r, d in centres]                # same images, displaced track
     control = en.combine(exps, ra, dec + 40 / 3600, 0.06, purpose="comoving", centres=wrong)
     assert centre_snr(control)[0] < 3.5                             # the alignment creates no source

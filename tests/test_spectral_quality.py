@@ -136,7 +136,7 @@ def _quality_frames(at):
 
 def test_simple_level_explains_in_plain_words_and_stays_quiet_without_losses(app_cube):
     at = spectral_app(app_cube)
-    at.button_group(key="level").set_value("Sencillo").run()
+    at.button_group(key="level").set_value("Simple").run()
     assert not at.exception and not any(e.label == "¿Por qué faltan algunos colores?" for e in at.expander)
 
 
@@ -162,7 +162,7 @@ def test_page_explains_rejected_channels_in_both_levels(punched, app_cube):
     # the table of the spectrum carries the new columns (CSV with provenance)
     assert any({"ap_pix_total", "ap_pix_invalidos", "ap_bloom", "ap_overflow"} <= set(d.value.columns) for d in at.dataframe)
 
-    at.button_group(key="level").set_value("Sencillo").run()
+    at.button_group(key="level").set_value("Simple").run()
     assert not at.exception
     txt = _text(at)
     assert "Este canal no puede analizarse porque parte de la región seleccionada no tiene datos utilizables." in txt
@@ -180,6 +180,6 @@ def test_second_position_gets_its_own_diagnosis_with_a_spectrum_column(punched, 
     at.run()
     assert not at.exception
     interval = _quality_frames(at)[0]
-    assert list(interval.columns)[0] == "Espectro" and set(interval["Espectro"]) == {"A"}      # B has nothing to tell here
+    assert list(interval.columns)[0] == "Spectrum" and set(interval["Spectrum"]) == {"A"}      # B has nothing to tell here
     whole = _quality_frames(at)[1]
-    assert {"A", "B"} == set(whole["Espectro"]) and set(whole[whole["Espectro"] == "B"]["Canal"]) == {51, 52}
+    assert {"A", "B"} == set(whole["Spectrum"]) and set(whole[whole["Spectrum"] == "B"]["Canal"]) == {51, 52}

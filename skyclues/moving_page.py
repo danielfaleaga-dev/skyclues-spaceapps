@@ -78,7 +78,7 @@ def _select(identity,ij,fov):
                 'No coverage: the query found no exposures in this interval. You can try other dates.');return
     if d.get('reference_warning'):
         st.warning('The reference table did not respond. The MOST positions for each exposure will be used, with their provenance made explicit.')
-    st.caption(f"{len(d['rows'])} exposiciones encontradas · NASA/IPAC IRSA")
+    st.caption(f"{len(d['rows'])} exposures found · NASA/IPAC IRSA")
     motion_sets=sources.motion_groups(d['rows'])
     # Measuring a displacement is the first choice whenever the archive allows it.
     band=st.selectbox('What to compare',list(BANDS),key=theme.bind('moving_band',MOTION if motion_sets else list(BANDS)[1]),
@@ -155,7 +155,7 @@ def render(region,scientific=False):
             ('Measured displacement',f"{motion['displacement_arcsec']:.0f}″",f"± {motion['error_arcsec']:.0f}″"),
             ('Interval',f"{minutes:.0f} min" if minutes<180 else f"{motion['interval_hours']:.1f} h",''),
             ('Apparent rate',f"{motion['rate_arcsec_per_hour']:.0f}″/h",'on the sky, as seen from SPHEREx'),
-            ('Control stars',str(motion['control_stars']),f"no se mueven: ≤ {motion['control_radius_arcsec']:.1f}″")])
+            ('Control stars',str(motion['control_stars']),f"they do not move: ≤ {motion['control_radius_arcsec']:.1f}″")])
         st.write(motion['reason'] if scientific else
                  'The object appears in one place in the first image and in another in the last, and is no longer where it was: '
                  'it has moved relative to the stars.')
@@ -192,7 +192,7 @@ def render(region,scientific=False):
     if len(frames)>1 and not animate:
         st.caption('Review by dates: some image does not provide enough signal for an animation. Use Previous / Next.')
     if scientific:
-        st.markdown('#### Calidad y procedencia')
+        st.markdown('#### Quality and provenance')
         if report['joint_signal'].get('tests'):
             with st.expander('Faint signal: combination of native measurements'):
                 st.json(report['joint_signal'])
@@ -207,7 +207,7 @@ def render(region,scientific=False):
                           'Measured RA':m.get('ra'),'Measured Dec':m.get('dec'),'S/N':m.get('snr'),
                           'measured − predicted E (″)':off[0],'measured − predicted N (″)':off[1],
                           'OUTLIER pixels used':m.get('outlier_pixels_in_core'),
-                          'observador':p['observer'],'estado':ns.LABELS[r['analysis']['status']],
+                          'observer':p['observer'],'status':ns.LABELS[r['analysis']['status']],
                           'no measured position':m.get('reason','')})
         st.dataframe(pd.DataFrame(table),hide_index=True,width='stretch')
         if motion.get('pair'):
@@ -226,7 +226,7 @@ def render(region,scientific=False):
                    'Unpublished orbital uncertainties remain unknown, never zero.')
         for i,r in enumerate(report['frames']):
             with st.expander(f"Analysis · {r['observation']['obs_id']}"):
-                st.json(r['analysis']);st.markdown(f"[FITS original]({r['observation']['url']}) · [Recorte utilizado]({r['cutout_url']})")
+                st.json(r['analysis']);st.markdown(f"[FITS original]({r['observation']['url']}) · [Cutout used]({r['cutout_url']})")
         if report['stack_allowed']:
             with st.expander('Stack following the object with a stationary control'):
                 if st.button('Compare stacks',key='moving_stack'):

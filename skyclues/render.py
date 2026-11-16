@@ -296,7 +296,7 @@ def dlambda_figure(ev: PairEvaluation, wcs, ra, dec, field_deg, limit=0.5):
     im = ax.imshow(ev.dlambda_bw, origin="lower", cmap=cm, vmin=-limit, vmax=limit, interpolation="nearest")
     _style_axes(ax)
     _mark_target(ax, ra, dec, field_deg)
-    ax.set_title("(λA − λB) / ancho de banda", color=INK, fontsize=10, loc="left")
+    ax.set_title("(λA − λB) / bandwidth", color=INK, fontsize=10, loc="left")
     cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     cb.ax.tick_params(labelsize=7, colors=INK)
     fig.tight_layout()

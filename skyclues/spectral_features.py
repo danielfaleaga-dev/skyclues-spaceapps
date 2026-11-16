@@ -232,7 +232,7 @@ def compatibility(a: Series, b: Series) -> tuple[list, list, float | None]:
     """(issues that forbid A − B and A / B, cautions, separation). Nothing is silently equalised."""
     issues, notes = [], []
     if a.quantity != b.quantity or a.unit != b.unit:
-        issues.append(f"Magnitudes distintas ({a.unit} y {b.unit}): no se restan ni se dividen.")
+        issues.append(f"Different quantities ({a.unit} and {b.unit}): they are neither subtracted nor divided.")
     same_grid = (a.n == b.n and np.array_equal(a.canal, b.canal) and np.allclose(a.lam, b.lam, rtol=0, atol=1e-6)
                  and np.allclose(a.lam_min, b.lam_min, rtol=0, atol=1e-6)
                  and np.allclose(a.lam_max, b.lam_max, rtol=0, atol=1e-6))
@@ -438,7 +438,7 @@ def _evaluate(s: Series, lo: int, hi: int, masked, sdet, *, origin: str, centre:
     for name, side, edge in (("menor", left, lo - 1), ("mayor", right, hi + 1)):
         if len(side) < N_SIDE:
             cause = ("edge of the spectral interval" if not 0 <= edge < s.n else
-                     f"canal {int(s.canal[edge])}: {_missing(s.status[edge])}"
+                     f"channel {int(s.canal[edge])}: {_missing(s.status[edge])}"
                      if not math.isfinite(s.value[edge]) else "channels without a value or of another feature")
             f.reasons.append(f"No valid surroundings towards λ {name} ({len(side)} of {N_SIDE} channels; {cause}): "
                              "there is no reliable local continuum.")

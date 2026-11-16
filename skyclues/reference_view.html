@@ -1,4 +1,4 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8">
+<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 body{margin:0;font:14px system-ui,sans-serif;color:#172433;background:#fff}
@@ -12,35 +12,35 @@ label{cursor:pointer}select,button{font:inherit;padding:5px;max-width:100%}
 </style></head><body>
 <div class="controls">
 <label><input type="checkbox" id="gaia" disabled> Gaia DR3 · J2016.0</label>
-<label><input type="checkbox" id="motion" disabled> Posiciones calculadas</label>
+<label><input type="checkbox" id="motion" disabled> Calculated positions</label>
 <label><input type="checkbox" id="wise" checked disabled> AllWISE</label>
-<label>Banda <select id="band" disabled><option value="W1">W1 · 3.4 µm</option><option value="W2">W2 · 4.6 µm</option></select></label>
-<button id="retry" disabled>Reintentar WISE</button>
+<label>Band <select id="band" disabled><option value="W1">W1 · 3.4 µm</option><option value="W2">W2 · 4.6 µm</option></select></label>
+<button id="retry" disabled>Retry WISE</button>
 </div>
-<div id="engine" class="status" role="status">Iniciando Aladin Lite 3.8.1…</div>
+<div id="engine" class="status" role="status">Starting Aladin Lite 3.8.1…</div>
 <div id="wisestatus" class="status" role="status"></div>
-<div class="layout"><div id="field" aria-label="Campo de referencias ICRS"></div>
+<div class="layout"><div id="field" aria-label="ICRS reference field"></div>
 <div class="details"><div id="geometry"></div>
-<p class="legend">○ Cian: catálogo Gaia, J2016.0.<br>+ Ámbar: cálculo por movimiento propio.<br>
-Círculo gris: límite de la consulta Gaia.<br>Norte arriba; este a la izquierda. Campo fijo.</p>
-<label for="source">Identificar fuente Gaia (o pulsar un marcador)</label>
-<select id="source" disabled><option value="">Seleccione una fuente</option></select>
-<div id="details">Sin asociación automática con SPHEREx o WISE.</div>
+<p class="legend">○ Cyan: Gaia catalogue, J2016.0.<br>+ Amber: calculation from proper motion.<br>
+Grey circle: limit of the Gaia query.<br>North up; east to the left. Fixed field.</p>
+<label for="source">Identify a Gaia source (or click a marker)</label>
+<select id="source" disabled><option value="">Select a source</option></select>
+<div id="details">No automatic association with SPHEREx or WISE.</div>
 <p id="gaiastatus" class="status"></p>
 </div></div>
 <script type="module">
 const cfg=__PAYLOAD__;
 const el=id=>document.getElementById(id);
-el('geometry').textContent=`Centro ICRS: ${cfg.ra.toFixed(6)}°, ${cfg.dec.toFixed(6)}° · FOV ${(cfg.fov*60).toFixed(2)}′ × ${(cfg.fov*60).toFixed(2)}′`;
+el('geometry').textContent=`ICRS centre: ${cfg.ra.toFixed(6)}°, ${cfg.dec.toFixed(6)}° · FOV ${(cfg.fov*60).toFixed(2)}′ × ${(cfg.fov*60).toFixed(2)}′`;
 el('motion').parentElement.append(` · J${cfg.epoch.toFixed(1)}`);
-el('gaiastatus').textContent=cfg.gaiaError || (cfg.gaiaLoaded ? `${cfg.sources.length} fuentes consultadas en J2016.0; las calculadas pueden salir del campo.` : 'Gaia sin consultar. Active la consulta encima del visor.');
-const fmt=(n,unit='')=>n===null ? 'no disponible' : `${n}${unit}`;
+el('gaiastatus').textContent=cfg.gaiaError || (cfg.gaiaLoaded ? `${cfg.sources.length} sources queried at J2016.0; the calculated ones may fall outside the field.` : 'Gaia not queried. Turn on the query above the viewer.');
+const fmt=(n,unit='')=>n===null ? 'not available' : `${n}${unit}`;
 function describe(s){
  el('source').value=s.source_id;
- el('details').textContent=`Gaia DR3 ${s.source_id}\nCatálogo ICRS J${s.ref_epoch.toFixed(1)} (TCB)\nRA ${s.ra.toFixed(9)}° · Dec ${s.dec.toFixed(9)}°\nError RA cos δ / Dec: ${fmt(s.ra_error)} / ${fmt(s.dec_error)} mas\npmra = μα cos δ: ${fmt(s.pmra,' mas/año')}\npmdec: ${fmt(s.pmdec,' mas/año')}\nErrores pmra / pmdec: ${fmt(s.pmra_error)} / ${fmt(s.pmdec_error)} mas/año\nParalaje: ${fmt(s.parallax,' mas')} · error ${fmt(s.parallax_error,' mas')}\nVelocidad radial: ${fmt(s.radial_velocity,' km/s')}\nG: ${fmt(s.phot_g_mean_mag,' mag')} · RUWE: ${fmt(s.ruwe)}\n\n`+
- (s.expected ? `Cálculo aproximado ICRS J${cfg.epoch.toFixed(1)}:\nRA ${s.expected[0].toFixed(9)}° · Dec ${s.expected[1].toFixed(9)}°\nUsa RA, Dec, ref_epoch, pmra, pmdec.\nSin paralaje, velocidad radial ni incertidumbre propagada. No es una detección.` : 'Sin movimiento propio completo: no se calcula una posición para otra época.');
+ el('details').textContent=`Gaia DR3 ${s.source_id}\nICRS catalogue J${s.ref_epoch.toFixed(1)} (TCB)\nRA ${s.ra.toFixed(9)}° · Dec ${s.dec.toFixed(9)}°\nRA cos δ / Dec error: ${fmt(s.ra_error)} / ${fmt(s.dec_error)} mas\npmra = μα cos δ: ${fmt(s.pmra,' mas/yr')}\npmdec: ${fmt(s.pmdec,' mas/yr')}\npmra / pmdec errors: ${fmt(s.pmra_error)} / ${fmt(s.pmdec_error)} mas/yr\nParallax: ${fmt(s.parallax,' mas')} · error ${fmt(s.parallax_error,' mas')}\nRadial velocity: ${fmt(s.radial_velocity,' km/s')}\nG: ${fmt(s.phot_g_mean_mag,' mag')} · RUWE: ${fmt(s.ruwe)}\n\n`+
+ (s.expected ? `Approximate ICRS calculation J${cfg.epoch.toFixed(1)}:\nRA ${s.expected[0].toFixed(9)}° · Dec ${s.expected[1].toFixed(9)}°\nUses RA, Dec, ref_epoch, pmra, pmdec.\nNo parallax, radial velocity or propagated uncertainty. It is not a detection.` : 'No complete proper motion: no position is calculated for another epoch.');
 }
-const engineTimer=setTimeout(()=>{el('engine').textContent='Aladin tarda demasiado o no está disponible. La tabla Gaia sigue disponible encima; cierre y abra el visor para reintentar.';el('engine').classList.add('error')},30000);
+const engineTimer=setTimeout(()=>{el('engine').textContent='Aladin is taking too long or is not available. The Gaia table is still available above; close and reopen the viewer to retry.';el('engine').classList.add('error')},30000);
 try {
  const {default:A}=await import(cfg.aladin);
  await A.init;
@@ -58,7 +58,7 @@ try {
  const boundary=A.graphicOverlay({color:'#aab2bd',lineWidth:1});aladin.addOverlay(boundary);
  boundary.add(A.circle(cfg.ra,cfg.dec,cfg.fov/2));
  const catalogue=A.catalog({name:'Gaia DR3 J2016.0',color:'#69e2ff',shape:'circle',sourceSize:10,onClick:s=>describe(s.data)});
- const predicted=A.catalog({name:`Calculadas J${cfg.epoch}`,color:'#ffc65c',shape:'plus',sourceSize:12,onClick:s=>describe(s.data)});
+ const predicted=A.catalog({name:`Calculated J${cfg.epoch}`,color:'#ffc65c',shape:'plus',sourceSize:12,onClick:s=>describe(s.data)});
  aladin.addCatalog(catalogue);aladin.addCatalog(predicted);
  catalogue.addSources(cfg.sources.map(s=>A.source(s.ra,s.dec,s)));
  predicted.addSources(cfg.sources.filter(s=>s.expected).map(s=>A.source(...s.expected,s)));
@@ -70,7 +70,7 @@ try {
  for(const s of cfg.sources){const option=document.createElement('option');option.value=s.source_id;option.textContent=`${s.source_id} · G ${s.phot_g_mean_mag ?? '—'}`;el('source').append(option)}
  el('source').disabled=!cfg.sources.length;
  el('source').onchange=()=>{const s=cfg.sources.find(s=>s.source_id===el('source').value);if(s)describe(s)};
- clearTimeout(engineTimer);el('engine').textContent='Aladin listo · referencias independientes · centro y FOV fijados al explorador.';
+ clearTimeout(engineTimer);el('engine').textContent='Aladin ready · independent references · centre and FOV fixed to the explorer.';
  el('engine').classList.remove('error');
  const layers={};let generation=0;
  const hide=()=>Object.values(layers).forEach(layer=>layer.setAlpha(0));
@@ -82,26 +82,26 @@ try {
  async function showWise(){
   const n=++generation, band=el('band').value;
   hide();el('wisestatus').classList.remove('error');
-  if(!el('wise').checked){el('wisestatus').textContent='AllWISE oculto.';return}
-  el('wisestatus').textContent=`Cargando AllWISE ${band} desde NASA/IPAC IRSA…`;
+  if(!el('wise').checked){el('wisestatus').textContent='AllWISE hidden.';return}
+  el('wisestatus').textContent=`Loading AllWISE ${band} from NASA/IPAC IRSA…`;
   try{
    // Verify metadata AND an actual JPEG tile at the requested centre, not just a catalogue entry.
    if(!layers[band]){
     const [properties,tile]=await Promise.all([boundedFetch(cfg.wise[band]+'/properties'),boundedFetch(cfg.wise[band]+cfg.tile)]);
-    const text=await properties.text();if(!text.includes('hips_order'))throw Error('Metadatos HiPS inválidos');
+    const text=await properties.text();if(!text.includes('hips_order'))throw Error('Invalid HiPS metadata');
     const bitmap=await createImageBitmap(tile);bitmap.close();
     if(n!==generation)return;
     const layer=aladin.newImageSurvey(cfg.wise[band],{name:`AllWISE ${band}`,imgFormat:'jpeg',
-      errorCallback:()=>{layer.setAlpha(0);if(layers[band]===layer){delete layers[band];if(el('wise').checked&&el('band').value===band){el('wisestatus').textContent=`No se pudo cargar AllWISE ${band}. Puede reintentar; Gaia sigue disponible.`;el('wisestatus').classList.add('error')}}}});
+      errorCallback:()=>{layer.setAlpha(0);if(layers[band]===layer){delete layers[band];if(el('wise').checked&&el('band').value===band){el('wisestatus').textContent=`Could not load AllWISE ${band}. You can retry; Gaia is still available.`;el('wisestatus').classList.add('error')}}}});
     layers[band]=layer;aladin.setOverlayImageLayer(layer,band);
    }
    if(n!==generation)return;
    hide();layers[band].setAlpha(1);
-   el('wisestatus').textContent=`AllWISE ${band} · tesela central JPEG recibida. El resto del mosaico se carga progresivamente; huecos de carga no significan ausencia de emisión.`;
-  }catch(error){if(n===generation){hide();el('wisestatus').textContent=`AllWISE ${band} no disponible (${error.message}). Puede reintentar; Gaia sigue disponible.`;el('wisestatus').classList.add('error')}}
+   el('wisestatus').textContent=`AllWISE ${band} · central JPEG tile received. The rest of the mosaic loads progressively; loading gaps do not mean absence of emission.`;
+  }catch(error){if(n===generation){hide();el('wisestatus').textContent=`AllWISE ${band} not available (${error.message}). You can retry; Gaia is still available.`;el('wisestatus').classList.add('error')}}
  }
  for(const id of ['wise','band','retry'])el(id).disabled=false;
  el('wise').onchange=showWise;el('band').onchange=showWise;el('retry').onclick=showWise;
  await showWise();
-}catch(error){clearTimeout(engineTimer);el('engine').textContent=`No se pudo iniciar Aladin (${error.message||error}). Consulte la tabla Gaia encima del visor. Cierre y abra para reintentar.`;el('engine').classList.add('error')}
+}catch(error){clearTimeout(engineTimer);el('engine').textContent=`Could not start Aladin (${error.message||error}). See the Gaia table above the viewer. Close and reopen to retry.`;el('engine').classList.add('error')}
 </script></body></html>

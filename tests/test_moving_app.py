@@ -19,7 +19,7 @@ def app():
     navigation.set_solar(state,qp,{'identity':IDENTITY,'ra':150,'dec':10,'utc':'2025-08-01T00:00:00',
         'observer':'500@399','observer_label':'geocentro terrestre','kind':'ephemeris','frame':'ICRF','source':'SIMULATED'})
     at=AppTest.from_file(APP,default_timeout=20)
-    at.session_state['region']=state['region'];at.session_state['nav']='Tiempo'
+    at.session_state['region']=state['region'];at.session_state['nav']='Time'
     return at.run()
 
 
@@ -46,7 +46,7 @@ def test_solar_route_preserves_region_and_never_uses_fixed_field_engine(monkeypa
     at=app();region=deepcopy(at.session_state['region'])
     at.button(key='moving_search').click().run()
     assert not at.exception
-    at.button_group(key='level').set_value('Científico').run()
+    at.button_group(key='level').set_value('Scientific').run()
     assert not at.exception and at.session_state['region']==region
     assert at.session_state['region']['fov']==.2
     assert any(s.label=='Secuencia de observaciones compatibles' for s in at.selectbox)
@@ -58,8 +58,8 @@ def test_dates_survive_navigation_and_switching_levels(monkeypatch):
     at.date_input(key='w_moving_start').set_value(date(2025,12,1)).run()
     at.date_input(key='w_moving_end').set_value(date(2025,12,20)).run()
     at.button(key='moving_search').click().run()
-    at.button_group(key='nav').set_value('Región').run()
-    at.button_group(key='nav').set_value('Tiempo').run()
+    at.button_group(key='nav').set_value('Region').run()
+    at.button_group(key='nav').set_value('Time').run()
     assert not at.exception
     assert at.date_input(key='w_moving_start').value==date(2025,12,1)
     assert at.date_input(key='w_moving_end').value==date(2025,12,20)

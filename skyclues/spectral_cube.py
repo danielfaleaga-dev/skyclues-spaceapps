@@ -227,8 +227,8 @@ def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
                                    "nothing has been read")
         if code != 206:
             if archive.is_transient_status(code):
-                raise archive.ArchiveTransientError(f"HTTP {code} de IRSA (cubo espectral)")
-            raise archive.ArchivePermanentError(f"HTTP {code} de IRSA (cubo espectral, no se reintenta)")
+                raise archive.ArchiveTransientError(f"HTTP {code} from IRSA (spectral cube)")
+            raise archive.ArchivePermanentError(f"HTTP {code} from IRSA (spectral cube, not retried)")
         got_etag = resp.headers.get("ETag")
         if etag and got_etag != etag:
             raise FileChangedError(f"The cube changed at IRSA (ETag {got_etag} ≠ {etag})")
@@ -247,7 +247,7 @@ def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
                     raise RangeNotHonoured("response larger than requested; read interrupted")
                 chunks.append(chunk)
         except (requests.Timeout, requests.ConnectionError, requests.exceptions.ChunkedEncodingError) as err:
-            raise archive.ArchiveTransientError(f"transferencia interrumpida: {str(err)[:120]}") from err
+            raise archive.ArchiveTransientError(f"transfer interrupted: {str(err)[:120]}") from err
         body = b"".join(chunks)
         ctype = resp.headers.get("Content-Type", "")
         if "multipart/byteranges" in ctype:
@@ -258,7 +258,7 @@ def _request_ranges(url: str, spec: list[tuple[int, int]], size: int | None,
         else:
             start, stop, total = _parse_content_range(resp.headers.get("Content-Range"))
             if len(body) != stop - start:
-                raise archive.ArchiveTransientError(f"rango incompleto: {len(body)} de {stop - start} B")
+                raise archive.ArchiveTransientError(f"incomplete range: {len(body)} of {stop - start} B")
             parts = [(start, stop, total, body)]
         last_modified = resp.headers.get("Last-Modified")
     totals = {p[2] for p in parts if p[2] >= 0}
@@ -390,7 +390,7 @@ class Channel:
 
     @property
     def label(self) -> str:
-        return (f"Canal {self.number} · {self.wavelength_um:.3f} µm · D{self.detector} subcanal "
+        return (f"Channel {self.number} · {self.wavelength_um:.3f} µm · D{self.detector} subchannel "
                 f"{self.subchannel}" + (" · NO DATA" if self.blank else ""))
 
 
@@ -572,16 +572,16 @@ def _validate_layout(t: CubeTile) -> None:
             raise CubeFormatError(f"extension {ext} is missing")
         h = t.header(ext)
         if int(h.get("NAXIS", 0)) != 3:
-            raise CubeFormatError(f"{ext} no es un cubo 3D")
+            raise CubeFormatError(f"{ext} is not a 3D cube")
         if (int(h["NAXIS1"]), int(h["NAXIS2"]), int(h["NAXIS3"])) != t.shape[::-1]:
             raise CubeFormatError(f"{ext} has a different shape from IMAGE")
         if float(h.get("BSCALE", 1)) != 1 or float(h.get("BZERO", 0)) != 0:
             raise CubeFormatError(f"{ext} with BSCALE/BZERO (not expected)")
         if int(h["BITPIX"]) not in _BITPIX_DTYPE:
-            raise CubeFormatError(f"BITPIX {h['BITPIX']} no previsto")
+            raise CubeFormatError(f"unexpected BITPIX {h['BITPIX']}")
     hi = t.header("IMAGE")
     if int(hi.get("ORDER", -1)) != t.order or int(hi.get("NPIX", -1)) != t.ipix:
-        raise CubeFormatError(f"cabecera ORDER/NPIX ({hi.get('ORDER')}/{hi.get('NPIX')}) ≠ tesela pedida "
+        raise CubeFormatError(f"header ORDER/NPIX ({hi.get('ORDER')}/{hi.get('NPIX')}) ≠ requested tile "
                               f"({t.order}/{t.ipix})")
     if t.bunit != "MJy/sr":
         raise CubeFormatError(f"BUNIT {t.bunit!r} ≠ 'MJy/sr'")
@@ -598,7 +598,7 @@ def _validate_layout(t: CubeTile) -> None:
             raise CubeFormatError(f"plane {c.plane}: D{c.detector} subchannel {c.subchannel} does not follow "
                                   "index = 17·(band−1) + (channel−1)")
         if not (c.wl_min_um <= c.wavelength_um <= c.wl_max_um):
-            raise CubeFormatError(f"canal {c.number}: λ fuera de [WL_MIN, WL_MAX]")
+            raise CubeFormatError(f"channel {c.number}: λ outside [WL_MIN, WL_MAX]")
 
 
 def read_layout(ipix: int, order: int = config.CUBE_ORDER, url: str | None = None) -> CubeTile:

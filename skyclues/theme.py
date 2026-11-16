@@ -30,7 +30,7 @@ def unit(text: str) -> str:
     return f'<span class="sc-unit">{text}</span>'
 BRAND_DIR = Path(__file__).resolve().parent.parent / "assets" / "brand"
 LEVELS = {"Simple": "simple", "Scientific": "scientific"}
-NAV = {"Región": "region", "Time": "time", "Spectrum": "spectrum"}
+NAV = {"Region": "region", "Time": "time", "Spectrum": "spectrum"}
 NAV_LABEL = {v: k for k, v in NAV.items()}
 
 
@@ -168,7 +168,7 @@ def loading(text: str, key: str):
 
 
 def brand_html() -> str:
-    return (f'<a class="sc-brand" href="?" target="_self" aria-label="SkyClues, inicio">{symbol_svg(30)}'
+    return (f'<a class="sc-brand" href="?" target="_self" aria-label="SkyClues, home">{symbol_svg(30)}'
             '<span>SkyClues</span><small>SPHEREx · IRSA</small></a>')
 
 
@@ -205,9 +205,9 @@ def region_strip(name: str, ra: float, dec: float, fov: float, extra: str = "") 
     """The active region, as the explorer is using it. One bar; the same in both explorers."""
     sci = scientific()
     st.html(
-        f'<div class="sc-strip"><span class="sc-name"><small>{"Región activa" if sci else "Zona que exploras"}</small>{name}</span><dl>'
+        f'<div class="sc-strip"><span class="sc-name"><small>{"Active region" if sci else "Area you are exploring"}</small>{name}</span><dl>'
         f'<div><dt>RA</dt><dd>{ra:.6f}°</dd></div><div><dt>Dec</dt><dd>{dec:+.6f}°</dd></div>'
-        f'<div><dt>{"Campo" if sci else "Tamaño"}</dt><dd>{fov * 60:.1f}′</dd></div></dl>{extra}</div>')
+        f'<div><dt>{"Field" if sci else "Size"}</dt><dd>{fov * 60:.1f}′</dd></div></dl>{extra}</div>')
 
 
 def area_flag(view: str) -> None:

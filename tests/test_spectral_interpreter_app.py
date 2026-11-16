@@ -1,4 +1,4 @@
-"""Spectrum Explorer: sección «¿Qué podría indicar este espectro?» en la página (integración).
+"""Spectrum Explorer: sección «What could this spectrum indicate?» en la página (integración).
 
 Cubo SINTÉTICO compartido (nunca datos reales) y un pico SIMULADO añadido al espectro de A en el canal 61
 (3,275 µm en la rejilla sintética) para ejercitar la interfaz. La coherencia científica del motor se prueba en
@@ -51,18 +51,18 @@ def level(at, name):
 def test_section_is_present_in_both_levels_and_says_nothing_without_features(app_cube):
     at = spectral_app(app_cube)
     assert not at.exception
-    assert "¿Qué podría indicar este espectro?" in html_of(at)
+    assert "What could this spectrum indicate?" in html_of(at)
     assert at.toggle(key="w_sx_refs").value is False
     assert "no hay nada que interpretar" in text_of(at)
-    level(at, "Sencillo")
-    assert "¿Qué podría indicar este espectro?" in html_of(at)
+    level(at, "Simple")
+    assert "What could this spectrum indicate?" in html_of(at)
     assert "no hay nada que interpretar" in text_of(at) and "no demuestra que falten sustancias" in text_of(at)
 
 
 def test_selecting_a_feature_explains_it_in_both_levels_with_the_same_result(app_cube, peak):
     peak.centre = app_cube.centre
     at = spectral_app(app_cube)
-    assert "Referencia compatible" in html_of(at)                     # overview badge for the simulated peak
+    assert "Compatible reference" in html_of(at)                     # overview badge for the simulated peak
     assert 'class="sc-badge sc-ok">Referencia compatible' in html_of(at)   # a class theme.py actually styles
     at.button(key="sx_interp_A_61").click().run()
     assert not at.exception and at.session_state[sa.INSPECT_KEY] == {"lo": 61, "hi": 61}
@@ -74,12 +74,12 @@ def test_selecting_a_feature_explains_it_in_both_levels_with_the_same_result(app
     assert "Qué impide la certeza" in sci_txt and "no identifica una sustancia" in sci_txt
     assert "Señal «visible»" not in sci_txt                           # quantifiable: no cap from the signal
     assert "desconocido" in html_of(at)                               # z of an uncatalogued position, stated
-    level(at, "Sencillo")
+    level(at, "Simple")
     txt = text_of(at)
     assert "Detectamos un exceso de emisión cerca de 3,3 µm" in txt
     assert "Podría relacionarse con compuestos aromáticos de carbono (PAH)" in txt
     assert "Hemos encontrado" not in txt and "Un pico o un valle no basta para identificar un material." in txt
-    assert "Referencia compatible" in html_of(at)
+    assert "Compatible reference" in html_of(at)
     assert at.session_state[sa.INSPECT_KEY] == {"lo": 61, "hi": 61}  # level change keeps the selection
     assert not [d for d in frames(at) if "Compatibilidad" in d.columns]   # no scientific table in Sencillo
 
@@ -89,9 +89,9 @@ def test_reference_marks_toggle_survives_level_changes(app_cube, peak):
     at = spectral_app(app_cube)
     at.toggle(key="w_sx_refs").set_value(True).run()
     assert not at.exception and at.session_state["opt_sx_refs"] is True
-    level(at, "Sencillo")
+    level(at, "Simple")
     assert at.toggle(key="w_sx_refs").value is True
-    level(at, "Científico")
+    level(at, "Scientific")
     assert at.toggle(key="w_sx_refs").value is True and at.session_state["opt_sx_refs"] is True
 
 
@@ -103,14 +103,14 @@ def test_a_and_b_are_interpreted_separately(app_cube, peak):
     at.run()
     assert not at.exception
     page = html_of(at)
-    page = page[page.index("¿Qué podría indicar este espectro?"):]   # the section (the inspector also names A, B)
+    page = page[page.index("What could this spectrum indicate?"):]   # the section (the inspector also names A, B)
     assert "Espectro A: " in page and "Espectro B: " in page
-    assert page.index("Referencia compatible") < page.index("Espectro B: ")
+    assert page.index("Compatible reference") < page.index("Espectro B: ")
     assert "No evaluable" in page[page.index("Espectro B: "):]       # B has no peak: nothing to interpret there
     sci_txt = " ".join(str(m.value) for m in at.markdown)
     assert "no identifica una sustancia" in sci_txt                   # A: a match is not an identification
     assert "que ninguna coincida no excluye otras sustancias" in sci_txt   # B: no match excludes nothing
-    level(at, "Sencillo")
+    level(at, "Simple")
     txt = text_of(at)
     assert "Aquí no destaca ningún pico ni valle." in txt and "Detectamos un exceso de emisión" in txt
 

@@ -50,7 +50,7 @@ def bumped(monkeypatch):
 def test_one_position_is_the_default_and_nothing_is_compared(app_cube):
     at = spectral_app(app_cube)
     assert sa.B_KEY not in at.session_state
-    assert at.button_group(key="w_sx_active").value == "Punto A"
+    assert at.button_group(key="w_sx_active").value == "Point A"
     assert "Espectro exploratorio de una posición" in text_of(at)
     assert not [b for b in at.button if b.key == "sx_b_remove"]
     assert "ningún pico ni valle" in text_of(at)           # flat synthetic spectrum: nothing is labelled
@@ -59,7 +59,7 @@ def test_one_position_is_the_default_and_nothing_is_compared(app_cube):
 def test_click_places_b_only_when_b_is_the_active_point(app_cube):
     pick = {"ra": 123.456789, "dec": -12.345678}
     state = {"sx_field": {"selection": {"pick": [pick]}}, "sx_region_key": (1.0, 2.0, 0.1), "sx_pick_ra": 9.0,
-             "sx_pick_dec": 8.0, "opt_sx_active": "Punto B"}
+             "sx_pick_dec": 8.0, "opt_sx_active": "Point B"}
     import streamlit as st
     orig = st.session_state
     try:
@@ -128,7 +128,7 @@ def test_selection_inspector_and_state_survive_level_mode_and_view_changes(app_c
     keep = {k: at.session_state[k] for k in (sa.B_KEY, sa.INSPECT_KEY, "sx_spec_params", "sx_channel")}
     at.session_state["opt_sx_derived"] = "Relación A / B"
 
-    at.button_group(key="level").set_value("Sencillo").run()
+    at.button_group(key="level").set_value("Simple").run()
     assert not at.exception
     simple = text_of(at)
     assert "pico: un 40% más brillante que los colores vecinos. Se distingue con claridad." in simple
@@ -136,12 +136,12 @@ def test_selection_inspector_and_state_survive_level_mode_and_view_changes(app_c
     assert "A es más brillante que B" in simple
     at.button_group(key="sx_mode").set_value("Composición multibanda (RGB)").run()
     at.button_group(key="sx_mode").set_value("Un canal").run()
-    at.button_group(key="nav").set_value("Tiempo").run()
-    at.button_group(key="nav").set_value("Espectro").run()
-    at.button_group(key="level").set_value("Científico").run()
+    at.button_group(key="nav").set_value("Time").run()
+    at.button_group(key="nav").set_value("Spectrum").run()
+    at.button_group(key="level").set_value("Scientific").run()
     assert not at.exception
     assert {k: at.session_state[k] for k in keep} == keep
-    assert at.session_state["opt_sx_derived"] == "Relación A / B" and at.session_state["opt_sx_active"] == "Punto A"
+    assert at.session_state["opt_sx_derived"] == "Relación A / B" and at.session_state["opt_sx_active"] == "Point A"
     at.button(key="sx_inspect_clear").click().run()
     assert not at.exception and sa.INSPECT_KEY not in at.session_state and sa.B_KEY in at.session_state
 
@@ -216,7 +216,7 @@ def test_units_survive_the_capitals_of_labels():
     from skyclues import theme
     head = sa._where(sf.Feature(serie="A", origin="x", klass=sf.QUANTIFIABLE, kind="pico", reasons=[], limitations=[], unit="mJy", canal=63,
                                 canal_lo=63, canal_hi=63, lam=3.293))
-    assert head == '3,293&nbsp;<span class="sc-unit">µm</span> (canal 63)'
+    assert head == '3.293&nbsp;<span class="sc-unit">µm</span> (channel 63)'
     assert ".sc-unit{text-transform:none!important" in theme.CSS
     css = theme.CSS
     assert css.index(".sc-unit{") > css.index(".sc-eyebrow{")              # declared after the capitals rule

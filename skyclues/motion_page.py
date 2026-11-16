@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from . import archive, config, motion, references, theme
+from . import archive, config, motion, references, saved_text, theme
 from .astrometry import Astrometry
 
 SOURCE_MODES = ["Catalogue target", "Source detected in epoch 1", "RA/Dec coordinates"]
@@ -52,13 +52,13 @@ def saved_investigations() -> dict[str, Path]:
         if p.stem.startswith("motion_search_"):
             continue
         try:
-            r = json.loads(p.read_text(encoding="utf-8"))
+            r = saved_text.motion(json.loads(p.read_text(encoding="utf-8")))
         except (OSError, ValueError):
             continue
         if "outcome" not in r:
             continue
         d = r.get("displacement") or {}
-        extra = (f" · {d['total_arcsec']:.2f}″ en {d['delta_t_days']:.0f} d"
+        extra = (f" · {d['total_arcsec']:.2f}″ in {d['delta_t_days']:.0f} d"
                  if d and r["outcome"] == motion.MOTION_MEASURED else "")
         out[f"{p.stem.replace('motion_', '')} · D{r.get('detector', '?')} · {r['outcome_label']}{extra}"] = p
     return out
@@ -94,7 +94,7 @@ def show_result(r: dict, key: str, simple: bool = False) -> None:
         st.caption('In Scientific you can review the measurements, the reasons and the images used.')
         return
     st.markdown(f'<span class="sc-badge {BADGE.get(r["outcome"], "")}">{r["outcome_label"]} · {r["outcome"]}</span>'
-                f' &nbsp; <span class="sc-badge">{r.get("source", {}).get("label") or "fuente seleccionada"}</span>',
+                f' &nbsp; <span class="sc-badge">{r.get("source", {}).get("label") or "selected source"}</span>',
                 unsafe_allow_html=True)
     for why in r.get("reasons", []):
         st.markdown(f"- {why}")
@@ -108,10 +108,10 @@ def show_result(r: dict, key: str, simple: bool = False) -> None:
         c[0].metric("Measured displacement" if measured else "Apparent displacement (not validated)",
                     f"{d['total_arcsec']:.2f}″", f"± {d['total_err_arcsec']:.2f}″", delta_color="off")
         c[1].metric("Interval", f"{d['delta_t_days']:.0f} d", f"{d['first']} → {d['last']}", delta_color="off")
-        c[2].metric("Significance", f"{d['significance_calibrated']:.1f}σ", f"umbral {motion.SIGNIFICANCE:g}σ",
+        c[2].metric("Significance", f"{d['significance_calibrated']:.1f}σ", f"threshold {motion.SIGNIFICANCE:g}σ",
                     delta_color="off")
         ctl = r.get("control") or {}
-        c[3].metric("Stationary control", f"{ctl.get('n', 0)} estrellas",
+        c[3].metric("Stationary control", f"{ctl.get('n', 0)} stars",
                     f"max. {ctl.get('max_significance_calibrated', 0):.1f}σ", delta_color="off")
         st.caption(f"Δξ (east) = {d['dxi']:+.2f} ± {d['err_dxi_calibrated']:.2f}″ · Δη (north) = {d['deta']:+.2f} ± "
                    f"{d['err_deta_calibrated']:.2f}″ · mean apparent rate {d['rate_arcsec_yr']:.2f}″/yr (includes "
@@ -128,7 +128,7 @@ def show_result(r: dict, key: str, simple: bool = False) -> None:
     if seasons:
         st.markdown("**Measured position per season** (joint fit of the exposures; tangent at the selection)")
         st.dataframe(pd.DataFrame([{
-            "temporada": s["date_utc"], "images": s["n_images"], "detection (σ)": round(s["significance"], 1),
+            "season": s["date_utc"], "images": s["n_images"], "detection (σ)": round(s["significance"], 1),
             "ξ (″)": round(s["xi"], 2), "σξ (″)": round(s["err_xi"], 2), "η (″)": round(s["eta"], 2),
             "ση (″)": round(s["err_eta"], 2), "registration (″)": f"{s['err_registration'][0]:.2f}/{s['err_registration'][1]:.2f}",
             "χ² interno": None if s.get("internal_chi2_red") is None else round(s["internal_chi2_red"], 2),
@@ -155,7 +155,7 @@ def show_result(r: dict, key: str, simple: bool = False) -> None:
                          hide_index=True, width="stretch")
             st.caption(ctl.get("rule", ""))
     for w in r.get("warnings", []):
-        st.caption(f"Aviso: {w}")
+        st.caption(f"Warning: {w}")
     st.download_button("Download reproducible result (JSON)", json.dumps(r, ensure_ascii=False, indent=1),
                        file_name=f"skyclues_motion_{r.get('detector', 'x')}_{(seasons or [{}])[0].get('date_utc', 'na')}.json",
                        mime="application/json", key=f"{key}_download")
@@ -186,7 +186,7 @@ def render(seq, report_json: str, level: str = "scientific") -> None:
     if saved:
         with st.expander("Saved real investigations (results/motion_*.json)" if sci else 'Saved investigations'):
             label = st.selectbox("Result", list(saved), key="mv_saved")
-            show_result(json.loads(saved[label].read_text(encoding="utf-8")), key="mv_saved_view", simple=not sci)
+            show_result(saved_text.motion(json.loads(saved[label].read_text(encoding="utf-8"))), key="mv_saved_view", simple=not sci)
     a = seq.astrometry
     modes = SOURCE_MODES if a is not None else SOURCE_MODES[1:]
     src_mode = st.radio("Source to investigate", modes, horizontal=True, key="mv_source")
@@ -194,7 +194,7 @@ def render(seq, report_json: str, level: str = "scientific") -> None:
     if src_mode == SOURCE_MODES[0]:
         start = seq.target_position(0)
         st.caption((f"{a.name}: catalogue position computed for epoch 1 (RA {start[0]:.6f}°, Dec "
-                   f"{start[1]:+.6f}°). It only defines the search circle; the position is measured in each season.") if sci else f'Objeto seleccionado: {a.name}.')
+                   f"{start[1]:+.6f}°). It only defines the search circle; the position is measured in each season.") if sci else f'Selected object: {a.name}.')
     elif src_mode == SOURCE_MODES[1]:
         dets = motion.detect_sources(f0.image)
         if not dets:

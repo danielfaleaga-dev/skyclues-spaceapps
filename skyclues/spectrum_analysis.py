@@ -150,7 +150,7 @@ def _plain(f: sf.Feature) -> str:
     if f.klass == sf.NO_FEATURE or f.kind is None:
         return "does not stand out from the neighbouring colours."
     up = f.kind == "pico"
-    size = (f"un {abs(f.relative):.0%}" if f.relative is not None and abs(f.relative) < 10
+    size = (f"{abs(f.relative):.0%}" if f.relative is not None and abs(f.relative) < 10
             else f"{abs(f.contrast):.3g} {f.unit}")
     text = f"{'peak' if up else 'valley'}: {size} {'brighter' if up else 'fainter'} than the neighbouring colours"
     return text + (". It stands out clearly." if f.klass == sf.QUANTIFIABLE else
@@ -166,11 +166,11 @@ def _labelled(f: sf.Feature) -> bool:
 
 
 def _comma(v: float, digits: int = 3) -> str:
-    return f"{v:.{digits}f}".replace(".", ",")
+    return f"{v:.{digits}f}"
 
 
 def _channels(lo: int, hi: int) -> str:
-    return f"canal {lo}" if lo == hi else f"canales {lo}–{hi}"
+    return f"channel {lo}" if lo == hi else f"channels {lo}–{hi}"
 
 
 def _examined_span(f: sf.Feature, series: sf.Series | None) -> tuple[float, float] | None:
@@ -208,13 +208,13 @@ def _science_rows(fs: dict, series: sf.Series | None = None) -> pd.DataFrame:
         refs = " · ".join(f"{n} {_num(v)}" for n, v in (("entorno", f.ref_local), ("detector", f.ref_detector),
                                                          ("fondo", f.ref_background)) if v is not None)
         if _labelled(f):
-            kind, centre = f"{f.kind} · {f.width}", f"{f.lam:.3f} (centroide {f.lam_centroid:.3f})"
+            kind, centre = f"{f.kind} · {f.width}", f"{f.lam:.3f} (centroid {f.lam_centroid:.3f})"
             half = f"{f.lam_lo:.3f}–{f.lam_hi:.3f} ({f.width_um:.3f})"
             chans = f"{f.canal_lo}–{f.canal_hi} · {f.trial_lo}–{f.trial_hi}"
         else:
             kind, centre, half = NOT_IDENTIFIED, NOT_APPLICABLE, NOT_APPLICABLE
             chans = f"{NOT_APPLICABLE.lower()} · {f.trial_lo}–{f.trial_hi}"
-        value = _num(f.value, f.unit) + ("" if f.canal is None else f" (canal {f.canal})")
+        value = _num(f.value, f.unit) + ("" if f.canal is None else f" (channel {f.canal})")
         return [f.label, kind, examined, centre, half, chans, value,
                 _num(f.continuum, f.unit), _num(f.contrast, f.unit, signed=True),
                 "—" if f.relative is None else f"{f.relative:+.1%}",
@@ -227,7 +227,7 @@ def _science_rows(fs: dict, series: sf.Series | None = None) -> pd.DataFrame:
              "Highest-contrast value in the interval", "Local continuum", "Contrast", "Relative contrast",
              "Contrast / reference scatter", "Reference scatter", "Surrounding channels", "Detectors",
              "NHITS of the interval / surroundings"]
-    return pd.DataFrame({"Quantity": names, **{f"Espectro {k}": col(f) for k, f in fs.items()}})
+    return pd.DataFrame({"Quantity": names, **{f"Spectrum {k}": col(f) for k, f in fs.items()}})
 
 
 def _feature_list(fs: list) -> str:
@@ -279,7 +279,7 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
     if sb is not None:
         cmp = sf.compare(sa, sb)
         for issue in cmp.issues:
-            st.warning(f"A y B no se restan ni se dividen: {issue}")
+            st.warning(f"A and B are neither subtracted nor divided: {issue}")
         if cmp.comparable:
             label = st.segmented_control("Channel-by-channel comparison", list(DERIVED), required=True,
                                          key=theme.bind("sx_derived", next(iter(DERIVED))), on_change=theme.keep,
@@ -299,7 +299,7 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
         head[1].button("Remove", key="sx_inspect_clear", on_click=_clear_inspection,
                        help="Stop examining this interval. The spectrum does not change.")
         if sci:
-            st.html("".join(f'<p style="margin:.1rem 0">Espectro {k}: {theme.badge(f.label, BADGE[f.klass])} '
+            st.html("".join(f'<p style="margin:.1rem 0">Spectrum {k}: {theme.badge(f.label, BADGE[f.klass])} '
                             f'<span class="sc-muted">{sf.CLASS_MEANING[f.klass]}.</span></p>' for k, f in found.items()))
             rows = _science_rows(found, sa)
             st.dataframe(rows, hide_index=True, width="stretch", height="content")   # every row, no blank tail
@@ -324,13 +324,13 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
     marked = [(s, f) for s, f in ((sa, fa), (sb, fb)) if s is not None]
     if any(f for _, f in marked):
         if sci:
-            parts = [f"{s.label}: {sum(x.klass == sf.QUANTIFIABLE for x in f)} cuantificables y "
-                     f"{sum(x.klass == sf.VISIBLE for x in f)} visibles" for s, f in marked]
+            parts = [f"{s.label}: {sum(x.klass == sf.QUANTIFIABLE for x in f)} quantifiable and "
+                     f"{sum(x.klass == sf.VISIBLE for x in f)} visible" for s, f in marked]
             st.caption("Chart marks (▼ peak, ▲ valley; filled = quantifiable, hollow = visible). " +
                        " · ".join(parts) + ". None is a detection: the cube has no uncertainties.")
         else:
             st.markdown("Flagged on the chart (▼ peak, ▲ valley): " + " · ".join(
-                f"**{s.label}**: {_feature_list(f) or 'nada destacable'}" for s, f in marked) + ".")
+                f"**{s.label}**: {_feature_list(f) or 'nothing notable'}" for s, f in marked) + ".")
     elif sci:
         st.caption("The method flags no peak or valley in this spectrum above its criteria.")
     if sci:

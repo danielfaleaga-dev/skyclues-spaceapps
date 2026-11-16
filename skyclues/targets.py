@@ -74,11 +74,11 @@ def validate_coordinates(ra, dec) -> tuple[float, float]:
     except (TypeError, ValueError):
         raise ValueError(f"Non-numeric coordinates: RA={ra!r}, Dec={dec!r}.") from None
     if not (math.isfinite(r) and math.isfinite(d)):
-        raise ValueError(f"Coordenadas no finitas: RA={r}, Dec={d}.")
+        raise ValueError(f"Non-finite coordinates: RA={r}, Dec={d}.")
     if not 0.0 <= r < 360.0:
-        raise ValueError(f"RA fuera de rango: {r}° (debe estar en [0°, 360°)).")
+        raise ValueError(f"RA out of range: {r}° (must be in [0°, 360°)).")
     if not -90.0 <= d <= 90.0:
-        raise ValueError(f"Dec fuera de rango: {d}° (debe estar en [−90°, +90°]).")
+        raise ValueError(f"Dec out of range: {d}° (must be in [−90°, +90°]).")
     return r, d
 
 
@@ -89,9 +89,9 @@ def validate_fov_deg(value) -> float:
     try:
         v = float(value)
     except (TypeError, ValueError):
-        raise ValueError(f"Campo de visión no numérico: {value!r}.") from None
+        raise ValueError(f"Non-numeric field of view: {value!r}.") from None
     if not math.isfinite(v) or not config.FOV_MIN_DEG <= v <= config.FOV_MAX_DEG:
-        raise ValueError(f"Campo de visión {v}° fuera de [{config.FOV_MIN_DEG}°, {config.FOV_MAX_DEG}°] "
+        raise ValueError(f"Field of view {v}° outside [{config.FOV_MIN_DEG}°, {config.FOV_MAX_DEG}°] "
                          f"({config.FOV_MIN_DEG * 60:g}′–{config.FOV_MAX_DEG * 60:g}′).")
     return round(v, 4)
 

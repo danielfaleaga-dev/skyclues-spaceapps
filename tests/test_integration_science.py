@@ -77,7 +77,7 @@ def test_interpreter_output_has_verdicts_and_no_probabilities():
                      + list(si.STATUS_LABELS.values()) + list(sxi.PLAIN_LIMITS.values())).lower()
     for banned in ("probab", "identificad", "confirmad", "hemos encontrado", "%"):
         assert banned not in words, banned
-    assert "no es una identificación" in si.VERDICT_MEANING[si.COMPATIBLE]
+    assert "not an identification" in si.VERDICT_MEANING[si.COMPATIBLE]
 
 
 def test_options_of_both_explorers_survive_a_round_trip_with_one_region(app_cube, monkeypatch):  # noqa: F811
@@ -85,7 +85,7 @@ def test_options_of_both_explorers_survive_a_round_trip_with_one_region(app_cube
         "propagated": True, "mjd_mid": 60000, "date_mid": "2023-02-25", "date_beg": "2023-01-01",
         "date_end": "2023-05-01", "motion_over_inputs_arcsec": 3}))
     at = AppTest.from_file(APP, default_timeout=60)
-    at.session_state["level"] = "Científico"
+    at.session_state["level"] = "Scientific"
     at.run()
     stem = next(s for s in config.VALIDATED_EXAMPLES if "wise" in s)
     at.button(key="example_" + stem).click().run()
@@ -93,19 +93,19 @@ def test_options_of_both_explorers_survive_a_round_trip_with_one_region(app_cube
     at.toggle(key="w_enhance").set_value(True).run()                     # Time: S/N option on
     assert not at.exception and at.session_state["opt_enhance"] is True
     shared = dict(at.session_state["region"])
-    at.button_group(key="nav").set_value("Espectro").run()
+    at.button_group(key="nav").set_value("Spectrum").run()
     assert not at.exception
     assert at.session_state["sx_region_key"] == (round(shared["ra"], 6), round(shared["dec"], 6), shared["fov"])
     at.toggle(key="w_sx_refs").set_value(True).run()                     # Spectrum: reference marks on
     assert not at.exception and at.session_state["opt_sx_refs"] is True
     assert at.session_state["opt_enhance"] is True                       # untouched by the other explorer
-    at.button_group(key="level").set_value("Sencillo").run()
+    at.button_group(key="level").set_value("Simple").run()
     assert not at.exception and at.session_state["opt_sx_refs"] is True and at.session_state["opt_enhance"] is True
-    at.button_group(key="nav").set_value("Tiempo").run()
+    at.button_group(key="nav").set_value("Time").run()
     assert not at.exception
     assert at.session_state["region"]["ra"] == pytest.approx(shared["ra"], abs=1e-6)
     assert at.session_state["region"]["dec"] == pytest.approx(shared["dec"], abs=1e-6)
     assert at.session_state["region"]["fov"] == shared["fov"]
     assert at.session_state["opt_enhance"] is True and at.session_state["opt_sx_refs"] is True
-    assert list(at.button_group(key="nav").options) == ["Región", "Tiempo", "Espectro"]
-    assert list(at.button_group(key="level").options) == ["Sencillo", "Científico"]
+    assert list(at.button_group(key="nav").options) == ["Region", "Time", "Spectrum"]
+    assert list(at.button_group(key="level").options) == ["Simple", "Scientific"]

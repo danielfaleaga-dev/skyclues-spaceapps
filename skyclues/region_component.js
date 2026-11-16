@@ -97,16 +97,16 @@ export default function (c) {
     $('#rg-fov').style.setProperty('--fill', `${((am - D().fov_min * 60) / ((D().fov_max - D().fov_min) * 60)) * 100}%`);
     const sx = Math.round(fov * 3600 / D().spherex_px), cube = Math.round(fov * 3600 / D().cube_px);
     $('.rg-fovhint').textContent = D().level === 'simple'
-      ? 'Desliza para abarcar más o menos cielo. El círculo naranja del mapa marca la zona que vas a explorar.'
-      : `${fmtArcmin(fov)}′ = ${fov.toFixed(4)}° de diámetro · ≈ ${sx} px SPHEREx (${D().spherex_px}″) · ≈ ${cube} px del cubo (${D().cube_px}″)`;
+      ? 'Slide to cover more or less sky. The orange circle on the map marks the area you are going to explore.'
+      : `${fmtArcmin(fov)}′ = ${fov.toFixed(4)}° in diameter · ≈ ${sx} SPHEREx px (${D().spherex_px}″) · ≈ ${cube} cube px (${D().cube_px}″)`;
     chip();
     identity();
   }
   function chip() {
-    let t = `${D().level === 'simple' ? 'Zona' : 'Campo'} ${fmtArcmin(S.cur.fov)}′`;
+    let t = `${D().level === 'simple' ? 'Area' : 'Field'} ${fmtArcmin(S.cur.fov)}′`;
     if (S.aladin) {
       const v = S.aladin.getFoV()[0];
-      t += ` · vista ${v >= 1 ? v.toFixed(2) + '°' : (v * 60).toFixed(1) + '′'}`;
+      t += ` · view ${v >= 1 ? v.toFixed(2) + '°' : (v * 60).toFixed(1) + '′'}`;
     }
     $('.rg-chip').textContent = t;
   }
@@ -123,9 +123,9 @@ export default function (c) {
     line.dataset.loading = String(!!S.resolving);
     if (S.resolving) {
       const seconds = Math.floor((Date.now() - (S.searchStarted || Date.now())) / 1000);
-      line.textContent = `Buscando «${S.resolving}»…` + (seconds ? ` · ${seconds} s` : '');
+      line.textContent = `Searching for “${S.resolving}”…` + (seconds ? ` · ${seconds} s` : '');
       notes.replaceChildren();
-      if (seconds >= 15) {const p = document.createElement('p'); p.textContent = 'El catálogo está tardando en responder. El mapa sigue disponible.'; notes.append(p);}
+      if (seconds >= 15) {const p = document.createElement('p'); p.textContent = 'The catalogue is taking a while to respond. The map is still available.'; notes.append(p);}
       clearTimeout(S.nameTick);
       S.nameTick = setTimeout(() => {if (root.isConnected !== false && S.resolving) identity();}, 1000);
       return;
@@ -139,7 +139,7 @@ export default function (c) {
       const visibleNotes = D().level === 'simple' ? o.short_notes : o.notes;
       notes.replaceChildren(...(visibleNotes || []).map((n) => { const p = document.createElement('p'); p.textContent = n; return p; }));
     } else {
-      line.textContent = o && o.name ? `Región libre (el centro ya no está sobre ${o.name}).` : 'Región libre, definida por sus coordenadas.';
+      line.textContent = o && o.name ? `Free region (the centre is no longer over ${o.name}).` : 'Free region, defined by its coordinates.';
       notes.replaceChildren();
     }
   }
@@ -255,8 +255,8 @@ export default function (c) {
       if (canSuggest(q) && !S.resolving) {
         const loading = !current || D().search_state === 'loading';
         searchStatus.dataset.loading = String(loading);
-        searchStatus.textContent = loading ? 'Buscando sugerencias en los catálogos…'
-          : D().search_message || (S.items.length ? 'Afina el nombre para ver más coincidencias.' : 'Sin sugerencias. Pulsa Intro para buscar el nombre completo.');
+        searchStatus.textContent = loading ? 'Searching the catalogues for suggestions…'
+          : D().search_message || (S.items.length ? 'Refine the name to see more matches.' : 'No suggestions. Press Enter to search for the full name.');
         searchStatus.hidden = false;
       }
     }
@@ -292,8 +292,8 @@ export default function (c) {
   function layerInfo(id) {
     const L = D().layers.find((l) => l.id === id) || D().layers[0];
     $('.rg-layerinfo').textContent = D().level === 'simple'
-      ? `Mapa de referencia: ${L.label}, de otra misión y otra época. No son datos SPHEREx: esos se abren en Tiempo y Espectro.`
-      : `${L.mission} · ${L.product} · ${L.bands} · ${L.epoch}. Mapa de contexto servido por NASA/IPAC IRSA; no son datos SPHEREx.`;
+      ? `Reference map: ${L.label}, from another mission and epoch. These are not SPHEREx data: those open in Time and Spectrum.`
+      : `${L.mission} · ${L.product} · ${L.bands} · ${L.epoch}. Context map served by NASA/IPAC IRSA; not SPHEREx data.`;
     return L;
   }
   function setLayer(id) {
@@ -337,7 +337,7 @@ export default function (c) {
     el.hidden = !(state === 'loading' || state === 'error' || empty);
     el.dataset.state = state;
     $('.rg-gaia-message').textContent = state === 'loading' ? 'Consultando fuentes Gaia DR3…'
-      : state === 'error' ? 'Gaia DR3 no disponible.' : empty ? 'No se encontraron fuentes Gaia DR3 en este campo.' : '';
+      : state === 'error' ? 'Gaia DR3 not available.' : empty ? 'No Gaia DR3 sources were found in this field.' : '';
     $('.rg-gaia-retry').hidden = state !== 'error';
     $('.rg-gaiainfo').textContent = on && current ? (D().level === 'simple' ? D().gaia_note_simple : D().gaia_note) || '' : '';
   }
@@ -361,8 +361,8 @@ export default function (c) {
     S.constNames[on && wide ? 'show' : 'hide']();
     $('#rg-constellations').checked = on;
     $('.rg-constinfo').textContent = on ? (wide
-      ? (D().level === 'simple' ? 'Constelaciones para orientarte; el círculo naranja sigue marcando tu campo.' : 'Figuras tradicionales de 88 constelaciones · no son límites IAU. El círculo naranja sigue siendo el campo científico.')
-      : 'Constelaciones ocultas en campos pequeños. Pulse Orientación para ampliar solo la vista.') : '';
+      ? (D().level === 'simple' ? 'Constellations to help you orient yourself; the orange circle still marks your field.' : 'Traditional figures of 88 constellations · not IAU boundaries. The orange circle remains the scientific field.')
+      : 'Constellations hidden in small fields. Press Orientation to enlarge only the view.') : '';
   }
 
   // ---------------------------------------------------------------- applying data from Python
@@ -407,8 +407,8 @@ export default function (c) {
     fovn.addEventListener('input', () => { clearTimeout(fovTimer); mark(fovn, false); fovTimer = setTimeout(() => applyFov(true), 750); });
     fovn.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyFov(true); } });
     fovn.addEventListener('blur', () => { applyFov(true); if (fovn.getAttribute('aria-invalid') !== 'true') paint(); });
-    coordField($('#rg-ra'), parseRa, 'ra', 'RA entre 0° y 360° (o hh mm ss)');
-    coordField($('#rg-dec'), parseDec, 'dec', 'Dec entre −90° y +90° (o ±dd mm ss)');
+    coordField($('#rg-ra'), parseRa, 'ra', 'RA between 0° and 360° (or hh mm ss)');
+    coordField($('#rg-dec'), parseDec, 'dec', 'Dec between −90° and +90° (or ±dd mm ss)');
 
     const q = $('#rg-q');
     q.addEventListener('input', () => {
@@ -446,9 +446,9 @@ export default function (c) {
 
     apply();
     setLayer(d.layer);
-    status('Cargando el atlas…');
+    status('Loading the atlas…');
     const slow = setTimeout(() => {
-      if (!S.aladin) status('El atlas tarda en cargar (necesita WebGL2 y acceso a jsDelivr e IRSA). El nombre, las coordenadas y el campo funcionan igualmente.', true);
+      if (!S.aladin) status('The atlas is slow to load (it needs WebGL2 and access to jsDelivr and IRSA). The name, coordinates and field still work.', true);
     }, 20000);
     import(d.aladin).then(async ({ default: A }) => {
       await A.init;
@@ -471,7 +471,7 @@ export default function (c) {
       S.aladin.on('objectClicked', (source) => {
         if (source && source.catalog === S.gaia) S.gaiaHits.push(source);
       });
-      S.constLines = A.graphicOverlay({name: 'Figuras tradicionales (no límites IAU)', color: '#91aab9', lineWidth: 1});
+      S.constLines = A.graphicOverlay({name: 'Traditional figures (not IAU boundaries)', color: '#91aab9', lineWidth: 1});
       S.aladin.addOverlay(S.constLines);
       for (const c of D().constellations) for (const line of c.lines) S.constLines.add(A.polyline(line));
       S.constNames = A.catalog({name: 'Constelaciones', color: '#c4d1d9', sourceSize: 0,
@@ -504,7 +504,7 @@ export default function (c) {
       root.querySelector('.sc-region').classList.add('rg-ready');
     }).catch((e) => {
       clearTimeout(slow);
-      status(`No se pudo iniciar el atlas (${e.message || e}). El nombre, las coordenadas y el campo funcionan igualmente.`, true);
+      status(`Could not start the atlas (${e.message || e}). The name, coordinates and field still work.`, true);
     });
     // v2 also calls cleanup when data changes: retain handlers while the root is mounted.
     return () => {

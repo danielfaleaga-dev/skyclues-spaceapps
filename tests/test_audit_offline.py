@@ -58,13 +58,13 @@ def test_parallax_is_applied_with_the_right_amplitude():
     shifts = [_sep(WISE0855.position_at(2026.0 + f), no_plx.position_at(2026.0 + f))
               for f in np.linspace(0, 1, 25)]
     assert 0.30 < max(shifts) < 0.50                            # parallax 0.439 arcsec
-    assert any("paralaje" in w for w in no_plx.warnings())
+    assert any("parallax" in w for w in no_plx.warnings())
 
 
 def test_static_target_and_missing_parameter_warnings():
     assert M101.position_at(2026.4) == (M101.ra_deg, M101.dec_deg)
-    assert not M101.has_proper_motion and "Sin movimiento propio" in M101.warnings()[0]
-    assert any("velocidad radial" in w for w in EPS_IND_B.warnings())
+    assert not M101.has_proper_motion and "No proper motion" in M101.warnings()[0]
+    assert any("radial velocity" in w for w in EPS_IND_B.warnings())
     assert BARNARD.warnings() == []
     assert Astrometry.from_dict(WISE0855.to_dict()) == WISE0855
     # MJD and Julian-year inputs agree
@@ -123,7 +123,7 @@ def _real_style_header():
 
 def test_satellite_halo_from_documentation_when_header_stops_at_bit_28():
     defs = read_flag_definitions(_real_style_header())
-    assert defs.bits[29] == "SATELLITE_HALO" and "documentación" in defs.source
+    assert defs.bits[29] == "SATELLITE_HALO" and "documentation" in defs.source
     strict = defs.bitmask(("unusable", "artifact"))
     assert strict & (1 << 29)
     img, var = np.ones((1, 4)), np.ones((1, 4))
@@ -254,7 +254,7 @@ def test_capabilities_502_but_direct_query_works(monkeypatch):
     log = _fake_sia2(monkeypatch, capabilities_ok=False)
     assert archive._query_images_live(10.0, 20.0, 1 / 3600, config.WIDE_COLLECTIONS) == []
     assert log["built"] == [True, False]                       # one capabilities attempt, then direct
-    assert archive.last_sia2_route.startswith("directo") and sleeps == []
+    assert archive.last_sia2_route.startswith("direct") and sleeps == []
     # identical scientific query on both routes: same collections, position and radius
     assert [k for _, k in log["searches"]] == [k for _, k in ok["searches"]]
     assert [k["collection"] for _, k in log["searches"]] == list(config.WIDE_COLLECTIONS)
@@ -339,7 +339,7 @@ def test_corrupt_reference_file_is_never_modified(tmp_store, monkeypatch, l2_byt
     bad = l2_bytes()[:5760]
     archive.atomic_write(ref, bad)
     calls = _scripted(monkeypatch, [_R(200, l2_bytes())])
-    with pytest.raises(archive.CorruptFitsError, match="referencia"):
+    with pytest.raises(archive.CorruptFitsError, match="Reference file"):
         archive.fetch(URL)
     assert calls == [] and ref.read_bytes() == bad
     assert isinstance(archive.fetch_many([URL])[URL], archive.CorruptFitsError)

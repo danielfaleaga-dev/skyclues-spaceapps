@@ -131,8 +131,8 @@ def render_frame_png(seq: TemporalSequence, i: int, norm, subtract_zodi: bool = 
             rgba = render.native_rgba(data, norm, caution, seq.common_mask if restrict_to_common else None)
         ax.imshow(rgba, origin="lower", interpolation="nearest")
     render._mark_sequence_target(ax, seq, i)
-    fig.text(0.01, 0.01, FRAME_STAMP[geometry] + f" · pantalla ≈{screen_scale_arcsec(seq):.1f}″/px"
-             + (" · HALO visible (exploratorio)" if show_halo else ""),
+    fig.text(0.01, 0.01, FRAME_STAMP[geometry] + f" · screen ≈{screen_scale_arcsec(seq):.1f}″/px"
+             + (" · HALO visible (exploratory)" if show_halo else ""),
              fontsize=6.5, color=render.INK if geometry == "exact" else "#8a1a36")
     cax = fig.add_axes(CB_RECT)
     cb = fig.colorbar(ScalarMappable(norm=norm, cmap=render._cmap()), cax=cax)
@@ -442,10 +442,10 @@ def player_html(seq: TemporalSequence, pngs: list[bytes], subtract_zodi: bool = 
         css += '.badge .sub,.kbd:not(#pos),td:nth-child(n+3),th:nth-child(n+3){display:none}.legend{font-size:14px;line-height:1.5}'
         legend = 'Pink: no data. Blue cross: reference position.'
         if show_halo:
-            legend += ' Cobre: zonas de calidad limitada.'
+            legend += ' Copper: areas of limited quality.'
         body = _BODY % {'legend': legend}
         body = body.replace('Epochs (authentic observations)', 'Available dates')
-        glue = glue.replace("'epoch '", "'fecha '")
+        glue = glue.replace("'epoch '", "'date '")
     return (f"<!doctype html><html><head><meta charset='utf-8'><style>{css}</style></head>"
             f"<body>{body}<script>{PLAYER_CORE_JS}</script><script>{glue}</script></body></html>")
 

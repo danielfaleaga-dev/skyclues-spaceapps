@@ -204,7 +204,7 @@ def select(exposures, ra: float, dec: float, field_deg: float, *, purpose: str =
     Never raises for a scientific reason: ``ok`` is False and ``reason`` explains it.
     """
     if purpose not in PURPOSES:
-        raise ValueError(f"purpose debe ser uno de {PURPOSES}")
+        raise ValueError(f"purpose must be one of {PURPOSES}")
     exps = [exposure_from(e) for e in exposures]
     rejected, kept = [], []
 
@@ -234,7 +234,7 @@ def select(exposures, ra: float, dec: float, field_deg: float, *, purpose: str =
     for e in main:
         m = e.image.meta
         if str(m.get("L2DQAFLG", "")).strip() != "Pass":
-            drop(e, f"Control de calidad oficial L2 = {m.get('L2DQAFLG')}.")
+            drop(e, f"Official L2 quality control = {m.get('L2DQAFLG')}.")
         elif m.get("FINAST") != 0:
             drop(e, f"Invalid fine astrometry (FINAST = {m.get('FINAST')}): it cannot be registered.")
         else:

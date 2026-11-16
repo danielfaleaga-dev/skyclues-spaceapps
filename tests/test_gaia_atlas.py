@@ -66,7 +66,7 @@ def test_exact_source_selection_without_remote_resolution(monkeypatch):
     assert r['astrometry']['epoch_jyear']==2016.
     assert r['astrometry']['pmra_masyr']==12.
     assert 'J2016.0' in region_ui.object_card(r)['detail']
-    assert 'detección SPHEREx' in ' '.join(region_ui.object_card(r)['notes'])
+    assert 'SPHEREx detection' in ' '.join(region_ui.object_card(r)['notes'])
     r['gaia']['alias']={'name':'HD 123', 'source':'SIMBAD'}
     assert region_ui.object_card(r)['name']==r['name'] and 'HD 123' in region_ui.object_card(r)['detail']
     for view in ['time','spectrum','region']:
@@ -107,7 +107,7 @@ def test_gaia_identity_survives_both_explorers(app_cube, monkeypatch):
     at=AppTest.from_file(str(config.ROOT/'app.py'),default_timeout=30)
     at.session_state['region']=state['region']
     at.run()
-    for view in ['Espectro','Tiempo','Región']:
+    for view in ['Spectrum','Time','Region']:
         at.button_group(key='nav').set_value(view).run()
         assert not at.exception
         r=at.session_state['region']

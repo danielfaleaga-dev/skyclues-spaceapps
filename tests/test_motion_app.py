@@ -16,7 +16,7 @@ def test_saved_investigations_are_real_reports_only():
     assert saved, "results/motion_*.json"
     for label, path in saved.items():
         r = json.loads(path.read_text(encoding="utf-8"))
-        assert r["outcome"] in motion.OUTCOME_LABELS and r["outcome_label"] in label
+        assert r["outcome"] in motion.OUTCOME_LABELS and motion_page.saved_text.motion(r)["outcome_label"] in label
         assert not path.stem.startswith("motion_search_")
         assert r["method"].startswith("skyclues-motion")
         assert all(im["sha256"] and im["cutout_url"].startswith("https://irsa.ipac.caltech.edu/") for im in r["images"])
@@ -27,12 +27,12 @@ def test_motion_tab_renders_and_gaia_outage_is_explained(monkeypatch):
         raise references.ReferenceError("Gaia DR3 (ESA) no responde.")
     monkeypatch.setattr(motion_page, "_gaia", down)
     at = AppTest.from_file(APP, default_timeout=120)
-    at.session_state['level']='Científico'
-    at.session_state['time_tab']='Movimiento'
+    at.session_state['level']='Scientific'
+    at.session_state['time_tab']='Motion'
     at.run()
     at.button(key='example_sequence_m101').click().run()
     assert not at.exception
-    assert any(t.label == "Movimiento" for t in at.tabs)
+    assert any(t.label == "Motion" for t in at.tabs)
     assert at.selectbox(key="mv_saved").options
     at.button(key="mv_run").click().run()
     assert not at.exception
@@ -68,8 +68,8 @@ def test_real_eps_ind_b_d3_reproduces_from_cached_originals():
 
 def test_extended_baseline_offers_images_per_season(monkeypatch):
     at = AppTest.from_file(APP, default_timeout=120)
-    at.session_state['level']='Científico'
-    at.session_state['time_tab']='Movimiento'
+    at.session_state['level']='Scientific'
+    at.session_state['time_tab']='Motion'
     at.run()
     at.button(key='example_sequence_m101').click().run()
     assert not at.exception

@@ -99,7 +99,7 @@ _HTML = f"""
       <div class="rg-tools">
         <select id="rg-layer" class="rg-tool" aria-label="Context map"></select>
         <label class="rg-tool"><input id="rg-gaia" type="checkbox"> Gaia DR3</label>
-        <label class="rg-tool"><input id="rg-constellations" type="checkbox"> Constelaciones</label>
+        <label class="rg-tool"><input id="rg-constellations" type="checkbox"> Constellations</label>
         <button type="button" class="rg-tool rg-wide" title="View 60 degrees without changing the scientific field">Orientation</button>
         <button type="button" class="rg-tool rg-frame" title="Fit the map zoom to the region (does not change the field)">Frame</button>
       </div>
@@ -215,7 +215,7 @@ def _on_pick() -> None:
             return
         astro_dict, warnings, extended = resolve(name)
     except Exception as err:  # noqa: BLE001 - shown to the user next to the search box
-        st.session_state["region_notice"] = f"No se pudo resolver «{name}»: {err}"
+        st.session_state["region_notice"] = f"Could not resolve “{name}”: {err}"
         return
     astro = Astrometry.from_dict(astro_dict)
     navigation.set_object(st.session_state, st.query_params, astro, warnings, extended,
@@ -473,7 +473,7 @@ def solar_controls(region, level='scientific'):
                    'the cube combines dates and is not a spectrum of the moving body. Sharing coordinates does not keep the ephemeris.' if sci else
                    'In Time you can look for images that follow the path of the object. Spectrum shows this fixed area of the sky.')
         if p['identity'].get('spkid') == '1004083':
-            st.markdown(f"[Observaciones oficiales de 3I/ATLAS]({solar_system.ATLAS_DOC}) · [Tabla original]({solar_system.ATLAS_TABLE})")
+            st.markdown(f"[Official 3I/ATLAS observations]({solar_system.ATLAS_DOC}) · [Original table]({solar_system.ATLAS_TABLE})")
             if st.button('Query the official 3I/ATLAS exposures'):
                 try:
                     with st.spinner('Querying the official 3I/ATLAS exposures at IRSA…', show_time=True):
@@ -491,7 +491,7 @@ def solar_controls(region, level='scientific'):
                     from astropy.time import Time
                     historical = dict(p, ra=float(r['comet_ra']), dec=float(r['comet_dec']), utc=Time(float(r['t_min']), format='mjd').isot,
                                       kind='irsa_exposure_prediction', observer_label='per-exposure prediction published by IRSA',
-                                      observer=None, frame='ICRS (tabla IRSA)', source=solar_system.ATLAS_TABLE,
+                                      observer=None, frame='ICRS (IRSA table)', source=solar_system.ATLAS_TABLE,
                                       exposure=str(r['obs_id']), access_url=str(r['access_url']))
                     navigation.set_solar(st.session_state, st.query_params, historical)
                     st.rerun()
@@ -507,8 +507,8 @@ def provenance() -> None:
                 'Serpens is drawn in two parts. The lines join stars and **are not the official IAU boundaries**. '
                 'They are hidden below 3° of view so as not to crowd the scientific field.')
     sx = atlas.SPHEREX_HIPS
-    st.markdown(f"- **SPHEREx**: IRSA publica `{sx['did']}` ({sx['kind']}, versión {sx['release']}). Sus teselas por "
-                "plano no siguen la ruta HiPS estándar que carga Aladin Lite 3.8.1, así que no se ofrece como mapa. "
-                "El cubo combinado se explora en «Spectrum»; ningún mapa del atlas es una secuencia temporal.")
+    st.markdown(f"- **SPHEREx**: IRSA publishes `{sx['did']}` ({sx['kind']}, version {sx['release']}). Its per-plane tiles "
+                "do not follow the standard HiPS path that Aladin Lite 3.8.1 loads, so it is not offered as a map. "
+                "The combined cube is explored in «Spectrum»; no atlas map is a time sequence.")
     st.caption("Gaia: ESA catalogue queried on the server for the region. Positions from other missions and epochs "
                "must not be compared with SPHEREx to infer motion or variability.")

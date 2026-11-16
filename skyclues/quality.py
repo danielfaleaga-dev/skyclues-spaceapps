@@ -124,7 +124,7 @@ def read_flag_definitions(flags_header) -> FlagDefinitions:
     for b, n in added.items():
         bits[b] = n
         desc.setdefault(b, "defined in the official documentation (absent from the header)")
-    source = "cabecera" + (f" + documentation (bits {', '.join(map(str, sorted(added)))})" if added else "")
+    source = "header" + (f" + documentation (bits {', '.join(map(str, sorted(added)))})" if added else "")
     return FlagDefinitions(bits=bits, descriptions=desc, source=source, conflicts=conflicts)
 
 

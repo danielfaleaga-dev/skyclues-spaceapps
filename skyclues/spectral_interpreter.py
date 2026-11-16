@@ -393,8 +393,8 @@ def _limitations(series, f, table, rs: sr.Redshift, aperture_arcsec, resolution)
                    + f", one resolution element ≈ {ch.element_um:.3f} µm. Narrow lines are not resolved and "
                      "they are not required to be resolved; only their position is compared.")
     if rs.known:
-        out.append(f"Desplazamiento al rojo z = {rs.z:.6f} ({rs.object_name}, {rs.source.upper()}): λ esperada = "
-                   "λ en reposo × (1 + z). " + rs.note)
+        out.append(f"Redshift z = {rs.z:.6f} ({rs.object_name}, {rs.source.upper()}): λ expected = "
+                   "λ at rest × (1 + z). " + rs.note)
     else:
         out.append(rs.note)
     if aperture_arcsec:
@@ -428,7 +428,7 @@ def survey(series: sf.Series, features=(), scatter: dict | None = None, *, redsh
         lam_obs, _ = _shifted(ref, redshift)
         if not lam_lo <= lam_obs <= lam_hi:
             out.append(Coverage(ref, COV_OUTSIDE, lam_obs, (), None,
-                                [f"{lam_obs:.3f} µm queda fuera de 0,75–5,0 µm."]))
+                                [f"{lam_obs:.3f} µm falls outside 0.75–5.0 µm."]))
             continue
         chans = channels_at(table, lam_obs)
         valued = [c for c in chans if np.isfinite(series.value[series.index(c)])]

@@ -66,7 +66,7 @@ def test_blank_and_missing_channels_are_never_filled():
     by = {r["canal"]: r for r in c.rows}
     for canal in (51, 52, 11, 21):
         assert by[canal]["diferencia"] is None and by[canal]["relacion"] is None
-        assert by[canal]["estado_relacion"] == "falta A o B"
+        assert by[canal]["estado_relacion"] == "A or B missing"
     assert by[11]["a"] is None and by[11]["b"] is not None and by[21]["b"] is None
     assert c.summary == {**c.summary, "n_ambos": 98, "n_solo_a": 1, "n_solo_b": 1, "n_ninguno": 2}
 
@@ -91,8 +91,8 @@ def test_ratio_withheld_when_denominator_is_inside_reference_scatter():
     b[30:] = 10.0
     c = sf.compare(mk(np.full(N, 20.0), "A", ref_scatter=ref), mk(b, "B", ref_scatter=ref))
     by = {r["canal"]: r for r in c.rows}
-    assert by[5]["relacion"] is None and "no fiable" in by[5]["estado_relacion"] and by[5]["diferencia"] == 18.0
-    assert by[40]["relacion"] == 2.0 and by[40]["estado_relacion"] == "válida"
+    assert by[5]["relacion"] is None and "not reliable" in by[5]["estado_relacion"] and by[5]["diferencia"] == 18.0
+    assert by[40]["relacion"] == 2.0 and by[40]["estado_relacion"] == "valid"
     no_ref = sf.compare(mk(np.full(N, 20.0), "A"), mk(b, "B"))
     assert no_ref.rows[5]["relacion"] == 10.0 and "sin filtro" in no_ref.rows[5]["estado_relacion"]
     assert not no_ref.summary["filtro_estabilidad"]
@@ -103,15 +103,15 @@ def test_different_extractions_or_units_block_the_operations():
     c = sf.compare(a, mk(POWER, "B", meta=meta(10.01, 10, r_ap=3.0)))
     assert not c.comparable and not c.rows and "r_ap" in c.issues[0]
     c = sf.compare(a, mk(POWER, "B", quantity="pixel", meta=meta(10.01, 10)))
-    assert not c.comparable and "Magnitudes distintas" in c.issues[0]
+    assert not c.comparable and "Different quantities" in c.issues[0]
     other = sf.series_from_arrays(POWER, LAM * 1.001, label="B", detector=DET)
-    assert "tablas de canales" in sf.compare(a, other).issues[0]
+    assert "channel tables" in sf.compare(a, other).issues[0]
 
 
 def test_contamination_and_overlap_are_reported():
     pix_deg = 12.883 / 3600
     a = mk(POWER, "A", meta=meta(10.0, 0.0))
-    assert any("solapan" in n for n in sf.compare(a, mk(POWER, "B", meta=meta(10.0, 3 * pix_deg))).notes)
+    assert any("overlap" in n for n in sf.compare(a, mk(POWER, "B", meta=meta(10.0, 3 * pix_deg))).notes)
     far = sf.compare(a, mk(POWER, "B", meta=meta(10.0, 6 * pix_deg)))
     assert far.comparable and any("anillo de fondo de la otra" in n for n in far.notes)
     assert far.separation_arcsec == pytest.approx(6 * 12.883, abs=0.01)
@@ -128,7 +128,7 @@ def test_real_extraction_path_two_positions(cube):
     assert c.comparable and c.unit == "MJy/sr"
     for r in c.rows:
         if r["canal"] in (51, 52):
-            assert r["diferencia"] is None and r["estado_a"] == "canal sin datos en DR1"
+            assert r["diferencia"] is None and r["estado_a"] == "channel without data in DR1"
         else:
             plane = r["canal"] - 1
             assert r["diferencia"] == pytest.approx(7.0) and r["relacion"] == pytest.approx((plane + 17) / (plane + 10))
@@ -270,7 +270,7 @@ def test_no_reliable_continuum_next_to_channels_without_data():
     s = mk(y)
     assert sf.find_features(s) == []
     f = sf.inspect_channel(s, 50)
-    assert f.klass == sf.NOT_EVALUABLE and "canal 51" in f.reasons[0] and "continuo local fiable" in f.reasons[0]
+    assert f.klass == sf.NOT_EVALUABLE and "channel 51" in f.reasons[0] and "reliable local continuum" in f.reasons[0]
     g = sf.measure_interval(s, 49, 53)
     assert g.klass == sf.NOT_EVALUABLE and "No se interpolan" in g.reasons[0] and "51, 52" in g.reasons[0]
 
@@ -279,7 +279,7 @@ def test_feature_across_detectors_is_only_visible():
     y = POWER.copy()
     y[17] *= 1.5                                         # channel 18: first of D2, environment reaches D1
     (f,) = sf.find_features(mk(y))
-    assert f.klass == sf.VISIBLE and f.detectors == [1, 2] and "detectores D1, D2" in f.limitations[0]
+    assert f.klass == sf.VISIBLE and f.detectors == [1, 2] and "detectors D1, D2" in f.limitations[0]
 
 
 def test_caution_flags_and_coverage_changes_cap_the_class():
@@ -292,7 +292,7 @@ def test_caution_flags_and_coverage_changes_cap_the_class():
     nhits = np.full(N, 40.0)
     nhits[30] = 8.0
     (g,) = sf.find_features(mk(y, nhits=nhits))
-    assert g.klass == sf.VISIBLE and "Cambio de cobertura" in g.limitations[0]
+    assert g.klass == sf.VISIBLE and "Change of coverage" in g.limitations[0]
     (h,) = sf.find_features(mk(y, nhits=np.full(N, 40.0)))
     assert h.klass == sf.QUANTIFIABLE
 
@@ -312,7 +312,7 @@ def test_linear_fallback_with_non_positive_values():
     f = next(f for f in sf.find_features(mk(y)) if f.canal == 31)
     assert f.kind == "pico" and f.contrast == pytest.approx(5.0, abs=0.05)
     assert f.relative is None or abs(f.relative) > 1
-    assert any("Valores ≤ 0" in t for t in f.limitations)
+    assert any("Values ≤ 0" in t for t in f.limitations)
 
 
 # ----------------------------------------------------------------------------- user selection
@@ -322,7 +322,7 @@ def test_manual_interval_matches_the_scan_and_wide_intervals_are_refused():
     s = mk(y)
     (auto,) = sf.find_features(s)
     manual = sf.measure_interval(s, 25, 27)
-    assert manual.origin == "selección" and manual.canal == 26 and manual.contrast == pytest.approx(auto.contrast)
+    assert manual.origin == "selection" and manual.canal == 26 and manual.contrast == pytest.approx(auto.contrast)
     assert (manual.trial_lo, manual.trial_hi) == (25, 27) and manual.klass == sf.QUANTIFIABLE
     assert (manual.mask_lo, manual.mask_hi) == (26, 26) and manual.contains(26) and not manual.contains(27)
     wide = sf.measure_interval(s, 20, 40)

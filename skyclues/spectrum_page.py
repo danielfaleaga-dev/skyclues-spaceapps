@@ -223,12 +223,12 @@ def render(level: str) -> None:
                    "colour. Its peaks and valleys can give clues about gas, dust or ices, but do not identify them on their "
                    "own.")
     theme.region_strip(inp["label"], ra_c, dec_c, fov, _region_extra(epoch_info, inp["follow"]) if sci else '')
-    theme.note(("<b>Producto combinado, no temporal.</b> " +
-            "Cada imagen es un canal del cubo DR1: el promedio de muchas exposiciones de fechas distintas (sin luz "
-            "zodiacal), en píxeles de 12.9″. Sirve para ver cómo cambia el cielo con la longitud de onda; no muestra "
-            "cambios en el tiempo (para eso, «Time» usa observaciones individuales de 6.15″/px).") if sci else
-            "Estas imágenes combinan muchas fechas: muestran colores, no cambios en el tiempo. Para comparar fechas, "
-            "abre «Time».")
+    theme.note(("<b>Combined product, not temporal.</b> " +
+            "Each image is one channel of the DR1 cube: the average of many exposures from different dates (zodiacal light "
+            "removed), in 12.9″ pixels. Use it to see how the sky changes with wavelength; it does not show "
+            "changes over time (for that, «Time» uses individual observations at 6.15″/px).") if sci else
+            "These images combine many dates: they show colours, not changes over time. To compare dates, "
+            "open «Time».")
     if epoch_info.get("warning"):
         st.warning(epoch_info["warning"] + f" Reference epoch: {astro.epoch_jyear:.2f}. It is not a detection.")
     if epoch_info.get("propagated") and "mjd_mid" in epoch_info and sci:
@@ -340,7 +340,7 @@ def render(level: str) -> None:
                        f"{s['flag_pixels']['SOURCE']}. λ, interval and R come from the SPECTRAL_CHANNELS table of the FITS.")
         else:
             theme.facts([
-                ("Wavelength", f"{ch.wavelength_um:.2f} µm", f"canal {ch.number} de 102"),
+                ("Wavelength", f"{ch.wavelength_um:.2f} µm", f"channel {ch.number} of 102"),
                 ("Pixels with data", f"{s['valid_fraction']:.0%}", "of the field in this channel")])
 
         mx = config.CUBE_APERTURE_MAX_PX
@@ -376,7 +376,7 @@ def render(level: str) -> None:
     if pick_b is None:
         st.markdown("### Exploratory spectrum of a position" if sci else "### The light of the chosen point")
     else:
-        st.markdown("### Espectros exploratorios de dos posiciones" if sci else "### The light of the two points")
+        st.markdown("### Exploratory spectra of two positions" if sci else "### The light of the two points")
     sp = state["sx_spec_params"]
     if sp != params_now:
         st.caption("The position or the aperture have changed: press «Get the spectrum at this position» to "

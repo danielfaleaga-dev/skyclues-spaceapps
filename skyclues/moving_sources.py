@@ -135,7 +135,7 @@ def published_predictions(url, *, ra_column='comet_ra', dec_column='comet_dec', 
     for r in tab:
         out[(str(r['obs_id']), int(str(r['spherex_detector']).lstrip('D')))] = {
             'ra': float(r[ra_column]), 'dec': float(r[dec_column]), 'source': url,
-            'frame': 'ICRS (tabla IRSA)', 'observer': 'per-exposure prediction published by IRSA',
+            'frame': 'ICRS (IRSA table)', 'observer': 'per-exposure prediction published by IRSA',
             'uncertainty_arcsec': None, 'refined': True,
             'mjd_start': float(r['t_min']), 'mjd_end': float(r['t_max']),
             'original_product': str(r['access_url']), 'provenance': p}

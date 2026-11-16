@@ -17,13 +17,13 @@ export default function (c) {
   function readout() {
     if (!st.aladin) return;
     const [ra, dec] = st.aladin.getRaDec(), view = st.aladin.getFoV()[0], f = regionFov();
-    el('.centre').textContent = `Centro ICRS: RA ${fmt(ra, 6)}°, Dec ${fmt(dec, 6)}° (${sexa(ra, dec)})`;
-    el('.view').textContent = `Vista: ${view >= 1 ? fmt(view, 2) + '°' : fmt(view * 60, 1) + '′'} · región: ${fmt(f * 60, 1)}′ ` +
-      `(círculo amarillo; límites de los exploradores ${data.fov_min * 60}′–${data.fov_max * 60}′)`;
+    el('.centre').textContent = `ICRS centre: RA ${fmt(ra, 6)}°, Dec ${fmt(dec, 6)}° (${sexa(ra, dec)})`;
+    el('.view').textContent = `View: ${view >= 1 ? fmt(view, 2) + '°' : fmt(view * 60, 1) + '′'} · region: ${fmt(f * 60, 1)}′ ` +
+      `(yellow circle; explorer limits ${data.fov_min * 60}′–${data.fov_max * 60}′)`;
     const warn = el('.warn');
     warn.textContent = view > data.fov_max * 1.0001
-      ? `La vista (${view >= 1 ? fmt(view, 2) + '°' : fmt(view * 60, 1) + '′'}) es mayor que el campo máximo de los exploradores (${data.fov_max * 60}′). ` +
-        'Se seleccionará solo el círculo amarillo; «Ajustar al zoom» propone el máximo admitido, sin recortar en silencio.'
+      ? `The view (${view >= 1 ? fmt(view, 2) + '°' : fmt(view * 60, 1) + '′'}) is larger than the explorers' maximum field (${data.fov_max * 60}′). ` +
+        'Only the yellow circle will be selected; “Fit to zoom” proposes the maximum allowed, without silently cropping.'
       : '';
     st.circle.removeAll();
     st.circle.add(st.A.circle(ra, dec, f / 2));
@@ -33,10 +33,10 @@ export default function (c) {
     el('.layerinfo').textContent = `${L.mission} · ${L.product} · ${L.bands} · ${L.epoch}. ${L.note}`;
     try {
       st.aladin.setImageSurvey(st.aladin.newImageSurvey(L.url, { name: L.label, imgFormat: L.format }));
-      el('.status').textContent = `Capa: ${L.label} (HiPS oficial servido por NASA/IPAC IRSA).`;
+      el('.status').textContent = `Layer: ${L.label} (official HiPS served by NASA/IPAC IRSA).`;
       el('.status').classList.remove('err');
     } catch (e) {
-      el('.status').textContent = `No se pudo cargar ${L.label}: ${e.message || e}`;
+      el('.status').textContent = `Could not load ${L.label}: ${e.message || e}`;
       el('.status').classList.add('err');
     }
   }
@@ -75,9 +75,9 @@ export default function (c) {
     for (const L of data.layers) { const o = document.createElement('option'); o.value = L.id; o.textContent = L.label; sel.append(o); }
     sel.value = data.default_layer;
     for (const a of data.fov_presets) { const o = document.createElement('option'); o.value = String(a); o.textContent = `${a}′`; el('.fov').append(o); }
-    el('.status').textContent = 'Iniciando Aladin Lite 3.8.1…';
+    el('.status').textContent = 'Starting Aladin Lite 3.8.1…';
     const timer = setTimeout(() => {
-      if (!st.aladin) { el('.status').textContent = 'Aladin Lite tarda demasiado o no está disponible (requiere WebGL2 y acceso a jsDelivr/IRSA). Use «Por nombre» o «Coordenadas».'; el('.status').classList.add('err'); }
+      if (!st.aladin) { el('.status').textContent = 'Aladin Lite is taking too long or is not available (it requires WebGL2 and access to jsDelivr/IRSA). Use “By name” or “Coordinates”.'; el('.status').classList.add('err'); }
     }, 30000);
     import(data.aladin).then(async ({ default: A }) => {
       await A.init;
@@ -90,7 +90,7 @@ export default function (c) {
         backgroundColor: 'rgb(16,20,26)',
       });
       st.circle = A.graphicOverlay({ color: '#ffd23f', lineWidth: 2 }); st.aladin.addOverlay(st.circle);
-      st.marker = A.catalog({ name: 'Objeto buscado', color: '#ff7a59', sourceSize: 14 }); st.aladin.addCatalog(st.marker);
+      st.marker = A.catalog({ name: 'Searched object', color: '#ff7a59', sourceSize: 14 }); st.aladin.addCatalog(st.marker);
       st.gaia = A.catalog({ name: 'Gaia DR3 (J2016.0)', color: '#69e2ff', shape: 'circle', sourceSize: 8 }); st.aladin.addCatalog(st.gaia);
       // Aladin redraws overlays (region circle, Gaia) only on a view change: force one when the box resizes.
       st.resize = new ResizeObserver(() => { if (st.aladin) { const [r, d] = st.aladin.getRaDec(); st.aladin.gotoRaDec(r, d); } });
@@ -108,8 +108,8 @@ export default function (c) {
           const o = document.createElement('option'); o.value = String(Math.round(v * 10) / 10); o.textContent = `${o.value}′`; el('.fov').append(o);
         }
         el('.fov').value = String(Math.round(v * 10) / 10);
-        el('.note').textContent = view > max ? `La vista abarca ${fmt(view, 1)}′: se propone ${max}′, el máximo admitido (no se recorta en silencio).`
-          : view < min ? `La vista abarca ${fmt(view, 1)}′: se propone ${min}′, el mínimo admitido.` : '';
+        el('.note').textContent = view > max ? `The view spans ${fmt(view, 1)}′: ${max}′ is proposed, the maximum allowed (it is not silently cropped).`
+          : view < min ? `The view spans ${fmt(view, 1)}′: ${min}′ is proposed, the minimum allowed.` : '';
         readout();
       };
       el('.use').onclick = () => {
@@ -119,7 +119,7 @@ export default function (c) {
       clearTimeout(timer);
       el('.use').disabled = false; el('.fit').disabled = false;
       apply();
-    }).catch((e) => { clearTimeout(timer); el('.status').textContent = `No se pudo iniciar Aladin Lite (${e.message || e}). Use «Por nombre» o «Coordenadas».`; el('.status').classList.add('err'); });
+    }).catch((e) => { clearTimeout(timer); el('.status').textContent = `Could not start Aladin Lite (${e.message || e}). Use “By name” or “Coordinates”.`; el('.status').classList.add('err'); });
   } else {
     apply();
   }

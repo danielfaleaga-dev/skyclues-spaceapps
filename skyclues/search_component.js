@@ -9,7 +9,7 @@ export default function(c) {
   const remote=norm(data.query||'')===q?data.remote:[];
   const seen=new Set();for(const item of [...local,...remote]){
    if(seen.has(item.id))continue;seen.add(item.id);
-   const b=document.createElement('button');b.type='button';b.textContent=`${item.id} | ${item.type} | ${item.aliases.join(', ')} | ${item.source||'SIMBAD: indice verificado'}`;
+   const b=document.createElement('button');b.type='button';b.textContent=`${item.id} | ${item.type} | ${item.aliases.join(', ')} | ${item.source||'SIMBAD: verified index'}`;
    b.onclick=()=>setTriggerValue('pick',item.id);list.append(b);
   }
  }

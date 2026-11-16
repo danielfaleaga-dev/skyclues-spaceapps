@@ -29,7 +29,7 @@ def test_layers_identify_mission_product_and_are_official_hips():
         assert all(L[k] for k in ("mission", "product", "bands", "epoch", "note"))
         assert "SPHEREx" not in L["mission"]          # no SPHEREx map is presented as a layer
     assert {"allwise", "w1", "w2"} <= set(ids) and "2mass" in ids
-    assert atlas.SPHEREX_HIPS["release"] and "combinado" in atlas.SPHEREX_HIPS["kind"]
+    assert atlas.SPHEREX_HIPS["release"] and "combined" in atlas.SPHEREX_HIPS["kind"]
 
 
 def test_object_position_now_uses_catalogue_motion():
@@ -88,7 +88,7 @@ def test_unified_component_and_gaia_outage(monkeypatch):
     assert not at.exception and len(calls)==1
     d=calls[0]
     assert d['region']['fov']==.1 and d['gaia']==[] and 'no disponible' in d['gaia_note']
-    assert at.button_group(key='nav').options==['Región','Tiempo','Espectro']
+    assert at.button_group(key='nav').options==['Region','Time','Spectrum']
     assert not at.radio
 
 
@@ -111,4 +111,4 @@ def test_rejected_component_event_preserves_region(monkeypatch):
     monkeypatch.setattr(region_ui.st,'session_state',state)
     monkeypatch.setattr(region_ui.st,'query_params',params)
     region_ui._on_region()
-    assert state['region']==before and 'no válida' in state['region_notice']
+    assert state['region']==before and 'Invalid region' in state['region_notice']

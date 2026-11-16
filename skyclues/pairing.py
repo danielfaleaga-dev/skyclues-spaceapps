@@ -173,8 +173,8 @@ def find_pair(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD_DEG
     log(f"With the full field inside the detector: {len(cands)}")
     tables = estimate_wavelengths(cands)
     pairs = rank_pairs(cands, require_same_collection)
-    log(f"Parejas preseleccionadas (mismo detector, Δt ≥ {config.MIN_TIME_SEPARATION_DAYS} d, "
-        f"|Δλ| estimado ≤ {config.SPECTRAL_PRESELECT_BW} BW): {len(pairs)}")
+    log(f"Preselected pairs (same detector, Δt ≥ {config.MIN_TIME_SEPARATION_DAYS} d, "
+        f"|Δλ| estimated ≤ {config.SPECTRAL_PRESELECT_BW} BW): {len(pairs)}")
 
     evaluated, failures = [], []
     top = pairs[:max_download_pairs]
@@ -187,13 +187,13 @@ def find_pair(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD_DEG
             ia, ib = fitsdata.load(pa), fitsdata.load(pb)
         except Exception as err:  # keep searching; report the failure
             failures.append({"a": p["a"].rec.file_name, "b": p["b"].rec.file_name, "error": str(err)[:300]})
-            log(f"  fallo al recuperar {p['a'].rec.obs_id} ↔ {p['b'].rec.obs_id}: {str(err)[:120]}")
+            log(f"  failed to retrieve {p['a'].rec.obs_id} ↔ {p['b'].rec.obs_id}: {str(err)[:120]}")
             continue
         ev = evaluate_pair(ia, ib, ra, dec, field_deg,
                            collections=(p["a"].rec.collection, p["b"].rec.collection))
         evaluated.append({"pair": p, "paths": (pa, pb), "images": (ia, ib), "evaluation": ev})
         log(f"  {p['a'].rec.obs_id} D{p['a'].rec.detector} ↔ {p['b'].rec.obs_id}: "
-            f"admisible={ev.admissible} cobertura={ev.metrics['coverage_common_valid']:.1%} "
+            f"admissible={ev.admissible} coverage={ev.metrics['coverage_common_valid']:.1%} "
             f"|Δλ|={ev.metrics['dlambda_target_bw']:.2f} BW")
 
     ok = [e for e in evaluated if e["evaluation"].admissible]

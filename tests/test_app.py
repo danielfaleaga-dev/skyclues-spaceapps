@@ -13,7 +13,7 @@ APP = str(Path(__file__).resolve().parent.parent / "app.py")
 
 def open_example(stem='sequence_m101'):
     at=AppTest.from_file(APP,default_timeout=120)
-    at.session_state['level']='Científico'
+    at.session_state['level']='Scientific'
     at.run();at.button(key='example_'+stem).click().run()
     assert not at.exception
     return at
@@ -31,7 +31,7 @@ def test_every_saved_result_renders():
         import json
         state,qp={},{}
         navigation.set_from_report(state,qp,Path(path).stem,json.loads(Path(path).read_text(encoding='utf8')))
-        at.session_state['region']=state['region'];at.session_state['nav']='Tiempo'
+        at.session_state['region']=state['region'];at.session_state['nav']='Time'
         at.run()
         assert not at.exception,label
         assert at.get('iframe'),label
@@ -52,7 +52,7 @@ def test_display_options_and_levels_do_not_change_the_science():
         at.toggle(key='w_halo').set_value(True).run()
         assert not at.exception
         assert at.session_state['region']==region
-    at.button_group(key='level').set_value('Sencillo').run()
+    at.button_group(key='level').set_value('Simple').run()
     assert not at.exception and at.session_state['opt_halo']
     assert at.session_state['region']==region
 
@@ -72,7 +72,7 @@ def test_irsa_failure_shows_a_clear_message_and_no_partial_data(monkeypatch, err
     monkeypatch.setattr(archive, "query_images", fail)
     at = AppTest.from_file(APP, default_timeout=300)
     at.run()
-    at.button_group(key='nav').set_value('Tiempo').run()
+    at.button_group(key='nav').set_value('Time').run()
     assert not at.exception
     assert any(text in e.value for e in at.error)
     assert not any(m.label == "Épocas" for m in at.metric)
@@ -91,7 +91,7 @@ def test_invalid_url_parameters_are_reported_and_never_queried(monkeypatch, qs):
     at.run()
     assert not at.exception
     assert any("no válid" in e.value for e in at.error)
-    assert at.session_state["nav"] == "Región"
+    assert at.session_state["nav"] == "Region"
     # the widgets show valid defaults, never a clamped or NaN version of the input
     if "fov=9" not in qs:
         assert at.session_state["region"]["ra"] == pytest.approx(210.802429)
@@ -107,7 +107,7 @@ def test_partial_download_is_reported(monkeypatch):
     at = AppTest.from_file(APP, default_timeout=300)
     state,qp={},{}
     r=navigation.set_region(state,qp,rep['target']['ra_deg'],rep['target']['dec_deg'],rep['target']['field_deg'])
-    at.session_state['region']=r;at.session_state['nav']='Tiempo'
+    at.session_state['region']=r;at.session_state['nav']='Time'
     at.session_state['time_reports']={time_page.search_key(navigation.explorer_inputs(r)):rep}
     at.run()
     assert not at.exception
@@ -117,7 +117,7 @@ def test_partial_download_is_reported(monkeypatch):
 
 def test_moving_target_is_shown_as_a_calculated_position():
     at = AppTest.from_file(APP, default_timeout=300)
-    at.session_state['level']='Científico'
+    at.session_state['level']='Scientific'
     at.run()
     at.button(key="example_" + next(s for s in config.VALIDATED_EXAMPLES if "wise" in s)).click().run()
     assert not at.exception
@@ -133,6 +133,6 @@ def test_field_of_view_is_applied_to_the_search(monkeypatch):
     monkeypatch.setattr(time_page,'find_sequence',find)
     at=AppTest.from_file(APP,default_timeout=30)
     at.query_params={'ra':'83.8221','dec':'-5.3911','fov':'.3'}
-    at.run();at.button_group(key='nav').set_value('Tiempo').run()
+    at.run();at.button_group(key='nav').set_value('Time').run()
     assert not at.exception
     assert calls[-1][:3]==(83.8221,-5.3911,.3)

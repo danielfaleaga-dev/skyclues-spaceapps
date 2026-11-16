@@ -1,4 +1,4 @@
-// Execute the real region component with DOM/Aladin doubles, no browser/network dependencies.
+﻿// Execute the real region component with DOM/Aladin doubles, no browser/network dependencies.
 const fs=require('fs'), assert=require('assert');
 const timers=new Map(); let nextTimer=0;
 const setTimeout=(fn)=>{timers.set(++nextTimer,fn);return nextTimer},clearTimeout=id=>timers.delete(id);
@@ -55,7 +55,7 @@ eval(code);
  data.object={name:'Gaia DR3 6051234567890123456',anchor:[11.001,21.002],notes:[],gaia_source_id:pick.source_id};render(api);
  assert.equal(node('.rg-gaia-status').hidden,true);
  data.gaia_key='empty';data.gaia=[];render(api);
- assert(node('.rg-gaia-message').textContent.includes('No se encontraron'));assert(node('.rg-gaia-retry').hidden);
+ assert(node('.rg-gaia-message').textContent.includes('No Gaia DR3 sources were found'));assert(node('.rg-gaia-retry').hidden);
  data.gaia_status='error';render(api);assert.equal(node('.rg-gaia-retry').hidden,false);
  node('.rg-gaia-retry').handlers.click();assert.equal(sent.at(-1)[0],'gaia_retry');
  data.gaia_on=false;render(api);assert.equal(gaia.visible,false);assert(node('.rg-gaia-status').hidden);

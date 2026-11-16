@@ -10,7 +10,7 @@ def test_complete_messier_range_is_dynamic(n, monkeypatch):
     monkeypatch.setattr(search,'INDEX',[])
     monkeypatch.setattr(search,'resolve_name',lambda name:(calls.append(name) or None, []))
     if n==102:
-        with pytest.raises(ValueError,match='ambigua'):search.resolve('Messier 102')
+        with pytest.raises(ValueError,match='ambiguous'):search.resolve('Messier 102')
         assert not calls
     else:
         search.resolve(f'Messier {n}')
@@ -73,4 +73,4 @@ def test_ephemeris_rejects_missing_ambiguous_or_invalid_data(monkeypatch,bad):
 def test_network_outage_is_explicit(monkeypatch):
     def down(*a,**k):raise solar.requests.Timeout()
     monkeypatch.setattr(solar.requests,'get',down)
-    with pytest.raises(solar.ServiceError,match='no disponible'):solar.lookup('Bennu')
+    with pytest.raises(solar.ServiceError,match='not available'):solar.lookup('Bennu')

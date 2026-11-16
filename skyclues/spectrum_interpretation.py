@@ -65,7 +65,7 @@ def chart_marks(ctx: Context) -> list[dict] | None:
 
 # ----------------------------------------------------------------------------- wording (pure, same facts)
 def _um(v: float, digits: int = 1) -> str:
-    return f"{v:.{digits}f}".replace(".", ",") + " µm"
+    return f"{v:.{digits}f}" + " µm"
 
 
 def observed_text(it: si.Interpretation) -> str:
@@ -135,7 +135,7 @@ def limits_text(it: si.Interpretation) -> list[str]:
 
 def _z_text(rs: sr.Redshift) -> tuple[str, str]:
     if rs.known:
-        return f"z = {rs.z:.6f}", f"{rs.object_name} · NED, dentro de su isofota D25 · ±{rs.sigma:.4f}"
+        return f"z = {rs.z:.6f}", f"{rs.object_name} · NED, inside its D25 isophote · ±{rs.sigma:.4f}"
     return "desconocido", "it is compared at rest (z = 0); it is never estimated from a coincidence"
 
 
@@ -144,9 +144,9 @@ def _match_rows(it: si.Interpretation) -> list[dict]:
     for m in it.matches + it.others + it.orientative:
         r = m.reference
         rows.append({"Reference": r.name, "Type": f"{sr.NATURE_TEXT[r.nature]} · {sr.FORM_TEXT[r.form]}",
-                     "λ en reposo (µm)": (f"{r.lam_range_um[0]:.3f}–{r.lam_range_um[1]:.3f}"
+                     "λ at rest (µm)": (f"{r.lam_range_um[0]:.3f}–{r.lam_range_um[1]:.3f}"
                                           if r.lam_range_um[0] != r.lam_range_um[1] else f"{r.lam_um:.4f}"),
-                     "λ esperada (µm)": f"{m.lam_obs_um:.4f}",
+                     "λ expected (µm)": f"{m.lam_obs_um:.4f}",
                      "Expected channel": " y ".join(map(str, m.predicted_channels)),
                      "Compatibility": si.STATUS_LABELS[m.status],
                      "z for which it holds": ("—" if m.z_range is None else
@@ -189,23 +189,23 @@ def _simple_block(k: str, it: si.Interpretation) -> None:
 
 
 def _scientific_block(k: str, it: si.Interpretation) -> None:
-    st.html(f'<p style="margin:.35rem 0 .1rem">Espectro {k}: {theme.badge(it.label, si.VERDICT_BADGE[it.verdict])} '
+    st.html(f'<p style="margin:.35rem 0 .1rem">Spectrum {k}: {theme.badge(it.label, si.VERDICT_BADGE[it.verdict])} '
             f'<span class="sc-muted">{si.VERDICT_MEANING[it.verdict]}.</span></p>')
     o, f = it.observation, it.feature
     z, zsrc = _z_text(it.redshift)
     if "lambda_um" in o:
         theme.facts([
-            (theme.unit("λ") + " observada", f"{o['lambda_um']:.3f} µm",
-             f"centroide {o['centroide_um']:.3f} · media altura {o['media_altura_um'][0]:.3f}–{o['media_altura_um'][1]:.3f}"
-             f" (canales {o['canales_media_altura'][0]}–{o['canales_media_altura'][1]})"),
+            (theme.unit("λ") + " observed", f"{o['lambda_um']:.3f} µm",
+             f"centroid {o['centroide_um']:.3f} · half height {o['media_altura_um'][0]:.3f}–{o['media_altura_um'][1]:.3f}"
+             f" (channels {o['canales_media_altura'][0]}–{o['canales_media_altura'][1]})"),
             ("Detector · resolution", f"D{o['detector']} · R = {o['R']:.0f}",
              f"resolution element ≈ {o['elemento_resolucion_um']:.3f} µm" +
-             ("" if o["R_del_fits"] else " (R estimada)")),
+             ("" if o["R_del_fits"] else " (R estimated)")),
             ("Redshift", z, zsrc),
             ("Data", f"{f.kind} · {f.label.lower()}",
              f"contrast / scatter {abs(o['contraste_sobre_dispersion']):.1f} (descriptive, not significance)")])
     else:
-        theme.facts([("Interval examined", f"canales {f.trial_lo}–{f.trial_hi}" if f is not None else "—",
+        theme.facts([("Interval examined", f"channels {f.trial_lo}–{f.trial_hi}" if f is not None else "—",
                       f.label.lower() if f is not None else ""), ("Redshift", z, zsrc)])
     rows = _match_rows(it)
     if rows:
@@ -218,7 +218,7 @@ def _scientific_block(k: str, it: si.Interpretation) -> None:
         with st.expander(f"Conditions, confusions and bibliography · spectrum {k}"):
             for r in refs:
                 st.markdown(f"**{r.name}** — {r.scientific} *{r.process}; {r.transition}.* {r.width_note}\n\n"
-                            "Condiciones: " + " ".join(r.conditions) + "\n\nOtras causas posibles: " +
+                            "Conditions: " + " ".join(r.conditions) + "\n\nOther possible causes: " +
                             " ".join(r.confounders) + "\n\n" +
                             "\n".join(f"- [{s.citation}]({s.url}): {s.used_for}" for s in r.sources))
 
@@ -242,14 +242,14 @@ def _overview(ctx: Context, sci: bool, inspect_key: str) -> None:
         for k, it in items:
             f = it.feature
             left, right = st.columns([4, 1], vertical_alignment="center")
-            where = f"{f.lam:.3f} µm (canal {f.canal})" if sci else f"cerca de {_um(f.lam)}"
+            where = f"{f.lam:.3f} µm (channel {f.canal})" if sci else f"near {_um(f.lam)}"
             left.html(f'<p style="margin:0"><b>{k}</b> · {f.kind} {where} '
                       f'{theme.badge(it.label, si.VERDICT_BADGE[it.verdict])}</p>')
             right.button("Examine", key=f"sx_interp_{k}_{f.canal}", on_click=_pick, args=(inspect_key, f.canal),
                          help="Examine this peak or valley on the chart and show its interpretation.")
     if sci:
         with st.expander("Where each reference would fall in this spectrum"):
-            rows = [{"Spectrum": k, "Reference": c.reference.name, "λ esperada (µm)": round(c.lam_obs_um, 4),
+            rows = [{"Spectrum": k, "Reference": c.reference.name, "λ expected (µm)": round(c.lam_obs_um, 4),
                      "Channel": " y ".join(map(str, c.channels)) or "—", "Status": si.COVERAGE_LABELS[c.status],
                      "Reason": " ".join(c.reasons)} for k, cs in ctx.surveys.items() for c in cs]
             st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
@@ -260,7 +260,7 @@ def _overview(ctx: Context, sci: bool, inspect_key: str) -> None:
 def _library_expander(ctx: Context) -> None:
     with st.expander("Library of references, compatibility window and limits"):
         lib = [{"Id": r.id, "Reference": r.name, "Carrier": r.carrier, "Transition": r.transition,
-                "λ en reposo (µm)": (f"{r.lam_range_um[0]:.3f}–{r.lam_range_um[1]:.3f}"
+                "λ at rest (µm)": (f"{r.lam_range_um[0]:.3f}–{r.lam_range_um[1]:.3f}"
                                      if r.lam_range_um[0] != r.lam_range_um[1] else f"{r.lam_um:.6f}"),
                 "Type": f"{sr.NATURE_TEXT[r.nature]} · {sr.FORM_TEXT[r.form]}",
                 "Documented FWHM (µm)": "—" if r.fwhm_um is None else f"{r.fwhm_um:.3f}",
@@ -293,4 +293,4 @@ def _library_expander(ctx: Context) -> None:
             st.markdown("**Limits of this interpretation**\n" + "\n".join(f"- {x}" for x in lims))
         used = dict.fromkeys([s for r in sr.REFERENCES for s in r.sources] + list(sr.INSTRUMENT_SOURCES) +
                              list(sr.REDSHIFT_SOURCES))
-        st.markdown("**Fuentes**\n" + "\n".join(f"- [{s.citation}]({s.url}): {s.used_for}" for s in used))
+        st.markdown("**Sources**\n" + "\n".join(f"- [{s.citation}]({s.url}): {s.used_for}" for s in used))

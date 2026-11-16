@@ -1,4 +1,4 @@
-// Controlled failures for the actual iframe JavaScript, with an isolated DOM/Aladin double.
+﻿// Controlled failures for the actual iframe JavaScript, with an isolated DOM/Aladin double.
 const fs=require('fs'),assert=require('assert');
 const html=fs.readFileSync(0,'utf8'),mode=process.argv[2];
 const nodes=new Map();
@@ -34,7 +34,7 @@ const js=html.split('<script type="module">')[1].split('</script>')[0].replace('
  assert.equal(built,1);assert.equal(catalogs[0].visible,false);assert.equal(catalogs[1].visible,true);
  // A late Aladin failure must remain visible after hiding and showing the same band.
  node('wise').checked=false;await node('wise').onchange();node('wise').checked=true;await node('wise').onchange();
- layers[1].opts.errorCallback();assert(node('wisestatus').textContent.includes('No se pudo cargar AllWISE W2'));
+ layers[1].opts.errorCallback();assert(node('wisestatus').textContent.includes('Could not load AllWISE W2'));
  assert.equal(catalogs[1].visible,true);await node('retry').onclick();assert.equal(layers.length,3);assert.equal(layers[2].alpha,1);
  console.log(mode+' passed');
 })().catch(err=>{console.error(err);process.exitCode=1});

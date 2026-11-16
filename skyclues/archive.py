@@ -113,7 +113,7 @@ def http_get(url: str, headers: dict | None = None, ok_status=(200,), validate=N
                 last = ArchiveTransientError(f"HTTP {r.status_code} de IRSA: {r.text[:100]!r}")
                 wait = _retry_after_s(r)
             else:
-                raise ArchivePermanentError(f"HTTP {r.status_code} de IRSA (no se reintenta): {r.text[:120]!r}")
+                raise ArchivePermanentError(f"HTTP {r.status_code} from IRSA (not retried): {r.text[:120]!r}")
         if attempt == retries - 1:
             break
         delay = min(config.HTTP_BACKOFF_MAX_S, wait if wait is not None else config.HTTP_BACKOFF_S * 2 ** attempt)
@@ -180,7 +180,7 @@ def validate_fits_bytes(data: bytes, required=REQUIRED_EXTENSIONS) -> None:
                 names = [h.name for h in hdul]
                 missing = [n for n in required if n not in names]
                 if missing:
-                    raise CorruptFitsError(f"faltan extensiones {missing} (presentes: {names})")
+                    raise CorruptFitsError(f"missing extensions {missing} (present: {names})")
                 for h in hdul:
                     if h.name in required:
                         _ = h.data
@@ -192,7 +192,7 @@ def validate_fits_bytes(data: bytes, required=REQUIRED_EXTENSIONS) -> None:
     except CorruptFitsError:
         raise
     except Exception as err:
-        raise CorruptFitsError(f"FITS ilegible: {type(err).__name__}: {str(err)[:160]}") from err
+        raise CorruptFitsError(f"FITS unreadable: {type(err).__name__}: {str(err)[:160]}") from err
 
 
 _validated: dict[tuple, bool] = {}

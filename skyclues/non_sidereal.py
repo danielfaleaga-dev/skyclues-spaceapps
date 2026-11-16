@@ -102,7 +102,7 @@ def fetch_frames(identity, rows, fov, progress=None):
             # Preserve requested FOV; extra context is explicit, used for local sky/control apertures.
             size = max(fov,.25)
             url = archive.cutout_url(row['url'],p['ra'],p['dec'],size)
-            log(f'Recuperando imagen {n+1} de {len(rows)}…')
+            log(f'Retrieving image {n+1} of {len(rows)}…')
             path = archive.fetch(url)
             img = fitsdata.load(path)
             det = int(str(img.meta['DETECTOR']).lstrip('D'))

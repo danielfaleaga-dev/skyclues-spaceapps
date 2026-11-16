@@ -89,7 +89,7 @@ class Response:
 def test_failed_gaia_is_not_empty_catalogue(status,monkeypatch):
     response=Response(b'failure',status)
     monkeypatch.setattr(ref.requests,'get',lambda *a,**k:response)
-    with pytest.raises(ref.ReferenceError,match='no disponible'): ref.fetch_gaia(10,0,.1)
+    with pytest.raises(ref.ReferenceError,match='not available'): ref.fetch_gaia(10,0,.1)
     assert response.closed
 
 

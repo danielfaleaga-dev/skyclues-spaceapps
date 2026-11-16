@@ -97,7 +97,7 @@ def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel]
         if st.session_state.get(ROLE_KEYS[r]) not in numbers:
             st.session_state[ROLE_KEYS[r]] = defaults[r]
 
-    st.markdown("### Multiband composite · false colour" if sci else "### Imagen en color")
+    st.markdown("### Multiband composite · false colour" if sci else "### Colour image")
     st.markdown((
         '<div class="sc-note"><b>Display convention, not real colour.</b> Three infrared channels of the cube '
         '(0.75–5.0 µm, invisible to the eye) are assigned to red, green and blue. The values are those of the FITS, '
@@ -108,12 +108,12 @@ def render_section(ra: float, dec: float, fov: float, channels: list[sc.Channel]
     for col, r in zip(cols, mb.ROLES):
         with col:
             st.selectbox(f"{r} · {mb.ROLE_NAMES[r]}", numbers, key=ROLE_KEYS[r],
-                         format_func=lambda n: f"Canal {n} · {by_number[n].wavelength_um:.3f} µm",
+                         format_func=lambda n: f"Channel {n} · {by_number[n].wavelength_um:.3f} µm",
                          help="Only channels with data in DR1. Usual convention: R = longest λ, B = shortest λ.")
             c = by_number[st.session_state[ROLE_KEYS[r]]]
             if sci:
-                st.caption(f"λ {c.wavelength_um:.3f} µm · ancho {c.bandwidth_um:.3f} µm "
-                           f"({c.wl_min_um:.3f}–{c.wl_max_um:.3f}) · D{c.detector} subcanal {c.subchannel}")
+                st.caption(f"λ {c.wavelength_um:.3f} µm · width {c.bandwidth_um:.3f} µm "
+                           f"({c.wl_min_um:.3f}–{c.wl_max_um:.3f}) · D{c.detector} subchannel {c.subchannel}")
     # Stable labels keep the browser's radio selection intact when changing detail level.
     mode = STRETCH_LABELS[st.radio("Contrast", list(STRETCH_LABELS), horizontal=True, key="mb_stretch",
                                    format_func=lambda x: 'Stretch each colour' if STRETCH_LABELS[x] == 'independiente' else 'Same contrast',

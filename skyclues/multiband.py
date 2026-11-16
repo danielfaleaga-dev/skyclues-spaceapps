@@ -149,7 +149,7 @@ class StretchSpec:
 def compute_stretch(samples: dict[str, np.ndarray], mode: str) -> StretchSpec:
     """Limits from the field pixels with data in the three channels (``samples`` per role)."""
     if mode not in STRETCH_MODES:
-        raise ValueError(f"modo de escala desconocido: {mode!r}")
+        raise ValueError(f"unknown scale mode: {mode!r}")
     n = {len(v) for v in samples.values()}
     if len(n) != 1:
         raise ValueError("the samples of the three channels must be the same pixels")
@@ -310,7 +310,7 @@ def build(ra: float, dec: float, field_deg: float, channels: list[sc.Channel], n
     """Read the three channels (through ``map_fn``, default ``spectral_cube.channel_map``), verify
     they share the same native pixels, measure their common coverage and compute the stretch."""
     if mode not in STRETCH_MODES:
-        raise ValueError(f"modo de escala desconocido: {mode!r}")
+        raise ValueError(f"unknown scale mode: {mode!r}")
     chosen = select_channels(channels, numbers)          # refuses BLANKCH before any read
     map_fn = map_fn or sc.channel_map
     maps = {r: map_fn(ra, dec, field_deg, chosen[r].plane) for r in ROLES}
@@ -378,7 +378,7 @@ def _warnings(comp: Composite, samples: dict[str, np.ndarray]) -> list[str]:
     sat = {r: f["OVERFLOW"] for r, f in flagged.items() if f.get("OVERFLOW")}
     if sat:
         w.append("Pixels with OVERFLOW (saturated inputs) in the field: " +
-                 ", ".join(f"canal {ch[r].number}: {n}" for r, n in sat.items()) + ".")
+                 ", ".join(f"channel {ch[r].number}: {n}" for r, n in sat.items()) + ".")
     return w
 
 

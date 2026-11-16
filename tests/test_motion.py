@@ -121,7 +121,7 @@ def simulate(stars, *, target_shift=(0.0, 0.0), target_flux=4000.0, seasons=((0.
 def test_psf_is_the_official_epsf_and_normalised():
     img = FakeImage(np.zeros((N, N)), np.ones((N, N)), _wcs(), 0, "x")
     psf = motion.psf_for(img, 30, 30)
-    assert "EPSF oficial" in psf.description and psf.array is not None
+    assert "Official EPSF" in psf.description and psf.array is not None
     yy, xx = np.mgrid[-6:7, -6:7].astype(float)
     assert abs(psf(xx, yy).sum() - 1) < 0.02
     assert abs(psf(xx + 0.37, yy - 0.21).sum() - 1) < 0.03   # flux conserved at sub-pixel phases
@@ -197,7 +197,7 @@ def test_source_below_detection_threshold_is_never_measured(stars):
     frames, gaia = simulate(stars, target_shift=(6.0, 0.0), target_flux=5.0, seed=7)
     inv = motion.investigate(frames, (RA0, DEC0), gaia=gaia)
     assert inv.outcome in (motion.INSUFFICIENT_EVIDENCE, motion.INSUFFICIENT_DATA)
-    assert "detecta" in " ".join(inv.reasons) or "temporada" in " ".join(inv.reasons)
+    assert "detected" in " ".join(inv.reasons) or "season" in " ".join(inv.reasons)
 
 
 def test_single_season_is_insufficient_data(stars):
@@ -274,4 +274,4 @@ def test_failed_season_is_reported_with_its_reason(stars):
             for k, f in enumerate(frames)]
     why = []
     assert motion.season_fit(ents, lambda e: (500.0, 0.0), RA0, DEC0, 20.0, why=why) is None   # outside the cutout
-    assert why and "borde" in why[0]
+    assert why and "edge" in why[0]

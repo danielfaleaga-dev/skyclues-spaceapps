@@ -121,7 +121,7 @@ def pixel_table(comp: mb.Composite, npix: int = DISPLAY_NPIX) -> pd.DataFrame:
             cols[role] = np.round(np.where(p.valid, p.image, np.nan)[keep], 4)
             cols[f"nhits_{role}"] = p.nhits[keep].astype(int)
         cols["cobertura"] = np.where(k == 3, "data in all 3 channels",
-                                     np.where(k == 0, "no data", "data only in " + k.astype(str) + " canal(es)"))
+                                     np.where(k == 0, "no data", "data only in " + k.astype(str) + " channel(s)"))
         cols["tesela"] = int(ps[0].tile.ipix)
         parts.append(pd.DataFrame(cols))
     return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame()
@@ -156,7 +156,7 @@ def composite_chart(png: bytes, info: dict, pixels: pd.DataFrame, comp: mb.Compo
     ch = comp.channels
     tip = [alt.Tooltip("ra:Q", title="RA (°)", format=".5f"), alt.Tooltip("dec:Q", title="Dec (°)", format="+.5f")]
     for r in mb.ROLES:
-        tip.append(alt.Tooltip(f"{r}:Q", title=f"{r} · canal {ch[r].number} · {ch[r].wavelength_um:.3f} µm (MJy/sr)",
+        tip.append(alt.Tooltip(f"{r}:Q", title=f"{r} · channel {ch[r].number} · {ch[r].wavelength_um:.3f} µm (MJy/sr)",
                                format=".4g"))
     tip += [alt.Tooltip("cobertura:N"), alt.Tooltip("tesela:Q", title="HEALPix tile")]
     px = max(4.0, size * comp.alignment["pixel_arcsec"] / (2 * R))

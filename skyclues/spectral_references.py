@@ -76,7 +76,7 @@ BOOGERT = Source("boogert2015", "Boogert, A. C. A., Gerakines, P. A. y Whittet, 
                  "FWHM ≈ 20 cm⁻¹); CO 4.67 µm (2141.3 cm⁻¹, FWHM 3–9 cm⁻¹). The bands are observed in absorption "
                  "against a background or embedded infrared source; excess absorption between 3.3 and 3.7 µm (long "
                  "wing of water ice). arXiv:1501.05317.")
-HORA = Source("hora2026", "Hora, J. L., Noh, J. K., Melnick, G. J. et al. 2026, ApJ (aceptado), «SPHEREx Wide-Field "
+HORA = Source("hora2026", "Hora, J. L., Noh, J. K., Melnick, G. J. et al. 2026, ApJ (accepted), «SPHEREx Wide-Field "
               "Infrared Spectral Mapping of Interstellar Ices and Polycyclic Aromatic Hydrocarbons»",
               "https://arxiv.org/abs/2603.12390",
               "With SPHEREx: ices of H₂O (3.05 µm), CO₂ (4.27 µm) and CO (4.67 µm) and the PAH at 3.28 µm (image "
@@ -132,8 +132,8 @@ REFERENCES: tuple[Reference, ...] = (
         id="h2o_hielo_3p0", name="H₂O ice (3.0 µm)", plain_name="water ice", carrier="Solid H₂O",
         transition="O–H stretch (several components)", process="absorption by ice mantles on dust grains",
         family="hielo", lam_um=3.0, lam_range_um=(3.0, 3.05), nature=ABSORPTION, form=BAND, fwhm_um=_H2O_FWHM,
-        width_note=f"FWHM ≈ 390 cm⁻¹ ≈ {_H2O_FWHM:.2f} µm (Boogert et al. 2015): abarca varios canales de D4. "
-                   "Centro 3,0 µm en Boogert et al. 2015; 3,05 µm en Hora et al. 2026.",
+        width_note=f"FWHM ≈ 390 cm⁻¹ ≈ {_H2O_FWHM:.2f} µm (Boogert et al. 2015): it spans several D4 channels. "
+                   "Centre at 3.0 µm in Boogert et al. 2015; 3.05 µm in Hora et al. 2026.",
         conditions=("Absorption: it needs an infrared continuum source behind the ice (background star or "
                     "embedded protostar).",
                     "A depression consistent with the width of the band against a reliable continuum on both sides; "

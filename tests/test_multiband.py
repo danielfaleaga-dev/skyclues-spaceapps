@@ -76,8 +76,8 @@ def test_blank_channels_cannot_enter_a_composition(cube, bad):
     assert calls == []                            # refused before any read
 
 
-@pytest.mark.parametrize('nums,match', [({'R': 1, 'G': 1, 'B': 2}, 'distintos'), ({'R': 1, 'G': 2, 'B': 103}, 'inexistente'),
-                                         ({'R': 1, 'G': 2}, 'exactamente'), ({'R': 1, 'G': 2, 'B': 3.0}, 'inexistente')])
+@pytest.mark.parametrize('nums,match', [({'R': 1, 'G': 1, 'B': 2}, 'different'), ({'R': 1, 'G': 2, 'B': 103}, 'does not exist'),
+                                         ({'R': 1, 'G': 2}, 'exactly one channel'), ({'R': 1, 'G': 2, 'B': 3.0}, 'does not exist')])
 def test_invalid_selections_are_refused(cube, nums, match):
     with pytest.raises(ValueError, match=match):
         mb.select_channels(cube.tile.channels, nums)
@@ -106,7 +106,7 @@ def test_alignment_verified_and_no_resampling(cube, grads):
     comp = build(cube, map_fn)
     a = comp.alignment
     assert a['verificada'] and not a['varias_teselas'] and a['teselas'][0]['tesela'] == 445
-    assert comp.provenance()['remuestreo'].startswith('ninguno')
+    assert comp.provenance()['remuestreo'].startswith('none')
     for u, v in zip(comp.maps['R'].patches[0].centres_world(), comp.maps['B'].patches[0].centres_world()):
         np.testing.assert_array_equal(u, v)
 
@@ -158,11 +158,11 @@ def test_missing_data_in_any_channel_is_never_coloured(cube, grads):
     cov = comp.coverage
     assert cov['parcial'] == 3 and cov['tres_canales'] == cov['n_campo'] - 3
     assert cov['con_datos']['R'] == cov['n_campo'] - 1
-    assert any('Cobertura distinta' in w for w in comp.warnings)
+    assert any('Different coverage' in w for w in comp.warnings)
     assert comp.stretch.n_pixels == cov['tres_canales']
     tab = mv.pixel_table(comp)
     row = tab[(tab.R.isna()) & (tab.G.notna())]
-    assert (row['cobertura'] == 'datos solo en 2 canal(es)').all() and len(row) == 1
+    assert (row['cobertura'] == 'data only in 2 channel(s)').all() and len(row) == 1
     # rendered: the masked cell is mask colour / white hatch, a valid cell has its exact colour
     png, info = mv.composite_png(comp)
     img = mpimg.imread(io.BytesIO(png))[..., :3]
@@ -202,7 +202,7 @@ def test_all_nan_channel_is_refused_not_painted(cube, grads):
     def map_fn(ra, dec, fov, plane):
         a = np.full((32, 32), np.nan) if plane == NUMS['G'] - 1 else arrays[plane]
         return synth_map(cube.tile, plane, a, ra=ra, dec=dec, fov=fov)
-    with pytest.raises(mb.InsufficientDataError, match='0 píxeles'):
+    with pytest.raises(mb.InsufficientDataError, match='0 pixels'):
         build(cube, map_fn)
 
 
@@ -220,8 +220,8 @@ def test_each_colour_carries_its_assigned_channel(cube, grads):
     swapped = build(cube, map_fn, nums={'R': 10, 'G': 40, 'B': 90})
     np.testing.assert_array_equal(swapped.rgb(0)[..., 0], rgb[..., 2])
     np.testing.assert_array_equal(swapped.rgb(0)[..., 2], rgb[..., 0])
-    assert any('orden cromático' in w for w in swapped.warnings)
-    assert not any('orden cromático' in w for w in comp.warnings)
+    assert any('chromatic order' in w for w in swapped.warnings)
+    assert not any('chromatic order' in w for w in comp.warnings)
 
 
 # 7 ------------------------------------------------------------------ stretch reproducibility
@@ -247,7 +247,7 @@ def test_stretch_is_documented_and_reproducible(cube, grads, mode):
         assert len(set(a.stretch.vmin.values())) == len(set(a.stretch.vmax.values())) == 1
         assert not any('Escala independiente' in w for w in a.warnings)
     else:
-        assert any('NO reflejan' in w for w in a.warnings)
+        assert any('do NOT reflect' in w for w in a.warnings)
 
 
 def test_flat_channel_is_reported_not_amplified(cube, grads):
@@ -259,7 +259,7 @@ def test_flat_channel_is_reported_not_amplified(cube, grads):
     comp = build(cube, map_fn)
     assert comp.stretch.degenerate == ('B',)
     assert np.ptp(comp.rgb(0)[..., 2][comp.common_valid(0)]) == 0
-    assert any('no tiene contraste' in w for w in comp.warnings)
+    assert any('has no contrast' in w for w in comp.warnings)
 
 
 def _faint_field_with_bright_spots(cube):
@@ -286,7 +286,7 @@ def test_common_scale_without_useful_contrast_is_measured_and_explained(cube):
     assert ds['fraccion_blanca'] < 0.05                        # dark, not white
     assert ds['n_pixeles'] == comp.coverage['tres_canales']
     msg = [w for w in comp.warnings if 'poco contraste útil' in w]
-    assert len(msg) == 1 and 'Resaltar cada color' in msg[0] and 'no un fallo' in msg[0]
+    assert len(msg) == 1 and 'Stretch each colour' in msg[0] and 'not a failure' in msg[0]
     assert comp.provenance()['visualizacion'] == ds
     for r in mb.ROLES:                                         # values never modified
         np.testing.assert_array_equal(comp.maps[r].patches[0].image, base[NUMS[r] - 1])
@@ -391,7 +391,7 @@ def app_cube(cube, monkeypatch):
 
 def spectral_app(cube, channel=63):
     at = AppTest.from_file(APP, default_timeout=60)
-    at.session_state['level'] = 'Científico'
+    at.session_state['level'] = 'Scientific'
     at.query_params = {'explorer': 'espectral', 'ra': str(cube.centre[0]), 'dec': str(cube.centre[1]), 'fov': '.5',
                        'canal': str(channel)}
     at.run()
@@ -452,7 +452,7 @@ def test_multiband_reader_failure_is_visible_without_image(app_cube, monkeypatch
         raise archive.ArchiveTransientError('test')
     monkeypatch.setattr(page, 'cached_map', fail)
     at = AppTest.from_file(APP, default_timeout=60)
-    at.session_state['level'] = 'Científico'
+    at.session_state['level'] = 'Scientific'
     at.query_params = {'explorer': 'espectral', 'ra': str(app_cube.centre[0]), 'dec': str(app_cube.centre[1]),
                        'fov': '.5'}
     at.session_state['sx_mode'] = mpage.MODES[1]
@@ -472,13 +472,13 @@ def test_insufficient_coverage_message_in_app(app_cube, monkeypatch):
         return sc.ChannelMap(m.channel, ra, dec, fov, [sc.Patch(p.tile, p.x0, p.y0, img, p.nhits, p.flags)])
     monkeypatch.setattr(page, 'cached_map', sparse)
     at = AppTest.from_file(APP, default_timeout=60)
-    at.session_state['level'] = 'Científico'
+    at.session_state['level'] = 'Scientific'
     at.query_params = {'explorer': 'espectral', 'ra': str(app_cube.centre[0]), 'dec': str(app_cube.centre[1]),
                        'fov': '.5'}
     at.session_state['sx_mode'] = mpage.MODES[1]
     at.run()
     assert not at.exception
-    assert any('Datos insuficientes' in e.value for e in at.error)
+    assert any('Insufficient data' in e.value for e in at.error)
 
 
 def test_returning_to_spectrum_explorer_with_the_same_region_keeps_working(app_cube):
@@ -487,7 +487,7 @@ def test_returning_to_spectrum_explorer_with_the_same_region_keeps_working(app_c
     at = AppTest.from_file(APP, default_timeout=60).run()
     stem = next(s for s in config.VALIDATED_EXAMPLES if 'm101' in s)
     at.button(key='example_' + stem).click().run()
-    explorer = ['Tiempo', 'Espectro']
+    explorer = ['Time', 'Spectrum']
     for _ in range(2):
         at.button_group(key='nav').set_value(explorer[1]).run()
         assert not at.exception

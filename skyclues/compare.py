@@ -114,7 +114,7 @@ def finast_status(values) -> str:
 
 
 #: What a criterion's result rests on (shown to the user).
-BASIS_EFFECTIVE = "efectiva"
+BASIS_EFFECTIVE = "effective"
 #: IRSA only publishes images with L2DQA = PASS and FINAST = 0 (Explanatory
 #: Supplement §3.2.12): these checks re-read the header but cannot discriminate
 #: among archive products; they only protect against non-standard files.
@@ -165,7 +165,7 @@ def evaluate_pair(a: SpectralImage, b: SpectralImage, ra: float, dec: float,
          "value": f"Δt = {dt:.2f} d", "threshold": f"≥ {config.MIN_TIME_SEPARATION_DAYS} d",
          "status": _status(dt >= config.MIN_TIME_SEPARATION_DAYS)},
         {"id": "C3", "criterion": "Same effective channel at the target (LVF)",
-         "value": f"|Δλ| = {abs(lam_a_t - lam_b_t) * 1000:.1f} nm = {dl_target:.2f} × ancho de banda",
+         "value": f"|Δλ| = {abs(lam_a_t - lam_b_t) * 1000:.1f} nm = {dl_target:.2f} × bandwidth",
          "threshold": f"≤ {config.SPECTRAL_PASS_BW} (warning ≤ {config.SPECTRAL_WARN_BW}; rejection above)",
          "status": spectral_status(dl_target)},
         {"id": "C4", "criterion": "Maximum spectral mismatch in the common area",
@@ -176,7 +176,7 @@ def evaluate_pair(a: SpectralImage, b: SpectralImage, ra: float, dec: float,
          "status": spectral_status(float(np.max(dl_common)) if dl_common.size else float("nan"))},
         {"id": "C5", "criterion": "Valid common coverage of the field",
          "value": f"{coverage:.1%} ({n_common} px; geometric overlap {geom_overlap:.1%})",
-         "threshold": f"≥ {config.COVERAGE_PASS:.0%} (aviso ≥ {config.COVERAGE_WARN:.0%})",
+         "threshold": f"≥ {config.COVERAGE_PASS:.0%} (warning ≥ {config.COVERAGE_WARN:.0%})",
          "status": _status(coverage >= config.COVERAGE_PASS and n_common >= config.MIN_COMMON_VALID_PIXELS,
                            coverage >= config.COVERAGE_WARN and n_common >= config.MIN_COMMON_VALID_PIXELS)},
         {"id": "C6", "criterion": "Official L2 quality control (L2DQAFLG)",

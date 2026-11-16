@@ -335,7 +335,7 @@ def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: flo
          "threshold": f"≥ {config.MIN_TIME_SEPARATION_DAYS} d",
          "status": _status(len(gaps) > 0 and gaps.min() >= config.MIN_TIME_SEPARATION_DAYS)},
         {"id": "S3", "criterion": "Same effective channel at the target (λ dispersion across all epochs)",
-         "value": f"{(np.nanmax(lam_t) - np.nanmin(lam_t)) * 1000:.1f} nm = {spread_target:.2f} × ancho de banda",
+         "value": f"{(np.nanmax(lam_t) - np.nanmin(lam_t)) * 1000:.1f} nm = {spread_target:.2f} × bandwidth",
          "threshold": f"≤ {config.SPECTRAL_PASS_BW} (warning ≤ {config.SPECTRAL_WARN_BW}; rejection above)",
          "status": spectral_status(spread_target)},
         {"id": "S4", "criterion": "Maximum spectral dispersion in the common region",
@@ -347,7 +347,7 @@ def evaluate_sequence(frames: list[Frame], ra: float, dec: float, field_deg: flo
          "status": spectral_status(max_sp)},
         {"id": "S5", "criterion": "Valid coverage common to ALL epochs",
          "value": f"{coverage:.1%} ({n_common} px; geometric overlap {geom:.1%})",
-         "threshold": f"≥ {config.COVERAGE_PASS:.0%} (aviso ≥ {config.COVERAGE_WARN:.0%})",
+         "threshold": f"≥ {config.COVERAGE_PASS:.0%} (warning ≥ {config.COVERAGE_WARN:.0%})",
          "status": _status(coverage >= config.COVERAGE_PASS and n_common >= config.MIN_COMMON_VALID_PIXELS,
                            coverage >= config.COVERAGE_WARN and n_common >= config.MIN_COMMON_VALID_PIXELS)},
         {"id": "S6", "criterion": "Official L2 quality control in all",
@@ -607,9 +607,9 @@ def find_sequence(ra: float, dec: float, field_deg: float = config.DEFAULT_FIELD
              f"FITS cutouts: {done} of {total} ready ({downloaded} downloaded from IRSA, "
              f"{done - downloaded} already in the local cache)")
 
-    step("download", 0.20, f"{len(proposals)} conjuntos compatibles; obteniendo {len(set(urls))} recortes FITS…")
+    step("download", 0.20, f"{len(proposals)} compatible sets; retrieving {len(set(urls))} FITS cutouts…")
     got = archive.fetch_many(urls, progress=on_file)
-    log(f"Recortes FITS: {len(set(urls))} en {time.time() - t1:.0f} s")
+    log(f"FITS cutouts: {len(set(urls))} in {time.time() - t1:.0f} s")
     step("evaluate", 0.86, "Aligning epochs and evaluating criteria S1–S9…")
 
     failures = []
@@ -748,7 +748,7 @@ def load_sequence(report: dict | str | Path, mask_classes=STRICT, verify: bool =
         name = url.split("?")[0].rsplit("/", 1)[-1]
         if isinstance(path, Exception):
             cls = type(path) if isinstance(path, archive.ArchiveError) else RuntimeError
-            raise cls(f"No se pudo obtener {name}: {path}") from path
+            raise cls(f"Could not obtain {name}: {path}") from path
         actual = archive.sha256(path)
         if verify and digest and actual != digest and not archive.is_reference(path):
             # A cache copy that differs from the report: set it aside and download it once more.
