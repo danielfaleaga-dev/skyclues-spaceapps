@@ -250,6 +250,12 @@ def _show(p: dict, sci: bool) -> None:
             f"of that piece of sky. «×{g['median']:.1f}» means that the same objects, measured the same way in the two "
             "images, stand out above the noise that many times more than in a single image." + (" This image mixes neighbouring infrared colours: it is useful for seeing and locating "
                                         "objects, not for comparing their brightness between dates." if broadband else ""))
+    if not p["new"] and det["combined"] <= det["single_median"]:
+        st.caption(f"No source appears only in the combination (combined: {det['combined']}; single exposure, median: "
+                   f"{det['single_median']:.0f}). The gain is in the S/N of the sources already detected, not in new "
+                   "detections." if sci else
+                   "No additional points stand out in this area: the combination lowers the noise, but the points it finds "
+                   "are the same as in a single image.")
     if p["new"]:
         # The null image holds only noise: as many peaks there as new ones here means the new ones are
         # not distinguishable from noise, so they are not presented as sources.

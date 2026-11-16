@@ -57,3 +57,25 @@ def test_featured_example_is_wired_and_in_english():
 def test_loading_indicator_stays_in_view():
     css = (ROOT / "skyclues" / "theme.css").read_text(encoding="utf-8")
     assert re.search(r'\[class\*="st-key-sc_loading_"\]\{position:sticky;top:[^;]+;bottom:[^;]+', css)
+
+
+def test_negative_flux_note_and_plain_wording():
+    from types import SimpleNamespace
+
+    from skyclues import spectral_features as sf
+    from skyclues import spectrum_analysis as sa
+
+    simple, sci = sa.negative_flux_text(12, False), sa.negative_flux_text(12, True)
+    assert "not negative light" in simple and "12 channels" in sci and "kept as measured" in sci
+    feature = SimpleNamespace(klass=sf.NO_FEATURE, kind=None)
+    assert "general shape of the light" in sa._plain(feature)
+
+
+def test_presentation_only_changes_have_no_spanish_residue():
+    root = ROOT / "skyclues"
+    for name, marker in (("time_page.py", "MIN_PM_ARCSEC_YR"), ("enhance_page.py", "No additional points stand out"),
+                         ("spectrum_analysis.py", "def negative_flux_text")):
+        text = (root / name).read_text(encoding="utf-8")
+        assert marker in text, (name, marker)
+    page = (root / "time_page.py").read_text(encoding="utf-8")
+    assert "moves = seq.target_moves and seq.astrometry.total_pm_arcsec_yr >= MIN_PM_ARCSEC_YR" in page

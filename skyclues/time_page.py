@@ -19,6 +19,9 @@ from . import render as figures  # the module; `render` below is this page's ent
 from .quality import flag_census
 from .sequence import STRICT, find_sequence, load_sequence, report_urls, save_report
 
+#: Proper motion below which a catalogued object is presented as fixed (display only; the sequence is unchanged).
+MIN_PM_ARCSEC_YR = 0.01
+
 STATUS_LABEL = {"pass": "✔ passes", "warn": "▲ warning", "fail": "✖ fails"}
 GEOMETRY_OPTIONS = {
     "WCS: native pixels, no resampling of values": "exact",
@@ -325,7 +328,9 @@ def render(level: str) -> None:
     _saturation_note(m, sci)
 
     centre_rule = (report.get("target", {}).get("centre") or {}).get("rule")
-    if seq.target_moves and sci:
+    # A catalogue proper motion of ~0 (e.g. a nebula) is not a moving target: no cross caption for it.
+    moves = seq.target_moves and seq.astrometry.total_pm_arcsec_yr >= MIN_PM_ARCSEC_YR
+    if moves and sci:
         a = seq.astrometry
         p0, p1 = seq.target_position(0), seq.target_position(seq.n - 1)
         theme.note(
@@ -333,8 +338,8 @@ def render(level: str) -> None:
             f'<b>calculated</b> for epoch 1: RA {p0[0]:.5f}°, Dec {p0[1]:+.5f}°; for epoch {seq.n}: RA '
             f'{p1[0]:.5f}°, Dec {p1[1]:+.5f}°. The player cross follows that calculation; it is not a detection by '
             'SPHEREx. Field centre: ' + (centre_rule or "—") + '.')
-    elif seq.target_moves:
-        st.caption('The cross marks a calculated position, not a detection.')
+    elif moves:
+        st.caption('The cross in the images marks a calculated position, not a detection.')
     elif centre_rule and sci:
         st.caption(f"Field centre: {centre_rule}.")
 

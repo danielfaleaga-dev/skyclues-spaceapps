@@ -148,7 +148,8 @@ def _plain(f: sf.Feature) -> str:
     if f.klass == sf.NOT_EVALUABLE:
         return "cannot be assessed: data are missing in that colour or around it."
     if f.klass == sf.NO_FEATURE or f.kind is None:
-        return "does not stand out from the neighbouring colours."
+        return ("does not stand out from the neighbouring colours. A wide, smooth bump is the general shape of the "
+                "light, not a peak or a line.")
     up = f.kind == "pico"
     size = (f"{abs(f.relative):.0%}" if f.relative is not None and abs(f.relative) < 10
             else f"{abs(f.contrast):.3g} {f.unit}")
@@ -235,6 +236,17 @@ def _feature_list(fs: list) -> str:
 
 
 # ----------------------------------------------------------------------------- page section
+def negative_flux_text(n: int, sci: bool) -> str:
+    """Why some fluxes are below zero (not negative light), in the wording of each level."""
+    if sci:
+        return (f"<b>Negative fluxes.</b> {n} channels have a negative aperture flux: the mean of the background annulus "
+                "(3σ-clipped) is higher than the mean of the aperture, as happens in extended emission with a brighter "
+                "surround. The values are kept as measured; the background is not adjusted to make them positive.")
+    return ("<b>Why are some values below zero?</b> The spectrum subtracts the brightness of a ring of sky around the "
+            "point. Where that ring is brighter than the point itself, for example inside a glowing nebula, the result "
+            "falls below zero. It is not negative light.")
+
+
 def render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, extract, show_error) -> None:
     """The spectrum plot and what attaches to it. ``extract(ra, dec)`` returns the spectrum of another
     position with the SAME aperture and annulus as ``spec_a`` (nothing is tuned per position)."""
@@ -274,6 +286,13 @@ def _render(spec_a, quantity: str, channel_number: int, sci: bool, region_key, e
                                       features=fa + fb, focus=focus, interactive=True,
                                       references=sxi.chart_marks(interp)),
                     width="stretch", key=CHART_KEY, on_select=_on_select, selection_mode=["canal", "intervalo"])
+    # Values below zero: by construction the flux is the aperture minus the local background, so it is negative when
+    # the surrounding ring is brighter than the aperture. Said only when the data show it.
+    for k, spec in {"A": spec_a, **({"B": spec_b} if spec_b is not None else {})}.items():
+        negative = [r for r in spec.rows if r.get("status") == "ok" and r.get("flujo_mjy") is not None
+                    and r["flujo_mjy"] < 0]
+        if len(negative) >= 3:
+            theme.note((f"<b>Point {k}.</b> " if spec_b is not None else "") + negative_flux_text(len(negative), sci))
     # A very bright source explains an empty or partial spectrum: say so right under the plot, per point.
     for k, qs in quals.items():
         bright = sq.too_bright(qs)
